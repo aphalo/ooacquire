@@ -1,5 +1,56 @@
-get_oo_descriptor <- function(w, sr.index = 0L) {
+#' Get the instrument description and EEPROM data
+#'
+#' Model, configuration, serial number, and calibration data stored in the
+#' EEPROM of an Ocean Optics spectrometer are retrieved and returned in a
+#' list.
+#'
+#' @param w an open Wrapper object from Omnidriver
+#' @param sr.index an index to address the spectrometer for the time being not
+#'   exported
+#' @param ch.index an index to address the channel in a spectrometer with more
+#'   than one channel.
+#'
+#' @export
+#' @return a list
+#'
+get_oo_descriptor <- function(w, sr.index = 0L, ch.index = 0L) {
+
+  get_calib_coeffs <- function() {
+    z <- list()
+    calib.data <-
+      rOmniDriver::get_calibration_coefficients_from_buffer(w, sr.index, ch.index)
+    # linearization
+    nl.cal.poly.order <- calib.data[["_NlOrder"]]
+    nl.coeff.names <- paste("NlCoef", 1:nl.cal.poly.order, sep = "")
+    nl.coeff.has <- paste("has", nl.coeff.names, sep = "")
+    if (!all(unlist(mget(nl.coeff.has, calib.data)))) {
+      z$nl.cal.poly <- NA
+      z$nl.cal.poly.order <- 0
+    } else {
+      nl.cal.poly <- unlist(mget(nl.coeff.names, calib.data))
+      z$nl.cal.poly <- polynom::polynomial(nl.cal.poly)
+      z$nl.cal.poly.order <- nl.cal.poly.order
+    }
+    # stray light
+    z$straylight.coeff <<- calib.data[["_StrayLight"]]
+    # wavelength calibration
+    wl.coeff.names <- c("_WlIntercept", "_WlFirst", "_WlSecond", "_WlThird")
+    wl.coeff.has <- paste("has", wl.coeff.names, sep = "")
+    if (!all(unlist(mget(wl.coeff.has, calib.data)))) {
+      z$wl.cal.poly <- NA
+      z$wl.cal.poly.order <- 0
+    } else {
+      wl.coeff.names <- wl.coeff.names[wl.coeff.has]
+      wl.cal.poly <- unlist(mget(wl.coeff.names, calib.data))
+      z$wl.cal.poly <- polynom::polynomial(wl.cal.poly)
+      z$wl.cal.poly.order <- 3
+    }
+    z
+  }
+
+  bench <- rOmniDriver::get_bench(w, sr.index)
   list(
+    time = lubridate::now(),
     w = w,
     sr = sr.index,
     spectrometer.name = rOmniDriver::get_name(w, sr.index),
@@ -10,13 +61,29 @@ get_oo_descriptor <- function(w, sr.index = 0L) {
     bench.detector = rOmniDriver::get_detector(w, sr.index),
     min.integ.time = rOmniDriver::get_minimum_integration_time(w, sr.index),
     max.integ.time = rOmniDriver::get_maximum_integration_time(w, sr.index),
-    wavelengths = rOmniDriver::get_wavelengths(w, sr.index)
+    max.counts = rOmniDriver::get_maximum_intensity(w, sr.index),
+    wavelengths = rOmniDriver::get_wavelengths(w, sr.index),
+    inst.calib = get_calib_coeffs()
   )
 }
 
+#' Get the current values of instrument settings
+#'
+#' Query the spectrometer for the settings currently in use for corrections,
+#' smotthing and acquisition parameters integration time and number of scans.
+#'
+#' @param w an open Wrapper object from Omnidriver
+#' @param sr.index an index to address the spectrometer for the time being not
+#'   exported
+#' @param ch.index an index to address the channel in a spectrometer with more
+#'   than one channel.
+#'
+#' @export
+#' @return a list
+#'
 get_oo_settings <- function(w, sr.index = 0L) {
-  bench <- rOmniDriver::get_bench(w, sr.index)
   list(
+    time = lubridate::now(),
     w = w,
     sr = sr.index,
     correct.elec.dark = rOmniDriver::get_correct_for_electrical_dark(w, sr.index),
@@ -24,300 +91,236 @@ get_oo_settings <- function(w, sr.index = 0L) {
     correct.stray.light = rOmniDriver::get_correct_for_stray_light(w, sr.index),
     boxcar.width = rOmniDriver::get_boxcar_width(w, sr.index),
     integ.time = rOmniDriver::get_integration_time(w, sr.index),
-    num.scans = rOmniDriver::get_scans_to_avg(w, sr.index),
+    num.scans = rOmniDriver::get_scans_to_avg(w, sr.index)
   )
 }
 
-
-#' Create a new list of raw spectra
+#' Tune settings for measurement
 #'
-#' Function to create a list object to be used to store
-#' one set of raw spectra.
+#' Find parameters for spectral measurements with a given measurements
+#' protocol.
 #'
-#' @keywords manip misc
-#' @export
-#' @return a list
-#'
-new_raw_spc <- function() {
-  x <- list(
-    init = FALSE,
-    params.set = FALSE,
-    data.valid = FALSE,
-    user.label = "",
-    settings = list(
-      w = NA,
-      sr = NA,
-      spectrometer.sn = "",
-      spectrometer.name = "",
-      bench = NA,
-      correct.elec.dark = NA,
-      correct.non.lin = NA,
-      boxcar.width = NA,
-      pix.selector = TRUE,
-      min.integ.time = NA,
-      max.integ.time = NA,
-      integ.time = NA,
-      num.scans = NA,
-      mode = NA
-    ),
-    data = list(),
-    version = "1"
-  )
-  return(x)
-}
-
-#' Initialize a list of raw spectra
-#'
-#' Function to initialize a list object to be used to store
-#' one set of raw spectra.
-#'
-#' @param x an empty list of raw spectra
-#' @param w an open Wrapper object from Omnidriver
-#' @param sr.index an index to address the spectrometer
-#' @keywords manip misc
-#' @export
-#' @return a list
-#'
-init_raw_spc <- function(x = new_raw_spc(), w, sr.index = 0) {
-  x$settings$w  <- w
-  x$settings$sr <- sr.index
-  x$settings$spectrometer.name <- rOmniDriver::get_name(w, sr.index)
-  x$settings$spectrometer.sn <- rOmniDriver::get_serial_number(w, sr.index)
-  bench <- rOmniDriver::get_bench(w, sr.index)
-  x$settings$bench <- list(grating = bench$getGrating(),
-                  filter = bench$getFilterWavelength(),
-                  slit = bench$getSlitSize()
-#                  detector = bench$get_detector(w, sr.index)
-  )
-  x$init <- TRUE
-  return(x)
-}
-
-#' Set the measurement parameters of a list of raw spectra
-#'
-#' Function to set parameters of a list object to be used to store
-#' one set of raw spectra.
-#'
-#' @param x an initialized list of raw spectra
-#' @param start.int.time numeric vaue in seconds
-#' @param min.int.time numeric vaue in seconds
-#' @param max.int.time numeric vaue in seconds
+#' @param oo_descriptor list as returned by function \code{get_oo_descriptor}
+#' @param start.integ.time numeric vaue in seconds
+#' @param min.integ.time numeric vaue in seconds
+#' @param max.integ.time numeric vaue in seconds
 #' @param min.tot.time numeric vaue in seconds
-#' @param HDR.mult a numeric vector with int.time multipliers
-#' @param NR.flag a logical vector indicating whether filter is used
-#' @param user.label a character string to be stored
-#' @param at.geocode a numeric vector of length two with
-#' @param mode a character string (only "raw" is implemented)
-#' @param verbose a logical to enable or disable warnings
+#' @param HDR.mult a numeric vector with integ.time multipliers to be used for
+#'   "bracketing".
+#' @param NR.flag a logical vector indicating whether a filter reading will be
+#'   used.
 #' @param pix.selector a logical or numeric vector used as subscript to select
 #'   pixels
+#' @param verbose a logical to enable or disable warnings
 #'
-#' @note The Maya2000Pro specifications give min.int.time at 7.2 ms and
-#'   max.int.time at 5 s. It seems to be possible to use longer max.int.time,
-#'   but when very long times are used the driver may override the setting to an
-#'   unknown value, causing gross errors when the calibration is applied as the
-#'   integration time stored in the returned object may differ from the one
-#'   really used by the instrument.
+#' @note Ocean Optics spectrometers can be queried for the maximum and minimum
+#'   supported integration times. This function modifies the user supplied
+#'   values if outside these bounds. The defaults of -Inf and Inf force the use
+#'   of the whole valid range of integration times for the connected intrument.
+#'   \code{pixel.selector} can be used for two different purposes: to ignore
+#'   bad pixels and to restrict integration-time tuning to the response from a
+#'   range of pixels.
+#'
+#' @details \code{tune_acq_settings()} is used usually for the fist measurement
+#'   in a series as it starts the tuning of the acquisition parameters from an
+#'   integration time suplied by the user or an arbitrary default.
+#'   \code{retune_acq_settings()} instead does a similar tunning starting from a
+#'   previously adjusted set of values. This is just a convenience function to
+#'   simplify data acquisition code and speed-up data acquisition by refining a
+#'   previously set value.
 #'
 #' @keywords manip misc
 #' @export
-#' @return a list
+#' @return a list.
 #'
-set_params_raw_spc <- function(x,
-                               start.int.time = 50e-3, # seconds
-                               min.int.time = 7.2e-3, # seconds
-                               max.int.time = 65, # seconds
-                               min.tot.time = 2, # seconds
-                               HDR.mult = c(short = 1, long = 10),
-                               NR.flag = c(short = TRUE, long = TRUE),
-                               user.label = "",
-                               at.geocode = c(lat=NA, lon=NA),
-                               mode = "raw",
-                               verbose = TRUE,
-                               pix.selector = TRUE) {
-  if (!x$init) {
-    warning("Object not initilized. Parameters not set.")
-    return(x)
-  }
-  if (mode != "raw") {
-    warning("Mode: ", mode, " not supported.")
-    return(x)
-  }
+tune_acq_settings <- function(oo_descriptor,
+                              start.integ.time = 50e-3, # seconds
+                              min.integ.time = -Inf, # seconds
+                              max.integ.time = Inf, # seconds
+                              min.tot.time = 2, # seconds
+                              HDR.mult = c(short = 1, long = 10),
+                              NR.flag = c(short = TRUE, long = TRUE),
+                              pix.selector = TRUE,
+                              verbose = TRUE) {
+  stopifnot(length(HDR.mult) == length(NR.flag))
   # convert times to microseconds
-  start.int.time <- start.int.time * 1e6
-  min.int.time   <- min.int.time   * 1e6
-  max.int.time   <- max.int.time   * 1e6
+  start.integ.time <- start.integ.time * 1e6
+  min.integ.time   <- min.integ.time   * 1e6
+  max.integ.time   <- max.integ.time   * 1e6
   min.tot.time   <- min.tot.time   * 1e6
   # make sure HDR multipliers are sorted
-  HDR.mult <- sort(HDR.mult)
+  mult.reorder <- order(HDR.mult)
+  HDR.mult <- HDR.mult[mult.reorder]
+  NR.flag <- NR.flag[mult.reorder]
   if (HDR.mult[1] > 1) {
     warning("Using a smallest 'HDR.mult' value that is > 1 will cause clipping")
   }
-  # mode is "raw"
-  x$user.label <- user.label
-  x$settings$mode <- mode
-  x$settings$pix.selector <- pix.selector
-  rOmniDriver::set_correct_for_electrical_dark(x$settings$w, 0L, x$settings$sr)
-  rOmniDriver::set_correct_for_detector_nonlinearity(x$settings$w, 0L, x$settings$sr)
-  rOmniDriver::set_boxcar_width(x$settings$w, 0L, x$settings$sr)
-  rOmniDriver::set_scans_to_avg(x$settings$w, 1L, x$settings$sr)
-  x$settings$correct.elec.dark <- FALSE
-  x$settings$correct.non.lin <- FALSE
-  x$settings$boxcar.width <- 0L
-  x$settings$min.integ.time <- min.int.time
-  x$settings$max.integ.time <- max.int.time
+  # We check bounds and set the "fixed settings" (non-tunable)
+  min.integ.time <- max(min.integ.time, oo_descriptor$min.integ.time)
+  max.integ.time <- min(max.integ.time, oo_descriptor$max.integ.time)
+  if (is.logical(pix.selector)) {
+    stopifnot(length(pix.selector) == length(oo_descriptor$wavelengths))
+  }
+  pix.selector <- pix.selector
+  rOmniDriver::set_correct_for_electrical_dark(oo_descriptor$w, 0L,
+                                               oo_descriptor$sr.index)
+  rOmniDriver::set_correct_for_detector_nonlinearity(oo_descriptor$w, 0L,
+                                                     oo_descriptor$sr.index)
+  rOmniDriver::set_boxcar_width(oo_descriptor$w, 0L, oo_descriptor$sr.index)
+  rOmniDriver::set_scans_to_avg(oo_descriptor$w, 1L, oo_descriptor$sr.index)
 
   # optimize parameters
-  int.time <- start.int.time
+  integ.time <- start.integ.time
+  target.min.counts <- 0.8 * oo_descriptor$max.counts
 
   i <- 0L
   repeat {
     if (verbose) {
-      message("Integration time (ms): ", format(int.time  * 1e-3))
+      message("Integration time (ms): ", format(integ.time  * 1e-3))
     }
-    rOmniDriver::set_integration_time(x$settings$w, int.time, x$settings$sr)
-    spc <- rOmniDriver::get_spectrum(x$settings$w, x$settings$sr)
-    max.counts <- max(spc[pix.selector])
-    while (rOmniDriver::is_saturated(x$settings$w, x$settings$sr))
+    rOmniDriver::set_integration_time(oo_descriptor$w, integ.time, oo_descriptor$sr)
+    raw.counts <- rOmniDriver::get_spectrum(oo_descriptor$w, oo_descriptor$sr)
+    max.counts <- max(raw.counts[pix.selector])
+    while (rOmniDriver::is_saturated(oo_descriptor$w, oo_descriptor$sr))
     {
-      int.time <- int.time * 0.6666667
-      if (int.time < min.int.time) {
-        warning("Clipping cannot be avoided! Using (ms): ", int.time)
+      integ.time <- integ.time * 0.6666667
+      if (integ.time < min.integ.time) {
         break()
       }
-      if (verbose) message("Clipping! Trying (ms): ", format(int.time  * 1e-3))
-      rOmniDriver::set_integration_time(x$settings$w, int.time, x$settings$sr)
-      spc <- rOmniDriver::get_spectrum(x$settings$w, x$settings$sr)
-      max.counts <- max(spc[pix.selector])
+      if (verbose) message("Clipping! Trying (ms): ", format(integ.time  * 1e-3))
+      rOmniDriver::set_integration_time(oo_descriptor$w, integ.time, oo_descriptor$sr)
+      raw.counts <- rOmniDriver::get_spectrum(oo_descriptor$w, oo_descriptor$sr)
+      max.counts <- max(raw.counts[pix.selector])
     }
     if (verbose) message(paste("max.counts[", i, "]: ", format(max.counts)))
-    if (max.counts < 50000 && int.time < max.int.time) {
+    if (max.counts < target.min.counts && integ.time < max.integ.time) {
       if (verbose) message("max count < 50000")
-      if (max.counts < 45000) {
-        int.time <- round(int.time * 55000 / max.counts, 0)
+      if (max.counts < 0.9 * target.min.counts) {
+        integ.time <- round(integ.time * target.min.counts / max.counts * 1.1, 0)
       } else {
-        int.time <- round(int.time * 1.2, 0)
+        integ.time <- round(integ.time * 1.2, 0)
       }
     }
 
-    if (int.time > max.int.time) {
-      int.time <- max.int.time
-
+    if (integ.time > max.integ.time) {
       if (verbose) {
-        warning("Light level is too low for optimal performance.")
+        warning("Light level is too low for optimal performance! Using (ms): ",
+                format(integ.time * 1e-3))
       }
+      break()
     }
-    if (max.counts >= 50000 || int.time >= max.int.time){
+
+    if (integ.time < min.integ.time) {
+      if (verbose) {
+        warning("Clipping cannot be avoided! Using (ms): ",
+                format(integ.time * 1e-3))
+      }
+      break()
+    }
+
+    if (max.counts >= target.min.counts) {
       break()
     } else {
       i <- i + 1
     }
   }
-  int.time <- HDR.mult * int.time # vectorized!
-  int.time <- ifelse(int.time > max.int.time, max.int.time, int.time)
-  int.time <- ifelse(int.time < min.int.time, min.int.time, int.time)
-  x$settings$integ.time <- int.time
+  integ.time <- HDR.mult * integ.time # vectorized!
+  integ.time <- ifelse(integ.time > max.integ.time, max.integ.time, integ.time)
+  integ.time <- ifelse(integ.time < min.integ.time, min.integ.time, integ.time)
+  num.scans <- ifelse(z$integ.time < min.tot.time,
+                      trunc(min.tot.time / z$integ.time) + 1,
+                      1)
+  total.time <- integ.time * num.scans
+  z <- list(
+    pix.selector = pix.selector,
+    HDR.mult = HDR.mult,
+    NR.flag = NR.flag
+    integ.time = integ.time,
+    max.integ.time = max.integ.time,
+    min.integ.time = min.integ.time,
+    num.scans = num.scans,
+    #diagnosis
+    total.time = total.time,
+    rel.signal = max.counts / oo_descriptor$max.counts,
 
-  x$settings$num.scans <- ifelse(x$settings$integ.time < min.tot.time,
-                                 trunc(min.tot.time / x$settings$integ.time) + 1,
-                                 1)
+  )
+
   if (verbose) {
-    message("Maximum counts:         ",
-            format(max.counts, width = 8), " ")
+    message("Relative saturation: ",
+            format(z$rel.signal, width = 8), " ")
     message("Integration times (ms): ",
-            format(x$settings$integ.time * 1e-3, nsmall = 0, width = 8), " ")
+            format(z$integ.time * 1e-3, nsmall = 0, width = 8), " ")
     message("Numbers of scans:       ",
-            format(x$settings$num.scans, width = 8), " ")
+            format(z$num.scans, width = 8), " ")
     message("Total time (s):         ",
-            format(x$settings$integ.time * x$settings$num.scans * 1e-6,
+            format(z$integ.time * z$num.scans * 1e-6,
                    digits = 3, width = 8), " ")
   }
-  x$params.set <- TRUE
-  return(x)
+
+  z
 }
 
-#' Copy the initialization data and measurement parameters from one list of raw spectra to another
+#' @rdname tune_acq_settings
 #'
-#' Function for copying the initialization data and measurement parameters
-#' from one list of raw spectra to another.
+#' @param x list as returned by a previous call to \code{tune_acq_settings()} or
+#'   \code{retune_acq_settings()}.
 #'
-#' @param x.to an empty list of raw spectra
-#' @param x.from an initialized and set up list of raw spectra
-#' @param user.label a character string to be stored
-#'
-#' @note x.from may contain data or not. If present data is not copied.
-#'
-#' @keywords manip misc
 #' @export
-#' @return a list
 #'
-copy_settings <- function(x.from, x.to=new_raw_spc(), user.label=NULL) {
-  x.to[["settings"]] <- x.from[["settings"]]
-  x.to$init <- x.from$init
-  x.to$params.set <- x.from$params.set
-  x.to$data.valid <- FALSE
-  if (is.null(user.label)) {
-    x.to$user.label <- x.from$user.label
-  } else {
-    x.to$user.label <- user.label
-  }
-  return(x.to)
+retune_acq_settingd(oo_descriptor,
+                    x,
+                    verbose = TRUE) {
+  tune_acq_settings(oo_descriptor = oo_descriptor,
+                    start.integ.time = x$integ.time,
+                    min.integ.time = x$min.integ.time,
+                    max.integ.time = x$max.integ.time,
+                    min.tot.time = x$min.tot.time,
+                    HDR.mult = x$HDR.mult,
+                    NR.flag = x$NR.flag,
+                    pix.selector = x$pix.selector,
+                    verbose = verbose)
 }
 
-#' Take one spectral reading with parameters from a list of raw spectra
+#' Measure one raw spectrum
 #'
-#' Function to take one set of possibly bracketed spectra using parameters stored in
-#' a list object used to store one set of raw spectra. The spectra are returned
-#' as a list of numeric vectors.
-#'
-#' @param x an initialized list of raw spectra containing parameter values
-#' @param verbose a logical to enable or disable warnings
-#' @keywords manip misc
 #' @export
-#' @return a list of numeric vectors
 #'
-take_one_reading <- function(x, verbose = TRUE) {
-  num.HDR.meas <- length(x$settings$integ.time)
-  raw.scans <- list(start.time=Sys.time())
-  for (i in 1:num.HDR.meas) {
-    scan.name <- paste("scan", formatC(i, width=3, flag="0"), sep="")
-    rOmniDriver::set_integration_time(x$settings$w, x$settings$integ.time[i], x$settings$sr)
-    actual.integ.time <- rOmniDriver::get_integration_time(x$settings$w, x$settings$sr)
-    if (actual.integ.time != x$settings$integ.time[i]) {
-      warning("The spectrometer has overridden the requested integration time!")
-      message("Requested integ.time: ", signif(x$settings$integ.time[i] * 1e6, 3),
-              ", actual integ.time: ", signif(actual.integ.time  * 1e6, 3), " seconds")
-      # This is needed to maintain acquired data validity!
-      x$settings$integ.time[i] <- actual.integ.time
+acq_raw_spct <- function(oo_descriptor,
+                             acq_settings,
+                             measurement.type = NULL) {
+  x <- acq_settings
+  y <- oo_descriptor
+  num.readings <- length(x$integ.time)
+  z <- raw_scpt(w.length = y$wavelengths, counts = 0)
+
+  for (i in 1:num.readings) {
+    counts.name <- paste("counts", i, sep="_")
+    rOmniDriver::set_integration_time(y$w, x$integ.time[i], y$sr.index, y$ch.index)
+    actual.integ.time <- rOmniDriver::get_integration_time(y$w, y$sr.index, y$ch.index)
+    if (actual.integ.time != x$integ.time[i]) {
+      warning("The spectrometer has overridden the integration time!")
+      x$integ.time[i] <- actual.integ.time
     }
-    rOmniDriver::set_scans_to_avg(x$settings$w, x$settings$num.scans[i], x$settings$sr)
+    rOmniDriver::set_scans_to_avg(y$w, x$num.scans[i], y$sr.index, y$ch.index)
     if (verbose) message(paste("Measurement ", i, "..."))
-    spc <- rOmniDriver::get_spectrum(x$settings$w, x$settings$sr)
-    if (rOmniDriver::is_spectrum_valid(x$settings$w, x$settings$sr))
+    spct <- rOmniDriver::get_spectrum(y$w, y$sr.index, y$ch.index)
+    if (rOmniDriver::is_spectrum_valid(y$w, y$sr.index, y$ch.index))
     {
-      raw.scans[[scan.name]] <- spc
-    }
-    else
-    {
-      raw.scans[[scan.name]] <- NA
+      z[`counts.name`] <- spct
+    } else {
+      z[`counts.name`] <- rep(NA_real_, length(z$w.length))
     }
   }
-  return(raw.scans)
+  setInstrDesc(z, y)
+  setInstrSettings(z, x)
+  setWhenMeasured(z, lubridate::now())
+  z
 }
 
-#' Take one set of spectral readings with parameters from a list of raw spectra
+#' Take one set of spectral readings
 #'
-#' Function to take one set of spectral readings as needed for noise reduction (NR)
-#' based on substraction of stray light estimated from readings with a long pass filter,
-#' and dark readings. Each of these, possibly bracketed as a series of spectra using
-#' different values for integration time and number of scans to average. All this information
-#' must be already stored in argument x.
-#' A copy of x is returned with the results of the measurements added.
-#'
-#' @note The parameter readings can be used to set the order of the different types of
-#' readings, and which readings will be done or skipped. In the current implementation
-#' it is possible to include "meas" and "filter" only once, but in contrast, it is possible
-#' to take two dark measurements if needed.
+#' Take readings according to parameters from a list of settings and a protocol
+#' defined by a vector of names.
 #'
 #' @param x an initialized list of raw spectra containing parameter values
 #' @param protocol a vector of character strings
@@ -328,7 +331,27 @@ take_one_reading <- function(x, verbose = TRUE) {
 #' @return a list
 #'
 
-take_readings <- function(x, protocol = c("meas", "filter", "dark1"), add.label=NULL, verbose=TRUE) {
+acq_readings <- function(oo_descriptor,
+                          acq_settings,
+                          protocol = c("measure", "filter", "dark"),
+                          geocode = NA,
+                          verbose = TRUE) {
+  previous.protocol <- "none"
+  z <- list()
+  for (p in protocol) {
+    if (p != previous.protocol) {
+      answ <- readline(paste("Ready for acquiring", p, "('z' = abort)"))
+      if (tolower(answ[1]) == "z") {
+        z <- raw_mspct()
+        break()
+      }
+    }
+    z <- c(z, acq_raw_spct(oo_descriptor = oo_descriptor,
+                           acq_settings = acq_settings,
+                           protocol.label = p))
+
+
+  }
   if (!x$init || !x$params.set) {
     warning("Object not in state valid for taking measurements.")
     return(x)

@@ -34,9 +34,12 @@ function(raw_counts, linearize.fun,
   }
   # linearization function as supplied by Ocean Optics
   if (polynom::is.polynomial(linearize.fun)) {
-    lin.calib.fun <- as.function(linearize.fun)
+    linearize.fun <- as.function(linearize.fun)
   }
-  linearized <- raw_counts / linearze.fun(raw_counts)
+  linearized <-
+    dplyr::mutate_(x,
+                   .dots = setNames(list(~counts / linearize.fun(counts)),
+                                    "counts"))
   if (any(is.na(linearized))) {
     stop("NAs in linearized raw_counts")
   }
@@ -66,8 +69,10 @@ function(raw_counts, linearize.fun,
 #' @references \url{http://www.r4photobiology.info/}
 #' @keywords misc
 #'
-linearize.oo_spct <- function(x, cal_idx, force.zero = TRUE, verbose = TRUE) {
-  linearize.fun <- polynom::polynomial()
+linearize.oo_spct <- function(x, force.zero = TRUE, verbose = TRUE) {
+  stopifnot(is.raw_spct(x))
+
+   <- polynom::polynomial()
   stopifnot(is.oo_spct(spct))
   x[["linear.counts"]] <- linearize_count(cal.idx, x[["counts"]],
                                           force.zero = force.zero, verbose = verbose)
