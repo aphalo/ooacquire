@@ -1,0 +1,38 @@
+Package: ooacquire
+Type: Package
+Title: Acquire Spectral Data from Ocean Optics Spectrometers
+Version: 0.1.0
+Date: 2015-08-10
+Author: Pedro J. Aphalo <pedro.aphalo@helsinki.fi>
+Maintainer: Pedro J. Aphalo <pedro.aphalo@helsinki.fi>
+Description: Functions to acquire data directly from the spectrometer,
+    apply corrections and calibration to obtain either counts per
+    second or spectral irradiances. It targets Ocean Optics Maya2000Pro
+    but algorithms and code should be directly applicable to other
+    USB-connetced spectrometers from Ocean Optics.
+License: GPL (>=2)
+VignetteBuilder: knitr
+Depends:
+    R (>= 3.2.0),
+    photobiology (>= 0.8.8),
+    photobiologygg (>= 0.4.0),
+    photobiologyWavebands (>= 0.3.3)
+Roxygen: list(wrap = FALSE)
+Imports:
+    rOmniDriver (>= 0.1.6),
+    dplyr (>= 0.4.3),
+    Rcpp (>= 0.12.1),
+    caTools (>= 1.17.1),
+    lubridate (>= 1.3.3)
+Suggests:
+    knitr  (>= 1.11),
+    ggplot2 (>= 1.0.1)
+LinkingTo: Rcpp
+Bytecompile: yes
+NeedsCompilation: yes
+LazyLoad: yes
+LazyData: yes
+Encoding: UTF-8
+URL: http://www.r4photobiology.info,
+    https://bitbucket.org/aphalo/mayacalc
+BugReports: https://bitbucket.org/aphalo/mayacalc
