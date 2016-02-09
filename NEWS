@@ -1,3 +1,17 @@
+TODO
+
+Add example data acquisition scripts.
+
+Implement a way of including bad pixel information in the instrument descriptor.
+
+Make tunning faster by linearizing the max counts value before extrapolating
+to guess need increment in integartion time.
+
+Add option to force exact total measurement time in addition to the current
+approach aiming at minimum time.
+
+Add function to get names and indexes for all currently connected instruments.
+
 OOAcquire 0.1.0
 ===============
 
