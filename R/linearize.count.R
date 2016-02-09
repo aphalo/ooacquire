@@ -14,17 +14,13 @@
 #'   counts. The object is tagged with the with attribute "linearized" set to
 #'   the function used for linearization.
 #'
-#' @author Pedro J. Aphalo, based on Excel code by Lasse Ylianttila.
 #' @export
-#' @references \url{http://www.r4photobiology.info/}
-#' @keywords misc
 #'
-linearize_count <-
-function(x, linearize.fun = NULL,
-         force_zero = TRUE, verbose = FALSE)
+linearize_count <- function(x, linearize.fun = NULL,
+                            force_zero = TRUE, verbose = FALSE)
 {
   # guard against attempts to reapply linearization
-  stopifnot(!attr(x, linearized))
+  stopifnot(!attr(x, "linearized"))
   # if linearization function not supplied use the polynomial earlier
   # retrieved from instrument firmware
   if (is.null(linearize.fun)) {
@@ -41,7 +37,7 @@ function(x, linearize.fun = NULL,
   for (col in counts.cols) {
     if (force_zero) {
       x[[col]] <- ifelse(x[[col]] >= 0.0, x[[col]], 0.0)
-    x[[col]] <- x[[col]] / linearize.fun(x[[col]])
+      x[[col]] <- x[[col]] / linearize.fun(x[[col]])
     }
   }
   attr(x, "linearized") <- TRUE

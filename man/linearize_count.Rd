@@ -27,11 +27,4 @@ A raw_spct object containing the adjusted values, still as uncalibrated
 Uses a user supplied function, possibly that supplied by a manufacturer
 like Ocean Optics stored in firmware or in any other form.
 }
-\author{
-Pedro J. Aphalo, based on Excel code by Lasse Ylianttila.
-}
-\references{
-\url{http://www.r4photobiology.info/}
-}
-\keyword{misc}
 

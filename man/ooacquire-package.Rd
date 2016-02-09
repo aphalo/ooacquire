@@ -4,17 +4,24 @@
 \name{ooacquire-package}
 \alias{ooacquire}
 \alias{ooacquire-package}
-\title{Processing of data from Maya2000Pro}
+\title{Acquire Spectral Data from Ocean Optics Spectrometers}
 \description{
-A set of functions and data for processing the raw data from the Maya2000 Pro
-spectrometer from Ocean Optics to obtain spectral (energy) irradiance. One
-needs to save raw count data from SpectraSuite as all calculations are done
-by this package, applying: 1) linearization, 2) slit function correction, 3)
-stray light correction, 4) integration time bracketing (optional), 5)
-calibration, and 6) adaptive smoothing.
+Functions to acquire data directly from spectrometers,
+automatically adjusting integration time and numbers of scans to average.
+Auxiliary functions to read the instrument description from its firmware ,
+and to read current instrument settings. Function to apply linearization
+function to data (when linearization is sisabled in the instrument).
+Built as an extenssion to package 'photobiology'. Spectral data is returned
+in objects of class "raw_spct" or "raw_mspct". The instrument settings,
+instrument description, date-time of acquisition and optionally goecode are
+stored as attributes.
 }
 \details{
-
+A higher level interface to the OmniDriver library for spectrometer
+control and data acquisition provided by Ocean Optics for their
+instruments. It is built on top of the 'rOmniDriver' package which
+provides a very thin wrapper on the Java functions giving access to
+the proprietary driver.
 }
 \note{
 This package is provided \strong{without nay warranty of suitability

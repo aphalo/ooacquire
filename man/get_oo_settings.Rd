@@ -2,23 +2,20 @@
 % Please edit documentation in R/raw.spc.obj.R
 \name{get_oo_settings}
 \alias{get_oo_settings}
-\title{Get the current values of instrument settings}
+\title{Replace wavelength values in an instrument description}
 \usage{
-get_oo_settings(w, sr.index = 0L, ch.index = 0L)
+get_oo_settings(oo_descriptor)
 }
 \arguments{
-\item{w}{an open Wrapper object from Omnidriver}
-
-\item{sr.index}{an index to address the spectrometer for the time being not
-exported}
-
-\item{ch.index}{an index to address the channel in a spectrometer with more
-than one channel.}
+\item{oo_descriptor}{list as returned by function \code{get_oo_descriptor}}
 }
 \value{
 a list
 }
 \description{
+Get the current values of instrument settings
+}
+\details{
 Query the spectrometer for the settings currently in use for corrections,
 smotthing and acquisition parameters integration time and number of scans.
 }

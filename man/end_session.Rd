@@ -4,10 +4,10 @@
 \alias{end_session}
 \title{Disconnect from spectrometer}
 \usage{
-end_session(oo.descriptor)
+end_session(w)
 }
 \arguments{
-\item{x}{a list as returned by \code{start_session()} or}
+\item{w}{a java wrapper as returned by \code{start_session()}}
 }
 \description{
 Close the connection to the spectrometer pointed

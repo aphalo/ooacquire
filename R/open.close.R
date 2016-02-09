@@ -6,6 +6,9 @@
 #' and initialize an object with a reference to the
 #' Java object returned by Omni Driver.
 #'
+#' @return a java wrapper which allows access to the driver with an open
+#' connection to the instrument.
+#'
 #' @export
 #'
 start_session <- function() {
@@ -26,10 +29,10 @@ start_session <- function() {
 #' Close the connection to the spectrometer pointed
 #' at by the Java object referenced in \code{x}.
 #'
-#' @param x a list as returned by \code{start_session()} or
+#' @param w a java wrapper as returned by \code{start_session()}
 #'
 #' @export
 #'
-end_session <- function(oo.descriptor) {
-  rOmniDriver::srs_close(oo.descriptor$w)
+end_session <- function(w) {
+  rOmniDriver::srs_close(w)
 }

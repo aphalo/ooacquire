@@ -6,6 +6,10 @@
 \usage{
 start_session()
 }
+\value{
+a java wrapper which allows access to the driver with an open
+connection to the instrument.
+}
 \description{
 Open a connection to the first spectrometer found
 and initialize an object with a reference to the

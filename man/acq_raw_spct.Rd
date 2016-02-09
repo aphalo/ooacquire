@@ -7,7 +7,22 @@
 acq_raw_spct(oo_descriptor, acq_settings, what.measured = NA,
   verbose = TRUE)
 }
+\arguments{
+\item{oo_descriptor}{list as returned by function \code{get_oo_descriptor}}
+
+\item{acq_settings}{list as returned by functions \code{tune_acq_settings}}
+
+\item{what.measured}{value used to set attribute}
+
+\item{verbose}{ogical to enable or disable warnings}
+}
+\value{
+a "raw_spct" object with one or more columns containing raw counts
+and one column with wavelength data.
+}
 \description{
-Measure one raw spectrum
+Take one spectral measurement which depending on the settings can consist
+on more than one raw spectrum meant to represent a SINGLE observation after
+conversion into calibrated data such as in the case of HDR.
 }
 

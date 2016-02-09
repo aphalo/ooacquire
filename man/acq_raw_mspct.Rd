@@ -5,16 +5,23 @@
 \title{Take one set of spectral readings}
 \usage{
 acq_raw_mspct(oo_descriptor, acq_settings, protocol = c("measure", "filter",
-  "dark"), user.label, geocode = NA, verbose = TRUE)
+  "dark"), user.label, geocode = data.frame(lon = NA_real_, lat = NA_real_),
+  verbose = TRUE)
 }
 \arguments{
-\item{protocol}{a vector of character strings}
+\item{oo_descriptor}{list as returned by function \code{get_oo_descriptor()}}
 
-\item{verbose}{a logical to enable or disable warnings}
+\item{acq_settings}{list as returned by functions \code{tune_acq_settings()}
+or \code{retune_acq_settings()} or \code{acq_settings()}}
 
-\item{x}{an initialized list of raw spectra containing parameter values}
+\item{protocol}{vector of character strings}
 
-\item{add.label}{a character string to be concatenated to the current label}
+\item{user.label}{character string to set as label}
+
+\item{geocode}{data.frame with at least columns "lon" and "lat" compatible
+with value returned by \code{ggmap::geocode()}}
+
+\item{verbose}{ogical to enable or disable warnings}
 }
 \value{
 a raw_mspct object
@@ -23,6 +30,4 @@ a raw_mspct object
 Take readings according to parameters from a list of settings and a protocol
 defined by a vector of names.
 }
-\keyword{manip}
-\keyword{misc}
 

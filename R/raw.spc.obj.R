@@ -48,21 +48,24 @@ get_oo_descriptor <- function(w, sr.index = 0L, ch.index = 0L) {
   )
 }
 
+#' Replace wavelength values in an instrument description
+#'
+
+
 #' Get the current values of instrument settings
 #'
 #' Query the spectrometer for the settings currently in use for corrections,
 #' smotthing and acquisition parameters integration time and number of scans.
 #'
-#' @param w an open Wrapper object from Omnidriver
-#' @param sr.index an index to address the spectrometer for the time being not
-#'   exported
-#' @param ch.index an index to address the channel in a spectrometer with more
-#'   than one channel.
+#' @param oo_descriptor list as returned by function \code{get_oo_descriptor}
 #'
 #' @export
 #' @return a list
 #'
-get_oo_settings <- function(w, sr.index = 0L, ch.index = 0L) {
+get_oo_settings <- function(oo_descriptor) {
+  w <- oo_descriptor$w
+  sr.index <- oo_descriptor$sr.index
+  ch.index <- oo_descriptor$sr.index
   list(
     time = lubridate::now(),
     w = w,
@@ -80,42 +83,94 @@ get_oo_settings <- function(w, sr.index = 0L, ch.index = 0L) {
   )
 }
 
-
-#' Tune settings for measurement
+#' Validate settings for spectral measurement
 #'
-#' Find parameters for spectral measurements with a given measurements
-#' protocol.
+#' Validate parameters for spectral measurements and return a list of values
+#' usable as input for functions \code{retune_acq_settings()}, \code{acq_sptc()},
+#' and \code{acq_mspct()}.
 #'
 #' @param oo_descriptor list as returned by function \code{get_oo_descriptor}
+#' @param integ.time numeric vaue in seconds
+#' @param num.scans integer
 #' @param start.integ.time numeric vaue in seconds
 #' @param min.integ.time numeric vaue in seconds
 #' @param max.integ.time numeric vaue in seconds
 #' @param min.tot.time numeric vaue in seconds
 #' @param HDR.mult a numeric vector with integ.time multipliers to be used for
 #'   "bracketing".
-#' @param NR.flag a logical vector indicating whether a filter reading will be
-#'   used.
 #' @param pix.selector a logical or numeric vector used as subscript to select
 #'   pixels
 #' @param verbose a logical to enable or disable warnings
 #'
+#' @note \code{pixel.selector} can be used for two different purposes: to
+#'   ignore bad pixels and to restrict integration-time tuning to the response
+#'   from a range of pixels.
+#'
+#' @details \code{acq_settings()} is used to manually save a complete set of
+#'   instrument settings in a way that they can be reused as needed for repated
+#'   acquisition of spectra. \code{tune_acq_settings()} and
+#'   \code{tune_acq_settings()} differ only in their formal parameters and
+#'   optimize settings to the current spectral irradiance.
+#'
 #' @note Ocean Optics spectrometers can be queried for the maximum and minimum
 #'   supported integration times. This function modifies the user supplied
 #'   values if outside these bounds. The defaults of -Inf and Inf force the use
-#'   of the whole valid range of integration times for the connected intrument.
-#'   \code{pixel.selector} can be used for two different purposes: to ignore
-#'   bad pixels and to restrict integration-time tuning to the response from a
-#'   range of pixels.
+#'   of the whole valid range of integration time supported by the connected
+#'   intrument. \code{pixel.selector} can be used for two different purposes: to
+#'   ignore bad pixels and to restrict integration-time tuning to the response
+#'   from a range of pixels.
 #'
-#' @details \code{tune_acq_settings()} is used usually for the fist measurement
-#'   in a series as it starts the tuning of the acquisition parameters from an
-#'   integration time suplied by the user or an arbitrary default.
-#'   \code{retune_acq_settings()} instead does a similar tunning starting from a
-#'   previously adjusted set of values. This is just a convenience function to
-#'   simplify data acquisition code and speed-up data acquisition by refining a
-#'   previously set value.
+#' @export
+#' @return a list.
 #'
-#' @keywords manip misc
+acq_settings <- function(oo_descriptor,
+                         integ.time, # seconds
+                         num.scans = 10L,
+                         start.integ.time = 50e-3, # seconds
+                         min.integ.time = -Inf, # seconds
+                         max.integ.time = Inf, # seconds
+                         min.tot.time = 2, # seconds
+                         HDR.mult = c(short = 1, long = 10),
+                         pix.selector = TRUE,
+                         verbose = TRUE) {
+  # Check length consistency
+  stopifnot(length(integ.time) == length(num.scans))
+  # convert times to microseconds
+  integ.time <- integ.time * 1e6
+  start.integ.time <- start.integ.time * 1e6
+  min.integ.time   <- min.integ.time   * 1e6
+  max.integ.time   <- max.integ.time   * 1e6
+  min.tot.time   <- min.tot.time   * 1e6
+  # We check bounds and set the "fixed settings" (non-tunable)
+  min.integ.time <- max(min.integ.time, oo_descriptor$min.integ.time)
+  max.integ.time <- min(max.integ.time, oo_descriptor$max.integ.time)
+  # Check bounds for integ.time value supplied by user
+  integ.time <- ifelse(integ.time > max.integ.time, max.integ.time, integ.time)
+  integ.time <- ifelse(integ.time < min.integ.time, min.integ.time, integ.time)
+  # Check num.scans
+  num.scans <- round(num.scans)
+  stopifnot(all(num.scans >= 1))
+  # Calculate total.time
+  total.time <- integ.time * num.scans
+  list(
+    pix.selector = pix.selector,
+    HDR.mult = HDR.mult,
+    integ.time = integ.time,
+    max.integ.time = max.integ.time,
+    min.integ.time = min.integ.time,
+    num.scans = num.scans,
+    #diagnosis
+    total.time = total.time,
+    rel.signal = NA
+  )
+}
+
+#' Tune settings for measurement
+#'
+#' Find parameters for spectral measurements with a given measurements
+#' protocol.
+#'
+#' @rdname acq_settings
 #' @export
 #' @return a list.
 #'
@@ -125,10 +180,8 @@ tune_acq_settings <- function(oo_descriptor,
                               max.integ.time = Inf, # seconds
                               min.tot.time = 2, # seconds
                               HDR.mult = c(short = 1, long = 10),
-                              NR.flag = c(short = TRUE, long = TRUE),
                               pix.selector = TRUE,
                               verbose = TRUE) {
-  stopifnot(length(HDR.mult) == length(NR.flag))
   # convert times to microseconds
   start.integ.time <- start.integ.time * 1e6
   min.integ.time   <- min.integ.time   * 1e6
@@ -238,7 +291,6 @@ tune_acq_settings <- function(oo_descriptor,
   z <- list(
     pix.selector = pix.selector,
     HDR.mult = HDR.mult,
-    NR.flag = NR.flag,
     integ.time = integ.time,
     max.integ.time = max.integ.time,
     min.integ.time = min.integ.time,
@@ -263,30 +315,42 @@ tune_acq_settings <- function(oo_descriptor,
   z
 }
 
-#' @rdname tune_acq_settings
+#' @rdname acq_settings
 #'
-#' @param x list as returned by a previous call to \code{tune_acq_settings()} or
-#'   \code{retune_acq_settings()}.
+#' @param acq_settings list as returned by a previous call to \code{acq_settings()},
+#'   \code{tune_acq_settings()} or \code{retune_acq_settings()}.
 #'
 #' @export
 #'
 retune_acq_settings <- function(oo_descriptor,
-                                x,
+                                acq_settings,
                                 verbose = TRUE) {
+  x <- acq_settings
   tune_acq_settings(oo_descriptor = oo_descriptor,
                     start.integ.time = x$integ.time,
                     min.integ.time = x$min.integ.time,
                     max.integ.time = x$max.integ.time,
                     min.tot.time = x$min.tot.time,
                     HDR.mult = x$HDR.mult,
-                    NR.flag = x$NR.flag,
                     pix.selector = x$pix.selector,
                     verbose = verbose)
 }
 
 #' Measure one raw spectrum
 #'
+#' Take one spectral measurement which depending on the settings can consist
+#' on more than one raw spectrum meant to represent a SINGLE observation after
+#' conversion into calibrated data such as in the case of HDR.
+#'
+#' @param oo_descriptor list as returned by function \code{get_oo_descriptor}
+#' @param acq_settings list as returned by functions \code{tune_acq_settings}
+#' @param what.measured value used to set attribute
+#' @param verbose ogical to enable or disable warnings
+#'
 #' @export
+#'
+#' @return a "raw_spct" object with one or more columns containing raw counts
+#' and one column with wavelength data.
 #'
 acq_raw_spct <- function(oo_descriptor,
                          acq_settings,
@@ -308,7 +372,7 @@ acq_raw_spct <- function(oo_descriptor,
     rOmniDriver::set_scans_to_avg(y$w, x$num.scans[i], y$sr.index, y$ch.index)
     if (verbose) message(paste("Measurement ", i, "..."))
     spct <- rOmniDriver::get_spectrum(y$w, y$sr.index, y$ch.index)
-    if (rOmniDriver::is_spectrum_valid(y$w, y$sr.index, y$ch.index))
+    if (rOmniDriver::is_spectrum_valid(y$w, y$sr.index, y$ch.index) || x$force.valid)
     {
       z[[counts.name]] <- spct
     } else {
@@ -327,11 +391,15 @@ acq_raw_spct <- function(oo_descriptor,
 #' Take readings according to parameters from a list of settings and a protocol
 #' defined by a vector of names.
 #'
-#' @param x an initialized list of raw spectra containing parameter values
-#' @param protocol a vector of character strings
-#' @param add.label a character string to be concatenated to the current label
-#' @param verbose a logical to enable or disable warnings
-#' @keywords manip misc
+#' @param oo_descriptor list as returned by function \code{get_oo_descriptor()}
+#' @param acq_settings list as returned by functions \code{tune_acq_settings()}
+#' or \code{retune_acq_settings()} or \code{acq_settings()}
+#' @param protocol vector of character strings
+#' @param user.label character string to set as label
+#' @param geocode data.frame with at least columns "lon" and "lat" compatible
+#' with value returned by \code{ggmap::geocode()}
+#' @param verbose ogical to enable or disable warnings
+#'
 #' @export
 #' @return a raw_mspct object
 #'
@@ -339,7 +407,7 @@ acq_raw_mspct <- function(oo_descriptor,
                           acq_settings,
                           protocol = c("measure", "filter", "dark"),
                           user.label,
-                          geocode = NA,
+                          geocode = data.frame(lon = NA_real_, lat = NA_real_),
                           verbose = TRUE) {
   previous.protocol <- "none"
   z <- list()

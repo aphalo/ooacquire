@@ -2,7 +2,7 @@
 
 export(acq_raw_mspct)
 export(acq_raw_spct)
-export(apply_tail_correction)
+export(acq_settings)
 export(end_session)
 export(get_oo_descriptor)
 export(get_oo_settings)
