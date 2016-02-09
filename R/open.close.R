@@ -9,18 +9,16 @@
 #' @export
 #'
 start_session <- function() {
-  srs <- rOmniDriver::init_srs()
-  num.srs <- rOmniDriver::number_srs(srs)
+  w <- rOmniDriver::init_srs()
+  num.srs <- rOmniDriver::number_srs(w)
 
   # num.srs <- 1
   if (num.srs < 0) {
-    stop("Error get number of SRs")
+    stop("Error in get number of SRs")
   } else if (num.srs == 0) {
     stop("No SR found")
-  } else {
-    sr.idxs <- 1:num.srs - 1
   }
-  return(init_raw_spc(w = srs, sr.index = sr.idxs[1]))
+  w
 }
 
 #' Disconnect from spectrometer
@@ -32,6 +30,6 @@ start_session <- function() {
 #'
 #' @export
 #'
-end_session <- function(x) {
-  rOmniDriver::srs_close(x$settings$w)
+end_session <- function(oo.descriptor) {
+  rOmniDriver::srs_close(oo.descriptor$w)
 }

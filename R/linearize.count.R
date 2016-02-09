@@ -1,19 +1,18 @@
 #' Function to apply linearization correction to raw counts data.
 #'
-#' Uses linearization parameters and function supplied by Ocean Optics, the
-#' manufacturer of the spectrometer.
+#' Uses a user supplied function, possibly that supplied by a manufacturer
+#' like Ocean Optics stored in firmware or in any other form.
 #'
-#' @param raw_counts A numeric vector of raw detector counts. Should include
-#'   data for the whole detector array.
+#' @param x raw_spct object.
 #' @param linearize.fun A function or a polynom::polynomial object containing
 #'   the linearization to be applied.
 #' @param force_zero A logical indicating whether to change negative count
 #'   values to zero.
-#' @param verbose Logical indicating the level of warnings wanted. Defaults to
-#'   \code{FALSE}.
+#' @param verbose Logical Currently ignired.
 #'
-#' @return A numeric array containing the adjusted values, still as uncalibrated
-#'   counts.
+#' @return A raw_spct object containing the adjusted values, still as uncalibrated
+#'   counts. The object is tagged with the with attribute "linearized" set to
+#'   the function used for linearization.
 #'
 #' @author Pedro J. Aphalo, based on Excel code by Lasse Ylianttila.
 #' @export
@@ -21,61 +20,31 @@
 #' @keywords misc
 #'
 linearize_count <-
-function(raw_counts, linearize.fun,
+function(x, linearize.fun = NULL,
          force_zero = TRUE, verbose = FALSE)
 {
-  if (any(raw_counts < 0.0)) {
-    if (force_zero) {
-      raw_counts <- ifelse(raw_counts >= 0.0, raw_counts, 0.0)
-      if (verbose) warning("negative counts in raw_counts converted to zeros")
-    } else if (verbose) {
-      warning("retaining raw_counts < 0.0 as input to linearize count")
-    }
+  # guard against attempts to reapply linearization
+  stopifnot(!attr(x, linearized))
+  # if linearization function not supplied use the polynomial earlier
+  # retrieved from instrument firmware
+  if (is.null(linearize.fun)) {
+    calib.data <- getInstrDesc(x)[["calib.data"]]
+    stopifnot(!is.null(calib.data))
+    linearize.fun <- calib.data[["nl.poly"]]
   }
-  # linearization function as supplied by Ocean Optics
+  # if polynomial supplied instead of function we convert it
   if (polynom::is.polynomial(linearize.fun)) {
     linearize.fun <- as.function(linearize.fun)
   }
-  linearized <-
-    dplyr::mutate_(x,
-                   .dots = setNames(list(~counts / linearize.fun(counts)),
-                                    "counts"))
-  if (any(is.na(linearized))) {
-    stop("NAs in linearized raw_counts")
+  # any variable whose name starts with "counts" will be linearized
+  counts.cols <- names(x)[grep("^counts", names(x))]
+  for (col in counts.cols) {
+    if (force_zero) {
+      x[[col]] <- ifelse(x[[col]] >= 0.0, x[[col]], 0.0)
+    x[[col]] <- x[[col]] / linearize.fun(x[[col]])
+    }
   }
-  if (verbose && any(linearized < 0.0)) {
-    warning("negative counts in linearized raw_counts")
-  }
-  return(linearized)
-}
-
-#' Function to apply linearization correction to raw counts data.
-#'
-#' Uses linearization parameters and function supplied by Ocean Optics, the
-#' manufacturer of the spectrometer.
-#'
-#' @param x An oo_spct object
-#' @param cal_idx A numeric index used to access calibration data
-#' @param force_zero A logical indicating whether to change negative count
-#'   values to zero.
-#' @param verbose Logical indicating the level of warnings wanted. Defaults to
-#'   \code{FALSE}.
-#'
-#' @return A numeric array containing the adjusted values, still as uncalibrated
-#'   counts.
-#'
-#' @author Pedro J. Aphalo, based on Excel code by Lasse Ylianttila.
-#' @export
-#' @references \url{http://www.r4photobiology.info/}
-#' @keywords misc
-#'
-linearize.oo_spct <- function(x, force.zero = TRUE, verbose = TRUE) {
-  stopifnot(is.raw_spct(x))
-
-   <- polynom::polynomial()
-  stopifnot(is.oo_spct(spct))
-  x[["linear.counts"]] <- linearize_count(cal.idx, x[["counts"]],
-                                          force.zero = force.zero, verbose = verbose)
+  attr(x, "linearized") <- TRUE
+  attr(x, "linearize.fun")  <- linearize.fun
   x
 }
-

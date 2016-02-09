@@ -2,31 +2,33 @@ Package: ooacquire
 Type: Package
 Title: Acquire Spectral Data from Ocean Optics Spectrometers
 Version: 0.1.0
-Date: 2015-08-10
+Date: 2016-02-08
 Author: Pedro J. Aphalo <pedro.aphalo@helsinki.fi>
 Maintainer: Pedro J. Aphalo <pedro.aphalo@helsinki.fi>
-Description: Functions to acquire data directly from the spectrometer,
-    apply corrections and calibration to obtain either counts per
-    second or spectral irradiances. It targets Ocean Optics Maya2000Pro
-    but algorithms and code should be directly applicable to other
-    USB-connetced spectrometers from Ocean Optics.
+Description: Functions to acquire data directly from spectrometers,
+    automatically adjusting integration time and numbers of scans to average.
+    Auxiliary functions to read the instrument description from its firmware ,
+    and to read current instrument settings. Function to apply linearization
+    function to data (when linearization is sisabled in the instrument).
+    Built as an extenssion to package 'photobiology'. Spectral data is returned
+    in objects of class "raw_spct" or "raw_mspct". The instrument settings,
+    instrument description, date-time of acquisition and optionally goecode are
+    stored as attributes.
 License: GPL (>=2)
 VignetteBuilder: knitr
 Depends:
     R (>= 3.2.0),
-    photobiology (>= 0.8.8),
-    photobiologygg (>= 0.4.0),
-    photobiologyWavebands (>= 0.3.3)
 Roxygen: list(wrap = FALSE)
 Imports:
-    rOmniDriver (>= 0.1.6),
+    photobiology (>= 0.9.6),
+    rOmniDriver (>= 0.1.10),
     dplyr (>= 0.4.3),
-    Rcpp (>= 0.12.1),
-    caTools (>= 1.17.1),
-    lubridate (>= 1.3.3)
+    lubridate (>= 1.5.0)
 Suggests:
-    knitr  (>= 1.11),
-    ggplot2 (>= 1.0.1)
+    knitr  (>= 1.12.3),
+    ggplot2 (>= 2.0.0),
+    ggspectra (>= 0.1.6),
+    photobiologyWavebands (>= 0.4.0)
 LinkingTo: Rcpp
 Bytecompile: yes
 NeedsCompilation: yes
@@ -36,3 +38,4 @@ Encoding: UTF-8
 URL: http://www.r4photobiology.info,
     https://bitbucket.org/aphalo/mayacalc
 BugReports: https://bitbucket.org/aphalo/mayacalc
+RoxygenNote: 5.0.1

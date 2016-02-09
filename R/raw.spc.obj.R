@@ -14,55 +14,36 @@
 #' @return a list
 #'
 get_oo_descriptor <- function(w, sr.index = 0L, ch.index = 0L) {
-
   get_calib_coeffs <- function() {
     z <- list()
     calib.data <-
       rOmniDriver::get_calibration_coefficients_from_buffer(w, sr.index, ch.index)
     # linearization
-    nl.cal.poly.order <- calib.data[["_NlOrder"]]
-    nl.coeff.names <- paste("NlCoef", 1:nl.cal.poly.order, sep = "")
-    nl.coeff.has <- paste("has", nl.coeff.names, sep = "")
-    if (!all(unlist(mget(nl.coeff.has, calib.data)))) {
-      z$nl.cal.poly <- NA
-      z$nl.cal.poly.order <- 0
-    } else {
-      nl.cal.poly <- unlist(mget(nl.coeff.names, calib.data))
-      z$nl.cal.poly <- polynom::polynomial(nl.cal.poly)
-      z$nl.cal.poly.order <- nl.cal.poly.order
-    }
+    nl.poly <- calib.data$getNlCoefficients()
+    z$nl.poly <- polynom::polynomial(nl.poly)
     # stray light
-    z$straylight.coeff <<- calib.data[["_StrayLight"]]
+    z$straylight.coeff <- calib.data$getStrayLight()
+    z$straylight.slope <- calib.data$getStrayLightSlope()
     # wavelength calibration
-    wl.coeff.names <- c("_WlIntercept", "_WlFirst", "_WlSecond", "_WlThird")
-    wl.coeff.has <- paste("has", wl.coeff.names, sep = "")
-    if (!all(unlist(mget(wl.coeff.has, calib.data)))) {
-      z$wl.cal.poly <- NA
-      z$wl.cal.poly.order <- 0
-    } else {
-      wl.coeff.names <- wl.coeff.names[wl.coeff.has]
-      wl.cal.poly <- unlist(mget(wl.coeff.names, calib.data))
-      z$wl.cal.poly <- polynom::polynomial(wl.cal.poly)
-      z$wl.cal.poly.order <- 3
-    }
+    wl.poly <- calib.data$getWlCoefficients()
+    z$wl.poly <- polynom::polynomial(wl.poly)
     z
   }
-
-  bench <- rOmniDriver::get_bench(w, sr.index)
+  bench <- rOmniDriver::get_bench(w, sr.index, ch.index)
   list(
     time = lubridate::now(),
     w = w,
-    sr = sr.index,
+    sr.index = sr.index,
+    ch.index = ch.index,
     spectrometer.name = rOmniDriver::get_name(w, sr.index),
     spectrometer.sn =  rOmniDriver::get_serial_number(w, sr.index),
     bench.grating = bench$getGrating(),
     bench.filter = bench$getFilterWavelength(),
     bench.slit = bench$getSlitSize(),
-    bench.detector = rOmniDriver::get_detector(w, sr.index),
     min.integ.time = rOmniDriver::get_minimum_integration_time(w, sr.index),
     max.integ.time = rOmniDriver::get_maximum_integration_time(w, sr.index),
     max.counts = rOmniDriver::get_maximum_intensity(w, sr.index),
-    wavelengths = rOmniDriver::get_wavelengths(w, sr.index),
+    wavelengths = rOmniDriver::get_wavelengths(w, sr.index, ch.index),
     inst.calib = get_calib_coeffs()
   )
 }
@@ -81,19 +62,24 @@ get_oo_descriptor <- function(w, sr.index = 0L, ch.index = 0L) {
 #' @export
 #' @return a list
 #'
-get_oo_settings <- function(w, sr.index = 0L) {
+get_oo_settings <- function(w, sr.index = 0L, ch.index = 0L) {
   list(
     time = lubridate::now(),
     w = w,
-    sr = sr.index,
-    correct.elec.dark = rOmniDriver::get_correct_for_electrical_dark(w, sr.index),
-    correct.non.lin = rOmniDriver::get_correct_for_detector_nonlineary(w, sr.index),
-    correct.stray.light = rOmniDriver::get_correct_for_stray_light(w, sr.index),
-    boxcar.width = rOmniDriver::get_boxcar_width(w, sr.index),
-    integ.time = rOmniDriver::get_integration_time(w, sr.index),
-    num.scans = rOmniDriver::get_scans_to_avg(w, sr.index)
+    sr.index = sr.index,
+    ch.index = ch.index,
+    correct.elec.dark =
+      rOmniDriver::get_correct_for_electrical_dark(w, sr.index, ch.index),
+    correct.non.lin =
+      rOmniDriver::get_correct_for_detector_nonlineary(w, sr.index, ch.index),
+    correct.stray.light =
+      rOmniDriver::get_correct_for_stray_light(w, sr.index, ch.index),
+    boxcar.width = rOmniDriver::get_boxcar_width(w, sr.index, ch.index),
+    integ.time = rOmniDriver::get_integration_time(w, sr.index, ch.index),
+    num.scans = rOmniDriver::get_scans_to_avg(w, sr.index, ch.index)
   )
 }
+
 
 #' Tune settings for measurement
 #'
@@ -163,11 +149,17 @@ tune_acq_settings <- function(oo_descriptor,
   }
   pix.selector <- pix.selector
   rOmniDriver::set_correct_for_electrical_dark(oo_descriptor$w, 0L,
-                                               oo_descriptor$sr.index)
+                                               oo_descriptor$sr.index,
+                                               oo_descriptor$ch.index)
   rOmniDriver::set_correct_for_detector_nonlinearity(oo_descriptor$w, 0L,
-                                                     oo_descriptor$sr.index)
-  rOmniDriver::set_boxcar_width(oo_descriptor$w, 0L, oo_descriptor$sr.index)
-  rOmniDriver::set_scans_to_avg(oo_descriptor$w, 1L, oo_descriptor$sr.index)
+                                                     oo_descriptor$sr.index,
+                                                     oo_descriptor$ch.index)
+  rOmniDriver::set_boxcar_width(oo_descriptor$w, 0L,
+                                oo_descriptor$sr.index,
+                                oo_descriptor$ch.index)
+  rOmniDriver::set_scans_to_avg(oo_descriptor$w, 1L,
+                                oo_descriptor$sr.index,
+                                oo_descriptor$ch.index)
 
   # optimize parameters
   integ.time <- start.integ.time
@@ -178,18 +170,30 @@ tune_acq_settings <- function(oo_descriptor,
     if (verbose) {
       message("Integration time (ms): ", format(integ.time  * 1e-3))
     }
-    rOmniDriver::set_integration_time(oo_descriptor$w, integ.time, oo_descriptor$sr)
-    raw.counts <- rOmniDriver::get_spectrum(oo_descriptor$w, oo_descriptor$sr)
+    rOmniDriver::set_integration_time(oo_descriptor$w,
+                                      integ.time,
+                                      oo_descriptor$sr.index,
+                                      oo_descriptor$ch.index)
+    raw.counts <- rOmniDriver::get_spectrum(oo_descriptor$w,
+                                            oo_descriptor$sr.index,
+                                            oo_descriptor$ch.index)
     max.counts <- max(raw.counts[pix.selector])
-    while (rOmniDriver::is_saturated(oo_descriptor$w, oo_descriptor$sr))
+    while (rOmniDriver::is_saturated(oo_descriptor$w,
+                                     oo_descriptor$sr.index,
+                                     oo_descriptor$ch.index))
     {
       integ.time <- integ.time * 0.6666667
       if (integ.time < min.integ.time) {
         break()
       }
       if (verbose) message("Clipping! Trying (ms): ", format(integ.time  * 1e-3))
-      rOmniDriver::set_integration_time(oo_descriptor$w, integ.time, oo_descriptor$sr)
-      raw.counts <- rOmniDriver::get_spectrum(oo_descriptor$w, oo_descriptor$sr)
+      rOmniDriver::set_integration_time(oo_descriptor$w,
+                                        integ.time,
+                                        oo_descriptor$sr.index,
+                                        oo_descriptor$ch.index)
+      raw.counts <- rOmniDriver::get_spectrum(oo_descriptor$w,
+                                              oo_descriptor$sr.index,
+                                              oo_descriptor$ch.index)
       max.counts <- max(raw.counts[pix.selector])
     }
     if (verbose) message(paste("max.counts[", i, "]: ", format(max.counts)))
@@ -227,22 +231,21 @@ tune_acq_settings <- function(oo_descriptor,
   integ.time <- HDR.mult * integ.time # vectorized!
   integ.time <- ifelse(integ.time > max.integ.time, max.integ.time, integ.time)
   integ.time <- ifelse(integ.time < min.integ.time, min.integ.time, integ.time)
-  num.scans <- ifelse(z$integ.time < min.tot.time,
-                      trunc(min.tot.time / z$integ.time) + 1,
+  num.scans <- ifelse(integ.time < min.tot.time,
+                      trunc(min.tot.time / integ.time) + 1,
                       1)
   total.time <- integ.time * num.scans
   z <- list(
     pix.selector = pix.selector,
     HDR.mult = HDR.mult,
-    NR.flag = NR.flag
+    NR.flag = NR.flag,
     integ.time = integ.time,
     max.integ.time = max.integ.time,
     min.integ.time = min.integ.time,
     num.scans = num.scans,
     #diagnosis
     total.time = total.time,
-    rel.signal = max.counts / oo_descriptor$max.counts,
-
+    rel.signal = max.counts / oo_descriptor$max.counts
   )
 
   if (verbose) {
@@ -267,9 +270,9 @@ tune_acq_settings <- function(oo_descriptor,
 #'
 #' @export
 #'
-retune_acq_settingd(oo_descriptor,
-                    x,
-                    verbose = TRUE) {
+retune_acq_settings <- function(oo_descriptor,
+                                x,
+                                verbose = TRUE) {
   tune_acq_settings(oo_descriptor = oo_descriptor,
                     start.integ.time = x$integ.time,
                     min.integ.time = x$min.integ.time,
@@ -286,15 +289,16 @@ retune_acq_settingd(oo_descriptor,
 #' @export
 #'
 acq_raw_spct <- function(oo_descriptor,
-                             acq_settings,
-                             measurement.type = NULL) {
+                         acq_settings,
+                         what.measured = NA,
+                         verbose = TRUE) {
   x <- acq_settings
   y <- oo_descriptor
   num.readings <- length(x$integ.time)
-  z <- raw_scpt(w.length = y$wavelengths, counts = 0)
+  z <- photobiology::raw_spct(w.length = y$wavelengths, counts = 0)
 
   for (i in 1:num.readings) {
-    counts.name <- paste("counts", i, sep="_")
+    counts.name <- paste("counts", i, sep = "_")
     rOmniDriver::set_integration_time(y$w, x$integ.time[i], y$sr.index, y$ch.index)
     actual.integ.time <- rOmniDriver::get_integration_time(y$w, y$sr.index, y$ch.index)
     if (actual.integ.time != x$integ.time[i]) {
@@ -306,14 +310,15 @@ acq_raw_spct <- function(oo_descriptor,
     spct <- rOmniDriver::get_spectrum(y$w, y$sr.index, y$ch.index)
     if (rOmniDriver::is_spectrum_valid(y$w, y$sr.index, y$ch.index))
     {
-      z[`counts.name`] <- spct
+      z[[counts.name]] <- spct
     } else {
-      z[`counts.name`] <- rep(NA_real_, length(z$w.length))
+      z[[counts.name]] <- rep(NA_real_, length(z$w.length))
     }
   }
-  setInstrDesc(z, y)
-  setInstrSettings(z, x)
-  setWhenMeasured(z, lubridate::now())
+  photobiology::setInstrDesc(z, y)
+  photobiology::setInstrSettings(z, x)
+  photobiology::setWhenMeasured(z, lubridate::now())
+  photobiology::setWhatMeasured(z, what.measured)
   z
 }
 
@@ -328,44 +333,31 @@ acq_raw_spct <- function(oo_descriptor,
 #' @param verbose a logical to enable or disable warnings
 #' @keywords manip misc
 #' @export
-#' @return a list
+#' @return a raw_mspct object
 #'
-
-acq_readings <- function(oo_descriptor,
+acq_raw_mspct <- function(oo_descriptor,
                           acq_settings,
                           protocol = c("measure", "filter", "dark"),
+                          user.label,
                           geocode = NA,
                           verbose = TRUE) {
   previous.protocol <- "none"
   z <- list()
   for (p in protocol) {
     if (p != previous.protocol) {
-      answ <- readline(paste("Ready for acquiring", p, "('z' = abort)"))
+      answ <- readline(paste("Ready to acquire", p,
+                             "measurement ('z' = abort)"))
       if (tolower(answ[1]) == "z") {
-        z <- raw_mspct()
         break()
       }
     }
     z <- c(z, acq_raw_spct(oo_descriptor = oo_descriptor,
                            acq_settings = acq_settings,
-                           protocol.label = p))
-
-
+                           what.measured = list(what = p, user.label = user.label)))
   }
-  if (!x$init || !x$params.set) {
-    warning("Object not in state valid for taking measurements.")
-    return(x)
-  }
-  if (!is.null(add.label)) {
-    x$user.label <- paste(x$user.label, add.label)
-  }
-  x$data$at.time <- Sys.time()
-  for (reading in protocol) {
-      readline(paste("SR ready to take", reading,  "measurement:"))
-      x$data$raw.scans[[reading]] <- take_one_reading(x, verbose=verbose)
-  }
-  x$data.valid <- TRUE # replace with test
-  return(x)
+  photobiology::as.raw_mspct(z)
+  photobiology::setWhereMeasured(z, geocode)
+  z
 }
 
 
