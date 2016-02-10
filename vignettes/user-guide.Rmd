@@ -17,13 +17,16 @@ vignette: >
 | ---------|----------------------------------------------------------|
 | `start_session()` | search for connected instruments and obtain a handle to the driver |
 | `end_session()` | close all connections and release handle |
+| `list_instruments()`| list all connected instruments |
 | `get_oo_descriptor()` | get a descriptor for one of the possibly several connected instruments |
-| `set_descriptor_wl()` | replace the wavelength values read from firmware with user supplied ones |
+| `set_descriptor_wl()` | replace the wavelength values |
+| `set_descriptor_nl()` | replace the function used to correct for array non-linearity |
 | `get_oo_settings()` | query the instrument to obtain its current settings |
 | `acq_settings()` | build a list of setting values |
 | `tune_acq_settings()` | tune the integration time and number of scans to the current radiation conditions |
 | `acq_raw_spct()` | take one measurement (data point) |
 | `acq_raw_mspct()` | take a sequence of spectral measurement (several data points) |
+| `linearize_counts()` | linearize the raw counts |
 
 ## Workflow
 
