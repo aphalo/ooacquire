@@ -68,24 +68,27 @@ acq_raw_spct <- function(oo_descriptor,
 acq_raw_mspct <- function(oo_descriptor,
                           acq_settings,
                           protocol = c("measure", "filter", "dark"),
-                          user.label,
+                          user.label = "",
                           geocode = data.frame(lon = NA_real_, lat = NA_real_),
                           verbose = TRUE) {
   previous.protocol <- "none"
   z <- list()
+  idx <- 0
   for (p in protocol) {
     if (p != previous.protocol) {
+      previous.protocol <- p
       answ <- readline(paste("Ready to acquire", p,
                              "measurement ('z' = abort)"))
       if (tolower(answ[1]) == "z") {
         break()
       }
     }
-    z <- c(z, acq_raw_spct(oo_descriptor = oo_descriptor,
-                           acq_settings = acq_settings,
-                           what.measured = list(what = p, user.label = user.label)))
+    idx <- idx + 1
+    z[[idx]] <- acq_raw_spct(oo_descriptor = oo_descriptor,
+                             acq_settings = acq_settings,
+                             what.measured = list(what = p, user.label = user.label))
   }
-  photobiology::as.raw_mspct(z)
+  z <- photobiology::as.raw_mspct(z)
   photobiology::setWhereMeasured(z, geocode)
   z
 }

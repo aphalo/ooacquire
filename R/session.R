@@ -24,6 +24,33 @@ start_session <- function() {
   w
 }
 
+#' List connected spectrometers
+#'
+#' List all connected spectrometers by model name and serial number, plus
+#' the number of channels in each of them.
+#'
+#' @param w an open Wrapper object from Omnidriver
+#'
+#' @return a list
+#'
+#' @export
+list_instruments <- function(w) {
+  number.srs <- rOmniDriver::number_srs(w)
+  srs.idxs <- (1:number.srs) - 1L
+  z <- data.frame(idx = numeric(),
+                  model = character(),
+                  serial.no = character(),
+                  num.channels = integer())
+  for (i in srs.idxs) {
+    tmp <- data.frame(idx = i,
+                      model = rOmniDriver::get_name(w, sr.index = i),
+                      serial.no = rOmniDriver::get_serial_number(w, sr.index = i),
+                      num.channels = rOmniDriver::get_number_of_channels(w, sr.index = i))
+    z <- rbind(z, tmp)
+  }
+  z
+}
+
 #' Disconnect from spectrometer
 #'
 #' Close the connection to the spectrometer pointed

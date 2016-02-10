@@ -5,8 +5,8 @@
 \title{Take one set of spectral readings}
 \usage{
 acq_raw_mspct(oo_descriptor, acq_settings, protocol = c("measure", "filter",
-  "dark"), user.label, geocode = data.frame(lon = NA_real_, lat = NA_real_),
-  verbose = TRUE)
+  "dark"), user.label = "", geocode = data.frame(lon = NA_real_, lat =
+  NA_real_), verbose = TRUE)
 }
 \arguments{
 \item{oo_descriptor}{list as returned by function \code{get_oo_descriptor()}}
