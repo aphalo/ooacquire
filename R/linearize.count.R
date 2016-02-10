@@ -24,21 +24,17 @@
 #'
 #' @export
 #'
-linearize_count <- function(x,
-                            force_zero = TRUE, verbose = FALSE)
-{
+linearize_counts <- function(x,
+                             force_zero = TRUE, verbose = FALSE) {
   # guard against attempts to reapply linearization
   stopifnot(!attr(x, "linearized"))
-  # if linearization function not supplied use the polynomial earlier
-  # retrieved from instrument firmware
-  # any variable whose name starts with "counts" will be linearized
   oo_descriptor <- getInstrDesc(x)
   nl.fun <- oo_descriptor$calib.data$nl.fun
   counts.cols <- names(x)[grep("^counts", names(x))]
   for (col in counts.cols) {
     if (force_zero) {
       x[[col]] <- ifelse(x[[col]] >= 0.0, x[[col]], 0.0)
-      x[[col]] <- x[[col]] / nl.fun(x[[col]])
+      x[[col]] <- nl.fun(x[[col]])
     }
   }
   attr(x, "linearized") <- TRUE

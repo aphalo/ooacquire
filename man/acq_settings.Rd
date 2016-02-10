@@ -6,11 +6,8 @@
 \title{Settings for spectral measurement}
 \usage{
 acq_settings(oo_descriptor, integ.time, num.scans = 10L,
-  start.integ.time = 0.05, min.integ.time = -Inf, max.integ.time = Inf,
-  min.tot.time = 2, HDR.mult = c(short = 1, long = 10),
-  pix.selector = TRUE, verbose = TRUE)
-
-tune_acq_settings(oo_descriptor, acq_settings, verbose = TRUE)
+  min.integ.time = -Inf, max.integ.time = Inf, tot.time.range = c(0, Inf),
+  HDR.mult = c(short = 1, long = 10), pix.selector = TRUE, verbose = TRUE)
 
 tune_acq_settings(oo_descriptor, acq_settings, verbose = TRUE)
 }
@@ -21,13 +18,11 @@ tune_acq_settings(oo_descriptor, acq_settings, verbose = TRUE)
 
 \item{num.scans}{integer}
 
-\item{start.integ.time}{numeric vaue in seconds}
-
 \item{min.integ.time}{numeric vaue in seconds}
 
 \item{max.integ.time}{numeric vaue in seconds}
 
-\item{min.tot.time}{numeric vaue in seconds}
+\item{tot.time.range}{numeric vector of length two with values in seconds}
 
 \item{HDR.mult}{a numeric vector with integ.time multipliers to be used for
 "bracketing".}
@@ -44,16 +39,11 @@ or \code{tune_acq_settings()}.}
 a list.
 
 a list.
-
-a list.
 }
 \description{
 Validate parameters for spectral measurements and return a list of values
 usable as input for functions \code{retune_acq_settings()}, \code{acq_sptc()},
 and \code{acq_mspct()}.
-
-Find parameters for spectral measurements with a given measurements
-protocol.
 
 Find optimal settings for spectral measurements under a given measurement
 protocol.
@@ -68,7 +58,9 @@ protocol.
 \note{
 \code{pixel.selector} can be used for two different purposes: to
   ignore bad pixels and to restrict integration-time tuning to the response
-  from a range of pixels.
+  from a range of pixels. The interpretation of \code{tot.time.range} is
+  as follows: first value is minimum time, second value is maximum time.
+  If both values are the same, then an exact measurement time is computed.
 
 Ocean Optics spectrometers can be queried for the maximum and minimum
   supported integration times. This function modifies the user supplied

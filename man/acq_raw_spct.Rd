@@ -6,7 +6,7 @@
 \usage{
 acq_raw_spct(oo_descriptor, acq_settings, what.measured = NA,
   where.measured = data.frame(lon = NA_real_, lat = NA_real_),
-  verbose = TRUE)
+  set.all = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{oo_descriptor}{list as returned by function \code{get_oo_descriptor}}
@@ -18,7 +18,9 @@ acq_raw_spct(oo_descriptor, acq_settings, what.measured = NA,
 \item{where.measured}{data.frame with at least columns "lon" and "lat" compatible
 with value returned by \code{ggmap::geocode()}}
 
-\item{verbose}{ogical to enable or disable warnings}
+\item{set.all}{logical resend or not all instrument settings}
+
+\item{verbose}{logical to enable or disable warnings}
 }
 \value{
 a "raw_spct" object with one or more columns containing raw counts

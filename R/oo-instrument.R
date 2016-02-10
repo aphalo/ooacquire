@@ -21,14 +21,15 @@ get_oo_descriptor <- function(w, sr.index = 0L, ch.index = 0L) {
     # linearization
     nl.poly <- calib.data$getNlCoefficients()
     nl.poly <- polynom::polynomial(nl.poly)
-    z$nl.fun <- polynom::as.function(nl.poly)
+    z$oo_nl_fun <- as.function(nl.poly)
+    z$nl_fun <- function(x) {x / z$oo_nl_fun(x)}
     # stray light
     z$straylight.coeff <- calib.data$getStrayLight()
     z$straylight.slope <- calib.data$getStrayLightSlope()
     # wavelength calibration
     wl.poly <- calib.data$getWlCoefficients()
     wl.poly <- polynom::polynomial(wl.poly)
-    z$wl.fun <- polynom::as.function(wl.poly)
+    z$wl.fun <- as.function(wl.poly)
     z
   }
   bench <- rOmniDriver::get_bench(w, sr.index, ch.index)

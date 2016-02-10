@@ -9,7 +9,8 @@
 #' @param what.measured value used to set attribute
 #' @param where.measured data.frame with at least columns "lon" and "lat" compatible
 #' with value returned by \code{ggmap::geocode()}
-#' @param verbose ogical to enable or disable warnings
+#' @param set.all logical resend or not all instrument settings
+#' @param verbose logical to enable or disable warnings
 #'
 #' @export
 #'
@@ -20,7 +21,25 @@ acq_raw_spct <- function(oo_descriptor,
                          acq_settings,
                          what.measured = NA,
                          where.measured = data.frame(lon = NA_real_, lat = NA_real_),
+                         set.all = TRUE,
                          verbose = TRUE) {
+  if (set.all) {
+    # set according to acq_settings
+    rOmniDriver::set_correct_for_electrical_dark(oo_descriptor$w,
+                                                 acq_settings$corr.elect.dark,
+                                                 oo_descriptor$sr.index,
+                                                 oo_descriptor$ch.index)
+    # in current implementation we apply the correction always after acquisition
+    rOmniDriver::set_correct_for_detector_nonlinearity(oo_descriptor$w,
+                                                       0L,
+                                                       oo_descriptor$sr.index,
+                                                       oo_descriptor$ch.index)
+    # in current implementation we apply smoothing always after acquisition
+    rOmniDriver::set_boxcar_width(oo_descriptor$w,
+                                  0L,
+                                  oo_descriptor$sr.index,
+                                  oo_descriptor$ch.index)
+  }
   x <- acq_settings
   y <- oo_descriptor
   num.readings <- length(x$integ.time)
@@ -32,15 +51,17 @@ acq_raw_spct <- function(oo_descriptor,
     rOmniDriver::set_integration_time(y$w, x$integ.time[i], y$sr.index, y$ch.index)
     actual.integ.time <- rOmniDriver::get_integration_time(y$w, y$sr.index, y$ch.index)
     if (actual.integ.time != x$integ.time[i]) {
+      # We guard against failure to set integration time
+      # It should never happen as we check validity value requested
       warning("The spectrometer has overridden the integration time!")
       x$integ.time[i] <- actual.integ.time
     }
     rOmniDriver::set_scans_to_avg(y$w, x$num.scans[i], y$sr.index, y$ch.index)
     if (verbose) message(paste("Measurement ", i, "..."))
-    spct <- rOmniDriver::get_spectrum(y$w, y$sr.index, y$ch.index)
+    counts <- rOmniDriver::get_spectrum(y$w, y$sr.index, y$ch.index)
     if (rOmniDriver::is_spectrum_valid(y$w, y$sr.index, y$ch.index) || x$force.valid)
     {
-      z[[counts.name]] <- spct
+      z[[counts.name]] <- counts
     } else {
       z[[counts.name]] <- rep(NA_real_, length(z$w.length))
     }
