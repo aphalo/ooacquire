@@ -5,6 +5,7 @@
 \title{Measure one raw spectrum}
 \usage{
 acq_raw_spct(oo_descriptor, acq_settings, what.measured = NA,
+  where.measured = data.frame(lon = NA_real_, lat = NA_real_),
   verbose = TRUE)
 }
 \arguments{
@@ -13,6 +14,9 @@ acq_raw_spct(oo_descriptor, acq_settings, what.measured = NA,
 \item{acq_settings}{list as returned by functions \code{tune_acq_settings}}
 
 \item{what.measured}{value used to set attribute}
+
+\item{where.measured}{data.frame with at least columns "lon" and "lat" compatible
+with value returned by \code{ggmap::geocode()}}
 
 \item{verbose}{ogical to enable or disable warnings}
 }

@@ -7,6 +7,8 @@
 #' @param oo_descriptor list as returned by function \code{get_oo_descriptor}
 #' @param acq_settings list as returned by functions \code{tune_acq_settings}
 #' @param what.measured value used to set attribute
+#' @param where.measured data.frame with at least columns "lon" and "lat" compatible
+#' with value returned by \code{ggmap::geocode()}
 #' @param verbose ogical to enable or disable warnings
 #'
 #' @export
@@ -17,11 +19,13 @@
 acq_raw_spct <- function(oo_descriptor,
                          acq_settings,
                          what.measured = NA,
+                         where.measured = data.frame(lon = NA_real_, lat = NA_real_),
                          verbose = TRUE) {
   x <- acq_settings
   y <- oo_descriptor
   num.readings <- length(x$integ.time)
-  z <- photobiology::raw_spct(w.length = y$wavelengths, counts = 0)
+  z <- dplyr::data_frame(w.length = y$wavelengths)
+  start.time <- lubridate::now()
 
   for (i in 1:num.readings) {
     counts.name <- paste("counts", i, sep = "_")
@@ -41,9 +45,11 @@ acq_raw_spct <- function(oo_descriptor,
       z[[counts.name]] <- rep(NA_real_, length(z$w.length))
     }
   }
+  z <- as.raw_spct(z)
   photobiology::setInstrDesc(z, y)
   photobiology::setInstrSettings(z, x)
-  photobiology::setWhenMeasured(z, lubridate::now())
+  photobiology::setWhenMeasured(z, start.time)
+  photobiology::setWhereMeasured(z, where.measured)
   photobiology::setWhatMeasured(z, what.measured)
   z
 }
@@ -58,7 +64,7 @@ acq_raw_spct <- function(oo_descriptor,
 #' or \code{retune_acq_settings()} or \code{acq_settings()}
 #' @param protocol vector of character strings
 #' @param user.label character string to set as label
-#' @param geocode data.frame with at least columns "lon" and "lat" compatible
+#' @param where.measured data.frame with at least columns "lon" and "lat" compatible
 #' with value returned by \code{ggmap::geocode()}
 #' @param verbose ogical to enable or disable warnings
 #'
@@ -69,11 +75,12 @@ acq_raw_mspct <- function(oo_descriptor,
                           acq_settings,
                           protocol = c("measure", "filter", "dark"),
                           user.label = "",
-                          geocode = data.frame(lon = NA_real_, lat = NA_real_),
+                          where.measured = data.frame(lon = NA_real_, lat = NA_real_),
                           verbose = TRUE) {
   previous.protocol <- "none"
   z <- list()
   idx <- 0
+  start.time <- lubridate::now()
   for (p in protocol) {
     if (p != previous.protocol) {
       previous.protocol <- p
@@ -86,10 +93,12 @@ acq_raw_mspct <- function(oo_descriptor,
     idx <- idx + 1
     z[[idx]] <- acq_raw_spct(oo_descriptor = oo_descriptor,
                              acq_settings = acq_settings,
-                             what.measured = list(what = p, user.label = user.label))
+                             what.measured = list(what = p, user.label = user.label),
+                             where.measured = where.measured)
   }
   z <- photobiology::as.raw_mspct(z)
-  photobiology::setWhereMeasured(z, geocode)
+  photobiology::setWhenMeasured(z, start.time)
+  photobiology::setWhereMeasured(z, where.measured)
   z
 }
 

@@ -20,13 +20,15 @@ get_oo_descriptor <- function(w, sr.index = 0L, ch.index = 0L) {
       rOmniDriver::get_calibration_coefficients_from_buffer(w, sr.index, ch.index)
     # linearization
     nl.poly <- calib.data$getNlCoefficients()
-    z$nl.poly <- polynom::polynomial(nl.poly)
+    nl.poly <- polynom::polynomial(nl.poly)
+    z$nl.fun <- polynom::as.function(nl.poly)
     # stray light
     z$straylight.coeff <- calib.data$getStrayLight()
     z$straylight.slope <- calib.data$getStrayLightSlope()
     # wavelength calibration
     wl.poly <- calib.data$getWlCoefficients()
-    z$wl.poly <- polynom::polynomial(wl.poly)
+    wl.poly <- polynom::polynomial(wl.poly)
+    z$wl.fun <- polynom::as.function(wl.poly)
     z
   }
   bench <- rOmniDriver::get_bench(w, sr.index, ch.index)
@@ -69,6 +71,32 @@ set_descriptor_wl <- function(oo_descriptor,
   stopifnot(length(old.wl) == length(wl) &&
               !is.unsorted(wl, strictly = TRUE))
   oo_descriptor$inst.calib$wavelengths <- wl
+  oo_descriptor
+}
+
+#' Replace linearization function in instrument description.
+#'
+#' Uses a user supplied function, possibly that supplied by a manufacturer
+#' like Ocean Optics stored in firmware or in any other form.
+#'
+#' @param oo_descriptor list as returned by function \code{get_oo_descriptor}
+#' @param nl.fun A function or a polynom::polynomial object containing
+#'   the linearization to be applied.
+#'
+#' @return A copy of the argument passed for \code{oo_descriptor} with the
+#' wavelengths field of the calibration data replaced by the new values.
+#'
+#' @export
+#'
+set_descriptor_nl <- function(oo_descriptor,
+                              nl.fun)
+{
+  # if polynomial supplied instead of function we convert it
+  if (polynom::is.polynomial(nl.fun)) {
+    nl.fun <- as.function(nl.fun)
+  }
+  stopifnot(is.function(nl.fun))
+  oo_descriptor$inst.calib$nl.fun <- nl.fun
   oo_descriptor
 }
 

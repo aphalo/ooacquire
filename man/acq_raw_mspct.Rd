@@ -5,8 +5,8 @@
 \title{Take one set of spectral readings}
 \usage{
 acq_raw_mspct(oo_descriptor, acq_settings, protocol = c("measure", "filter",
-  "dark"), user.label = "", geocode = data.frame(lon = NA_real_, lat =
-  NA_real_), verbose = TRUE)
+  "dark"), user.label = "", where.measured = data.frame(lon = NA_real_, lat
+  = NA_real_), verbose = TRUE)
 }
 \arguments{
 \item{oo_descriptor}{list as returned by function \code{get_oo_descriptor()}}
@@ -18,7 +18,7 @@ or \code{retune_acq_settings()} or \code{acq_settings()}}
 
 \item{user.label}{character string to set as label}
 
-\item{geocode}{data.frame with at least columns "lon" and "lat" compatible
+\item{where.measured}{data.frame with at least columns "lon" and "lat" compatible
 with value returned by \code{ggmap::geocode()}}
 
 \item{verbose}{ogical to enable or disable warnings}
