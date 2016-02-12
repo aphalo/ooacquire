@@ -14,6 +14,8 @@
 #'   "bracketing".
 #' @param pix.selector a logical or numeric vector used as subscript to select
 #'   pixels
+#' @param corr.elect.dark,corr.sensor.nl  integer 0L (FALSE) or 1L (TRUE)
+#' @param boxcar.width integer number of pixels to average
 #' @param verbose a logical to enable or disable warnings
 #'
 #' @note \code{pixel.selector} can be used for two different purposes: to
@@ -47,6 +49,9 @@ acq_settings <- function(oo_descriptor,
                          tot.time.range = c(0, Inf), # seconds
                          HDR.mult = c(short = 1, long = 10),
                          pix.selector = TRUE,
+                         corr.elect.dark = 0L,
+                         corr.sensor.nl = 0L,
+                         boxcar.width = 0L,
                          verbose = TRUE) {
   # Check length consistency
   stopifnot(length(integ.time) == length(num.scans))
@@ -82,7 +87,9 @@ acq_settings <- function(oo_descriptor,
     min.integ.time = min.integ.time,
     num.scans = num.scans,
     tot.time.range = tot.time.range,
-    corr.elect.dark = 0L,
+    corr.elect.dark = corr.elect.dark,
+    corr.sensor.nl = corr.sensor.nl,
+    boxcar.width = boxcar.width,
     # diagnosis
     tot.time = integ.time * num.scans,
     rel.signal = NA
@@ -106,16 +113,19 @@ tune_acq_settings <- function(oo_descriptor,
                               acq_settings,
                               verbose = TRUE) {
   x <- acq_settings
-  # set according to acq_settings
+  nl.fun <- oo_descriptor$inst.calib$nl.fun
+  # correction for electrical dark (in instrument using ocluded pixels in array)
   rOmniDriver::set_correct_for_electrical_dark(oo_descriptor$w, x$corr.elect.dark,
                                                oo_descriptor$sr.index,
                                                oo_descriptor$ch.index)
-  # in current implementation we apply the correction always after acquisition
-  rOmniDriver::set_correct_for_detector_nonlinearity(oo_descriptor$w, 0L,
+  # correction for sensor non-linearuty (in instrument)
+  rOmniDriver::set_correct_for_detector_nonlinearity(oo_descriptor$w,
+                                                     x$corr.sensor.nl,
                                                      oo_descriptor$sr.index,
                                                      oo_descriptor$ch.index)
-  # in current implementation we apply smoothing always after acquisition
-  rOmniDriver::set_boxcar_width(oo_descriptor$w, 0L,
+  # moving window smoothing
+  rOmniDriver::set_boxcar_width(oo_descriptor$w,
+                                x$boxcar.width,
                                 oo_descriptor$sr.index,
                                 oo_descriptor$ch.index)
   # to speed up tunning we set number of scans to one
@@ -123,7 +133,7 @@ tune_acq_settings <- function(oo_descriptor,
                                 oo_descriptor$sr.index,
                                 oo_descriptor$ch.index)
   # to more easily reach the target we linearize the counts before interpolation
-  nl.fun <- oo_descriptor$calib.data$nl.fun
+  nl.fun <- oo_descriptor$inst.calib$nl.fun
   # optimize parameters
   integ.time <- x$integ.time[1]
   target.min.counts <- nl.fun(0.8 * oo_descriptor$max.counts)
@@ -197,9 +207,9 @@ tune_acq_settings <- function(oo_descriptor,
   num.scans <- ifelse(integ.time < x$tot.time.range[1],
                       trunc(x$tot.time.range[1] / integ.time) + 1,
                       1)
-  if (all.equal(x$tot.time.range)) {
+  if (x$tot.time.range[2] - x$tot.time.range[1] < x$min.integ.time) {
     integ.time <- x$tot.time.range[1] / num.scans
-  } else if (integ.time > x$tot.time.range[2]) {
+  } else if (integ.time[1] > x$tot.time.range[2]) {
     integ.time <- x$tot.time.range[2]
   }
   acq_settings$integ.time <- integ.time

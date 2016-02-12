@@ -29,7 +29,7 @@ linearize_counts <- function(x,
   # guard against attempts to reapply linearization
   stopifnot(!attr(x, "linearized"))
   oo_descriptor <- getInstrDesc(x)
-  nl.fun <- oo_descriptor$calib.data$nl.fun
+  nl.fun <- oo_descriptor$inst.calib$nl.fun
   counts.cols <- names(x)[grep("^counts", names(x))]
   for (col in counts.cols) {
     if (force_zero) {

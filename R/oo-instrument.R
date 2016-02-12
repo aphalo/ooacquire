@@ -16,22 +16,24 @@
 get_oo_descriptor <- function(w, sr.index = 0L, ch.index = 0L) {
   get_calib_coeffs <- function() {
     z <- list()
-    calib.data <-
+    inst.calib <-
       rOmniDriver::get_calibration_coefficients_from_buffer(w, sr.index, ch.index)
     # linearization
-    nl.poly <- calib.data$getNlCoefficients()
-    nl.poly <- polynom::polynomial(nl.poly)
-    z$oo_nl_fun <- as.function(nl.poly)
-    z$nl_fun <- function(x) {x / z$oo_nl_fun(x)}
+    oo.nl.poly <- inst.calib$getNlCoefficients()
+    oo.nl.poly <- polynom::polynomial(oo.nl.poly)
+    oo.nl.fun <- as.function(oo.nl.poly)
+    nl.fun <- function(x) {x / oo.nl.fun(x)}
+    z$nl.fun <- nl.fun
     # stray light
-    z$straylight.coeff <- calib.data$getStrayLight()
-    z$straylight.slope <- calib.data$getStrayLightSlope()
+    z$straylight.coeff <- inst.calib$getStrayLight()
+    z$straylight.slope <- inst.calib$getStrayLightSlope()
     # wavelength calibration
-    wl.poly <- calib.data$getWlCoefficients()
+    wl.poly <- inst.calib$getWlCoefficients()
     wl.poly <- polynom::polynomial(wl.poly)
     z$wl.fun <- as.function(wl.poly)
     z
   }
+
   bench <- rOmniDriver::get_bench(w, sr.index, ch.index)
   list(
     time = lubridate::now(),
@@ -47,8 +49,34 @@ get_oo_descriptor <- function(w, sr.index = 0L, ch.index = 0L) {
     max.integ.time = rOmniDriver::get_maximum_integration_time(w, sr.index),
     max.counts = rOmniDriver::get_maximum_intensity(w, sr.index),
     wavelengths = rOmniDriver::get_wavelengths(w, sr.index, ch.index),
+    bad.pixs = numeric(),
     inst.calib = get_calib_coeffs()
   )
+}
+
+#' Add bad pixel informatoin to an instrument description
+#'
+#' A integer vector of indexes to bad pixels in the instrument array. Data from
+#' these array pixels will be discarded.
+#'
+#' @param oo_descriptor list as returned by function \code{get_oo_descriptor}
+#' @param bad.pixs numeric vector of sorted wavelengths values corresponding to each
+#' pixel in the instrument array.
+#'
+#' @return a copy of the argument passed for \code{oo_descriptor} with the
+#' wavelengths field of the calibration data replaced by the new values.
+#'
+#' @export
+#'
+set_descriptor_bad_pixs <- function(oo_descriptor,
+                                    bad.pixs) {
+  # validate user input
+  bad.pixs <- as.integer(bad.pixs)
+  bad.pixs <- unique(sort(bad.pixs))
+  stopifnot(min(bad.pixs) >= 1 &&
+              max(bad.pixs) <= length(oo_descriptor$wavelengths))
+  oo_descriptor$bad.pixs <- bad.pixs
+  oo_descriptor
 }
 
 #' Replace wavelength values in an instrument description
@@ -71,7 +99,7 @@ set_descriptor_wl <- function(oo_descriptor,
   old.wl <- oo_descriptor$inst.calib$wavelengths
   stopifnot(length(old.wl) == length(wl) &&
               !is.unsorted(wl, strictly = TRUE))
-  oo_descriptor$inst.calib$wavelengths <- wl
+  oo_descriptor$wavelengths <- wl
   oo_descriptor
 }
 

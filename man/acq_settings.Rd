@@ -7,7 +7,9 @@
 \usage{
 acq_settings(oo_descriptor, integ.time, num.scans = 10L,
   min.integ.time = -Inf, max.integ.time = Inf, tot.time.range = c(0, Inf),
-  HDR.mult = c(short = 1, long = 10), pix.selector = TRUE, verbose = TRUE)
+  HDR.mult = c(short = 1, long = 10), pix.selector = TRUE,
+  corr.elect.dark = 0L, corr.sensor.nl = 0L, boxcar.width = 0L,
+  verbose = TRUE)
 
 tune_acq_settings(oo_descriptor, acq_settings, verbose = TRUE)
 }
@@ -29,6 +31,10 @@ tune_acq_settings(oo_descriptor, acq_settings, verbose = TRUE)
 
 \item{pix.selector}{a logical or numeric vector used as subscript to select
 pixels}
+
+\item{corr.elect.dark, corr.sensor.nl}{integer 0L (FALSE) or 1L (TRUE)}
+
+\item{boxcar.width}{integer number of pixels to average}
 
 \item{verbose}{a logical to enable or disable warnings}
 

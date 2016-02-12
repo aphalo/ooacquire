@@ -6,7 +6,7 @@
 \usage{
 acq_raw_mspct(oo_descriptor, acq_settings, protocol = c("measure", "filter",
   "dark"), user.label = "", where.measured = data.frame(lon = NA_real_, lat
-  = NA_real_), verbose = TRUE)
+  = NA_real_), pause.fun = NULL, verbose = TRUE, ...)
 }
 \arguments{
 \item{oo_descriptor}{list as returned by function \code{get_oo_descriptor()}}
@@ -18,10 +18,14 @@ or \code{retune_acq_settings()} or \code{acq_settings()}}
 
 \item{user.label}{character string to set as label}
 
-\item{where.measured}{data.frame with at least columns "lon" and "lat" compatible
-with value returned by \code{ggmap::geocode()}}
+\item{where.measured}{data.frame with at least columns "lon" and "lat"
+compatible with value returned by \code{ggmap::geocode()}}
+
+\item{pause.fun}{function used for handling protocol transitions#'}
 
 \item{verbose}{ogical to enable or disable warnings}
+
+\item{...}{passed to \code{pause.fun} (ignored by the default function)}
 }
 \value{
 a raw_mspct object
@@ -29,5 +33,10 @@ a raw_mspct object
 \description{
 Take readings according to parameters from a list of settings and a protocol
 defined by a vector of names.
+}
+\note{
+The default \code{pause.fun} prompts the user at each change of value
+  in \code{protocol}. The user can write other functions, for example for a
+  time delay.
 }
 

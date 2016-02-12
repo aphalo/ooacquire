@@ -5,7 +5,10 @@ w <- start_session()
 
 list_instruments(w)
 
-descriptor <- get_oo_descriptor(w)
+descriptor_ch1 <- get_oo_descriptor(w, ch.index = 0L)
+descriptor_ch2 <- get_oo_descriptor(w, ch.index = 1L)
+
+descriptor <- descriptor_ch2
 
 current_settings <- get_oo_settings(descriptor)
 

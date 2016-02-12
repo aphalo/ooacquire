@@ -25,21 +25,22 @@ acq_raw_spct <- function(oo_descriptor,
                          verbose = TRUE) {
   if (set.all) {
     # set according to acq_settings
+    # correction for electrical dark (in instrument using ocluded pixels in array)
     rOmniDriver::set_correct_for_electrical_dark(oo_descriptor$w,
-                                                 acq_settings$corr.elect.dark,
+                                                 x$corr.elect.dark,
                                                  oo_descriptor$sr.index,
                                                  oo_descriptor$ch.index)
-    # in current implementation we apply the correction always after acquisition
+    # correction for sensor non-linearuty (in instrument)
     rOmniDriver::set_correct_for_detector_nonlinearity(oo_descriptor$w,
-                                                       0L,
+                                                       x$corr.sensor.nl,
                                                        oo_descriptor$sr.index,
                                                        oo_descriptor$ch.index)
-    # in current implementation we apply smoothing always after acquisition
+    # moving window smoothing
     rOmniDriver::set_boxcar_width(oo_descriptor$w,
-                                  0L,
+                                  x$boxcar.width,
                                   oo_descriptor$sr.index,
                                   oo_descriptor$ch.index)
-  }
+   }
   x <- acq_settings
   y <- oo_descriptor
   num.readings <- length(x$integ.time)
@@ -50,12 +51,14 @@ acq_raw_spct <- function(oo_descriptor,
     counts.name <- paste("counts", i, sep = "_")
     rOmniDriver::set_integration_time(y$w, x$integ.time[i], y$sr.index, y$ch.index)
     actual.integ.time <- rOmniDriver::get_integration_time(y$w, y$sr.index, y$ch.index)
-    if (actual.integ.time != x$integ.time[i]) {
+    # We need to
+    if (x$integ.time[i] - actual.integ.time > x$integ.time[i] * 1e-5) {
       # We guard against failure to set integration time
       # It should never happen as we check validity value requested
       warning("The spectrometer has overridden the integration time!")
-      x$integ.time[i] <- actual.integ.time
     }
+    # could improve precision in case of rounding errors
+    x$integ.time[i] <- actual.integ.time
     rOmniDriver::set_scans_to_avg(y$w, x$num.scans[i], y$sr.index, y$ch.index)
     if (verbose) message(paste("Measurement ", i, "..."))
     counts <- rOmniDriver::get_spectrum(y$w, y$sr.index, y$ch.index)
@@ -67,6 +70,7 @@ acq_raw_spct <- function(oo_descriptor,
     }
   }
   z <- as.raw_spct(z)
+  attr(z, "linearized") <- FALSE
   photobiology::setInstrDesc(z, y)
   photobiology::setInstrSettings(z, x)
   photobiology::setWhenMeasured(z, start.time)
@@ -82,22 +86,40 @@ acq_raw_spct <- function(oo_descriptor,
 #'
 #' @param oo_descriptor list as returned by function \code{get_oo_descriptor()}
 #' @param acq_settings list as returned by functions \code{tune_acq_settings()}
-#' or \code{retune_acq_settings()} or \code{acq_settings()}
+#'   or \code{retune_acq_settings()} or \code{acq_settings()}
 #' @param protocol vector of character strings
 #' @param user.label character string to set as label
-#' @param where.measured data.frame with at least columns "lon" and "lat" compatible
-#' with value returned by \code{ggmap::geocode()}
+#' @param where.measured data.frame with at least columns "lon" and "lat"
+#'   compatible with value returned by \code{ggmap::geocode()}
+#' @param pause.fun function used for handling protocol transitions#'
 #' @param verbose ogical to enable or disable warnings
+#' @param ... passed to \code{pause.fun} (ignored by the default function)
 #'
 #' @export
 #' @return a raw_mspct object
+#'
+#' @note The default \code{pause.fun} prompts the user at each change of value
+#'   in \code{protocol}. The user can write other functions, for example for a
+#'   time delay.
 #'
 acq_raw_mspct <- function(oo_descriptor,
                           acq_settings,
                           protocol = c("measure", "filter", "dark"),
                           user.label = "",
                           where.measured = data.frame(lon = NA_real_, lat = NA_real_),
-                          verbose = TRUE) {
+                          pause.fun = NULL,
+                          verbose = TRUE,
+                          ...) {
+
+  default_pause_fun <- function(acq.what, ...) {
+    answ <- readline(paste("Ready to acquire", acq.what,
+                           "measurement ('z' = abort)"))
+    tolower(answ[1]) != "z"
+  }
+
+  if (is.null(pause.fun)) {
+    pause.fun <- default_pause_fun
+  }
   previous.protocol <- "none"
   z <- list()
   idx <- 0
@@ -105,9 +127,7 @@ acq_raw_mspct <- function(oo_descriptor,
   for (p in protocol) {
     if (p != previous.protocol) {
       previous.protocol <- p
-      answ <- readline(paste("Ready to acquire", p,
-                             "measurement ('z' = abort)"))
-      if (tolower(answ[1]) == "z") {
+      if (!pause.fun(p, ...)) {
         break()
       }
     }

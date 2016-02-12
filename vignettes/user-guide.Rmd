@@ -11,6 +11,20 @@ vignette: >
 
 ## Introduction
 
+we define higher-level functions using package 'rOmniDriver' as basis. 
+One could say that they conform a grammar for spectral data acquisition. The
+basic steps of the acquisition of data after starting a session and obtaining
+a descriptor of an attached instrument are: 1) define the settings to be used,
+2) optionally adjust or tune some of these settings automatically, 3) acquire
+the spectrum, 4) convert the raw counts into linearized counts per second.
+
+We usually acquire more than one spectrum, frequently following a certain
+protocol. The fifth word (5) allows the acquisition of a collection of spectra
+following a user specified protocol.
+
+Metadata is stored at each step, allowing the tracing of the origin and
+processing of the data.
+
 ## Functions
 
 | function name | role |
@@ -20,6 +34,7 @@ vignette: >
 | `list_instruments()`| list all connected instruments |
 | `get_oo_descriptor()` | get a descriptor for one of the possibly several connected instruments |
 | `set_descriptor_wl()` | replace the wavelength values |
+| `set_descriptor_bad_pixs()` | replace the idexes to bad array detector pixels |
 | `set_descriptor_nl()` | replace the function used to correct for array non-linearity |
 | `get_oo_settings()` | query the instrument to obtain its current settings |
 | `acq_settings()` | build a list of setting values |
@@ -27,6 +42,8 @@ vignette: >
 | `acq_raw_spct()` | take one measurement (data point) |
 | `acq_raw_mspct()` | take a sequence of spectral measurement (several data points) |
 | `linearize_counts()` | linearize the raw counts |
+| `raw2cps()` | methods to convert raw counts into counts per second |
+| ---     | the method specialization for `raw_spct` returns a `cps_spct` object |
 
 ## Workflow
 
