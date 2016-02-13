@@ -1,10 +1,5 @@
 TODO
 
-Implement a way of including bad pixel information in the instrument descriptor.
-
-Make tunning faster by linearizing the max counts value before extrapolating
-to guess needed increment in integration time.
-
 OOAcquire 0.1.0
 ===============
 

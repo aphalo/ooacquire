@@ -13,6 +13,3 @@
 #' @import photobiology
 #'
 "_PACKAGE"
-
-
-

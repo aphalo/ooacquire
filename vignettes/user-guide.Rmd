@@ -40,10 +40,13 @@ processing of the data.
 | `acq_settings()` | build a list of setting values |
 | `tune_acq_settings()` | tune the integration time and number of scans to the current radiation conditions |
 | `acq_raw_spct()` | take one measurement (data point) |
+| `trim_counts()` | replace values from saturated array pixels with NAs |
 | `acq_raw_mspct()` | take a sequence of spectral measurement (several data points) |
 | `linearize_counts()` | linearize the raw counts |
+| `skip_bad_pixs()` | replace bad pixels with interpolated raw counts |
 | `raw2cps()` | methods to convert raw counts into counts per second |
 | ---     | the method specialization for `raw_spct` returns a `cps_spct` object |
+| `merge_cps()` | method to do HDR merge of bracketed scans |
 
 ## Workflow
 

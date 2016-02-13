@@ -23,6 +23,12 @@ acq_raw_spct <- function(oo_descriptor,
                          where.measured = data.frame(lon = NA_real_, lat = NA_real_),
                          set.all = TRUE,
                          verbose = TRUE) {
+  x <- acq_settings
+  y <- oo_descriptor
+  num.readings <- length(x$integ.time)
+  z <- dplyr::data_frame(w.length = y$wavelengths)
+  start.time <- lubridate::now()
+
   if (set.all) {
     # set according to acq_settings
     # correction for electrical dark (in instrument using ocluded pixels in array)
@@ -41,11 +47,6 @@ acq_raw_spct <- function(oo_descriptor,
                                   oo_descriptor$sr.index,
                                   oo_descriptor$ch.index)
    }
-  x <- acq_settings
-  y <- oo_descriptor
-  num.readings <- length(x$integ.time)
-  z <- dplyr::data_frame(w.length = y$wavelengths)
-  start.time <- lubridate::now()
 
   for (i in 1:num.readings) {
     counts.name <- paste("counts", i, sep = "_")
