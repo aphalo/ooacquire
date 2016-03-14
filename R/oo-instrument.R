@@ -14,7 +14,7 @@
 #' @return a list
 #'
 get_oo_descriptor <- function(w, sr.index = 0L, ch.index = 0L) {
-  get_calib_coeffs <- function() {
+  get_calib <- function() {
     z <- list()
     inst.calib <-
       rOmniDriver::get_calibration_coefficients_from_buffer(w, sr.index, ch.index)
@@ -31,6 +31,13 @@ get_oo_descriptor <- function(w, sr.index = 0L, ch.index = 0L) {
     wl.poly <- inst.calib$getWlCoefficients()
     wl.poly <- polynom::polynomial(wl.poly)
     z$wl.fun <- as.function(wl.poly)
+    # irradiance calibration factors
+    if (rOmniDriver::is_feature_supported_irradiance_calibration_factor(w, sr.index)) {
+      z$irrad.mult <-
+        rOmniDriver::get_feature_irradiance_calibration_factor(w, sr.index)$getIrradianceCalibrationFactors()
+    } else {
+      z$irrad.mult <- NA_real_
+    }
     z
   }
 
@@ -50,7 +57,7 @@ get_oo_descriptor <- function(w, sr.index = 0L, ch.index = 0L) {
     max.counts = rOmniDriver::get_maximum_intensity(w, sr.index),
     wavelengths = rOmniDriver::get_wavelengths(w, sr.index, ch.index),
     bad.pixs = numeric(),
-    inst.calib = get_calib_coeffs()
+    inst.calib = get_calib()
   )
 }
 
@@ -126,6 +133,31 @@ set_descriptor_nl <- function(oo_descriptor,
   }
   stopifnot(is.function(nl.fun))
   oo_descriptor$inst.calib$nl.fun <- nl.fun
+  oo_descriptor
+}
+
+#' Add spectral irradiance calibration
+#'
+#' Adds calibration data for each pixel as a numeric vector
+#'
+#' @param oo_descriptor list as returned by function \code{get_oo_descriptor}
+#' @param irrad.mult numeric vector of the same length as the number of pixels
+#'   or of length one.
+#'
+#' @return A copy of the argument passed for \code{oo_descriptor} with the
+#' irrad.mult field of the calibration data replaced by the new values.
+#'
+#' @export
+#'
+set_descriptor_irrad_mult <- function(oo_descriptor,
+                           irrad.mult)
+{
+  stopifnot(length(irrad.mult) == 1 ||
+              length(irrad.mult) == length(oo_descriptor$wavelengths))
+  if (length(irrad.mult == 1)) {
+    warning("'irrad.mult' of length one will be recycled.")
+  }
+  oo_descriptor$inst.calib$irra.mult <- irrad.mult
   oo_descriptor
 }
 

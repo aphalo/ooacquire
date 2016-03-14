@@ -12,6 +12,7 @@
 #' @param tot.time.range numeric vector of length two with values in seconds
 #' @param HDR.mult a numeric vector with integ.time multipliers to be used for
 #'   "bracketing".
+#' @param target.marging numeric (0..1)
 #' @param pix.selector a logical or numeric vector used as subscript to select
 #'   pixels
 #' @param corr.elect.dark,corr.sensor.nl  integer 0L (FALSE) or 1L (TRUE)
@@ -42,12 +43,13 @@
 #' @return a list.
 #'
 acq_settings <- function(oo_descriptor,
-                         integ.time, # seconds
+                         integ.time = 10e-3, # seconds
                          num.scans = 10L,
                          min.integ.time = -Inf, # seconds
                          max.integ.time = Inf, # seconds
                          tot.time.range = c(0, Inf), # seconds
                          HDR.mult = c(short = 1, long = 10),
+                         target.marging = 0.10, # fraction
                          pix.selector = TRUE,
                          corr.elect.dark = 0L,
                          corr.sensor.nl = 0L,
@@ -79,21 +81,42 @@ acq_settings <- function(oo_descriptor,
   }
   # return a list
   list(
-    # settings
+    # user settings
     pix.selector = pix.selector,
+    # tunning settings
     HDR.mult = HDR.mult,
-    integ.time = integ.time,
+    target.marging = target.marging,
     max.integ.time = max.integ.time,
     min.integ.time = min.integ.time,
-    num.scans = num.scans,
     tot.time.range = tot.time.range,
+    # instrument settings
+    integ.time = integ.time,
+    num.scans = num.scans,
     corr.elect.dark = corr.elect.dark,
     corr.sensor.nl = corr.sensor.nl,
     boxcar.width = boxcar.width,
+    # processing flag
+    linearized = as.logical(corr.sensor.nl),
     # diagnosis
     tot.time = integ.time * num.scans,
     rel.signal = NA
   )
+}
+
+#' Set linearized attribute
+#'
+#' Tag the settings as linearized
+#'
+#' @param acq_settings list as returned by function \code{acq_settings()}
+#'
+#' @return a copy of the argument passed for \code{acq_settings} with the
+#' linearized field of the settings data replaced by TRUE.
+#'
+#' @keywords internal
+#'
+set_linearized <- function(acq_settings) {
+  acq_settings$linearized <- TRUE
+  acq_settings
 }
 
 #' Tune settings for measurement
@@ -136,7 +159,9 @@ tune_acq_settings <- function(oo_descriptor,
   nl.fun <- oo_descriptor$inst.calib$nl.fun
   # optimize parameters
   integ.time <- x$integ.time[1]
-  target.min.counts <- nl.fun(0.8 * oo_descriptor$max.counts)
+  target.marging <- x$target.marging
+  target.min.counts <- nl.fun((1 - target.marging) * oo_descriptor$max.counts)
+  target.counts <- nl.fun((1 - target.marging / 2) * oo_descriptor$max.counts)
 
   i <- 0L
   repeat {
@@ -150,6 +175,7 @@ tune_acq_settings <- function(oo_descriptor,
     raw.counts <- rOmniDriver::get_spectrum(oo_descriptor$w,
                                             oo_descriptor$sr.index,
                                             oo_descriptor$ch.index)
+    dark.counts <- nl.fun(min(raw.counts[x$pix.selector]))
     max.counts <- nl.fun(max(raw.counts[x$pix.selector]))
     while (rOmniDriver::is_saturated(oo_descriptor$w,
                                      oo_descriptor$sr.index,
@@ -167,16 +193,21 @@ tune_acq_settings <- function(oo_descriptor,
       raw.counts <- rOmniDriver::get_spectrum(oo_descriptor$w,
                                               oo_descriptor$sr.index,
                                               oo_descriptor$ch.index)
+      # subtracting the minimum counts as proxi for dark signal improves
+      # the guess without much danger of overshooting
+      dark.counts <- nl.fun(min(raw.counts[x$pix.selector]))
       max.counts <- nl.fun(max(raw.counts[x$pix.selector]))
     }
     if (verbose) message(paste("max.counts[", i, "]: ", format(max.counts)))
     if (max.counts < target.min.counts && integ.time < x$max.integ.time) {
       if (verbose) message("max count <", round(target.min.counts))
-      if (max.counts < 0.9 * target.min.counts) {
-        integ.time <- round(integ.time * target.min.counts / max.counts * 1.1, 0)
-      } else {
-        integ.time <- round(integ.time * 1.2, 0)
-      }
+#      if (max.counts < target.min.counts) {
+        integ.time <- round(integ.time *
+                              (target.counts - dark.counts) /
+                              (max.counts - dark.counts), 0)
+      # } else {
+      #   integ.time <- round(integ.time * 1.1, 0)
+      # }
     }
 
     if (integ.time > x$max.integ.time) {
@@ -216,7 +247,7 @@ tune_acq_settings <- function(oo_descriptor,
   acq_settings$num.scans <- num.scans
   #diagnosis
   acq_settings$tot.time <- integ.time * num.scans
-  acq_settings$rel.signal = max.counts / oo_descriptor$max.counts
+  acq_settings$rel.signal = max.counts / nl.fun(oo_descriptor$max.counts)
 
   if (verbose) {
     message("Relative saturation: ",

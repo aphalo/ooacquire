@@ -43,7 +43,7 @@ raw2cps.numeric <- function(x, integ.time, ...) {
 raw2cps.raw_spct <- function(x,
                              ...) {
   # guard against attempts to reapply linearization
-  if (!attr(x, "linearized")) {
+  if (!getInstrSettings(x)[["linearized"]]) {
     x <- linearize_counts(x)
   }
   acq_settings <- getInstrSettings(x)

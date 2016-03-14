@@ -1,41 +1,114 @@
 library(photobiology)
+library(ggplot2)
+library(ggspectra)
 library(ooacquire)
 
 w <- start_session()
 
 list_instruments(w)
 
+# get a descriptor for the first channel of the first spectrometer
 descriptor <- get_oo_descriptor(w)
 
-current_settings <- get_oo_settings(descriptor)
-
-settings <- acq_settings(descriptor, integ.time = 10e-3, num.scans = 1,
-                         tot.time.range = c(1,1))
+## PROTOCOL 0
+# set measurement settings directly
+settings <- acq_settings(descriptor,
+                         integ.time = 10e-3,
+                         num.scans = 1)
 
 spct_0 <- acq_raw_spct(descriptor, settings)
-plot(spct_0, type = "l")
+plot(spct_0)
+
+# we stop here because the settings most likely have been unsuitable
+# if we had used correct values then processing could continue as below
+
+# PROTOCOL 1
+# set measurement settings for automatic adjustment
+# the only restriction for HDR settings is that the two vectors are of the
+# same length. Lengths between 1 and 3 seem reasonable.
+#
+settings <- acq_settings(descriptor,
+                         HDR.mult = c(1,10),
+                         tot.time.range = c(10,10))
 
 settings <- tune_acq_settings(descriptor, settings)
 settings
 
-spct_1 <- acq_raw_spct(descriptor, settings)
-plot(counts_1 ~ w.length, data = spct_1, type = "l")
-lines(counts_2 ~ w.length, data = spct_1, col = "red")
+spct_1.acq <- acq_raw_spct(descriptor, settings)
+plot(spct_1.acq)
 
-spct_1_lin <- linearize_counts(spct_1)
-plot(counts_1 ~ w.length, data = spct_1_lin, type = "l")
-lines(counts_2 ~ w.length, data = spct_1_lin, col = "red")
+# processing of raw counts
 
-settings <- acq_settings(descriptor, integ.time = c(10e-3, 100e-3),
-                         num.scans = c(20, 5))
+spct_1 <- trim_counts(spct_1.acq)
+plot(spct_1)
 
-spct_2 <- acq_raw_spct(descriptor, settings)
-plot(counts_1 ~ w.length, data = spct_2, type = "l")
-lines(counts_2 ~ w.length, data = spct_2, col = "red")
-class(spct_2)
+spct_1 <- linearize_counts(spct_1)
+plot(spct_1)
 
-mspct_1 <- acq_raw_mspct(descriptor, settings, protocol = rep("test", 3))
+# use an internal "dark" reference from 191 to 350 nm
+spct_1 <- fshift(spct_1, range = c(191,290))
+plot(spct_1)
+
+# conversion to counts per second
+spct_1a <- raw2cps(spct_1)
+plot(spct_1a)
+
+# merge data from long and short integration times
+spct_1b <- merge_cps(spct_1a)
+plot(spct_1b)
+
+## PROTOCOL 2
+# acquire a measure in the light and a dark reference spectrum
+# (The character vector for protocol can be of any length, and the strings
+# can be anything you want. A prompt is issued if two consecutive strings
+# are different. A protocol like c(rep("light", 20), "filter", "dark") is
+# legal.)
+#
+# We first tune again the settings in case the light level has changed.
+settings <- tune_acq_settings(descriptor, settings)
+
+# we acquire two pairs of bracketed spectra
+mspct_1 <- acq_raw_mspct(descriptor, settings,
+                         protocol = c("light", "dark"),
+                         user.label = "example")
 mspct_1
 class(mspct_1)
 
+mslply(mspct_1, getWhatMeasured)
+mslply(mspct_1, getWhenMeasured)
+
+plot(mspct_1[["spct_1"]], annotations = NULL) +
+  ylim(0, max(mspct_1[["spct_1"]]$counts_1))
+plot(mspct_1[["spct_2"]], annotations = NULL) +
+  ylim(0, max(mspct_1[["spct_1"]]$counts_1))
+
+# processing of raw counts
+mspct_01 <- msmsply(mspct_1, trim_counts)
+plot(mspct_01[["spct_1"]], annotations = NULL) +
+  ylim(0, max(mspct_1[["spct_1"]]$counts_1))
+plot(mspct_01[["spct_2"]], annotations = NULL) +
+  ylim(0, max(mspct_1[["spct_1"]]$counts_1))
+
+mspct_01 <- msmsply(mspct_01, linearize_counts)
+plot(mspct_01[["spct_1"]], annotations = NULL) +
+  ylim(0, max(mspct_1[["spct_1"]]$counts_1))
+plot(mspct_01[["spct_2"]], annotations = NULL) +
+  ylim(0, max(mspct_1[["spct_1"]]$counts_1))
+
+# subtract dark reference from corresponding light scans (short and long)
+spct_01 <- ref_correction(mspct_01$spct_1, mspct_01$spct_2)
+plot(spct_01)
+
+# conversion to counts per second
+spct_01 <- raw2cps(spct_01)
+plot(spct_1)
+
+# merge data from long and short integration times
+spct_1 <- merge_cps(spct_1)
+plot(spct_1, annotations = c("color.guide", "labels", "segments"))
+
+# just if we want to confirm the settings actualy in use in the spectrometer
+current_settings <- get_oo_settings(descriptor)
+
 end_session(w)
+

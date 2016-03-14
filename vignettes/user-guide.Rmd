@@ -34,8 +34,9 @@ processing of the data.
 | `list_instruments()`| list all connected instruments |
 | `get_oo_descriptor()` | get a descriptor for one of the possibly several connected instruments |
 | `set_descriptor_wl()` | replace the wavelength values |
-| `set_descriptor_bad_pixs()` | replace the idexes to bad array detector pixels |
+| `set_descriptor_bad_pixs()` | replace the indexes to bad array detector pixels |
 | `set_descriptor_nl()` | replace the function used to correct for array non-linearity |
+| `set_descriptor_calib_mult()` | replace the vector of irradiance calibration multipliers |
 | `get_oo_settings()` | query the instrument to obtain its current settings |
 | `acq_settings()` | build a list of setting values |
 | `tune_acq_settings()` | tune the integration time and number of scans to the current radiation conditions |
@@ -44,9 +45,40 @@ processing of the data.
 | `acq_raw_mspct()` | take a sequence of spectral measurement (several data points) |
 | `linearize_counts()` | linearize the raw counts |
 | `skip_bad_pixs()` | replace bad pixels with interpolated raw counts |
+| `ref_correction()`| subtract a reference (e.g. dark signal) from a measured spectrum |
+| `photobiology::fshift()`| can be used to subtract a region of the same scan as an internal "dark" reference |
 | `raw2cps()` | methods to convert raw counts into counts per second |
 | ---     | the method specialization for `raw_spct` returns a `cps_spct` object |
 | `merge_cps()` | method to do HDR merge of bracketed scans |
+| `cps2irrad()` | methods to convert counts per second into spectral irradiance |
+| `cps2Tfr()` | methods to convert counts per second into transmittance |
+| `cps2Rfr()` | methods to convert counts per second into reflectance |
 
 ## Workflow
+
+The workflow consists in several steps. First all one needs to start a new connection to the driver by means of `start_session()` and disconnect at the end of the measuring session with `end_session()`. To learn which instruments are connected and which numerical index pints to each one uses `list_instruments()`. The indexes start at zero, so if there is only one instrument connected one can rely on its index being 0. The same applies to channels, for multichannel instruments.
+
+Once we know which instrument we want to address and its index, we must create an instrument descriptor with function `get_oo_descriptor()`. From this point onwards we will use this _descriptor_ to address the instrument. The descriptor contains information about the instrument obtained initially by querying it. Instruments may have some pieces of information unavailable (e.g. not stored in there non-volatile memory), or the user may want to override the available information with that from a more recent or better calibration. `set_descriptor_nl()`, `set_descriptor_wl()` and `set_descriptor_bad_pixs()` can be used to set or override the function used for correcting for the non-linearity of the sensors, the wavelength values corresponding to each pixel and a vector of indexes (starting at one) corresponding to bad pixels in the array (pixel know to return bad data).
+
+As there are several settings needed for the acquisition of a spectrum, we will store sets of settings into objects that can reuse and modify. To create these objects we use function `acq_settings()`. The _settings_ include both actual parameters that need to be set in the instrument by sending commands and parameters that our software may use to calculate suitable values for such settings. This function is quite flexible and allows the use of bracketing. In other words a single observation can consist in more than one data acquisition, each of these using different setting, with the aim of merging them into a single spectrum.
+
+Some settings need to be adjusted according to the current irradiance level so as to make full use of the dynamic range of the instrument. For this we use function `tune_acq_settings()`, which updates the settings stored in a list as created by `acq_settings()` or as returned by a previous call to `tune_acq_settings()`.
+
+Function `get_oo_settings()` can be used to query the instrument for the settings currently in use. 
+
+To acquire spectral data we can use one of two functions, `acq_raw_spct()` to acquire a single spectrum, or `acq_raw_mspct()` to acquire a collection of spectra according to a user supplied protocol. In cases when we use HDR (bracketing) or _overexpose_ some part of the spectrum the first data-processing step is to replace the data from the saturated pixels with `NA`'s using function `trim_counts()`---as the settings used in the acquisition and descriptor of the instrument are stored in the spectral object, this function needs only to be supplied a `raw_spct` object, unless the user wants to discard more pixels. If the instrument array contains bad pixels, it is best to replace the data produced by them at this early stage. Function `skip_bad_pixs()` is useful here and it replaces the bad data with the average of the readings from the neighbouring pixels. The third step after data acquisition, unless the linearization is done by the instrument, is to linearize the acquired _valid_ raw counts by means of method `linearize_counts()`.
+
+CCD arrays, especially if not cooled, have a significant dark signal. The best approach to remove this _background_ signal is to measure it---to take a spectral reading with the array not exposed to light. This _dark spectrum_ is them subtracted from the one measured in the light. An alternative, with advantages and disadvantages, is to use the signal from pixels corresponding to wavelengths **known** _a priori_ to be absent in the light source being measured. This calculation is done with the **linearized** raw counts by means of method `photobiology::fshift()` with a pair of suitable wavelength values for `range`. In the case of measuring transmittance (and absorbance) and reflectance we need to also measure a _clear_ and _white_ reference respectively.
+
+The raw counts after linearization followed by subtraction of the dark signal are still expressed in number of counts per integration period. As the duration of the integration time is variable, we need to re-express the raw counts as counts-per-second (_cps_). Only these values expressed as counts per second are linearly proportional to the number of photons impinging the pixel times a proportionality constant that is dependent on the pixel and wavelength---detector quantum yield depends on the wavelength. Once more, the integration time used for the acquisition is stored in the `cps_spct` object and the conversion can be done by method `raw2cps()` with just this object as input.
+
+If bracketing for HDR has been used during acquisition, at this point, the values of the _cps_ for each of the bracketed spectra are expressed on the same scale. This means that they can simply be spliced together. The simplest approach possible, used by method `merge_cps()` is to replace the clipped data from saturated pixels in the long integration with data from the same pixels in the short integration. As we used `trim_counts()` on the raw counts, those saturated pixels have already been replaced with `NA`'s making the operation easy to implement.
+
+This is the last step implemented in the current version of the package. If the _cps_ or merged _cps_ values are from an irradiance measurement these data are now ready to be multiplied by the calibration constants corresponding to each individual pixel. If the values are to be used for calculation of transmittance or reflectance, all what is left to do is simple arithmetic.
+
+## What's next
+
+You can compose from these simple functions different measurement protocols. This is the reason why they have been designed as a set of small functions, each one doing a single operaton.
+
+Please see the example scripts installed with the package.
 

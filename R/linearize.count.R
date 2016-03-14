@@ -37,6 +37,9 @@ linearize_counts <- function(x,
       x[[col]] <- nl.fun(x[[col]])
     }
   }
-  attr(x, "linearized") <- TRUE
+  settings <- getInstrSettings(x)
+  setInstrSettings(x, set_linearized(settings))
   x
 }
+
+

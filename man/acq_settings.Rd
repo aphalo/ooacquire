@@ -5,11 +5,11 @@
 \alias{tune_acq_settings}
 \title{Settings for spectral measurement}
 \usage{
-acq_settings(oo_descriptor, integ.time, num.scans = 10L,
+acq_settings(oo_descriptor, integ.time = 0.01, num.scans = 10L,
   min.integ.time = -Inf, max.integ.time = Inf, tot.time.range = c(0, Inf),
-  HDR.mult = c(short = 1, long = 10), pix.selector = TRUE,
-  corr.elect.dark = 0L, corr.sensor.nl = 0L, boxcar.width = 0L,
-  verbose = TRUE)
+  HDR.mult = c(short = 1, long = 10), target.marging = 0.1,
+  pix.selector = TRUE, corr.elect.dark = 0L, corr.sensor.nl = 0L,
+  boxcar.width = 0L, verbose = TRUE)
 
 tune_acq_settings(oo_descriptor, acq_settings, verbose = TRUE)
 }
@@ -28,6 +28,8 @@ tune_acq_settings(oo_descriptor, acq_settings, verbose = TRUE)
 
 \item{HDR.mult}{a numeric vector with integ.time multipliers to be used for
 "bracketing".}
+
+\item{target.marging}{numeric (0..1)}
 
 \item{pix.selector}{a logical or numeric vector used as subscript to select
 pixels}
