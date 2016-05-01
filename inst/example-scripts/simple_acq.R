@@ -9,11 +9,17 @@ list_instruments(w)
 
 # get a descriptor for the first channel of the first spectrometer
 descriptor <- get_oo_descriptor(w)
+# set Maya hot pixels and correct time limits
+descriptor <- set_descriptor_bad_pixs(descriptor, c(123,380,1829,1994))
+descriptor <- set_descriptor_integ_time(descriptor, NA, 7.2)
+
+#
 
 ## PROTOCOL 0
 # set measurement settings directly
 settings <- acq_settings(descriptor,
-                         integ.time = 10e-3,
+                         HDR.mult = 1,
+                         integ.time = 60,
                          num.scans = 1)
 
 spct_0 <- acq_raw_spct(descriptor, settings)
@@ -24,12 +30,12 @@ plot(spct_0)
 
 # PROTOCOL 1
 # set measurement settings for automatic adjustment
-# the only restriction for HDR settings is that the two vectors are of the
-# same length. Lengths between 1 and 3 seem reasonable.
+# there is no restriction for HDR settings but lengths between 1 and 3
+# seem reasonable.
 #
 settings <- acq_settings(descriptor,
                          HDR.mult = c(1,10),
-                         tot.time.range = c(10,10))
+                         tot.time.range = c(5,10))
 
 settings <- tune_acq_settings(descriptor, settings)
 settings
@@ -72,6 +78,7 @@ mspct_1 <- acq_raw_mspct(descriptor, settings,
                          protocol = c("light", "dark"),
                          user.label = "example")
 mspct_1
+
 class(mspct_1)
 
 mslply(mspct_1, getWhatMeasured)
@@ -95,17 +102,21 @@ plot(mspct_01[["spct_1"]], annotations = NULL) +
 plot(mspct_01[["spct_2"]], annotations = NULL) +
   ylim(0, max(mspct_1[["spct_1"]]$counts_1))
 
+mspct_filter <- msmsply(mspct_01, fshift, range = c(190,200))
+mspct_filter_01 <- msmsply(mspct_filter, trim_wl, range = c(270,900))
+mspct_filter_02 <- msmsply(mspct_filter_01, raw2cps)
+mspct_filter_03 <- msmsply(mspct_filter_02, merge_cps)
+
+plot(mspct_filter_03[[1]])
+plot(mspct_filter_03[[2]])
+
 # subtract dark reference from corresponding light scans (short and long)
-spct_01 <- ref_correction(mspct_01$spct_1, mspct_01$spct_2)
+spct_01 <- ref_correction(mspct_filter_03$spct_1, mspct_filter_03$spct_2)
 plot(spct_01)
 
-# conversion to counts per second
-spct_01 <- raw2cps(spct_01)
-plot(spct_1)
-
-# merge data from long and short integration times
-spct_1 <- merge_cps(spct_1)
-plot(spct_1, annotations = c("color.guide", "labels", "segments"))
+getInstrDesc(spct_01)
+getInstrSettings(spct_01)
+plot(spct_01, annotations = c("color.guide", "labels", "segments"))
 
 # just if we want to confirm the settings actualy in use in the spectrometer
 current_settings <- get_oo_settings(descriptor)

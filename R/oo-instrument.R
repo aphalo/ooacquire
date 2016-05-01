@@ -86,6 +86,53 @@ set_descriptor_bad_pixs <- function(oo_descriptor,
   oo_descriptor
 }
 
+#' Replace integration time limits in instrument descriptor
+#'
+#' This function can be needed in exceptional cases such as when the instrument
+#' the limits stored in the intrument firmware are wrong. In other cases in can
+#' be used to limit the range of values allowed to be set.
+#'
+#' @param oo_descriptor list as returned by function \code{get_oo_descriptor}
+#' @param min.integ.time,max.integ.time numeric values in seconds in seconds.
+#' @param force.change If FALSE values outside the range returned by a query
+#' to the instrument trigger an error. If TRUE this test is overriden.
+#'
+#' @return a copy of the argument passed for \code{oo_descriptor} with the
+#' integration time fields of the descriptor modified.
+#'
+#' @note This function should not be needed, but for some instruments the query
+#' may fail or return the wrong value. Values should be within the range
+#' in the instrument's specifications. Setting wrong values can result in
+#' invalid data without an error being triggered.
+#'
+#' @export
+#'
+set_descriptor_integ_time <- function(oo_descriptor,
+                                      min.integ.time = NA_integer_,
+                                      max.integ.time = NA_integer_,
+                                      force.change = FALSE) {
+  # validate user input
+  min.integ.time <- as.integer(min.integ.time * 1e6)
+  max.integ.time <- as.integer(max.integ.time * 1e6)
+  if (!is.na(min.integ.time)) {
+    if (!force.change) {
+      stopifnot(min.integ.time >=
+        rOmniDriver::get_minimum_integration_time(
+          oo_descriptor$w, oo_descriptor$sr.index))
+    }
+    oo_descriptor$min.integ.time <- min.integ.time
+  }
+  if (!is.na(max.integ.time)) {
+    if (!force.change) {
+      stopifnot(max.integ.time <=
+                  rOmniDriver::get_maximum_integration_time(
+                    oo_descriptor$w, oo_descriptor$sr.index))
+    }
+    oo_descriptor$max.integ.time <- max.integ.time
+  }
+  oo_descriptor
+}
+
 #' Replace wavelength values in an instrument description
 #'
 #' Replace wavelength values in an instrument descriptor for an Ocean Optics

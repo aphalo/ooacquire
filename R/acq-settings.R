@@ -177,9 +177,7 @@ tune_acq_settings <- function(oo_descriptor,
                                             oo_descriptor$ch.index)
     dark.counts <- nl.fun(min(raw.counts[x$pix.selector]))
     max.counts <- nl.fun(max(raw.counts[x$pix.selector]))
-    while (rOmniDriver::is_saturated(oo_descriptor$w,
-                                     oo_descriptor$sr.index,
-                                     oo_descriptor$ch.index))
+    while (max.counts > target.counts)
     {
       integ.time <- integ.time / 3
       if (integ.time < x$min.integ.time) {
@@ -210,7 +208,8 @@ tune_acq_settings <- function(oo_descriptor,
       # }
     }
 
-    if (integ.time > x$max.integ.time) {
+    if (integ.time >= x$max.integ.time) {
+      integ.time <- x$max.integ.time
       if (verbose) {
         warning("Light level is too low for optimal performance! Using (ms): ",
                 format(integ.time * 1e-3))
@@ -219,6 +218,7 @@ tune_acq_settings <- function(oo_descriptor,
     }
 
     if (integ.time < x$min.integ.time) {
+      integ.time = x$min.integ.time
       if (verbose) {
         warning("Clipping cannot be avoided! Using (ms): ",
                 format(integ.time * 1e-3))

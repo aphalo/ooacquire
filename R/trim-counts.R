@@ -69,6 +69,8 @@ skip_bad_pixs <- function(x) {
 #'
 merge_cps <- function(x) {
   stopifnot(is.cps_spct(x))
+  instr.desc <- getInstrDesc(x)
+  instr.settings <- getInstrSettings(x)
   counts.cols <- grep("^cps", names(x), value = TRUE)
   integ.times <- getInstrSettings(x)$integ.time
   cols <- counts.cols[order(integ.times, decreasing = TRUE)]
@@ -78,5 +80,8 @@ merge_cps <- function(x) {
                           x[[cols[i]]],
                           x[["cps"]] )
   }
-  x[ , c("w.length", "cps")]
+  x <- x[ , c("w.length", "cps")]
+  setInstrDesc(x, instr.desc)
+  setInstrSettings(x, instr.settings)
+  x
 }
