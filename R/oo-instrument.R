@@ -31,6 +31,8 @@ get_oo_descriptor <- function(w, sr.index = 0L, ch.index = 0L) {
     wl.poly <- inst.calib$getWlCoefficients()
     wl.poly <- polynom::polynomial(wl.poly)
     z$wl.fun <- as.function(wl.poly)
+    # slit function
+    z$slit.fun <- NA
     # irradiance calibration factors
     if (rOmniDriver::is_feature_supported_irradiance_calibration_factor(w, sr.index)) {
       z$irrad.mult <-
@@ -197,7 +199,7 @@ set_descriptor_nl <- function(oo_descriptor,
 #' @export
 #'
 set_descriptor_irrad_mult <- function(oo_descriptor,
-                           irrad.mult)
+                                      irrad.mult)
 {
   stopifnot(length(irrad.mult) == 1 ||
               length(irrad.mult) == length(oo_descriptor$wavelengths))
@@ -205,6 +207,30 @@ set_descriptor_irrad_mult <- function(oo_descriptor,
     warning("'irrad.mult' of length one will be recycled.")
   }
   oo_descriptor$inst.calib$irra.mult <- irrad.mult
+  oo_descriptor
+}
+
+#' Add function for slit correction
+#'
+#' Adds a function to the instrument descriptor that can be used to
+#' correct counts per second data to remove the effect of the tails of
+#' the slit function of the instrument.
+#'
+#' @param oo_descriptor list as returned by function \code{get_oo_descriptor}
+#' @param inv.slit.fun function with two first formal parameters taking numeric
+#'   vectors of wavelengths and counts that aoolies a correction suitable
+#'   for the instrument.
+#'
+#' @return A copy of the argument passed for \code{oo_descriptor} with the
+#' irrad.mult field of the calibration data replaced by the new values.
+#'
+#' @export
+#'
+set_descriptor_slit_fun <- function(oo_descriptor,
+                                      inv.slit.fun)
+{
+  stopifnot(is.function(.fun))
+  oo_descriptor$inst.calib$slit.fun <- inv.slit.fun
   oo_descriptor
 }
 

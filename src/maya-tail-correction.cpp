@@ -10,8 +10,6 @@ using namespace std;
 
 //' Function to compute the tail correction
 //'
-//' @usage apply_tail_correction(w_length, cts_second)
-//'
 //' @param w_length numeric vector of wavelengths in nm.
 //' @param cts_second numeric vector of counts per second (stray-light corrected).
 //'
@@ -23,10 +21,9 @@ using namespace std;
 //' @author Pedro J. Aphalo
 //' @export
 //' @references \url{http://www.r4photobiology.info}
-//' @keywords misc
 //'
 // [[Rcpp::export]]
-List apply_tail_correction(NumericVector w_length, NumericVector cts_second) {
+List maya_tail_correction(NumericVector w_length, NumericVector cts_second) {
 
     const int window_width = 300L;
 

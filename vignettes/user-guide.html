@@ -12,7 +12,7 @@
 
 <meta name="author" content="Pedro J. Aphalo" />
 
-<meta name="date" content="2016-04-26" />
+<meta name="date" content="2016-05-01" />
 
 <title>ooacquire 0.1.0.9003 User Guide</title>
 
@@ -32,7 +32,7 @@
 
 <h1 class="title"><code>ooacquire</code> 0.1.0.9003<br>User Guide</h1>
 <h4 class="author"><em>Pedro J. Aphalo</em></h4>
-<h4 class="date"><em>2016-04-26</em></h4>
+<h4 class="date"><em>2016-05-01</em></h4>
 
 
 
@@ -89,68 +89,84 @@
 <td>replace the vector of irradiance calibration multipliers</td>
 </tr>
 <tr class="odd">
+<td><code>set_descriptor_integ_time()</code></td>
+<td>replace the vector defining the range of valid integration times</td>
+</tr>
+<tr class="even">
 <td><code>get_oo_settings()</code></td>
 <td>query the instrument to obtain its current settings</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>acq_settings()</code></td>
 <td>build a list of setting values</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>tune_acq_settings()</code></td>
 <td>tune the integration time and number of scans to the current radiation conditions</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>acq_raw_spct()</code></td>
 <td>take one measurement (data point)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>trim_counts()</code></td>
 <td>replace values from saturated array pixels with NAs</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>acq_raw_mspct()</code></td>
 <td>take a sequence of spectral measurement (several data points)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>linearize_counts()</code></td>
 <td>linearize the raw counts</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>skip_bad_pixs()</code></td>
 <td>replace bad pixels with interpolated raw counts</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>ref_correction()</code></td>
 <td>subtract a reference (e.g. dark signal) from a measured spectrum</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>photobiology::fshift()</code></td>
 <td>can be used to subtract a region of the same scan as an internal “dark” reference</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>raw2cps()</code></td>
 <td>methods to convert raw counts into counts per second</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>—</td>
 <td>the method specialization for <code>raw_spct</code> returns a <code>cps_spct</code> object</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>merge_cps()</code></td>
 <td>method to do HDR merge of bracketed scans</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>cps2irrad()</code></td>
 <td>methods to convert counts per second into spectral irradiance</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>cps2Tfr()</code></td>
 <td>methods to convert counts per second into transmittance</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>cps2Rfr()</code></td>
 <td>methods to convert counts per second into reflectance</td>
+</tr>
+<tr class="even">
+<td><code>uvb_corrections()</code></td>
+<td>apply corrections for reducing the impact of stray light on UVB measurements</td>
+</tr>
+<tr class="odd">
+<td><code>slit_function_correction()</code></td>
+<td>apply a correction for the‘long tails’ of the slit function</td>
+</tr>
+<tr class="even">
+<td><code>filter_correctio()</code></td>
+<td>apply a correction for stray light based on the use of UV-cutoff filter</td>
 </tr>
 </tbody>
 </table>
@@ -158,7 +174,7 @@
 <div id="workflow" class="section level2">
 <h2>Workflow</h2>
 <p>The workflow consists in several steps. First all one needs to start a new connection to the driver by means of <code>start_session()</code> and disconnect at the end of the measuring session with <code>end_session()</code>. To learn which instruments are connected and which numerical index pints to each one uses <code>list_instruments()</code>. The indexes start at zero, so if there is only one instrument connected one can rely on its index being 0. The same applies to channels, for multichannel instruments.</p>
-<p>Once we know which instrument we want to address and its index, we must create an instrument descriptor with function <code>get_oo_descriptor()</code>. From this point onwards we will use this <em>descriptor</em> to address the instrument. The descriptor contains information about the instrument obtained initially by querying it. Instruments may have some pieces of information unavailable (e.g. not stored in there non-volatile memory), or the user may want to override the available information with that from a more recent or better calibration. <code>set_descriptor_nl()</code>, <code>set_descriptor_wl()</code> and <code>set_descriptor_bad_pixs()</code> can be used to set or override the function used for correcting for the non-linearity of the sensors, the wavelength values corresponding to each pixel and a vector of indexes (starting at one) corresponding to bad pixels in the array (pixel know to return bad data).</p>
+<p>Once we know which instrument we want to address and its index, we must create an instrument descriptor with function <code>get_oo_descriptor()</code>. From this point onwards we will use this <em>descriptor</em> to address the instrument. The descriptor contains information about the instrument obtained initially by querying it. Instruments may have some pieces of information unavailable (e.g. not stored in there non-volatile memory), or the user may want to override the available information with that from a more recent or better calibration. <code>set_descriptor_nl()</code>, <code>set_descriptor_wl()</code>, <code>set_descriptor_bad_pixs()</code> and <code>set_descripto_integ_time()</code> can be used to set or override the function used for correcting for the non-linearity of the sensors, the wavelength values corresponding to each pixel, a vector of indexes (starting at one) corresponding to bad pixels in the array (pixel known to return bad data) and the range of integration times in ms that are valid input for the instrument. __It is always good to check against the specifications of the instrument whether the values stored in its</p>
 <p>As there are several settings needed for the acquisition of a spectrum, we will store sets of settings into objects that can reuse and modify. To create these objects we use function <code>acq_settings()</code>. The <em>settings</em> include both actual parameters that need to be set in the instrument by sending commands and parameters that our software may use to calculate suitable values for such settings. This function is quite flexible and allows the use of bracketing. In other words a single observation can consist in more than one data acquisition, each of these using different setting, with the aim of merging them into a single spectrum.</p>
 <p>Some settings need to be adjusted according to the current irradiance level so as to make full use of the dynamic range of the instrument. For this we use function <code>tune_acq_settings()</code>, which updates the settings stored in a list as created by <code>acq_settings()</code> or as returned by a previous call to <code>tune_acq_settings()</code>.</p>
 <p>Function <code>get_oo_settings()</code> can be used to query the instrument for the settings currently in use.</p>
