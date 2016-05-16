@@ -53,7 +53,7 @@ raw2cps.raw_spct <- function(x,
   stopifnot(length(counts.cols) == length(integ.time))
   other.cols <- setdiff(names(x), counts.cols)
   z <- as.generic_spct(x)[other.cols]
-  for (i in 1:length(counts.cols)) {
+  for (i in seq_along(counts.cols)) {
     z[[cps.cols[i]]] <- x[[counts.cols[i]]] / integ.time[i] * 1e6
   }
   setCpsSpct(z)

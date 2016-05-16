@@ -64,7 +64,7 @@ ref_correction.raw_spct <- function(x,
   z <- as.generic_spct(x)[other.cols]
 
   # subtract column by column
-  for (i in 1:length(counts.cols)) {
+  for (i in seq_along(counts.cols)) {
     z[[counts.cols[i]]] <- .oper(x[[counts.cols[i]]], y[[counts.cols[i]]], ...)
   }
   setRawSpct(z)
@@ -107,7 +107,7 @@ ref_correction.cps_spct <- function(x,
   z <- as.generic_spct(x)[other.cols]
 
   # subtract column by column
-  for (i in 1:length(cps.cols)) {
+  for (i in seq_along(cps.cols)) {
     z[[cps.cols[i]]] <- .oper(x[[cps.cols[i]]],  y[[cps.cols[i]]], ...)
   }
   setCpsSpct(z)
