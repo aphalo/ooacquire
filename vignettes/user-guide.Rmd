@@ -25,6 +25,14 @@ following a user specified protocol.
 Metadata is stored at each step, allowing the tracing of the origin and
 processing of the data.
 
+In all cases a wavelength calibration is used to map the pixels to wavelengths.
+Further steps are needed depending on the quantity measured. In the case of 
+irradiance, a calibration needs to be applied to the spectral data. Usually
+calibration data is stored in the non-volatile memory of the spectrometer, but
+in some cases it is convenient to apply special algorithms or calibration data 
+that cannot be retrieved from the instrument itself. Funtions for these special 
+cases are also included in the package.
+
 ## Functions
 
 | function name | role |

@@ -9,6 +9,9 @@ list_instruments(w)
 
 # get a descriptor for the first channel of the first spectrometer
 descriptor <- get_oo_descriptor(w)
+# set Maya hot pixels and correct time limits
+descriptor <- set_descriptor_bad_pixs(descriptor, c(123,380,1829,1994))
+descriptor <- set_descriptor_integ_time(descriptor, NA, 7.2)
 
 #
 
@@ -72,10 +75,23 @@ settings <- tune_acq_settings(descriptor, settings)
 
 # we acquire two pairs of bracketed spectra
 mspct_1 <- acq_raw_mspct(descriptor, settings,
-                         protocol = c("light", "dark"),
-                         user.label = "example")
+                         protocol = c("light", "filter", "dark"),
+                         user.label = "window.sun")
 mspct_1
 
+## use new function
+##
+
+corrected.spct <- uvb_corrections(x = mspct_1[[1]],
+                            flt = mspct_1[[2]],
+                            dark = mspct_1[[3]],
+                            method = "original",
+                            stray.light.wl = c(218.5, 228.5),
+                            flt.dark.wl = c(193, 209.5),
+                            flt.ref.wl = c(360, 379.5),
+                            worker_fun = maya_tail_correction,
+                            trim = 0,
+                            verbose = FALSE)
 class(mspct_1)
 
 mslply(mspct_1, getWhatMeasured)
@@ -106,6 +122,7 @@ mspct_filter_03 <- msmsply(mspct_filter_02, merge_cps)
 
 plot(mspct_filter_03[[1]])
 plot(mspct_filter_03[[2]])
+plot(mspct_filter_03[[3]]) + ylim(NA, max(mspct_filter_03[[1]]$cps))
 
 # subtract dark reference from corresponding light scans (short and long)
 spct_01 <- ref_correction(mspct_filter_03$spct_1, mspct_filter_03$spct_2)
@@ -120,3 +137,4 @@ current_settings <- get_oo_settings(descriptor)
 
 end_session(w)
 
++
