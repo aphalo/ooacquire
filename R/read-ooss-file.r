@@ -75,6 +75,7 @@ read_oo_ssdata <- function(file,
   photobiology::setWhenMeasured(z, date)
   photobiology::setWhereMeasured(z, geocode)
   photobiology::setWhatMeasured(z, label)
-  z
+  z <- set_oo_ssdata_descriptor(z)
+  set_oo_ssdata_settings(z)
 }
 

@@ -35,18 +35,18 @@ set_oo_ssdata_settings <- function(x,
   lines.map <- map_oofile_header_rows(lines,
                                       header.end = 20,
                                       grammar = my.gr)
+
   inst.settings <-
     list(
-      time = photobiology::getWhenMeasured(x),
-      w = NA,
-      sr.index = NA_integer_,
-      ch.index = NA_integer_,
+      # user settings
+      pix.selector = TRUE,
+      # instrument settings
       correct.elec.dark =
-        grepl("Yes", lines[lines.map[["dark.corr"]]], fixed = TRUE),
-      correct.non.lin =
-        grepl("Yes", lines[lines.map[["lin.corr"]]], fixed = TRUE),
+        as.integer(grepl("Yes", lines[lines.map[["dark.corr"]]], fixed = TRUE)),
+      corr.sensor.nl =
+        as.integer(grepl("Yes", lines[lines.map[["lin.corr"]]], fixed = TRUE)),
       correct.stray.light =
-        grepl("Yes", lines[lines.map[["stray.corr"]]], fixed = TRUE),
+        as.integer(grepl("Yes", lines[lines.map[["stray.corr"]]], fixed = TRUE)),
       boxcar.width =
         as.integer(stringr::str_split(lines[lines.map[["boxcar"]]], " ")[[1]][3]),
       integ.time =
@@ -54,7 +54,13 @@ set_oo_ssdata_settings <- function(x,
                       # micro-seconds -> seconds
       num.scans =
         as.integer(stringr::str_split(lines[lines.map[["scans"]]], " ")[[1]][3])
-    )
+      )
+  # processing flag
+  inst.settings[["linearized"]] <- as.logical(inst.settings[["corr.sensor.nl"]])
+  # diagnosis
+  inst.settings[["tot.time"]] = with(inst.settings, integ.time * num.scans)
+  inst.settings[["rel.signal"]] = NA
+
   photobiology::setInstrSettings(x, inst.settings)
   x
 }

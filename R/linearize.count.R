@@ -27,8 +27,14 @@
 linearize_counts <- function(x,
                              force_zero = TRUE, verbose = FALSE) {
   # guard against attempts to reapply linearization
-  stopifnot(!attr(x, "linearized"))
+  settings <- getInstrSettings(x)
+  stopifnot(!settings[["linearized"]])
   oo_descriptor <- getInstrDesc(x)
+  if (is.null(oo_descriptor$inst.calib) ||
+      is.na(oo_descriptor$inst.calib) ||
+      !is.function(oo_descriptor$inst.calib$nl.fun)) {
+    stop("Non-linearity correction function is not available")
+  }
   nl.fun <- oo_descriptor$inst.calib$nl.fun
   counts.cols <- names(x)[grep("^counts", names(x))]
   for (col in counts.cols) {
@@ -37,7 +43,6 @@ linearize_counts <- function(x,
       x[[col]] <- nl.fun(x[[col]])
     }
   }
-  settings <- getInstrSettings(x)
   setInstrSettings(x, set_linearized(settings))
   x
 }
