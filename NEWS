@@ -2,6 +2,14 @@ TODO
 
 Add test cases.
 
+OOAcquire 0.1.1
+===============
+
+Add functions for reading metadata from SpectraSuite raw data files.
+Add function for reading data from SpectraSuite raw data files.
+Parsing is quite flexible, so hopefully robust accross versions of the software
+and spectrometer models and their possible configurations.
+
 OOAcquire 0.1.0
 ===============
 

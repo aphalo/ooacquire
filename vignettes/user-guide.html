@@ -12,9 +12,9 @@
 
 <meta name="author" content="Pedro J. Aphalo" />
 
-<meta name="date" content="2016-05-01" />
+<meta name="date" content="2016-06-26" />
 
-<title>ooacquire 0.1.0.9003 User Guide</title>
+<title>ooacquire 0.1.0.9004 User Guide</title>
 
 
 
@@ -30,9 +30,9 @@
 
 
 
-<h1 class="title"><code>ooacquire</code> 0.1.0.9003<br>User Guide</h1>
+<h1 class="title toc-ignore"><code>ooacquire</code> 0.1.0.9004<br>User Guide</h1>
 <h4 class="author"><em>Pedro J. Aphalo</em></h4>
-<h4 class="date"><em>2016-05-01</em></h4>
+<h4 class="date"><em>2016-06-26</em></h4>
 
 
 
@@ -41,6 +41,7 @@
 <p>we define higher-level functions using package ‘rOmniDriver’ as basis. One could say that they conform a grammar for spectral data acquisition. The basic steps of the acquisition of data after starting a session and obtaining a descriptor of an attached instrument are: 1) define the settings to be used, 2) optionally adjust or tune some of these settings automatically, 3) acquire the spectrum, 4) convert the raw counts into linearized counts per second.</p>
 <p>We usually acquire more than one spectrum, frequently following a certain protocol. The fifth word (5) allows the acquisition of a collection of spectra following a user specified protocol.</p>
 <p>Metadata is stored at each step, allowing the tracing of the origin and processing of the data.</p>
+<p>In all cases a wavelength calibration is used to map the pixels to wavelengths. Further steps are needed depending on the quantity measured. In the case of irradiance, a calibration needs to be applied to the spectral data. Usually calibration data is stored in the non-volatile memory of the spectrometer, but in some cases it is convenient to apply special algorithms or calibration data that cannot be retrieved from the instrument itself. Funtions for these special cases are also included in the package.</p>
 </div>
 <div id="functions" class="section level2">
 <h2>Functions</h2>
