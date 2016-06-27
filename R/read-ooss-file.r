@@ -49,6 +49,8 @@ read_oo_ssdata <- function(file,
       }
     }
     date <- lubridate::parse_date_time(line03, "m*!d! hms y", tz = tz)
+  } else if (is.na(date)) {
+    date <- as.POSIXct(NA_real_, origin = lubridate::origin)
   }
 
   data.rows <- oofile_data_rows(file_header)

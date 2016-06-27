@@ -1,6 +1,7 @@
 library(photobiology)
 library(readr)
 library(ooacquire)
+library(lubridate)
 
 my.locale <- locale(decimal_mark = ",", tz = "EET")
 
@@ -12,7 +13,6 @@ getInstrSettings(test.spct)
 getWhenMeasured(test.spct)
 attributes(test.spct)
 cat(comment(test.spct))
-raw2cps(test.spct)
 
 my.locale <- locale(decimal_mark = ".", tz = "CET")
 
@@ -24,7 +24,6 @@ getInstrSettings(test.spct)
 getWhenMeasured(test.spct)
 attributes(test.spct)
 cat(comment(test.spct))
-raw2cps(test.spct)
 
 my.locale <- default_locale()
 
@@ -36,7 +35,6 @@ getInstrSettings(test.spct)
 getWhenMeasured(test.spct)
 attributes(test.spct)
 cat(comment(test.spct))
-raw2cps(test.spct)
 
 test.spct <- read_oo_pidata(file = "vk_open_b_dark.txt", locale = my.locale)
 test.spct
@@ -45,6 +43,26 @@ getInstrSettings(test.spct)
 getWhenMeasured(test.spct)
 attributes(test.spct)
 cat(comment(test.spct))
-raw2cps(test.spct)
+
+# test date
+
+# my.file <- "vk_open_b00.txt" # just to make easy to test different files
+
+my.file <- "vk_open_b_dark.txt"
+
+my.locale <- locale(decimal_mark = ".", tz = "EET")
+
+test.spct <- read_oo_pidata(file = my.file, locale = my.locale)
+getWhenMeasured(test.spct)
+
+test.spct <- read_oo_pidata(file = my.file, locale = my.locale, date = lubridate::ymd_hm("2016-01-01 10:30", tz = "EET"))
+getWhenMeasured(test.spct)
+
+test.spct <- read_oo_pidata(file = my.file, locale = my.locale, date = NA)
+getWhenMeasured(test.spct)
+
+test.spct <- read_oo_pidata(file = my.file, locale = my.locale, date = NULL)
+getWhenMeasured(test.spct)
 
 setwd(old.wd)
+

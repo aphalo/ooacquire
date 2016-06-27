@@ -29,7 +29,7 @@
 #' since the Pi was switched on.
 #'
 read_oo_pidata <- function(file,
-                           date = NULL,
+                           date = NA,
                            geocode = NULL,
                            label = NULL,
                            tz = NULL,
@@ -40,6 +40,12 @@ read_oo_pidata <- function(file,
   }
   if (is.null(label)) {
     label <- paste("File:", file)
+  }
+  if (is.null(date) || is.na(date)) {
+    if (is.null(date)) {
+      warning("Setting date to NA as file contains no date information")
+    }
+    date <- as.POSIXct(NA_real_, origin = lubridate::origin)
   }
   file.header <- scan(file = file, nlines = 10,
                       skip = 0, what = "character", sep = "\n")
