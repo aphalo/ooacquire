@@ -28,7 +28,14 @@ linearize_counts <- function(x,
                              force_zero = TRUE, verbose = FALSE) {
   # guard against attempts to reapply linearization
   settings <- getInstrSettings(x)
-  stopifnot(!settings[["linearized"]])
+  if (is.null(settings[["linearized"]])) {
+    warning("Linearized attr is NULL, assuming FALSE")
+  } else if (is.na(settings[["linearized"]])) {
+    stop("Linearization status unknown")
+  } else if (settings[["linearized"]]) {
+    warning("Spectrum already linearized, returning as is.")
+    return(x)
+  }
   oo_descriptor <- getInstrDesc(x)
   if (is.null(oo_descriptor$inst.calib) ||
       is.na(oo_descriptor$inst.calib) ||
@@ -43,7 +50,8 @@ linearize_counts <- function(x,
       x[[col]] <- nl.fun(x[[col]])
     }
   }
-  setInstrSettings(x, set_linearized(settings))
+  settings[["linearized"]] <- TRUE
+  setInstrSettings(x, settings)
   x
 }
 

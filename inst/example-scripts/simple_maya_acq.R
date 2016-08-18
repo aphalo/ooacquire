@@ -136,5 +136,3 @@ plot(spct_01, annotations = c("color.guide", "labels", "segments"))
 current_settings <- get_oo_settings(descriptor)
 
 end_session(w)
-
-+

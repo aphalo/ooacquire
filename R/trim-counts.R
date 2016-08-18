@@ -85,3 +85,51 @@ merge_cps <- function(x) {
   setInstrSettings(x, instr.settings)
   x
 }
+
+#' Expand NA's to neighbouring pixels
+#'
+#' Replace "good" data from pixels adyacent to NAs with NAs as data from pixels
+#' not saturated but located in the neighbourhood of saturated pixels can return
+#' unreliable data. This correction is needed by a phenomenon similar to
+#' "blooming" in camera sensors whereby when a sensor well gets saturated some
+#' of charge migrates to adjacent wells in the detector increasing their
+#' readings.
+#'
+#' @param x raw_spct object
+#' @param n integer Number of pixels to set to NAs.
+#'
+#' @export
+#'
+#' @return  a copy of x with values replaced by NAs as needed in all counts
+#'   columns present.
+#'
+#' @note Avoid using large n values as n pixels at each end of the array are
+#'   skipped. The value of n needed for each detector type/instrument
+#'   needs to be found through testing. As rule of thumb use 5 < n < 10 for
+#'   Sony's ILxxx and 8 < n < 14 for Hamamatsu xxxx. At the moment we use
+#'   a symetric window although "blooming" could be asymetric.
+#'
+#' @references
+#'
+#'
+bleed_nas <- function(x, n = 10) {
+  stopifnot(is.raw_spct(x))
+  instr.desc <- getInstrDesc(x)
+  instr.settings <- getInstrSettings(x)
+  counts.cols <- grep("^counts", names(x), value = TRUE)
+  # this is a "quick and dirty" algorithm that assumes that we can ignore the
+  # first n and last n pixels of the detector array, which in practice are
+  # almost never used for anything but dark reference and so very unlikely
+  # to be exposed to an irradiance saturating their response.
+  z <- x
+  for (i in counts.cols) {
+    for (j in n:(nrow(x) - n)) {
+      if (anyNA(x[(j-n):(j+n), i])) {
+        z[j, i] <- NA
+      }
+    }
+  }
+#  setInstrDesc(z, instr.desc)
+#  setInstrSettings(z, instr.settings)
+  z
+}
