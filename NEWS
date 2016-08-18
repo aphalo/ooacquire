@@ -5,11 +5,11 @@ Add test cases.
 OOAcquire 0.1.1
 ===============
 
-Add function bleed_nas_cps() to be used to discard data from sensor pixels
+Add function bleed_nas() to be used to discard data from sensor pixels
 adjacent to saturated/clipped pixels.
 Add functions for reading metadata from SpectraSuite raw data files.
 Add function for reading data from SpectraSuite raw data files.
-Parsing is quite flexible, so hopefully robust accross versions of the software
+Parsing is quite flexible, so hopefully robust across versions of the software
 and spectrometer models and their possible configurations.
 
 OOAcquire 0.1.0
