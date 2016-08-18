@@ -1,7 +1,8 @@
-#' Convert raw detector counts into counts per second (cps).
+#' Apply a correction to spectral data.
 #'
-#' These functions simply divide "raw counts" by the integration time used
-#' for acquisition.
+#' These functions simply subtract (by default) detector counts data (raw or cps)
+#' of one spectrum by the corresponding columns in another spectrum, or apply
+#' a user supplied operator or function to them.
 #'
 #' @param x,y R objects
 #' @param .oper a function with its first two formal parameters accepting

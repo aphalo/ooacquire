@@ -92,8 +92,13 @@ After the preceding steps, if the _cps_ or merged _cps_ values are from an irrad
 
 ## Additional corrections
 
-### Slit function correction
+### Apply slit function correction
 
+The slit function describes how monochromatic light "reaches" adjacent pixels which should have been in total darkness had the monochromator been perfect. This is a subtle correction, which will affect only regions of a spectrum where the change in signal strength with wavelength is very steep, such as the UV region of a solar spectrum or a very narrow absorption peak.
+
+The slit function of a spectrometer can be estimated by measuring laser beams at different wavelengths and fitting suitable functions to the observed data. Here we explain how to apply such a function. The slit finction is the result of an optical effect, and consequently indepedent of integration time and other detector settings. Consequently, can be applied to either the merged _cps_ values or after application of a calibration. **Obviously, the stage at which the slit correction is applied needs to match the stage of processing of the data used for estimating the slit function.**
+
+The correction to apply to a given pixel depends on the readings of nearby pixels. Some authors recomend to apply this correction recursively, however, we follow the simple approach of applying it only once as an approximation.
 
 ## Irradiance calibration
 
