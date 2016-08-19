@@ -11,10 +11,12 @@ vignette: >
 
 ## Introduction
 
-In this package we define higher-level functions using packages 'rOmniDriver' and the 'r4photobiology' suite as bases. 
-These functions conform a sort of "grammar for spectral data acquisition". We
-provide a separate function for each conceptual step in the process leading
-from raw counts to final spectral data---e.g. spectral irradiance. 
+In this package we define higher-level functions using packages 'rOmniDriver'
+and the 'r4photobiology' suite as bases. These functions conform a sort of
+"grammar for spectral data acquisition". We provide a separate function for each
+conceptual step in the process leading from raw counts to final spectral
+data---e.g. spectral irradiance. Some higher level functions are included as
+examples of good protocols.
 
 The initial steps are opening a connection to an instrument and retrieving a 
 descriptor including model type, optical configuration and possibly calibration data from its non-volatile memory. These first steps in most cases are needed only at the start the R session where data will be acquired. 
@@ -29,16 +31,17 @@ Following the approach of the 'r4photobiology' suite, we store all available
 metadata as attributes to the same objects where the acquired spectral data themselves are stored. The stored metadata includes a descriptor of the instrument and the instruments settings used, in addition to metadata that is held in spectral objects of classes defined in package 'photobiology', such as time, location, and label for the measured data. Furthermore, metadata is added at each step, allowing the tracing of the origin and processing of the data. This allows the functions to detect mistakes like an user attempting to linearise raw-counts data that have been already linearised.
 
 In all cases a wavelength calibration is used to map the pixels to wavelengths. Wavelength calibration can be that retrieved from the instruments' non-volatile memory or supplied directly by to user. Different further steps are needed depending on the quantity measured. In the case of 
-irradiance, a calibration needs to be applied to the raw spectral data. Usually
+irradiance, a calibration needs to be applied to the counts-per-second spectral data. Usually
 calibration data is also stored in the non-volatile memory of the spectrometer, but
 in some cases it is convenient to apply special algorithms or calibration data 
 that cannot be retrieved from the instrument itself. Functions for both the normal and special 
-cases are also included in the package. Here it is important to remember that a calibration will be valid only if the raw spectral data processing steps are exactly the same for the calibration spectral data and the measured data. **This in practice means that calibrations supplied by instrument manufacturers will almost never be usable if you process the measured data with this pacakge. You will need the reference lamp spectrum and the raw detector-counts data for the calibration event, to be able to calculte valid calibration coefficients for the exact same data-processing protocol you adopt for your actual measurements.** On the other hand, this also means that the functions in the present package, as each of them fulfils a simple and well defined step of data processing, are ideal for _in silico_ testing of alternative data processing approaches and measuring protocols. 
+cases are also included in the package. Here it is important to remember that a calibration will be valid only if the raw spectral data processing steps are exactly the same for the spectral data used for calibration and the measured data. **This in practice means that calibrations supplied by instrument manufacturers will almost never be usable if you process the measured data with this pacakge. You will need the reference lamp spectrum and the raw detector-counts data for the calibration event, to be able to calculte valid calibration coefficients for the exact same data-processing protocol you adopt for your actual measurements.** On the other hand, this also means that the functions in the present package, as each of them fulfils a simple and well defined step of data processing, are ideal for _in silico_ testing of alternative data processing approaches and measuring protocols. 
 
 ## Functions
 
 | function name | role |
 | ---------|----------------------------------------------------------|
+| **data acquisition** | |
 | `start_session()` | search for connected instruments and obtain a handle to the driver |
 | `end_session()` | close all connections and release handle |
 | `list_instruments()`| list all connected instruments |
@@ -52,7 +55,9 @@ cases are also included in the package. Here it is important to remember that a 
 | `acq_settings()` | build a list of setting values |
 | `tune_acq_settings()` | tune the integration time and number of scans to the current radiation conditions |
 | `acq_raw_spct()` | take one measurement (data point) |
+| **data procesing** | |
 | `trim_counts()` | replace values from saturated array pixels with NAs |
+| `bleed_nas()` | replace values from pixels neigbouring NAs with NAs |
 | `acq_raw_mspct()` | take a sequence of spectral measurement (several data points) |
 | `linearize_counts()` | linearize the raw counts |
 | `skip_bad_pixs()` | replace bad pixels with interpolated raw counts |
@@ -61,12 +66,13 @@ cases are also included in the package. Here it is important to remember that a 
 | `raw2cps()` | methods to convert raw counts into counts per second |
 | ---     | the method specialization for `raw_spct` returns a `cps_spct` object |
 | `merge_cps()` | method to do HDR merge of bracketed scans |
+| `slit_function_correction()` | apply a correction for the 'long tails' of the slit function |
+| `filter_correctio()` | apply a correction for stray light based on the use of UV-cut-off or other selective filters |
+| `uvb_corrections()` | apply corrections for reducing the impact of stray light on |
+| `raw2corr_cps`| higher level function that returns **corrected** counts per second |
 | `cps2irrad()` | methods to convert counts per second into spectral irradiance |
 | `cps2Tfr()` | methods to convert counts per second into transmittance |
 | `cps2Rfr()` | methods to convert counts per second into reflectance |
-| `uvb_corrections()` | apply corrections for reducing the impact of stray light on UVB measurements |
-| `slit_function_correction()` | apply a correction for the'long tails' of the slit function |
-| `filter_correctio()` | apply a correction for stray light based on the use of UV-cut-off filter |
 
 ## Workflow
 
@@ -106,9 +112,11 @@ The correction to apply to a given pixel depends on the readings of nearby pixel
 
 ### Applying calibration constants
 
-## What's next
+## High level functions
 
-You can compose from these simple functions different measurement protocols and data processing sequences. This is the reason why they have been designed as a set of small functions, each one doing a single operation.
+## Definig new protocols
+
+You can compose from simple functions different measurement protocols and data processing sequences. This is the reason why they have been designed as a set of small functions, each one doing a single operation.
 
 Please see the example scripts installed with the package.
 

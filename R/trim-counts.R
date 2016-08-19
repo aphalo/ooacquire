@@ -69,9 +69,12 @@ skip_bad_pixs <- function(x) {
 #'
 merge_cps <- function(x) {
   stopifnot(is.cps_spct(x))
+  counts.cols <- grep("^cps", names(x), value = TRUE)
+  if (length(counts.cols) == 1) {
+    return(x)
+  }
   instr.desc <- getInstrDesc(x)
   instr.settings <- getInstrSettings(x)
-  counts.cols <- grep("^cps", names(x), value = TRUE)
   integ.times <- getInstrSettings(x)$integ.time
   cols <- counts.cols[order(integ.times, decreasing = TRUE)]
   x[["cps"]] <- x[[cols[1]]]
@@ -108,9 +111,6 @@ merge_cps <- function(x) {
 #'   needs to be found through testing. As rule of thumb use 5 < n < 10 for
 #'   Sony's ILxxx and 8 < n < 14 for Hamamatsu xxxx. At the moment we use
 #'   a symetric window although "blooming" could be asymetric.
-#'
-#' @references
-#'
 #'
 bleed_nas <- function(x, n = 10) {
   stopifnot(is.raw_spct(x))

@@ -97,14 +97,19 @@ slit_function_correction <- function(x,
                                      worker_fun = ooacquire::maya_tail_correction,
                                      ...) {
   stopifnot(is.cps_spct(x))
+#  x <- clean(x)
   # check number of cps columns
   counts.cols <- grep("^cps", names(x), value = TRUE)
-  if (length(counts.cols > 1)) {
+  if (length(counts.cols) > 1) {
     warning("Multiple 'cps' variables found: merging them before continuing!")
     x <- merge_cps(x)
+    counts.cols <- grep("^cps", names(x), value = TRUE)
+    if (length(counts.cols) > 1) {
+      stop("Multiple 'cps' variables found: merge operation failed!")
+    }
   }
   new.cps <- worker_fun(x[["w.length"]], x[["cps"]], ...)
-  x[["cps"]] <- new.cps
+  x[["cps"]] <- x[["cps"]] - new.cps[["tail"]]
   attr(x, "slit corrected") <- TRUE
   x
 }

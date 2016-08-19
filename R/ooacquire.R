@@ -12,5 +12,6 @@
 #'
 #' @import photobiology
 #' @importFrom Rcpp evalCpp
+#' @useDynLib ooacquire
 #'
 "_PACKAGE"
