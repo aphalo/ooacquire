@@ -3,6 +3,7 @@ library(ooacquire)
 library(ggspectra)
 library(ggplot2)
 
+old_wd <- setwd("./inst/example-scripts")
 load(file = "test_data.rda")
 # replace values from saturated pixels with NA
 spct_1.a <- trim_counts(spct_1)
@@ -18,6 +19,11 @@ test_cps <- raw2cps(test_1)
 plot(test_cps)
 plot(test_cps, range = c(605, 620)) + geom_point()
 summary(test_cps)
+
+corr_cps <- slit_function_correction(test_cps)
+plot(corr_cps)
+ggplot(test_cps, range = c(605, 620)) + geom_point() +
+  geom_point(data = corr_cps, color = "red")
 
 ggplot(test_cps, aes(w.length, cps_1)) + geom_line() + ylim(0, 6.3e+5)
 ggplot(test_cps, aes(w.length, cps_2)) + geom_line() + ylim(0, 6.3e+5)
@@ -40,3 +46,5 @@ summary(test_merge)
 
 integrate_spct(test_cps)
 integrate_spct(test_merge)
+
+setwd(old_wd)

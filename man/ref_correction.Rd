@@ -6,7 +6,7 @@
 \alias{ref_correction.default}
 \alias{ref_correction.numeric}
 \alias{ref_correction.raw_spct}
-\title{Convert raw detector counts into counts per second (cps).}
+\title{Apply a correction to spectral data.}
 \usage{
 ref_correction(x, y, .oper, ...)
 
@@ -34,8 +34,9 @@ an object of class "cps_spct"
 an object of class "cps_spct"
 }
 \description{
-These functions simply divide "raw counts" by the integration time used
-for acquisition.
+These functions simply subtract (by default) detector counts data (raw or cps)
+of one spectrum by the corresponding columns in another spectrum, or apply
+a user supplied operator or function to them.
 }
 \section{Methods (by class)}{
 \itemize{

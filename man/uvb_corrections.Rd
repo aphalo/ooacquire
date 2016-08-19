@@ -10,7 +10,7 @@ uvb_corrections(x, flt, dark, method = "original", stray.light.wl = c(218.5,
   228.5), flt.dark.wl = c(193, 209.5), flt.ref.wl = c(360, 379.5),
   worker_fun = maya_tail_correction, trim = 0, verbose = FALSE, ...)
 
-slit_function_correction(x, worker_fun = maya_tail_correction, ...)
+slit_function_correction(x, worker_fun = ooacquire::maya_tail_correction, ...)
 
 filter_correction(x, flt, method = "original", flt.dark.wl = c(193, 209.5),
   flt.ref.wl = c(360, 379.5), trim = 0, verbose = FALSE)

@@ -20,10 +20,4 @@ Ylianttila (STUK, Finland), originally in Excel.
 \description{
 Function to compute the tail correction
 }
-\author{
-Pedro J. Aphalo
-}
-\references{
-\url{http://www.r4photobiology.info}
-}
 

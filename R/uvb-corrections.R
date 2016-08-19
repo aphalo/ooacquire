@@ -94,12 +94,12 @@ uvb_corrections <- function(x,
 #' @export
 #'
 slit_function_correction <- function(x,
-                                     worker_fun = maya_tail_correction,
+                                     worker_fun = ooacquire::maya_tail_correction,
                                      ...) {
   stopifnot(is.cps_spct(x))
   # check number of cps columns
   counts.cols <- grep("^cps", names(x), value = TRUE)
-  if (counts.cols > 1) {
+  if (length(counts.cols > 1)) {
     warning("Multiple 'cps' variables found: merging them before continuing!")
     x <- merge_cps(x)
   }

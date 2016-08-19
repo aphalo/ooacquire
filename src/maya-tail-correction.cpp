@@ -3,11 +3,6 @@
 using namespace Rcpp;
 using namespace std;
 
-#undef DEBUG
-#ifdef DEBUG
-#include <iostream>
-#endif
-
 //' Function to compute the tail correction
 //'
 //' @param w_length numeric vector of wavelengths in nm.
@@ -18,9 +13,7 @@ using namespace std;
 //' Tail correction is a reimplementation of the calculations developed by Lasse
 //' Ylianttila (STUK, Finland), originally in Excel.
 //'
-//' @author Pedro J. Aphalo
 //' @export
-//' @references \url{http://www.r4photobiology.info}
 //'
 // [[Rcpp::export]]
 List maya_tail_correction(NumericVector w_length, NumericVector cts_second) {

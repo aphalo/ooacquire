@@ -18,9 +18,8 @@ License: GPL (>=2)
 VignetteBuilder: knitr
 Depends:
     R (>= 3.2.0),
-Roxygen: list(wrap = FALSE)
 Imports:
-    Rcpp (>= 0.12.4.5),
+    Rcpp (>= 0.12.6),
     photobiology (>= 0.9.6),
     rOmniDriver (>= 0.1.11),
     lubridate (>= 1.5.6),
@@ -29,14 +28,11 @@ Imports:
     dplyr (>= 0.4.3),
     readr (>= 0.2.2)
 Suggests:
-    knitr  (>= 1.12.3)
-Bytecompile: yes
-LazyLoad: yes
+    knitr (>= 1.12.3)
 LazyData: yes
 Encoding: UTF-8
 URL: http://www.r4photobiology.info,
     https://bitbucket.org/aphalo/mayacalc
 BugReports: https://bitbucket.org/aphalo/mayacalc
+LinkingTo: Rcpp
 RoxygenNote: 5.0.1
-LinkingTo:
-    Rcpp

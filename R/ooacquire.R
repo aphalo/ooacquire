@@ -11,5 +11,6 @@
 #'   many possible configurations.
 #'
 #' @import photobiology
+#' @importFrom Rcpp evalCpp
 #'
 "_PACKAGE"

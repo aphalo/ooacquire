@@ -11,9 +11,7 @@
 #' Tail correction is a reimplementation of the calculations developed by Lasse
 #' Ylianttila (STUK, Finland), originally in Excel.
 #'
-#' @author Pedro J. Aphalo
 #' @export
-#' @references \url{http://www.r4photobiology.info}
 #'
 maya_tail_correction <- function(w_length, cts_second) {
     .Call('ooacquire_maya_tail_correction', PACKAGE = 'ooacquire', w_length, cts_second)
