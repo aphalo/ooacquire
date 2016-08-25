@@ -11,6 +11,8 @@ Add functions for reading metadata from SpectraSuite raw data files.
 Add function for reading data from SpectraSuite raw data files.
 Parsing is quite flexible, so hopefully robust across versions of the software
 and spectrometer models and their possible configurations.
+Debug UVB correction methods and get all steps up to calculation of irradiance
+working.
 
 OOAcquire 0.1.0
 ===============
