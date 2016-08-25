@@ -153,7 +153,7 @@ set_descriptor_integ_time <- function(oo_descriptor,
 set_descriptor_wl <- function(oo_descriptor,
                               wl) {
   old.wl <- oo_descriptor$inst.calib$wavelengths
-  stopifnot(length(old.wl) == length(wl) &&
+  stopifnot((is.null(old.wl) || length(old.wl) == length(wl)) &&
               !is.unsorted(wl, strictly = TRUE))
   oo_descriptor$wavelengths <- wl
   oo_descriptor
@@ -203,10 +203,10 @@ set_descriptor_irrad_mult <- function(oo_descriptor,
 {
   stopifnot(length(irrad.mult) == 1 ||
               length(irrad.mult) == length(oo_descriptor$wavelengths))
-  if (length(irrad.mult == 1)) {
+  if (length(irrad.mult) == 1) {
     warning("'irrad.mult' of length one will be recycled.")
   }
-  oo_descriptor$inst.calib$irra.mult <- irrad.mult
+  oo_descriptor[["inst.calib"]][["irrad.mult"]] <- irrad.mult
   oo_descriptor
 }
 

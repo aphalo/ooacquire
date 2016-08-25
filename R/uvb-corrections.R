@@ -42,26 +42,31 @@ uvb_corrections <- function(x,
                             stray.light.wl = c(218.5, 228.5),
                             flt.dark.wl = c(193, 209.5),
                             flt.ref.wl = c(360, 379.5),
-                            worker_fun = maya_tail_correction,
+                            worker_fun = ooacquire::maya_tail_correction,
                             trim = 0,
                             verbose = FALSE,
                             ...) {
+  inst.descriptor <- getInstrDesc(x)
+  inst.settings <- getInstrDesc(x)
   x <- trim_counts(x)
+  x <- bleed_nas(x)
   x <- linearize_counts(x)
   x <- raw2cps(x)
   x <- fshift(x, range = flt.dark.wl)
   x <- merge_cps(x)
   flt <- trim_counts(flt)
+  flt <- bleed_nas(flt)
   flt <- linearize_counts(flt)
   flt <- raw2cps(flt)
   flt <- fshift(flt, range = flt.dark.wl)
   flt <- merge_cps(flt)
   dark <- trim_counts(dark)
+  dark <- bleed_nas(dark)
   dark <- linearize_counts(dark)
   dark <- raw2cps(dark)
   dark <- fshift(dark, range = flt.dark.wl)
   dark <- merge_cps(dark)
-  x   <- x - dark
+  x <- x - dark
   flt <- flt - dark
 
   y <- filter_correction(x, flt,
@@ -86,7 +91,10 @@ uvb_corrections <- function(x,
     stray.light <- 0.0
   }
 
-  z - stray.light
+  z <- z - stray.light
+  z <- setInstrDesc(z, inst.descriptor)
+  z <- setInstrSettings(z, inst.settings)
+  z
 }
 
 #' @rdname uvb_corrections
@@ -110,7 +118,7 @@ slit_function_correction <- function(x,
   }
   new.cps <- worker_fun(x[["w.length"]], x[["cps"]], ...)
   x[["cps"]] <- x[["cps"]] - new.cps[["tail"]]
-  attr(x, "slit corrected") <- TRUE
+  attr(x, "slit.corrected") <- TRUE
   x
 }
 
@@ -127,12 +135,12 @@ filter_correction <- function(x,
                               verbose = FALSE) {
   stopifnot(is.cps_spct(x) && is.cps_spct(flt))
   stopifnot(range(x) == range(flt) && length(x) == length(flt))
-  counts.cols <- grep("^cps", names(x), value = TRUE)
+  counts.cols <- length(grep("^cps", names(x), value = TRUE))
   if (counts.cols > 1) {
     warning("Multiple 'cps' variables found in 'x': merging them before continuing!")
     x <- merge_cps(x)
   }
-  counts.cols <- grep("^cps", names(flt), value = TRUE)
+  counts.cols <- length(grep("^cps", names(flt), value = TRUE))
   if (counts.cols > 1) {
     warning("Multiple 'cps' variables found in 'flt': merging them before continuing!")
     flt <- merge_cps(flt)
@@ -143,7 +151,7 @@ filter_correction <- function(x,
   }
   ## stray light estimate
   # ranges by name
-  flt[["range"]] <- ifelse(x[["w.length"]] > flt.dark.wl[1] & x[["w.length"]] < flt.dark.wl[2],
+  x[["range"]] <- flt[["range"]] <- ifelse(x[["w.length"]] > flt.dark.wl[1] & x[["w.length"]] < flt.dark.wl[2],
                            "short",
                            ifelse(x[["w.length"]] > flt.ref.wl[1] & x[["w.length"]] < flt.ref.wl[2],
                                   "medium", "other"))
@@ -161,7 +169,7 @@ filter_correction <- function(x,
                     "NAs in filter_ratio"))
     }
     mean_flt_ratio_short <-
-      mean(dplyr::filter(cts, range == "short")[["filter_ratio"]],
+      mean(dplyr::filter(flt, range == "short")[["filter_ratio"]],
            trim = trim, na.rm = TRUE)
   } else if (method == "full" || method == "sun" || method == "raw") {
     # attempt to avoid overcorrection
@@ -202,9 +210,9 @@ filter_correction <- function(x,
 
   # substraction of stray light
   first_correction <- ifelse(mean_flt_cs_medium > 0.0, mean_flt_cs_medium/mean_flt_ratio_short, 0.0)
-  flt <- dplyr::mutate(flt, cps = ifelse(cps < 0.0, 0.0, cps))
-  x   <- dplyr::mutate(x, cps = ifelse(w.length < flt.ref.wl[2],
-                                       cps - flt[["cps"]] / mean_flt_ratio_short,
-                                       cps - first_correction))
+  flt[["cps"]] <- ifelse(flt[["cps"]] < 0.0, 0.0, flt[["cps"]])
+  x[["cps"]]  <- ifelse(x[["w.length"]] < flt.ref.wl[2],
+                                       x[["cps"]] - flt[["cps"]] / mean_flt_ratio_short,
+                                       x[["cps"]] - first_correction)
   x
 }
