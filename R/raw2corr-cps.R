@@ -10,7 +10,7 @@
 #' @param x raw_spct object.
 #' @param ref.pixs.range integer vector of length 2.
 #'
-#' @value a cps_spct object with one spectrum preserving the metadata present in
+#' @return a cps_spct object with one spectrum preserving the metadata present in
 #'   \code{x}.
 #'
 #' @export

@@ -38,26 +38,12 @@ plot(spct_1.acq)
 
 # processing of raw counts
 
-spct_1 <- trim_counts(spct_1.acq)
-plot(spct_1)
+spct_1.spct <- raw2corr_cps(spct_1.acq, c(191,290))
+plot(spct_1.spct)
 
-spct_1 <- linearize_counts(spct_1)
-plot(spct_1)
-
-# use an internal "dark" reference from 191 to 350 nm
-spct_1 <- fshift(spct_1, range = c(191,290))
-plot(spct_1)
-
-# conversion to counts per second
-spct_1a <- raw2cps(spct_1)
-plot(spct_1a)
-
-# merge data from long and short integration times
-spct_1b <- merge_cps(spct_1a)
-plot(spct_1b)
-
-irrad_1b <- cps2irrad(spct_1b)
+irrad_1b <- cps2irrad(spct_1.spct)
 plot(irrad_1b)
+
 plot(irrad_1b, unit.out = "photon")
 
 ## PROTOCOL 2
@@ -94,5 +80,6 @@ plot(corrected.spct)
 irrad.spct <- cps2irrad(corrected.spct)
 
 plot(irrad.spct)
+plot(irrad.spct, unit.out = "photon")
 
 end_session(w)
