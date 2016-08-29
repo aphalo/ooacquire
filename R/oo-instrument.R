@@ -83,7 +83,7 @@ set_descriptor_bad_pixs <- function(oo_descriptor,
   bad.pixs <- as.integer(bad.pixs)
   bad.pixs <- unique(sort(bad.pixs))
   stopifnot(min(bad.pixs) >= 1 &&
-              max(bad.pixs) <= length(oo_descriptor$wavelengths))
+              max(bad.pixs) <= length(oo_descriptor$inst.calib$wavelengths))
   oo_descriptor$bad.pixs <- bad.pixs
   oo_descriptor
 }
@@ -152,10 +152,10 @@ set_descriptor_integ_time <- function(oo_descriptor,
 #'
 set_descriptor_wl <- function(oo_descriptor,
                               wl) {
-  old.wl <- oo_descriptor$inst.calib$wavelengths
+  old.wl <- oo_descriptor[["inst.calib"]][["wavelengths"]]
   stopifnot((is.null(old.wl) || length(old.wl) == length(wl)) &&
               !is.unsorted(wl, strictly = TRUE))
-  oo_descriptor$wavelengths <- wl
+  oo_descriptor[["wavelengths"]] <- wl
   oo_descriptor
 }
 
@@ -181,7 +181,7 @@ set_descriptor_nl <- function(oo_descriptor,
     nl.fun <- as.function(nl.fun)
   }
   stopifnot(is.function(nl.fun))
-  oo_descriptor$inst.calib$nl.fun <- nl.fun
+  oo_descriptor[["inst.calib"]][["nl.fun"]] <- nl.fun
   oo_descriptor
 }
 
@@ -230,7 +230,7 @@ set_descriptor_slit_fun <- function(oo_descriptor,
                                     inv.slit.fun)
 {
   stopifnot(is.function(inv.slit.fun))
-  oo_descriptor$inst.calib$slit.fun <- inv.slit.fun
+  oo_descriptor[["inst.calib"]][["$slit.fun"]] <- inv.slit.fun
   oo_descriptor
 }
 
@@ -264,3 +264,4 @@ get_oo_settings <- function(oo_descriptor) {
     num.scans = rOmniDriver::get_scans_to_avg(w, sr.index, ch.index)
   )
 }
+

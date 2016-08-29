@@ -50,7 +50,7 @@ set_oo_ssdata_settings <- function(x,
       boxcar.width =
         as.integer(stringr::str_split(lines[lines.map[["boxcar"]]], " ")[[1]][3]),
       integ.time =
-        as.numeric(stringr::str_split(lines[lines.map[["integ.time"]]], " ")[[1]][4]) * 1e-6,
+        as.numeric(stringr::str_split(lines[lines.map[["integ.time"]]], " ")[[1]][4]),
                       # micro-seconds -> seconds
       num.scans =
         as.integer(stringr::str_split(lines[lines.map[["scans"]]], " ")[[1]][3])

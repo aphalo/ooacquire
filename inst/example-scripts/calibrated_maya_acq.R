@@ -65,16 +65,17 @@ mspct_1
 ## use new function
 ##
 
-corrected.spct <- uvb_corrections(x = mspct_1[[1]],
-                            flt = mspct_1[[2]],
-                            dark = mspct_1[[3]],
-                            method = "original",
-                            stray.light.wl = c(218.5, 228.5),
-                            flt.dark.wl = c(193, 209.5),
-                            flt.ref.wl = c(360, 379.5),
-                            worker_fun = ooacquire::maya_tail_correction,
-                            trim = 0,
-                            verbose = FALSE)
+corrected.spct <-
+  uvb_corrections(x = mspct_1[[1]],
+                  flt = mspct_1[[2]],
+                  dark = mspct_1[[3]],
+                  method = "original",
+                  stray.light.wl = c(218.5, 228.5),
+                  flt.dark.wl = c(193, 209.5),
+                  flt.ref.wl = c(360, 379.5),
+                  worker_fun = ooacquire::maya_tail_correction,
+                  trim = 0,
+                  verbose = FALSE)
 plot(corrected.spct)
 
 irrad.spct <- cps2irrad(corrected.spct)

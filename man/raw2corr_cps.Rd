@@ -11,6 +11,10 @@ raw2corr_cps(x, ref.pixs.range = c(1, 100))
 
 \item{ref.pixs.range}{integer vector of length 2.}
 }
+\value{
+a cps_spct object with one spectrum preserving the metadata present in
+  \code{x}.
+}
 \description{
 Replace data from bad pixels with interpolated values, replace data from
 saturated and nearby pixels withs NAs, apply linearization function if data
