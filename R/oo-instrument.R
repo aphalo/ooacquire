@@ -83,7 +83,7 @@ set_descriptor_bad_pixs <- function(oo_descriptor,
   bad.pixs <- as.integer(bad.pixs)
   bad.pixs <- unique(sort(bad.pixs))
   stopifnot(min(bad.pixs) >= 1 &&
-              max(bad.pixs) <= length(oo_descriptor$inst.calib$wavelengths))
+              max(bad.pixs) <= length(oo_descriptor$wavelengths))
   oo_descriptor$bad.pixs <- bad.pixs
   oo_descriptor
 }

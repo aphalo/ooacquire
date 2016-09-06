@@ -10,23 +10,10 @@ list_instruments(w)
 # get a descriptor for the first channel of the first spectrometer
 descriptor <- get_oo_descriptor(w)
 # set Maya hot pixels and correct time limits
-descriptor <- set_descriptor_bad_pixs(descriptor, c(123,380,1829,1994))
+# descriptor <- set_descriptor_bad_pixs(descriptor, c(123,380,1829,1994))
 descriptor <- set_descriptor_integ_time(descriptor, NA, 7.2)
 
 #
-
-## PROTOCOL 0
-# set measurement settings directly
-settings <- acq_settings(descriptor,
-                         HDR.mult = 1,
-                         integ.time = 60,
-                         num.scans = 1)
-
-spct_0 <- acq_raw_spct(descriptor, settings)
-plot(spct_0)
-
-# we stop here because the settings most likely have been unsuitable
-# if we had used correct values then processing could continue as below
 
 # PROTOCOL 1
 # set measurement settings for automatic adjustment
@@ -35,10 +22,10 @@ plot(spct_0)
 #
 settings <- acq_settings(descriptor,
                          HDR.mult = c(1,10),
-                         tot.time.range = c(5,10))
+                         tot.time.range = c(15,20))
 
 settings <- tune_acq_settings(descriptor, settings)
-settings
+# settings
 
 spct_1.acq <- acq_raw_spct(descriptor, settings)
 plot(spct_1.acq)
@@ -70,6 +57,12 @@ plot(spct_1b)
 # are different. A protocol like c(rep("light", 20), "filter", "dark") is
 # legal.)
 #
+
+settings <- acq_settings(descriptor,
+                         HDR.mult = c(1,10),
+                         tot.time.range = c(45,60))
+
+
 # We first tune again the settings in case the light level has changed.
 settings <- tune_acq_settings(descriptor, settings)
 

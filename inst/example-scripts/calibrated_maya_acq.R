@@ -14,10 +14,10 @@ list_instruments(w)
 # get a descriptor for the first channel of the first spectrometer
 descriptor <- get_oo_descriptor(w)
 # set Maya hot pixels and correct time limits
-descriptor <- set_descriptor_bad_pixs(descriptor, c(123,380,1829,1994))
 descriptor <- set_descriptor_integ_time(descriptor, NA, 7.2)
 descriptor <- set_descriptor_wl(descriptor, calibration.data$w.length)
 descriptor <- set_descriptor_irrad_mult(descriptor, calibration.data$multiplier * 1e4)
+descriptor <- set_descriptor_bad_pixs(descriptor, c(123,380,1829,1994))
 # descriptor <- set_descriptor_slit_fun(descriptor, ooacquire::maya_tail_correction)
 #
 
@@ -28,7 +28,7 @@ descriptor <- set_descriptor_irrad_mult(descriptor, calibration.data$multiplier 
 #
 settings <- acq_settings(descriptor,
                          HDR.mult = c(1,10),
-                         tot.time.range = c(5,10))
+                         tot.time.range = c(30,30))
 
 settings <- tune_acq_settings(descriptor, settings)
 settings
@@ -84,3 +84,4 @@ plot(irrad.spct)
 plot(irrad.spct, unit.out = "photon")
 
 end_session(w)
+
