@@ -48,7 +48,7 @@ read_oo_ssdata <- function(file,
         tz <- sub("S", "", tz)
       }
     }
-    date <- lubridate::parse_date_time(line03, "m*!d! hms y", tz = tz)
+    date <- lubridate::parse_date_time(line03, "mdHMSy", tz = tz)
   } else if (is.na(date)) {
     date <- as.POSIXct(NA_real_, origin = lubridate::origin)
   }
@@ -81,3 +81,29 @@ read_oo_ssdata <- function(file,
   set_oo_ssdata_settings(z)
 }
 
+#' Read multiple files into raw_mspct object
+#'
+#' Read multiple files and return a collection of raw spectra as a raw_spct
+#' object.
+#'
+#' @param files a named list of character strings of file names
+#' @param read.f a function which expects in its first parameter a file name or
+#' file path
+#' @param ... additional arguments passed by name to the function passed as
+#' argument to \code{read.f}
+#'
+#' @note Depending of the function passed to \code{read.f} more or less complete
+#' metadata information will be stored as attributes in the raw_spct objects.
+#'
+#' @export
+#'
+read_files2mspct <- function(files, read.f = read_oo_ssdata, ...) {
+  stopifnot(is.list(files))
+  spectra.lst <- list()
+  i = 0
+  for (f in files) {
+    i = i + 1
+    spectra.lst[[ names(files)[i] ]] <- read.f(f, ...)
+  }
+  raw_mspct(spectra.lst)
+}

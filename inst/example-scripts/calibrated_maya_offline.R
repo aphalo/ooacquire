@@ -8,44 +8,23 @@ library(readxl)
 
 calibration.data <- read_excel("cal-coeffs.xlsx")
 
-w <- start_session()
-
-list_instruments(w)
-
-# get a descriptor for the first channel of the first spectrometer
-descriptor <- get_oo_descriptor(w)
+# get a descriptor from raw_spct object
+descriptor <- getInstrDesc(ss.spct)
+descriptor[["inst.calib"]] <- list()
 # set Maya hot pixels and correct time limits
-descriptor <- set_descriptor_integ_time(descriptor, NA, 7.2)
 descriptor <- set_descriptor_wl(descriptor, calibration.data$w.length)
 descriptor <- set_descriptor_irrad_mult(descriptor, calibration.data$multiplier * 1e4)
 descriptor <- set_descriptor_bad_pixs(descriptor, c(123,380,1829,1994))
-# descriptor <- set_descriptor_slit_fun(descriptor, ooacquire::maya_tail_correction)
-#
 
-# PROTOCOL 1
-# set measurement settings for automatic adjustment
-# there is no restriction for HDR settings but lengths between 1 and 3
-# seem reasonable.
-#
-settings <- acq_settings(descriptor,
-                         HDR.mult = c(1,10),
-                         tot.time.range = c(10,10))
-
-settings <- tune_acq_settings(descriptor, settings)
-settings
-
-spct_1.acq <- acq_raw_spct(descriptor, settings)
-plot(spct_1.acq)
-
-# processing of raw counts
-
-spct_1.spct <- raw2corr_cps(spct_1.acq, c(191,290))
-plot(spct_1.spct)
-
-irrad_1b <- cps2irrad(spct_1.spct)
-plot(irrad_1b)
-
-plot(irrad_1b, unit.out = "photon")
+# # get a descriptor for the first channel of the first spectrometer
+# descriptor <- get_oo_descriptor(w)
+# # set Maya hot pixels and correct time limits
+# descriptor <- set_descriptor_integ_time(descriptor, NA, 7.2)
+# descriptor <- set_descriptor_wl(descriptor, calibration.data$w.length)
+# descriptor <- set_descriptor_irrad_mult(descriptor, calibration.data$multiplier * 1e4)
+# descriptor <- set_descriptor_bad_pixs(descriptor, c(123,380,1829,1994))
+# # descriptor <- set_descriptor_slit_fun(descriptor, ooacquire::maya_tail_correction)
+# #
 
 ## PROTOCOL 2
 # acquire a measure in the light and a dark reference spectrum
@@ -54,13 +33,20 @@ plot(irrad_1b, unit.out = "photon")
 # are different. A protocol like c(rep("light", 20), "filter", "dark") is
 # legal.)
 #
-# We first tune again the settings in case the light level has changed.
-settings <- tune_acq_settings(descriptor, settings)
 
-# we acquire two pairs of bracketed spectra
-mspct_1 <- acq_raw_mspct(descriptor, settings,
-                         protocol = c("light", "filter", "dark"),
-                         user.label = "window.sun")
+# example list of file names
+my.locale <- readr::locale("en", decimal_mark = ",", tz = "EET")
+
+files <- list(light = "data-example/pheno1normal.txt",
+              filter = "data-example/pheno1normaldark.txt",
+              dark = "data-example/pheno1normaldark.txt")
+
+files <- list(light = "data-example/pheno2normal.txt",
+              filter = "data-example/pheno2normaldark.txt",
+              dark = "data-example/pheno2normaldark.txt")
+
+mspct_1 <- read_files2mspct(files, locale = my.locale)
+
 mspct_1
 
 ## use new function
@@ -79,14 +65,17 @@ corrected.spct <-
                   verbose = FALSE)
 plot(corrected.spct)
 
+temp <- getInstrDesc(corrected.spct)
+temp[["inst.calib"]] <- descriptor[["inst.calib"]]
+
+setInstrDesc(corrected.spct, temp)
+
 irrad.spct <- cps2irrad(corrected.spct)
 
 plot(irrad.spct)
-plot(irrad.spct, unit.out = "photon")
+plot(irrad.spct, unit.out = "photon", range = c(250, 800))
 
 R_FR(irrad.spct)
 Pfr_Ptot(irrad.spct)
 
-
-end_session(w)
 
