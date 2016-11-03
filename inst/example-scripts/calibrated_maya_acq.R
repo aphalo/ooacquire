@@ -40,6 +40,7 @@ plot(spct_1.acq)
 # processing of raw counts
 
 spct_1.spct <- raw2corr_cps(spct_1.acq, c(191,290))
+
 plot(spct_1.spct)
 
 irrad_1b <- cps2irrad(spct_1.spct)

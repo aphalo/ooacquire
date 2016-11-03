@@ -77,8 +77,9 @@ set_oo_ssdata_settings <- function(x,
 #' @param inst.descriptor list An already built instrument descriptor,
 #'   in which case \code{file.header} is used only to validate the serial
 #'   number.
-#' @param overwrite logical A flag indicating if an existing instrument
-#'   descriptor in \code{x} should be overwritten.
+#' @param action character A flag indicating if an existing instrument
+#'   descriptor in \code{x} should be overwritten, merged or kept as is.
+#' @param descriptor list A list describing the instrument used.
 #'
 #' @return A copy of \code{x} with updated attributes.
 #'
@@ -87,19 +88,15 @@ set_oo_ssdata_settings <- function(x,
 set_oo_ssdata_descriptor <- function(x,
                                      file.header = comment(x),
                                      inst.descriptor = NULL,
-                                     overwrite = FALSE) {
-  stopifnot(overwrite || is.na(getInstrDesc(x)))
+                                     action = "overwrite") {
   stopifnot(length(file.header) == 1)
   lines <- stringr::str_split(file.header, "\n")[[1]]
   idx <- which(stringr::str_detect(lines, "Spectrometers: "))[1]
   spectrometer.sn <- sub("Spectrometers: ", "", lines[idx], fixed = TRUE)
 
-  if (!is.null(inst.descriptor)) {
-    # user supplied descriptor
-    stopifnot(spectrometer.sn == inst.descriptor[["spectrometer.sn"]])
-  } else {
+  if (action %in% c("keep", "merge")) {
     # decode as much data as possible from header
-    inst.descriptor <-
+    file.inst.descriptor <-
       list(
         time = photobiology::getWhenMeasured(x),
         w = NA,
@@ -117,6 +114,18 @@ set_oo_ssdata_descriptor <- function(x,
         bad.pixs = numeric(),
         inst.calib = NA
       )
+  }
+
+  if (action == "keep") {
+    inst.descriptor <- file.inst.descriptor
+  } else if (!is.null(inst.descriptor)) {
+    # user supplied descriptor
+    stopifnot(spectrometer.sn == inst.descriptor[["spectrometer.sn"]])
+    if (action == "merge") {
+      for (i in names(file.inst.descriptor)) {
+        inst.descriptor[[i]] <- file.inst.descriptor[[i]]
+      }
+    }
   }
   photobiology::setInstrDesc(x, inst.descriptor)
   x

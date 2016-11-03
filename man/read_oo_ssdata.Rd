@@ -5,7 +5,7 @@
 \title{Read File Saved by Ocean Optics' SpectraSuite.}
 \usage{
 read_oo_ssdata(file, date = NULL, geocode = NULL, label = NULL,
-  tz = NULL, locale = readr::default_locale())
+  inst.descriptor = NULL, tz = NULL, locale = readr::default_locale())
 }
 \arguments{
 \item{file}{character string}
@@ -17,6 +17,8 @@ file is used, and if \code{NA} no date variable is added}
 
 \item{label}{character string, but if \code{NULL} the value of \code{file} is
 used, and if \code{NA} the "what.measured" attribute is not set.}
+
+\item{inst.descriptor}{list A list describing the instrument used.}
 
 \item{tz}{character Time zone is by default read from the file.}
 

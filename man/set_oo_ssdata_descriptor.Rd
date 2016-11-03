@@ -5,7 +5,7 @@
 \title{Set the instrument description.}
 \usage{
 set_oo_ssdata_descriptor(x, file.header = comment(x),
-  inst.descriptor = NULL, overwrite = FALSE)
+  inst.descriptor = NULL, action = "overwrite")
 }
 \arguments{
 \item{x}{generic_spct, although with defaults only raw_spct.}
@@ -17,8 +17,10 @@ SpectraSuite.}
 in which case \code{file.header} is used only to validate the serial
 number.}
 
-\item{overwrite}{logical A flag indicating if an existing instrument
-descriptor in \code{x} should be overwritten.}
+\item{action}{character A flag indicating if an existing instrument
+descriptor in \code{x} should be overwritten, merged or kept as is.}
+
+\item{descriptor}{list A list describing the instrument used.}
 }
 \value{
 A copy of \code{x} with updated attributes.

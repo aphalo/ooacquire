@@ -46,6 +46,10 @@ uvb_corrections <- function(x,
                             trim = 0,
                             verbose = FALSE,
                             ...) {
+  if (is.null(x)) {
+    warning("No 'light' measurement available: aborting")
+    return(source_spct())
+  }
   inst.descriptor <- getInstrDesc(x)
   inst.settings <- getInstrDesc(x)
   x <- trim_counts(x)
@@ -54,29 +58,43 @@ uvb_corrections <- function(x,
   x <- raw2cps(x)
   x <- fshift(x, range = flt.dark.wl)
   x <- merge_cps(x)
-  flt <- trim_counts(flt)
-  flt <- bleed_nas(flt)
-  flt <- linearize_counts(flt)
-  flt <- raw2cps(flt)
-  flt <- fshift(flt, range = flt.dark.wl)
-  flt <- merge_cps(flt)
-  dark <- trim_counts(dark)
-  dark <- bleed_nas(dark)
-  dark <- linearize_counts(dark)
-  dark <- raw2cps(dark)
-  dark <- fshift(dark, range = flt.dark.wl)
-  dark <- merge_cps(dark)
-  x <- x - dark
-  flt <- flt - dark
+  if (!is.null(dark)) {
+    dark <- trim_counts(dark)
+    dark <- bleed_nas(dark)
+    dark <- linearize_counts(dark)
+    dark <- raw2cps(dark)
+    dark <- fshift(dark, range = flt.dark.wl)
+    dark <- merge_cps(dark)
+  }
+  if (is.null(flt)) {
+    warning("No filter spectra available: continuing without filter correction")
+  } else {
+    flt <- trim_counts(flt)
+    flt <- bleed_nas(flt)
+    flt <- linearize_counts(flt)
+    flt <- raw2cps(flt)
+    flt <- fshift(flt, range = flt.dark.wl)
+    flt <- merge_cps(flt)
+  }
+  if (is.null(dark)) {
+    warning("No 'dark' measurement available: using internal reference")
+  } else {
+    x <- x - dark
+    if (!is.null(flt)) {
+      flt <- flt - dark
+    }
+  }
 
-  y <- filter_correction(x, flt,
-                         method = method,
-                         flt.dark.wl = flt.dark.wl,
-                         flt.ref.wl = flt.ref.wl,
-                         trim = trim,
-                         verbose = verbose)
+  if (!is.null(flt)) {
+    x <- filter_correction(x, flt,
+                           method = method,
+                           flt.dark.wl = flt.dark.wl,
+                           flt.ref.wl = flt.ref.wl,
+                           trim = trim,
+                           verbose = verbose)
+  }
 
-  z <- slit_function_correction(y, worker_fun = worker_fun, ...)
+  z <- slit_function_correction(x, worker_fun = worker_fun, ...)
 
   stray.light <-
     mean(z[z$w.length > stray.light.wl[1] & z$w.length < stray.light.wl[2]][["cps"]],
@@ -215,4 +233,55 @@ filter_correction <- function(x,
                                        x[["cps"]] - flt[["cps"]] / mean_flt_ratio_short,
                                        x[["cps"]] - first_correction)
   x
+}
+
+#' @rdname uvb_corrections
+#'
+#' @param files A named list of three file names, with names "light", "filter",
+#'   and "dark".
+#' @param descriptor A named list with a descriptor of the characteristics of
+#'   the spectrometer (if serial number does not agree an error is triggered).
+#' @param locale	The locale controls defaults that vary from place to place. The
+#'   default locale is US-centric (like R), but you can use
+#'   \code{\link[readr]{locale}} to create your own locale that controls things
+#'   like the default time zone, encoding, decimal mark, big mark, and day/month
+#'   names.
+#'
+#' @note Currently \code{uvb_corrections_nb_files} allows processing of files
+#'   written by OceanOptics' SpectraSuite software, from a simple protocol with
+#'   no integration-time bracketing, with three measurements: a "light"
+#'   measurement, a "filter" measurement using a polycarbonate filter and a dark
+#'   measurement. Data should be raw counts, either corrected for detector
+#'   non-linearity or not. All three spectra should be acquired using the
+#'   same instrument settings to achieve good accuracy.
+#'
+#' @export
+#'
+uvb_corrections_nb_files <- function(files,
+                                     descriptor = descriptor,
+                                     locale = readr::default_locale(),
+                                     method = "original",
+                                     stray.light.wl = c(218.5, 228.5),
+                                     flt.dark.wl = c(193, 209.5),
+                                     flt.ref.wl = c(360, 379.5),
+                                     worker_fun = ooacquire::maya_tail_correction,
+                                     trim = 0,
+                                     verbose = FALSE) {
+  raw.mspct <-
+    ooacquire::read_files2mspct(files,
+                                locale = locale,
+                                inst.descriptor = descriptor)
+  corrected.spct <-
+    ooacquire::uvb_corrections(x = raw.mspct[["light"]],
+                               flt = raw.mspct[["filter"]],
+                               dark = raw.mspct[["dark"]],
+                               method = method,
+                               stray.light.wl = stray.light.wl,
+                               flt.dark.wl = flt.dark.wl,
+                               flt.ref.wl = flt.ref.wl,
+                               worker_fun = worker_fun,
+                               trim = trim,
+                               verbose = verbose)
+
+  photobiology::cps2irrad(corrected.spct)
 }

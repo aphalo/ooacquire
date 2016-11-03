@@ -9,8 +9,8 @@ library(readxl)
 calibration.data <- read_excel("cal-coeffs.xlsx")
 
 # get a descriptor from raw_spct object
-descriptor <- getInstrDesc(ss.spct)
-descriptor[["inst.calib"]] <- list()
+descriptor <- getInstrDesc(Aralab.UV.4V1.spct)
+descriptor[["inst.calib"]] <- list(z = NA)
 # set Maya hot pixels and correct time limits
 descriptor <- set_descriptor_wl(descriptor, calibration.data$w.length)
 descriptor <- set_descriptor_irrad_mult(descriptor, calibration.data$multiplier * 1e4)
