@@ -101,13 +101,24 @@ read_oo_ssdata <- function(file,
 #'
 #' @export
 #'
-read_files2mspct <- function(files, read.f = read_oo_ssdata, ...) {
+read_files2mspct <- function(files, read.f = ooacquire::read_oo_ssdata, ...) {
   stopifnot(is.list(files))
   spectra.lst <- list()
-  i = 0
+  i <- 0
   for (f in files) {
-    i = i + 1
-    spectra.lst[[ names(files)[i] ]] <- read.f(f, ...)
+    i <- i + 1
+    if (length(f) == 1) {
+      spectra.lst[[ names(files)[i] ]] <- read.f(f, ...)
+    } else if (length(f > 1)) {
+      temp.lst <- list()
+      j <- 0
+      for (ff in f) {
+        j <- j + 1
+        temp.lst[[j]] <- read.f(ff, ...)
+      }
+      temp.mspct <- raw_mspct(temp.lst)
+      spectra.lst[[ names(files)[i] ]] <- merge_raw_mspct(temp.mspct)
+    }
   }
   raw_mspct(spectra.lst)
 }

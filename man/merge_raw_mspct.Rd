@@ -2,11 +2,11 @@
 % Please edit documentation in R/read_oo_ss_measurement.r
 \name{merge_raw_mspct}
 \alias{merge_raw_mspct}
-\title{Read one (HDR) measurement from files}
+\title{Merge raw spectra into a single multicolumn spectrum}
 \usage{
-merge_raw_mspct(x, label = NULL)
+merge_raw_mspct(x)
 }
 \description{
-Read
+Merge raw spectra into a single multicolumn spectrum
 }
 

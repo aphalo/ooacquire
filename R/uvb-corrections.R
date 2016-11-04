@@ -46,38 +46,41 @@ uvb_corrections <- function(x,
                             trim = 0,
                             verbose = FALSE,
                             ...) {
+
+  spct.worker <- function(x) {
+    x <- trim_counts(x)
+    x <- bleed_nas(x)
+    x <- linearize_counts(x)
+    if (length(flt.dark.wl) >= 1) {
+      x <- fshift(x, range = flt.dark.wl)
+    }
+    x <- raw2cps(x)
+    merge_cps(x)
+  }
+
   if (is.null(x)) {
-    warning("No 'light' measurement available: aborting")
+    if (verbose) {
+      warning("No 'light' measurement available: aborting")
+    }
     return(source_spct())
   }
   inst.descriptor <- getInstrDesc(x)
   inst.settings <- getInstrDesc(x)
-  x <- trim_counts(x)
-  x <- bleed_nas(x)
-  x <- linearize_counts(x)
-  x <- raw2cps(x)
-  x <- fshift(x, range = flt.dark.wl)
-  x <- merge_cps(x)
+  x <- spct.worker(x)
   if (!is.null(dark)) {
-    dark <- trim_counts(dark)
-    dark <- bleed_nas(dark)
-    dark <- linearize_counts(dark)
-    dark <- raw2cps(dark)
-    dark <- fshift(dark, range = flt.dark.wl)
-    dark <- merge_cps(dark)
+    dark <- spct.worker(dark)
   }
   if (is.null(flt)) {
-    warning("No filter spectra available: continuing without filter correction")
+    if (verbose) {
+      warning("No filter spectra available: continuing without filter correction")
+    }
   } else {
-    flt <- trim_counts(flt)
-    flt <- bleed_nas(flt)
-    flt <- linearize_counts(flt)
-    flt <- raw2cps(flt)
-    flt <- fshift(flt, range = flt.dark.wl)
-    flt <- merge_cps(flt)
+    flt <- spct.worker(flt)
   }
   if (is.null(dark)) {
-    warning("No 'dark' measurement available: using internal reference")
+    if (verbose) {
+      warning("No 'dark' measurement available: using internal reference")
+    }
   } else {
     x <- x - dark
     if (!is.null(flt)) {
@@ -96,20 +99,24 @@ uvb_corrections <- function(x,
 
   z <- slit_function_correction(x, worker_fun = worker_fun, ...)
 
+  z.cps <- z[["cps"]][z$w.length > stray.light.wl[1] &
+                        z$w.length < stray.light.wl[2]]
   stray.light <-
-    mean(z[z$w.length > stray.light.wl[1] & z$w.length < stray.light.wl[2]][["cps"]],
-         trim = trim,
-         na.rm = TRUE)
+    mean(z.cps, trim = trim, na.rm = TRUE)
   if (method == "original") {
     stray.light <- stray.light +
-      stats::sd(z[z$w.length > stray.light.wl[1] & z$w.length < stray.light.wl[2]][["cps"]],
-         na.rm = TRUE)
+      stats::sd(z.cps, na.rm = TRUE)
   }
   if (stray.light < 0.0) {
-    stray.light <- 0.0
+    if (verbose) {
+      warning("Straylight estimate < 0")
+    }
+    # stray.light <- 0
+    # Lasse discards straylight estimate if < 0
+    # changed to avoid negative counts but should be changed
   }
-
   z <- z - stray.light
+
   z <- setInstrDesc(z, inst.descriptor)
   z <- setInstrSettings(z, inst.settings)
   z
@@ -121,17 +128,23 @@ uvb_corrections <- function(x,
 #'
 slit_function_correction <- function(x,
                                      worker_fun = ooacquire::maya_tail_correction,
+                                     verbose = TRUE,
                                      ...) {
   stopifnot(is.cps_spct(x))
+  stopifnot(is.null(attr(x, "slit.corrected")) || !attr(x, "slit.corrected"))
 #  x <- clean(x)
   # check number of cps columns
   counts.cols <- grep("^cps", names(x), value = TRUE)
   if (length(counts.cols) > 1) {
-    warning("Multiple 'cps' variables found: merging them before continuing!")
+    if (verbose) {
+      warning("Multiple 'cps' variables found: merging them before continuing!")
+    }
     x <- merge_cps(x)
     counts.cols <- grep("^cps", names(x), value = TRUE)
     if (length(counts.cols) > 1) {
-      stop("Multiple 'cps' variables found: merge operation failed!")
+      if (verbose) {
+        stop("Multiple 'cps' variables found: merge operation failed!")
+      }
     }
   }
   new.cps <- worker_fun(x[["w.length"]], x[["cps"]], ...)
@@ -151,6 +164,7 @@ filter_correction <- function(x,
                               flt.ref.wl = c(360, 379.5),
                               trim = 0,
                               verbose = FALSE) {
+  stopifnot(is.null(attr(x, "flt.corrected")) || !attr(x, "flt.corrected"))
   stopifnot(is.cps_spct(x) && is.cps_spct(flt))
   stopifnot(range(x) == range(flt) && length(x) == length(flt))
   counts.cols <- length(grep("^cps", names(x), value = TRUE))
@@ -232,13 +246,17 @@ filter_correction <- function(x,
   x[["cps"]]  <- ifelse(x[["w.length"]] < flt.ref.wl[2],
                                        x[["cps"]] - flt[["cps"]] / mean_flt_ratio_short,
                                        x[["cps"]] - first_correction)
+  attr(x, "flt.corrected") <- TRUE
+
   x
 }
 
-#' @rdname uvb_corrections
+#' Convert raw counts data into spectral irradiance
 #'
-#' @param files A named list of three file names, with names "light", "filter",
-#'   and "dark".
+#' @param x A named list of one to hree vectors of file names, with names
+#'   "light", "filter", and "dark".
+#' @param method.data A named list of constants and functions defining the
+#'   method to be sued for stray light and dark signal corrections.
 #' @param descriptor A named list with a descriptor of the characteristics of
 #'   the spectrometer (if serial number does not agree an error is triggered).
 #' @param locale	The locale controls defaults that vary from place to place. The
@@ -246,42 +264,76 @@ filter_correction <- function(x,
 #'   \code{\link[readr]{locale}} to create your own locale that controls things
 #'   like the default time zone, encoding, decimal mark, big mark, and day/month
 #'   names.
+#' @param verbose Logical indicating the level of warnings wanted.
 #'
-#' @note Currently \code{uvb_corrections_nb_files} allows processing of files
-#'   written by OceanOptics' SpectraSuite software, from a simple protocol with
-#'   no integration-time bracketing, with three measurements: a "light"
-#'   measurement, a "filter" measurement using a polycarbonate filter and a dark
-#'   measurement. Data should be raw counts, either corrected for detector
-#'   non-linearity or not. All three spectra should be acquired using the
-#'   same instrument settings to achieve good accuracy.
+#' @note Currently \code{s_irrad_corrected.list} allows processing of files
+#'   written by OceanOptics' SpectraSuite software, from protocols with
+#'   integration-time bracketing or not, with a dark reference measurement or
+#'   not. Three measurements components are recognized: a "light" measurement, a
+#'   "filter" measurement using a polycarbonate filter and a dark measurement.
+#'   Only "light" is mandatory. Data should be raw counts, either corrected for
+#'   detector non-linearity or not. All three spectra should be acquired using
+#'   the same instrument settings to achieve good accuracy.
 #'
 #' @export
 #'
-uvb_corrections_nb_files <- function(files,
-                                     descriptor = descriptor,
-                                     locale = readr::default_locale(),
-                                     method = "original",
-                                     stray.light.wl = c(218.5, 228.5),
-                                     flt.dark.wl = c(193, 209.5),
-                                     flt.ref.wl = c(360, 379.5),
-                                     worker_fun = ooacquire::maya_tail_correction,
-                                     trim = 0,
-                                     verbose = FALSE) {
+s_irrad_corrected <- function(x, ...) UseMethod("s_irrad_corrected")
+
+#' @describeIn s_irrad_corrected Default for generic function.
+#' @export
+s_irrad_corrected.default <- function(x, ...) {
+  stop("'s_irrad_corrected' not implemented for class '", class(x))
+}
+
+#' @describeIn s_irrad_corrected Default for generic function.
+#' @export
+s_irrad_corrected.list <- function(x,
+                                   method.data,
+                                   descriptor,
+                                   locale,
+                                   verbose = FALSE,
+                                   ...) {
+  if(length(x[["light"]]) == 0) {
+    if (verbose) {
+      warning("Filename(s) with name 'light' missing")
+    }
+    return(source_spct())
+  }
   raw.mspct <-
-    ooacquire::read_files2mspct(files,
+    ooacquire::read_files2mspct(x,
                                 locale = locale,
                                 inst.descriptor = descriptor)
-  corrected.spct <-
-    ooacquire::uvb_corrections(x = raw.mspct[["light"]],
-                               flt = raw.mspct[["filter"]],
-                               dark = raw.mspct[["dark"]],
-                               method = method,
-                               stray.light.wl = stray.light.wl,
-                               flt.dark.wl = flt.dark.wl,
-                               flt.ref.wl = flt.ref.wl,
-                               worker_fun = worker_fun,
-                               trim = trim,
-                               verbose = verbose)
+  s_irrad_corrected(raw.mspct,
+                    method.data,
+                    verbose = verbose,
+                    ...)
+}
 
-  photobiology::cps2irrad(corrected.spct)
+#' @describeIn s_irrad_corrected Default for generic function.
+#' @export
+s_irrad_corrected.raw_mspct <- function(x,
+                                        method.data,
+                                        verbose = FALSE,
+                                        ...) {
+  if (length(x[["light"]]) == 0) {
+    if (verbose) {
+      warning("'raw_spct' object with name 'light' missing")
+    }
+    return(source_spct())
+  }
+
+  corrected.spct <-
+    with(method.data,
+         ooacquire::uvb_corrections(x = x[["light"]],
+                                    flt = x[["filter"]],
+                                    dark = x[["dark"]],
+                                    method = method,
+                                    stray.light.wl = stray.light.wl,
+                                    flt.dark.wl = flt.dark.wl,
+                                    flt.ref.wl = flt.ref.wl,
+                                    worker_fun = worker_fun,
+                                    trim = trim,
+                                    verbose = verbose)
+    )
+  photobiology::cps2irrad(corrected.spct, ...)
 }

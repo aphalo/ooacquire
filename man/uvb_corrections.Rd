@@ -4,7 +4,6 @@
 \alias{filter_correction}
 \alias{slit_function_correction}
 \alias{uvb_corrections}
-\alias{uvb_corrections_nb_files}
 \title{Apply filter-based stray-light correction}
 \usage{
 uvb_corrections(x, flt, dark, method = "original", stray.light.wl = c(218.5,
@@ -12,16 +11,11 @@ uvb_corrections(x, flt, dark, method = "original", stray.light.wl = c(218.5,
   worker_fun = ooacquire::maya_tail_correction, trim = 0, verbose = FALSE,
   ...)
 
-slit_function_correction(x, worker_fun = ooacquire::maya_tail_correction, ...)
+slit_function_correction(x, worker_fun = ooacquire::maya_tail_correction,
+  verbose = TRUE, ...)
 
 filter_correction(x, flt, method = "original", flt.dark.wl = c(193, 209.5),
   flt.ref.wl = c(360, 379.5), trim = 0, verbose = FALSE)
-
-uvb_corrections_nb_files(files, descriptor = descriptor,
-  locale = readr::default_locale(), method = "original",
-  stray.light.wl = c(218.5, 228.5), flt.dark.wl = c(193, 209.5),
-  flt.ref.wl = c(360, 379.5), worker_fun = ooacquire::maya_tail_correction,
-  trim = 0, verbose = FALSE)
 }
 \arguments{
 \item{x, flt, dark}{\code{cps_spct} objects.}
@@ -45,18 +39,6 @@ counts per second vectors.}
 \code{FALSE}.}
 
 \item{...}{additional params passed to worker_fun.}
-
-\item{files}{A named list of three file names, with names "light", "filter",
-and "dark".}
-
-\item{descriptor}{A named list with a descriptor of the characteristics of
-the spectrometer (if serial number does not agree an error is triggered).}
-
-\item{locale}{The locale controls defaults that vary from place to place. The
-default locale is US-centric (like R), but you can use
-\code{\link[readr]{locale}} to create your own locale that controls things
-like the default time zone, encoding, decimal mark, big mark, and day/month
-names.}
 }
 \value{
 A copy of \code{x} with the "cps" data replaced by the corrected
@@ -75,14 +57,6 @@ specific to each individual spectrometer unit (not type or configuration)
 and need to be written for each use case. The slit function tail correction
 requires the characterization of the shape of the slit function by
 measuring one or more laser beams at suitable wavelengths.
-
-Currently \code{uvb_corrections_nb_files} allows processing of files
-  written by OceanOptics' SpectraSuite software, from a simple protocol with
-  no integration-time bracketing, with three measurements: a "light"
-  measurement, a "filter" measurement using a polycarbonate filter and a dark
-  measurement. Data should be raw counts, either corrected for detector
-  non-linearity or not. All three spectra should be acquired using the
-  same instrument settings to achieve good accuracy.
 }
 \author{
 Algorithm for method "original" developed by Lasse Ylianttila. Other

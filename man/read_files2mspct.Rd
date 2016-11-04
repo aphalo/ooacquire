@@ -4,7 +4,7 @@
 \alias{read_files2mspct}
 \title{Read multiple files into raw_mspct object}
 \usage{
-read_files2mspct(files, read.f = read_oo_ssdata, ...)
+read_files2mspct(files, read.f = ooacquire::read_oo_ssdata, ...)
 }
 \arguments{
 \item{files}{a named list of character strings of file names}

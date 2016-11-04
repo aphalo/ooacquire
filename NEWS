@@ -7,12 +7,16 @@ OOAcquire 0.1.1
 
 Add function bleed_nas() to be used to discard data from sensor pixels
 adjacent to saturated/clipped pixels.
-Add functions for reading metadata from SpectraSuite raw data files.
 Add function for reading data from SpectraSuite raw data files.
+Add functions for reading metadata from SpectraSuite raw data files.
 Parsing is quite flexible, so hopefully robust across versions of the software
 and spectrometer models and their possible configurations.
-Debug UVB correction methods and get all steps up to calculation of irradiance
-working.
+Add generic s_irrad_corrected() with methods for raw_mspct objects and for
+lists of file names.
+Add automatic support for different protocols including bracketing based on the
+the raw spectral data passed as argument.
+Add example data.
+Test and debug.
 
 OOAcquire 0.1.0
 ===============
