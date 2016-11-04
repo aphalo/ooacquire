@@ -44,6 +44,7 @@ get_oo_descriptor <- function(w, sr.index = 0L, ch.index = 0L) {
   }
 
   bench <- rOmniDriver::get_bench(w, sr.index, ch.index)
+  w.lengths <- rOmniDriver::get_wavelengths(w, sr.index, ch.index)
   list(
     time = lubridate::now(),
     w = w,
@@ -57,7 +58,8 @@ get_oo_descriptor <- function(w, sr.index = 0L, ch.index = 0L) {
     min.integ.time = rOmniDriver::get_minimum_integration_time(w, sr.index),
     max.integ.time = rOmniDriver::get_maximum_integration_time(w, sr.index),
     max.counts = rOmniDriver::get_maximum_intensity(w, sr.index),
-    wavelengths = rOmniDriver::get_wavelengths(w, sr.index, ch.index),
+    wavelengths = w.lengths,
+    wl.range = range(w.lengths),
     bad.pixs = numeric(),
     inst.calib = get_calib()
   )
@@ -192,6 +194,8 @@ set_descriptor_nl <- function(oo_descriptor,
 #' @param oo_descriptor list as returned by function \code{get_oo_descriptor}
 #' @param irrad.mult numeric vector of the same length as the number of pixels
 #'   or of length one.
+#' @param wl.range numeric Range of wavelengths for which the calibration is
+#'   valid.
 #'
 #' @return A copy of the argument passed for \code{oo_descriptor} with the
 #' irrad.mult field of the calibration data replaced by the new values.
@@ -199,7 +203,8 @@ set_descriptor_nl <- function(oo_descriptor,
 #' @export
 #'
 set_descriptor_irrad_mult <- function(oo_descriptor,
-                                      irrad.mult)
+                                      irrad.mult,
+                                      wl.range = NULL)
 {
   stopifnot(length(irrad.mult) == 1 ||
               length(irrad.mult) == length(oo_descriptor$wavelengths))
@@ -207,6 +212,9 @@ set_descriptor_irrad_mult <- function(oo_descriptor,
     warning("'irrad.mult' of length one will be recycled.")
   }
   oo_descriptor[["inst.calib"]][["irrad.mult"]] <- irrad.mult
+  if (!is.null(range)) {
+    oo_descriptor[["inst.calib"]][["wl.range"]] <- range(wl.range)
+  }
   oo_descriptor
 }
 

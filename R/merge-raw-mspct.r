@@ -1,24 +1,14 @@
-# read_m_oo_ssdata <- function(files,
-#                              names = NULL,
-#                              date = NULL,
-#                              geocode = NULL,
-#                              label = NULL,
-#                              tz = NULL,
-#                              locale = readr::default_locale()) {
-#   names <- names(files)
-#   spcts <- list()
-#   i <- 0L
-#   for (f in file) {
-#     print(f)
-#     i <- i + 1L
-#     temp.spct <-
-#       photobiologyInOut::read_oo_ssdata(f, date, geocode, label, tz, locale)
-#     spcts[[names[i]]] <- temp.spct
-#   }
-#   raw_mspct(spcts)
-# }
-
 #' Merge raw spectra into a single multicolumn spectrum
+#'
+#' Member spectra are sorted according to integration time stored in the
+#' \code{inst.settings} attribute aand merged into a single \code{raw_spct}
+#' object with raw counts variables named \code{counts_1}, \code{counts_2},
+#' etc.
+#'
+#' @param x raw_mspct
+#'
+#' @note The individual \code{raw_spct} objects contained in \code{x} must have
+#'   identical values in \code{w.length}.
 #'
 #' @export
 #'

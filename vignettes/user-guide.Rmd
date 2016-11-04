@@ -16,10 +16,17 @@ and the 'r4photobiology' suite as bases. These functions conform a sort of
 "grammar for spectral data acquisition". We provide a separate function for each
 conceptual step in the process leading from raw counts to final spectral
 data---e.g. spectral irradiance. Some higher level functions are included as
-examples of good protocols.
+well, mainly as examples of how to implement some protocols.
 
-The initial steps are opening a connection to an instrument and retrieving a 
-descriptor including model type, optical configuration and possibly calibration data from its non-volatile memory. These first steps in most cases are needed only at the start the R session where data will be acquired. 
+The package includes functions for direct data acquisition and near real-time
+processing of spectra, plus functions that read raw-detector-counts and 
+instrument settings from text files output by the SpectraSuite program from
+Ocean Optics. After acquisition or file reading the processing of the raw 
+spectral data is identical in both cases.
+
+For data acquisition, the initial steps are opening a connection to an instrument and retrieving a descriptor including model type, optical configuration and possibly calibration data from its non-volatile memory. These first steps in most cases are needed only at the start the R session where data will be acquired. The drivers
+from Ocean Optics support multichannel instruments and simultaneous connection
+to multiple spectrometers. This is also supported by this package.
 
 The steps for the acquisition of one raw spectrum are to 1) define the settings to be used, 2) optionally adjust or tune some of these settings automatically, 3) acquire the spectrum, 4) convert the raw counts into linearised counts per second.
 
@@ -27,10 +34,15 @@ In most cases we need acquire more than one raw spectrum, frequently following a
 
 In case a) all the acquired raw spectra are stored as columns in the same `raw_spct` object, while in case b) the different conceptual spectra are each stored in a separate `raw_spct` object, member of a `raw_mspct` collection of spectra object. As a) and b) are usually combined, this approach allows and easy distinction of the two situations, and greatly simplifies the coding of later data processing steps.
 
-Following the approach of the 'r4photobiology' suite, we store all available
-metadata as attributes to the same objects where the acquired spectral data themselves are stored. The stored metadata includes a descriptor of the instrument and the instruments settings used, in addition to metadata that is held in spectral objects of classes defined in package 'photobiology', such as time, location, and label for the measured data. Furthermore, metadata is added at each step, allowing the tracing of the origin and processing of the data. This allows the functions to detect mistakes like an user attempting to linearise raw-counts data that have been already linearised.
+When spectral data are acquired with other software and read from files into R, this
+same approach is used for raw data storage. The role of the different files is determined by the structure of a named list used as argument. Files do not contain
+a full descriptor of the instrument and consequently the instrument descriptor need to be supplied as an additional argument.
 
-In all cases a wavelength calibration is used to map the pixels to wavelengths. Wavelength calibration can be that retrieved from the instruments' non-volatile memory or supplied directly by to user. Different further steps are needed depending on the quantity measured. In the case of 
+Following the approach of the 'r4photobiology' suite, we store all available
+metadata as attributes to the same objects where the acquired spectral data themselves are stored. The stored metadata includes a descriptor of the instrument and the instrument settings used. These attributes are an addition to metadata that is normally held in spectral objects of classes defined in package 'photobiology', such as time, location, and label for the measured data. Furthermore, metadata is added at each step, allowing the tracing of the origin and processing of the data. This allows the functions to detect mistakes like an user attempting to linearise raw-counts data that have been already linearised. This safeguard works even
+for data linearised in the spectrometer software and read from files.
+
+In all cases a wavelength calibration is used to map the pixels to wavelengths. Wavelength calibration can be that retrieved from the instruments' non-volatile memory or supplied directly by to user. Different further steps are needed depending on the quantity measured and method. In the case of 
 irradiance, a calibration needs to be applied to the counts-per-second spectral data. Usually
 calibration data is also stored in the non-volatile memory of the spectrometer, but
 in some cases it is convenient to apply special algorithms or calibration data 
@@ -55,24 +67,32 @@ cases are also included in the package. Here it is important to remember that a 
 | `acq_settings()` | build a list of setting values |
 | `tune_acq_settings()` | tune the integration time and number of scans to the current radiation conditions |
 | `acq_raw_spct()` | take one measurement (data point) |
+| `acq_raw_mspct()` | take a sequence of spectral measurements (several data points) |
 | **data procesing** | |
 | `trim_counts()` | replace values from saturated array pixels with NAs |
-| `bleed_nas()` | replace values from pixels neigbouring NAs with NAs |
-| `acq_raw_mspct()` | take a sequence of spectral measurement (several data points) |
+| `bleed_nas()` | replace values from pixels neighbouring NAs with NAs |
 | `linearize_counts()` | linearize the raw counts |
 | `skip_bad_pixs()` | replace bad pixels with interpolated raw counts |
 | `ref_correction()`| subtract a reference (e.g. dark signal) from a measured spectrum |
 | `photobiology::fshift()`| can be used to subtract a region of the same scan as an internal "dark" reference |
-| `raw2cps()` | methods to convert raw counts into counts per second |
-| ---     | the method specialization for `raw_spct` returns a `cps_spct` object |
+| `raw2cps()` | methods to convert raw counts into counts per second. The method specialization for `raw_spct` returns a `cps_spct` object |
 | `merge_cps()` | method to do HDR merge of bracketed scans |
 | `slit_function_correction()` | apply a correction for the 'long tails' of the slit function |
-| `filter_correctio()` | apply a correction for stray light based on the use of UV-cut-off or other selective filters |
-| `uvb_corrections()` | apply corrections for reducing the impact of stray light on |
-| `raw2corr_cps`| higher level function that returns **corrected** counts per second |
-| `cps2irrad()` | methods to convert counts per second into spectral irradiance |
-| `cps2Tfr()` | methods to convert counts per second into transmittance |
-| `cps2Rfr()` | methods to convert counts per second into reflectance |
+| `filter_correction()` | apply a correction for stray light based on the use of UV-cut-off or other selective filters |
+| `uvb_corrections()` | apply corrections for reducing the impact of stray light and slit function on counts-per-second estimates. This function intelligently adjusts the processing method used based on the spectral data item supplied as `x` argument |
+| `photobiology::cps2irrad()` | methods to convert counts per second into spectral irradiance |
+| `photobiology::cps2Tfr()` | methods to convert counts per second into transmittance |
+| `photobiology::cps2Rfr()` | methods to convert counts per second into reflectance |
+| **file reading**  | |
+| `read_oo_ssdata` | read data from a 'SpectraSuite' output file with raw-counts data |
+| `read_oo_pidata` | read data from a 'XXXXXXXXX' output file with raw-counts data from a Raspberry Pi board |
+| `read_files2mspct` | read multiple data files and assemble from them into a `raw_maspct` object compatible to that obtained through direct data acquisition |
+| `set_oo_ssdata_settings` | set the instrument settings attributes by decoding the header of text files saved from SpectraSuite |
+| `set_oo_ssdata_descriptor` | set the instrument descriptor attribute by decoding the header of text files saved from SpectraSuite and optionally merging these data incomplete with a _descriptor_ supplied as argument |
+| `merge_raw_mspct` | Merge `raw_spct` objects members of a single `raw_mspct` object into a `raw_spct` object with multiple columns |
+| **high level method** | |
+| `raw2corr_cps`| higher level function that returns **corrected** counts per second useful for calculating spectral reflectance and spectral transmittamce.|
+| `s_irrad_corrected` | high-level method with specializations for files and `raw_mspct` objects returning spectral irradiance in a `source_spct` object. |
 
 ## Workflow
 
@@ -102,9 +122,91 @@ After the preceding steps, if the _cps_ or merged _cps_ values are from an irrad
 
 The slit function describes how monochromatic light "reaches" adjacent pixels which should have been in total darkness had the monochromator been perfect. This is a subtle correction, which will affect only regions of a spectrum where the change in signal strength with wavelength is very steep, such as the UV region of a solar spectrum or a very narrow absorption peak.
 
-The slit function of a spectrometer can be estimated by measuring laser beams at different wavelengths and fitting suitable functions to the observed data. Here we explain how to apply such a function. The slit finction is the result of an optical effect, and consequently indepedent of integration time and other detector settings. Consequently, can be applied to either the merged _cps_ values or after application of a calibration. **Obviously, the stage at which the slit correction is applied needs to match the stage of processing of the data used for estimating the slit function.**
+The slit function of a spectrometer can be estimated by measuring laser beams at different wavelengths and fitting suitable functions to the observed data. Here we explain how to apply such a function. The slit function is the result of an optical effect, and consequently independent of integration time and other detector settings. Consequently, can be applied to either the merged _cps_ values or after application of a calibration. **Obviously, the stage at which the slit correction is applied needs to match the stage of processing of the data used for estimating the slit function.**
 
-The correction to apply to a given pixel depends on the readings of nearby pixels. Some authors recomend to apply this correction recursively, however, we follow the simple approach of applying it only once as an approximation.
+The correction to apply to a given pixel depends on the readings of nearby pixels. Some authors recommend to apply this correction recursively, however, we follow the simple approach of applying it only once as an approximation.
+
+## Examples
+
+```{r "setup", include=FALSE}
+require("knitr")
+opts_knit$set(root.dir = system.file("extdata", package = "ooacquire"))
+```
+
+### With data from files
+
+We first load the packages to be used, and set the working directory to the
+location of the example data files included in the package.
+```{r}
+library(photobiology)
+library(ggspectra)
+library(ooacquire)
+```
+
+We set a locale matching that under which the files to be read were saved.
+```{r}
+my.locale <- readr::locale("en", decimal_mark = ",", tz = "EET")
+
+```
+
+We next set a list of file names to be read, with members named according
+to their role in the measuring protocol.
+
+The first example is very simple, we use a single spectrum, using for the dark correction pixels expected to receive no true excitation. For example, those in the UVC region of the spectrum when the light source is sunlight at ground level.
+
+```{r}
+my.spct <- s_irrad_corrected(x = list(light = "light-short.txt"),
+                             descriptor = maya_descriptor,
+                             method.data = maya_ylianttila,
+                             locale = my.locale)
+```
+
+As these measurements are of sunlight in a greenhouse we can remove noise from regions known to be zero.
+
+```{r}
+# clip data outside calibration range
+my.spct <- clip_wl(my.spct, range = c(250, 899))
+# force to zero wavelengths < 290 nm use only for sunlight, and after checking plot
+my.spct <- trim_wl(my.spct, range = c(290, NA), use.hinges = FALSE, fill = 0)
+```
+
+We can now plot the result from simplest protocol.
+
+```{r, fig.height=5, fig.width=7}
+plot(my.spct, unit.out = "photon")
+```
+
+At the other extreme, we can use bracketing, a dark measurement, plus a measurement with a UV-absorbing filter (polycarbonate). The UV absorbing filter allows us to estimate stray light in the UV region.
+
+```{r}
+files_names <- list(light = c("light-short.txt",
+                              "light-long.txt"),
+                    filter = "flt-long.txt",
+                    dark = c("dark-short.txt",
+                             "dark-long.txt"))
+```
+
+```{r}
+my.spct <- s_irrad_corrected(x = files_names,
+                             descriptor = maya_descriptor,
+                             method.data = maya_ylianttila,
+                             locale = my.locale)
+```
+
+As these measurements are of sunlight in a greenhouse we can remove noise from regions known to be zero as we did above.
+
+```{r}
+# clip data outside calibration range
+my.spct <- clip_wl(my.spct, range = c(250, 899))
+# force to zero wavelengths < 290 nm use only for sunlight, and after checking plot
+my.spct <- trim_wl(my.spct, range = c(290, NA), use.hinges = FALSE, fill = 0)
+```
+
+We can now plot the result from complex protocol.
+
+```{r, fig.height=5, fig.width=7}
+plot(my.spct, unit.out = "photon")
+```
 
 ## Irradiance calibration
 

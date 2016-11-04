@@ -265,6 +265,8 @@ filter_correction <- function(x,
 #'   like the default time zone, encoding, decimal mark, big mark, and day/month
 #'   names.
 #' @param verbose Logical indicating the level of warnings wanted.
+#' @param ... Named argument passed to \code{photobiology::cps2irrad} which is
+#'   the final calculation step.
 #'
 #' @note Currently \code{s_irrad_corrected.list} allows processing of files
 #'   written by OceanOptics' SpectraSuite software, from protocols with

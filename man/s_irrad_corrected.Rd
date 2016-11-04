@@ -20,6 +20,9 @@ s_irrad_corrected(x, ...)
 \item{x}{A named list of one to hree vectors of file names, with names
 "light", "filter", and "dark".}
 
+\item{...}{Named argument passed to \code{photobiology::cps2irrad} which is
+the final calculation step.}
+
 \item{method.data}{A named list of constants and functions defining the
 method to be sued for stray light and dark signal corrections.}
 
