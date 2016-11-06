@@ -17,7 +17,9 @@ descriptor <- get_oo_descriptor(w)
 # set Maya hot pixels and correct time limits
 descriptor <- set_descriptor_integ_time(descriptor, NA, 7.2)
 descriptor <- set_descriptor_wl(descriptor, calibration.data$w.length)
-descriptor <- set_descriptor_irrad_mult(descriptor, calibration.data$multiplier * 1e4)
+descriptor <- set_descriptor_irrad_mult(descriptor,
+                                        calibration.data$multiplier * 1e4,
+                                        wl.range = c(251, 899))
 descriptor <- set_descriptor_bad_pixs(descriptor, c(123,380,1829,1994))
 # descriptor <- set_descriptor_slit_fun(descriptor, ooacquire::maya_tail_correction)
 #

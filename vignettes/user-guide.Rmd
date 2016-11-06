@@ -54,35 +54,35 @@ cases are also included in the package. Here it is important to remember that a 
 | function name | role |
 | ---------|----------------------------------------------------------|
 | **data acquisition** | |
-| `start_session()` | search for connected instruments and obtain a handle to the driver |
-| `end_session()` | close all connections and release handle |
-| `list_instruments()`| list all connected instruments |
-| `get_oo_descriptor()` | get a descriptor for one of the possibly several connected instruments |
-| `set_descriptor_wl()` | replace the wavelength values |
-| `set_descriptor_bad_pixs()` | replace the indexes to bad array detector pixels |
-| `set_descriptor_nl()` | replace the function used to correct for array non-linearity |
-| `set_descriptor_calib_mult()` | replace the vector of irradiance calibration multipliers |
-| `set_descriptor_integ_time()` | replace the vector defining the range of valid integration times |
-| `get_oo_settings()` | query the instrument to obtain its current settings |
-| `acq_settings()` | build a list of setting values |
-| `tune_acq_settings()` | tune the integration time and number of scans to the current radiation conditions |
-| `acq_raw_spct()` | take one measurement (data point) |
-| `acq_raw_mspct()` | take a sequence of spectral measurements (several data points) |
+| `start_session` | search for connected instruments and obtain a handle to the driver |
+| `end_session` | close all connections and release handle |
+| `list_instruments`| list all connected instruments |
+| `get_oo_descriptor` | get a descriptor for one of the possibly several connected instruments |
+| `set_descriptor_wl` | replace the wavelength values |
+| `set_descriptor_bad_pixs` | replace the indexes to bad array detector pixels |
+| `set_descriptor_nl` | replace the function used to correct for array non-linearity |
+| `set_descriptor_calib_mult` | replace the vector of irradiance calibration multipliers |
+| `set_descriptor_integ_time` | replace the vector defining the range of valid integration times |
+| `get_oo_settings` | query the instrument to obtain its current settings |
+| `acq_settings` | build a list of setting values |
+| `tune_acq_settings` | tune the integration time and number of scans to the current radiation conditions |
+| `acq_raw_spct` | take one measurement (data point) |
+| `acq_raw_mspct` | take a sequence of spectral measurements (several data points) |
 | **data procesing** | |
-| `trim_counts()` | replace values from saturated array pixels with NAs |
-| `bleed_nas()` | replace values from pixels neighbouring NAs with NAs |
-| `linearize_counts()` | linearize the raw counts |
-| `skip_bad_pixs()` | replace bad pixels with interpolated raw counts |
-| `ref_correction()`| subtract a reference (e.g. dark signal) from a measured spectrum |
-| `photobiology::fshift()`| can be used to subtract a region of the same scan as an internal "dark" reference |
-| `raw2cps()` | methods to convert raw counts into counts per second. The method specialization for `raw_spct` returns a `cps_spct` object |
-| `merge_cps()` | method to do HDR merge of bracketed scans |
-| `slit_function_correction()` | apply a correction for the 'long tails' of the slit function |
-| `filter_correction()` | apply a correction for stray light based on the use of UV-cut-off or other selective filters |
-| `uvb_corrections()` | apply corrections for reducing the impact of stray light and slit function on counts-per-second estimates. This function intelligently adjusts the processing method used based on the spectral data item supplied as `x` argument |
-| `photobiology::cps2irrad()` | methods to convert counts per second into spectral irradiance |
-| `photobiology::cps2Tfr()` | methods to convert counts per second into transmittance |
-| `photobiology::cps2Rfr()` | methods to convert counts per second into reflectance |
+| `trim_counts` | replace values from saturated array pixels with NAs |
+| `bleed_nas` | replace values from pixels neighbouring NAs with NAs |
+| `linearize_counts` | linearize the raw counts |
+| `skip_bad_pixs` | replace bad pixels with interpolated raw counts |
+| `ref_correction`| subtract a reference (e.g. dark signal) from a measured spectrum |
+| `photobiology::fshift`| can be used to subtract a region of the same scan as an internal "dark" reference |
+| `raw2cps` | methods to convert raw counts into counts per second. The method specialization for `raw_spct` returns a `cps_spct` object |
+| `merge_cps` | method to do HDR merge of bracketed scans |
+| `slit_function_correction` | apply a correction for the 'long tails' of the slit function |
+| `filter_correction` | apply a correction for stray light based on the use of UV-cut-off or other selective filters |
+| `uvb_corrections` | apply corrections for reducing the impact of stray light and slit function on counts-per-second estimates. This function intelligently adjusts the processing method used based on the spectral data item supplied as `x` argument |
+| `photobiology::cps2irrad` | methods to convert counts per second into spectral irradiance |
+| `photobiology::cps2Tfr` | methods to convert counts per second into transmittance |
+| `photobiology::cps2Rfr` | methods to convert counts per second into reflectance |
 | **file reading**  | |
 | `read_oo_ssdata` | read data from a 'SpectraSuite' output file with raw-counts data |
 | `read_oo_pidata` | read data from a 'XXXXXXXXX' output file with raw-counts data from a Raspberry Pi board |
@@ -164,8 +164,6 @@ my.spct <- s_irrad_corrected(x = list(light = "light-short.txt"),
 As these measurements are of sunlight in a greenhouse we can remove noise from regions known to be zero.
 
 ```{r}
-# clip data outside calibration range
-my.spct <- clip_wl(my.spct, range = c(250, 899))
 # force to zero wavelengths < 290 nm use only for sunlight, and after checking plot
 my.spct <- trim_wl(my.spct, range = c(290, NA), use.hinges = FALSE, fill = 0)
 ```
@@ -196,8 +194,6 @@ my.spct <- s_irrad_corrected(x = files_names,
 As these measurements are of sunlight in a greenhouse we can remove noise from regions known to be zero as we did above.
 
 ```{r}
-# clip data outside calibration range
-my.spct <- clip_wl(my.spct, range = c(250, 899))
 # force to zero wavelengths < 290 nm use only for sunlight, and after checking plot
 my.spct <- trim_wl(my.spct, range = c(290, NA), use.hinges = FALSE, fill = 0)
 ```

@@ -18,8 +18,6 @@ my.spct <- s_irrad_corrected(x = files2,
                              descriptor = maya_descriptor,
                              method.data = maya_ylianttila,
                              locale = my.locale)
-# clip data outside calibration range
-my.spct <- clip_wl(my.spct, range = c(250, 899))
 
 plot(my.spct, unit.out = "photon")
 # force to zero wavelengths < 290 nm use only for sunlight, and after checking plot
@@ -42,8 +40,7 @@ my.spct <- s_irrad_corrected(x = filesBR1,
                              descriptor = maya_descriptor,
                              method.data = maya_ylianttila,
                              locale = my.locale)
-# clip data outside calibration range
-my.spct <- clip_wl(my.spct, range = c(250, 899))
+
 plot(my.spct, unit.out = "photon")
 # force to zero wavelengths < 290 nm use only for sunlight, and after checking plot
 my.spct <- trim_wl(my.spct, range = c(290, NA), use.hinges = FALSE, fill = 0)

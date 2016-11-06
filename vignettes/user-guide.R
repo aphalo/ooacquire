@@ -18,8 +18,6 @@ my.spct <- s_irrad_corrected(x = list(light = "light-short.txt"),
                              locale = my.locale)
 
 ## ------------------------------------------------------------------------
-# clip data outside calibration range
-my.spct <- clip_wl(my.spct, range = c(250, 899))
 # force to zero wavelengths < 290 nm use only for sunlight, and after checking plot
 my.spct <- trim_wl(my.spct, range = c(290, NA), use.hinges = FALSE, fill = 0)
 
@@ -40,8 +38,6 @@ my.spct <- s_irrad_corrected(x = files_names,
                              locale = my.locale)
 
 ## ------------------------------------------------------------------------
-# clip data outside calibration range
-my.spct <- clip_wl(my.spct, range = c(250, 899))
 # force to zero wavelengths < 290 nm use only for sunlight, and after checking plot
 my.spct <- trim_wl(my.spct, range = c(290, NA), use.hinges = FALSE, fill = 0)
 

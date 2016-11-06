@@ -1,10 +1,14 @@
 Package: ooacquire
 Type: Package
 Title: Acquire Spectral Data from Ocean Optics Spectrometers
-Version: 0.1.0.9007
-Date: 2016-11-04
-Author: Pedro J. Aphalo [aut, cre]
-Maintainer: Pedro J. Aphalo <pedro.aphalo@helsinki.fi>
+Version: 0.1.0.9008
+Date: 2016-11-05
+Authors@R:
+   c(
+    person("Pedro J.", "Aphalo", email = "pedro.aphalo@helsinki.fi", role = c("aut", "trl", "cre")),
+    person("Lasse", "Ylianttila", role = c("aut")),
+    person("Titta K.", "Kotilainen", role = "ctb")
+    )
 Description: Functions to acquire data directly from spectrometers,
     automatically adjusting integration time and numbers of scans to average.
     Auxiliary functions to read the instrument description from its firmware ,
@@ -14,13 +18,13 @@ Description: Functions to acquire data directly from spectrometers,
     in objects of class "raw_spct" or "raw_mspct". The instrument settings,
     instrument description, date-time of acquisition and optionally goecode are
     stored as attributes.
-License: GPL (>=2)
+License: GPL (>= 2)
 VignetteBuilder: knitr
 Depends:
     R (>= 3.2.0),
 Imports:
     Rcpp (>= 0.12.6),
-    photobiology (>= 0.9.12),
+    photobiology (> 0.9.12),
     rOmniDriver (>= 0.1.11),
     lubridate (>= 1.6.0),
     polynom (>= 1.3-8),
@@ -32,9 +36,12 @@ Imports:
 Suggests:
     knitr (>= 1.12.3)
 LazyData: yes
-Encoding: UTF-8
-URL: http://www.r4photobiology.info,
-    https://bitbucket.org/aphalo/mayacalc
-BugReports: https://bitbucket.org/aphalo/mayacalc
+LazyLoad: yes
+ByteCompile: true
 LinkingTo: Rcpp
+URL: http://www.r4photobiology.info,
+    https://bitbucket.org/aphalo/ooacquire
+BugReports: https://bitbucket.org/aphalo/ooacquire/issues
 RoxygenNote: 5.0.1
+Encoding: UTF-8
+VignetteBuilder: knitr

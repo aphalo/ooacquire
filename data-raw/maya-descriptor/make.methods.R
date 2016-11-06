@@ -11,12 +11,8 @@ maya_ylianttila <- list(
 load(file = "./data-raw/maya-descriptor/MAYP11278.Rda")
 
 maya_descriptor <- descriptor
-# maya_descriptor$inst.calib$irrad.mult <-
-#   ifelse(maya_descriptor$wavelengths < 250 |
-#            maya_descriptor$wavelengths >= 900,
-#          NA_real_,
-#          maya_descriptor$wavelengths)
 rm(descriptor)
+maya_descriptor[["inst.calib"]][["wl.range"]] <- c(251, 899)
 
 save(maya_ylianttila, maya_descriptor, file = "data/maya-ylianttila.rda")
 
