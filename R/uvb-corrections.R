@@ -356,3 +356,37 @@ s_irrad_corrected.raw_mspct <- function(x,
     photobiology::cps2irrad(corrected.spct, ...)
   }
 }
+
+#' Select which instrument descriptor to use
+#'
+#' Select from a list of instrument descriptors which one to use based on
+#' date of measurement.
+#'
+#' @param date Any object that lubridate::as_date() will decode as a date or
+#'   convert to a date. Used only to override the selection of the descriptor
+#'   containing calibration data.
+#' @param descriptors A named list of descriptors of the characteristics of
+#'   the spectrometer including calibration data.
+#' @param verbose Logical indicating the level of warnings wanted.
+#' @param ... Currently ignored.
+#'
+#' @export
+#'
+which_descriptor <- function(date = lubridate::today(),
+                             descriptors = ooacquire::MAYP11278_descriptors,
+                             verbose = FALSE,
+                             ...) {
+  for (d in rev(names(descriptors))) {
+    if (descriptors[[d]][["inst.calib"]][["start.date"]] < date &
+        descriptors[[d]][["inst.calib"]][["end.date"]] > date) {
+      if (verbose) {
+        message("Descriptor ", d, "selected")
+      }
+      return(descriptors[[d]])
+    }
+  }
+  if (verbose) {
+    warning("No valid descriptor found")
+  }
+  return(list())
+}

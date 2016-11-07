@@ -221,6 +221,8 @@ set_descriptor_irrad_mult <- function(oo_descriptor,
   if (!is.null(range)) {
     oo_descriptor[["inst.calib"]][["wl.range"]] <- range(wl.range)
   }
+  oo_descriptor[["inst.calib"]][["start.date"]] <- start.date
+  oo_descriptor[["inst.calib"]][["end.date"]] <- end.date
   oo_descriptor
 }
 
