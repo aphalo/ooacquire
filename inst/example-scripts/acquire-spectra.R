@@ -28,7 +28,7 @@
 #' }
 #'
 acq_interactive <- function(min.tot.time = 5, method = "full",
-                                HDR.mult = c(short = 1, long = 10)) {
+                            HDR.mult = c(short = 1, long = 10)) {
 
   # define measurement protocols
   protocols <- list(md = c("meas", "dark1"),

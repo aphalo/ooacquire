@@ -37,10 +37,13 @@ get_oo_descriptor <- function(w, sr.index = 0L, ch.index = 0L) {
     if (rOmniDriver::is_feature_supported_irradiance_calibration_factor(w, sr.index)) {
       z$irrad.mult <-
         rOmniDriver::get_feature_irradiance_calibration_factor(w, sr.index)$getIrradianceCalibrationFactors()
+      z$start.date <- lubridate::today() - lubridate::days(1)
+      z$end.date <- lubridate::today() + lubridate::days(1)
     } else {
       z$irrad.mult <- NA_real_
+      z$start.date <- NA_real_
+      z$end.date <- NA_real_
     }
-    z
   }
 
   bench <- rOmniDriver::get_bench(w, sr.index, ch.index)
@@ -196,6 +199,7 @@ set_descriptor_nl <- function(oo_descriptor,
 #'   or of length one.
 #' @param wl.range numeric Range of wavelengths for which the calibration is
 #'   valid.
+#' @param start.date,end.date range of dates when calibration is valid.
 #'
 #' @return A copy of the argument passed for \code{oo_descriptor} with the
 #' irrad.mult field of the calibration data replaced by the new values.
@@ -204,7 +208,9 @@ set_descriptor_nl <- function(oo_descriptor,
 #'
 set_descriptor_irrad_mult <- function(oo_descriptor,
                                       irrad.mult,
-                                      wl.range = NULL)
+                                      wl.range = NULL,
+                                      start.date = lubridate::today() - lubridate::days(1),
+                                      end.date = lubridate::today() + lubridate::days(1))
 {
   stopifnot(length(irrad.mult) == 1 ||
               length(irrad.mult) == length(oo_descriptor$wavelengths))

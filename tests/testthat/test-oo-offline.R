@@ -2,6 +2,7 @@ context("read raw Ocean Optics")
 
 library(photobiology)
 library(lubridate)
+library(readr)
 
 # test_that("SpectraSuite", {
 #
@@ -61,32 +62,32 @@ test_that("SpectraSuite comma multiple", {
   my.locale <- readr::locale("en", decimal_mark = ",", tz = "EET")
 
   ss.mspct <- read_files2mspct(files = list(
-    measure = "data-test/pheno1normal.txt",
+    light = "data-test/pheno1normal.txt",
     dark = "data-test/pheno1normaldark.txt"
   ),
   locale = my.locale
   )
 
   expect_equal(length(ss.mspct), 2)
-  expect_equivalent(names(ss.mspct), c("measure", "dark"))
-  expect_equal(ss.mspct[["measure"]][1, 1], 187.82)
+  expect_equivalent(names(ss.mspct), c("light", "dark"))
+  expect_equal(ss.mspct[["light"]][1, 1], 187.82)
   expect_equal(ss.mspct[["dark"]][1, 1], 187.82)
-  expect_equal(ss.mspct[["measure"]][2068, 1], 1117.14)
+  expect_equal(ss.mspct[["light"]][2068, 1], 1117.14)
   expect_equal(ss.mspct[["dark"]][2068, 1], 1117.14)
-  expect_is(ss.mspct[["measure"]][[1]], "numeric")
-  expect_equal(sum(is.na(ss.mspct[["measure"]][[1]])), 0)
-  expect_true(all(sign(ss.mspct[["measure"]][[1]]) > 0))
-  expect_is(ss.mspct[["measure"]][[2]], "numeric")
-  expect_equal(sum(is.na(ss.mspct[["measure"]][[2]])), 0)
+  expect_is(ss.mspct[["light"]][[1]], "numeric")
+  expect_equal(sum(is.na(ss.mspct[["light"]][[1]])), 0)
+  expect_true(all(sign(ss.mspct[["light"]][[1]]) > 0))
+  expect_is(ss.mspct[["light"]][[2]], "numeric")
+  expect_equal(sum(is.na(ss.mspct[["light"]][[2]])), 0)
   expect_is(ss.mspct, "raw_mspct")
-  expect_is(ss.mspct[["measure"]], "raw_spct")
+  expect_is(ss.mspct[["light"]], "raw_spct")
   expect_is(ss.mspct[["dark"]], "raw_spct")
-  expect_named(ss.mspct[["measure"]], c("w.length", "counts"))
+  expect_named(ss.mspct[["light"]], c("w.length", "counts"))
   # expect_equal(as.numeric(getWhenMeasured(ss.spct), tz = "EET"),
   #              as.numeric(ymd_hms("2016-10-11 11:23:05", tz = "EET"), tz = "EET"))
-  expect_equal(getWhereMeasured(ss.mspct[["measure"]]),
+  expect_equal(getWhereMeasured(ss.mspct[["light"]]),
                data.frame(lon = NA_real_, lat = NA_real_))
-  expect_equal(getWhatMeasured(ss.mspct[["measure"]]), "File: data-test/pheno1normal.txt")
-  expect_equal(getTimeUnit(ss.mspct[["measure"]]), NA)
-  expect_gt(length(comment(ss.mspct[["measure"]])), 0)
+  expect_equal(getWhatMeasured(ss.mspct[["light"]]), "File: data-test/pheno1normal.txt")
+  expect_equal(getTimeUnit(ss.mspct[["light"]]), NA)
+  expect_gt(length(comment(ss.mspct[["light"]])), 0)
 })

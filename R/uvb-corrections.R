@@ -257,6 +257,8 @@ filter_correction <- function(x,
 #'   "light", "filter", and "dark".
 #' @param method.data A named list of constants and functions defining the
 #'   method to be sued for stray light and dark signal corrections.
+#' @param return.cps logical Useful when there is no need to apply a calibration,
+#'   such as when computing new calibration multipliers.
 #' @param descriptor A named list with a descriptor of the characteristics of
 #'   the spectrometer (if serial number does not agree an error is triggered).
 #' @param locale	The locale controls defaults that vary from place to place. The
@@ -291,6 +293,7 @@ s_irrad_corrected.default <- function(x, ...) {
 #' @export
 s_irrad_corrected.list <- function(x,
                                    method.data,
+                                   return.cps = FALSE,
                                    descriptor,
                                    locale,
                                    verbose = FALSE,
@@ -299,14 +302,19 @@ s_irrad_corrected.list <- function(x,
     if (verbose) {
       warning("Filename(s) with name 'light' missing")
     }
-    return(source_spct())
+    if (return.cps) {
+      return(cps_spct())
+    } else {
+      return(source_spct())
+    }
   }
   raw.mspct <-
     ooacquire::read_files2mspct(x,
                                 locale = locale,
                                 inst.descriptor = descriptor)
-  s_irrad_corrected(raw.mspct,
-                    method.data,
+  s_irrad_corrected(x = raw.mspct,
+                    method.data = method.data,
+                    return.cps = return.cps,
                     verbose = verbose,
                     ...)
 }
@@ -315,13 +323,18 @@ s_irrad_corrected.list <- function(x,
 #' @export
 s_irrad_corrected.raw_mspct <- function(x,
                                         method.data,
+                                        return.cps = FALSE,
                                         verbose = FALSE,
                                         ...) {
   if (length(x[["light"]]) == 0) {
     if (verbose) {
       warning("'raw_spct' object with name 'light' missing")
     }
-    return(source_spct())
+    if (return.cps) {
+      return(cps_spct())
+    } else {
+      return(source_spct())
+    }
   }
 
   corrected.spct <-
@@ -337,5 +350,9 @@ s_irrad_corrected.raw_mspct <- function(x,
                                     trim = trim,
                                     verbose = verbose)
     )
-  photobiology::cps2irrad(corrected.spct, ...)
+  if (return.cps) {
+    corrected.spct
+  } else {
+    photobiology::cps2irrad(corrected.spct, ...)
+  }
 }

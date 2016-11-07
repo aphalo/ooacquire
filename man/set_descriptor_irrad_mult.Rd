@@ -4,7 +4,9 @@
 \alias{set_descriptor_irrad_mult}
 \title{Add spectral irradiance calibration}
 \usage{
-set_descriptor_irrad_mult(oo_descriptor, irrad.mult, wl.range = NULL)
+set_descriptor_irrad_mult(oo_descriptor, irrad.mult, wl.range = NULL,
+  start.date = lubridate::today() - lubridate::days(1),
+  end.date = lubridate::today() + lubridate::days(1))
 }
 \arguments{
 \item{oo_descriptor}{list as returned by function \code{get_oo_descriptor}}
@@ -14,6 +16,8 @@ or of length one.}
 
 \item{wl.range}{numeric Range of wavelengths for which the calibration is
 valid.}
+
+\item{start.date, end.date}{range of dates when calibration is valid.}
 }
 \value{
 A copy of the argument passed for \code{oo_descriptor} with the

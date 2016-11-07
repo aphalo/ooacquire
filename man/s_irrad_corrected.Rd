@@ -11,10 +11,11 @@ s_irrad_corrected(x, ...)
 
 \method{s_irrad_corrected}{default}(x, ...)
 
-\method{s_irrad_corrected}{list}(x, method.data, descriptor, locale,
-  verbose = FALSE, ...)
+\method{s_irrad_corrected}{list}(x, method.data, return.cps = FALSE,
+  descriptor, locale, verbose = FALSE, ...)
 
-\method{s_irrad_corrected}{raw_mspct}(x, method.data, verbose = FALSE, ...)
+\method{s_irrad_corrected}{raw_mspct}(x, method.data, return.cps = FALSE,
+  verbose = FALSE, ...)
 }
 \arguments{
 \item{x}{A named list of one to hree vectors of file names, with names
@@ -25,6 +26,9 @@ the final calculation step.}
 
 \item{method.data}{A named list of constants and functions defining the
 method to be sued for stray light and dark signal corrections.}
+
+\item{return.cps}{logical Useful when there is no need to apply a calibration,
+such as when computing new calibration multipliers.}
 
 \item{descriptor}{A named list with a descriptor of the characteristics of
 the spectrometer (if serial number does not agree an error is triggered).}

@@ -1,9 +1,0 @@
-## Calibration dates
-#
-inst.sn, name, calib.date, start.date, end.date, coeffs.file
-MAYP11278, 2012a, 2012-03-16, 2012-03-16, 2013-02-14, cal-coeffs-2012a.xlsx
-MAYP11278, 2013a, 2013-02-14, 2013-02-14, 2014-03-12, cal-coeffs-2013a.xlsx
-MAYP11278, 2014a, 2013-03-12, 2014-03-12, 2014-10-14, cal-coeffs-2013a.xlsx
-MAYP11278, 2014b, 2014-10-14, 2014-10-14, 2016-02-25, cal-coeffs-2014b.xlsx
-MAYP11278, 2016, 2016-02-25, 2016-02-25, 2100-01-01, cal-coeffs-2016.xlsx
-
