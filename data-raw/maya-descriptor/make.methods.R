@@ -4,7 +4,7 @@ maya_ylianttila <- list(
   stray.light.wl = c(218.5, 228.5),
   flt.dark.wl = c(193, 209.5),
   flt.ref.wl = c(360, 379.5),
-  worker_fun = ooacquire::maya_tail_correction,
+  worker.fun = ooacquire::maya_tail_correction,
   trim = 0
 )
 

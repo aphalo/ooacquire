@@ -4,10 +4,10 @@
 \alias{set_descriptor_bad_pixs}
 \title{Add bad pixel informatoin to an instrument description}
 \usage{
-set_descriptor_bad_pixs(oo_descriptor, bad.pixs)
+set_descriptor_bad_pixs(descriptor, bad.pixs)
 }
 \arguments{
-\item{oo_descriptor}{list as returned by function \code{get_oo_descriptor}}
+\item{descriptor}{list as returned by function \code{get_oo_descriptor}}
 
 \item{bad.pixs}{numeric vector of sorted wavelengths values corresponding to each
 pixel in the instrument array.}

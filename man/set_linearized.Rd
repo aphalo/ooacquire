@@ -4,13 +4,13 @@
 \alias{set_linearized}
 \title{Set linearized attribute}
 \usage{
-set_linearized(acq_settings)
+set_linearized(acq.settings)
 }
 \arguments{
-\item{acq_settings}{list as returned by function \code{acq_settings()}}
+\item{acq.settings}{list as returned by function \code{acq_settings()}}
 }
 \value{
-a copy of the argument passed for \code{acq_settings} with the
+a copy of the argument passed for \code{acq.settings} with the
 linearized field of the settings data replaced by TRUE.
 }
 \description{

@@ -4,11 +4,11 @@
 \alias{set_descriptor_integ_time}
 \title{Replace integration time limits in instrument descriptor}
 \usage{
-set_descriptor_integ_time(oo_descriptor, min.integ.time = NA_integer_,
+set_descriptor_integ_time(descriptor, min.integ.time = NA_integer_,
   max.integ.time = NA_integer_, force.change = FALSE)
 }
 \arguments{
-\item{oo_descriptor}{list as returned by function \code{get_oo_descriptor}}
+\item{descriptor}{list as returned by function \code{get_oo_descriptor}}
 
 \item{min.integ.time, max.integ.time}{numeric values in seconds in seconds.}
 

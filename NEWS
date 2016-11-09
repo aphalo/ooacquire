@@ -17,6 +17,7 @@ Add automatic support for different protocols including bracketing based on the
 the raw spectral data passed as argument.
 Add function compute_irrad_calibration() accepting measurements of both D2 and
 FEL lamps and the coefficients for reconstructing the emission of the lamps.
+Add function acq_irrad_interactive().
 Add example data.
 Test and debug.
 

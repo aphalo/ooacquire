@@ -4,8 +4,8 @@
 \alias{set_oo_ssdata_descriptor}
 \title{Set the instrument description.}
 \usage{
-set_oo_ssdata_descriptor(x, file.header = comment(x),
-  inst.descriptor = NULL, action = "overwrite")
+set_oo_ssdata_descriptor(x, file.header = comment(x), descriptor = NULL,
+  action = "overwrite")
 }
 \arguments{
 \item{x}{generic_spct, although with defaults only raw_spct.}
@@ -13,14 +13,12 @@ set_oo_ssdata_descriptor(x, file.header = comment(x),
 \item{file.header}{character string The header of the file output by
 SpectraSuite.}
 
-\item{inst.descriptor}{list An already built instrument descriptor,
+\item{descriptor}{list An already built instrument descriptor,
 in which case \code{file.header} is used only to validate the serial
 number.}
 
 \item{action}{character A flag indicating if an existing instrument
 descriptor in \code{x} should be overwritten, merged or kept as is.}
-
-\item{descriptor}{list A list describing the instrument used.}
 }
 \value{
 A copy of \code{x} with updated attributes.

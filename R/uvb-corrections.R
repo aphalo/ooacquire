@@ -7,19 +7,18 @@
 #' for.
 #'
 #' @param x,flt,dark \code{cps_spct} objects.
-#' @param method Method variant used "original" (Ylianttila), "full" (Aphalo),
-#'   "sun" (full with trimming).
+#' @param stray.light.method Method variant used "original" (Ylianttila).
 #' @param stray.light.wl numeric vector of length 2 giving the range of
 #'   wavelengths to use for the final stray light correction.
 #' @param flt.dark.wl,flt.ref.wl numeric vectors of length 2 giving the ranges
 #'   of wavelengths to use for the "dark" and "illuminated" regions of the
 #'   array in the filter correction.
-#' @param worker_fun function actually doing the correction on the w.lengths and
+#' @param worker.fun function actually doing the correction on the w.lengths and
 #'   counts per second vectors.
 #' @param trim a numeric value to be used as argument for mean
 #' @param verbose Logical indicating the level of warnings wanted. Defaults to
 #'   \code{FALSE}.
-#' @param ... additional params passed to worker_fun.
+#' @param ... additional params passed to worker.fun.
 #'
 #' @return A copy of \code{x} with the "cps" data replaced by the corrected
 #'   ones.
@@ -29,7 +28,7 @@
 #'
 #' @references \url{http://www.r4photobiology.info}
 #'
-#' @note The default \code{worker_fun} is just an example. Corrections are
+#' @note The default \code{worker.fun} is just an example. Corrections are
 #' specific to each individual spectrometer unit (not type or configuration)
 #' and need to be written for each use case. The slit function tail correction
 #' requires the characterization of the shape of the slit function by
@@ -38,11 +37,11 @@
 uvb_corrections <- function(x,
                             flt,
                             dark,
-                            method = "original",
+                            stray.light.method = "original",
                             stray.light.wl = c(218.5, 228.5),
                             flt.dark.wl = c(193, 209.5),
                             flt.ref.wl = c(360, 379.5),
-                            worker_fun = ooacquire::maya_tail_correction,
+                            worker.fun = ooacquire::maya_tail_correction,
                             trim = 0,
                             verbose = FALSE,
                             ...) {
@@ -64,8 +63,8 @@ uvb_corrections <- function(x,
     }
     return(source_spct())
   }
-  inst.descriptor <- getInstrDesc(x)
-  inst.settings <- getInstrDesc(x)
+  descriptor <- getInstrDesc(x)
+  inst.settings <- getInstrSettings(x)
   x <- spct.worker(x)
   if (!is.null(dark)) {
     dark <- spct.worker(dark)
@@ -90,20 +89,20 @@ uvb_corrections <- function(x,
 
   if (!is.null(flt)) {
     x <- filter_correction(x, flt,
-                           method = method,
+                           stray.light.method = stray.light.method,
                            flt.dark.wl = flt.dark.wl,
                            flt.ref.wl = flt.ref.wl,
                            trim = trim,
                            verbose = verbose)
   }
 
-  z <- slit_function_correction(x, worker_fun = worker_fun, ...)
+  z <- slit_function_correction(x, worker.fun = worker.fun, ...)
 
   z.cps <- z[["cps"]][z$w.length > stray.light.wl[1] &
                         z$w.length < stray.light.wl[2]]
   stray.light <-
     mean(z.cps, trim = trim, na.rm = TRUE)
-  if (method == "original") {
+  if (stray.light.method == "original") {
     stray.light <- stray.light +
       stats::sd(z.cps, na.rm = TRUE)
   }
@@ -117,7 +116,7 @@ uvb_corrections <- function(x,
   }
   z <- z - stray.light
 
-  z <- setInstrDesc(z, inst.descriptor)
+  z <- setInstrDesc(z, descriptor)
   z <- setInstrSettings(z, inst.settings)
   z
 }
@@ -127,7 +126,7 @@ uvb_corrections <- function(x,
 #' @export
 #'
 slit_function_correction <- function(x,
-                                     worker_fun = ooacquire::maya_tail_correction,
+                                     worker.fun = ooacquire::maya_tail_correction,
                                      verbose = TRUE,
                                      ...) {
   stopifnot(is.cps_spct(x))
@@ -147,7 +146,7 @@ slit_function_correction <- function(x,
       }
     }
   }
-  new.cps <- worker_fun(x[["w.length"]], x[["cps"]], ...)
+  new.cps <- worker.fun(x[["w.length"]], x[["cps"]], ...)
   x[["cps"]] <- x[["cps"]] - new.cps[["tail"]]
   attr(x, "slit.corrected") <- TRUE
   x
@@ -159,7 +158,7 @@ slit_function_correction <- function(x,
 #'
 filter_correction <- function(x,
                               flt,
-                              method = "original",
+                              stray.light.method = "original",
                               flt.dark.wl = c(193, 209.5),
                               flt.ref.wl = c(360, 379.5),
                               trim = 0,
@@ -194,16 +193,16 @@ filter_correction <- function(x,
     mean(dplyr::filter(x, range == "short")[["cps"]],
          trim = trim, na.rm = TRUE)
 
-  if (method == "original") {
+  if (stray.light.method == "original") {
     flt[["filter_ratio"]] <- flt[["cps"]] / x[["cps"]]
-    if (verbose && any(is.na(dplyr::filter(flt, range = "short")[["filter_ratio"]]))) {
-      warning(paste(sum(is.na(dplyr::filter(flt, range = "short")[["filter_ratio"]])),
+    if (verbose && any(is.na(dplyr::filter(flt, range == "short")[["filter_ratio"]]))) {
+      warning(paste(sum(is.na(dplyr::filter(flt, range == "short")[["filter_ratio"]])),
                     "NAs in filter_ratio"))
     }
     mean_flt_ratio_short <-
       mean(dplyr::filter(flt, range == "short")[["filter_ratio"]],
            trim = trim, na.rm = TRUE)
-  } else if (method == "full" || method == "sun" || method == "raw") {
+  } else if (stray.light.method == "full" || stray.light.method == "sun" || stray.light.method == "raw") {
     # attempt to avoid overcorrection
     if ((mean_merged_cs_short - mean_flt_cs_short) < 0.0) {
       mean_flt_ratio_short <- 1.0
@@ -211,7 +210,7 @@ filter_correction <- function(x,
       mean_flt_ratio_short <- mean_flt_cs_short / mean_merged_cs_short
     }
   } else {
-    stop(paste("method", method, "not supported"))
+    stop(paste("method", stray.light.method, "not supported"))
   }
 
   # diagnosis and correction of bad estimates
@@ -255,7 +254,7 @@ filter_correction <- function(x,
 #'
 #' @param x A named list of one to hree vectors of file names, with names
 #'   "light", "filter", and "dark".
-#' @param method.data A named list of constants and functions defining the
+#' @param method A named list of constants and functions defining the
 #'   method to be sued for stray light and dark signal corrections.
 #' @param return.cps logical Useful when there is no need to apply a calibration,
 #'   such as when computing new calibration multipliers.
@@ -292,7 +291,7 @@ s_irrad_corrected.default <- function(x, ...) {
 #' @describeIn s_irrad_corrected Default for generic function.
 #' @export
 s_irrad_corrected.list <- function(x,
-                                   method.data,
+                                   method,
                                    return.cps = FALSE,
                                    descriptor,
                                    locale,
@@ -311,9 +310,9 @@ s_irrad_corrected.list <- function(x,
   raw.mspct <-
     ooacquire::read_files2mspct(x,
                                 locale = locale,
-                                inst.descriptor = descriptor)
+                                descriptor = descriptor)
   s_irrad_corrected(x = raw.mspct,
-                    method.data = method.data,
+                    method = method,
                     return.cps = return.cps,
                     verbose = verbose,
                     ...)
@@ -322,7 +321,7 @@ s_irrad_corrected.list <- function(x,
 #' @describeIn s_irrad_corrected Default for generic function.
 #' @export
 s_irrad_corrected.raw_mspct <- function(x,
-                                        method.data,
+                                        method,
                                         return.cps = FALSE,
                                         verbose = FALSE,
                                         ...) {
@@ -338,15 +337,15 @@ s_irrad_corrected.raw_mspct <- function(x,
   }
 
   corrected.spct <-
-    with(method.data,
+    with(method,
          ooacquire::uvb_corrections(x = x[["light"]],
                                     flt = x[["filter"]],
                                     dark = x[["dark"]],
-                                    method = method,
+                                    stray.light.method = stray.light.method,
                                     stray.light.wl = stray.light.wl,
                                     flt.dark.wl = flt.dark.wl,
                                     flt.ref.wl = flt.ref.wl,
-                                    worker_fun = worker_fun,
+                                    worker.fun = worker.fun,
                                     trim = trim,
                                     verbose = verbose)
     )
@@ -355,6 +354,21 @@ s_irrad_corrected.raw_mspct <- function(x,
   } else {
     photobiology::cps2irrad(corrected.spct, ...)
   }
+}
+
+#' @describeIn s_irrad_corrected Default for generic function.
+#' @export
+s_irrad_corrected.raw_spct <- function(x,
+                                       method,
+                                       return.cps = FALSE,
+                                       verbose = FALSE,
+                                       ...) {
+  raw.mspct <- raw_mspct(list(light = x))
+  s_irrad_corrected(x = raw.mspct,
+                    method = method,
+                    return.cps = return.cps,
+                    verbose = verbose,
+                    ...)
 }
 
 #' Select which instrument descriptor to use
@@ -380,13 +394,15 @@ which_descriptor <- function(date = lubridate::today(),
     if (descriptors[[d]][["inst.calib"]][["start.date"]] < date &
         descriptors[[d]][["inst.calib"]][["end.date"]] > date) {
       if (verbose) {
-        message("Descriptor ", d, "selected")
+        message("Descriptor ", d, " selected for ", date)
       }
       return(descriptors[[d]])
     }
   }
   if (verbose) {
-    warning("No valid descriptor found")
+    warning("No valid descriptor found for ", date)
+  } else {
+    message("No valid descriptor found for ", date)
   }
   return(list())
 }

@@ -11,7 +11,7 @@ automatically adjusting integration time and numbers of scans to average.
 Auxiliary functions to read the instrument description from its firmware ,
 and to read current instrument settings. Function to apply linearization
 function to data (when linearization is sisabled in the instrument).
-Built as an extenssion to package 'photobiology'. Spectral data is returned
+Built as an extension to package 'photobiology'. Spectral data is returned
 in objects of class "raw_spct" or "raw_mspct". The instrument settings,
 instrument description, date-time of acquisition and optionally goecode are
 stored as attributes.

@@ -5,16 +5,16 @@
 \alias{tune_acq_settings}
 \title{Settings for spectral measurement}
 \usage{
-acq_settings(oo_descriptor, integ.time = 0.01, num.scans = 10L,
+acq_settings(descriptor, integ.time = 0.01, num.scans = 10L,
   min.integ.time = -Inf, max.integ.time = Inf, tot.time.range = c(0, Inf),
-  HDR.mult = c(short = 1, long = 10), target.marging = 0.1,
+  HDR.mult = c(short = 1, long = 10), target.margin = 0.1,
   pix.selector = TRUE, corr.elect.dark = 0L, corr.sensor.nl = 0L,
   boxcar.width = 0L, verbose = TRUE)
 
-tune_acq_settings(oo_descriptor, acq_settings, verbose = TRUE)
+tune_acq_settings(descriptor, acq.settings, verbose = TRUE)
 }
 \arguments{
-\item{oo_descriptor}{list as returned by function \code{get_oo_descriptor}}
+\item{descriptor}{list as returned by function \code{get_oo_descriptor}}
 
 \item{integ.time}{numeric vaue in seconds}
 
@@ -29,7 +29,7 @@ tune_acq_settings(oo_descriptor, acq_settings, verbose = TRUE)
 \item{HDR.mult}{a numeric vector with integ.time multipliers to be used for
 "bracketing".}
 
-\item{target.marging}{numeric (0..1)}
+\item{target.margin}{numeric (0..1)}
 
 \item{pix.selector}{a logical or numeric vector used as subscript to select
 pixels}
@@ -40,7 +40,7 @@ pixels}
 
 \item{verbose}{a logical to enable or disable warnings}
 
-\item{acq_settings}{list as returned by a previous call to \code{acq_settings()},
+\item{acq.settings}{list as returned by a previous call to \code{acq_settings()},
 or \code{tune_acq_settings()}.}
 }
 \value{

@@ -4,12 +4,12 @@
 \alias{linearize_counts}
 \title{Function to apply linearization correction to raw counts data.}
 \usage{
-linearize_counts(x, force_zero = TRUE, verbose = FALSE)
+linearize_counts(x, force.zero = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{x}{raw_spct object.}
 
-\item{force_zero}{A logical indicating whether to change negative count
+\item{force.zero}{A logical indicating whether to change negative count
 values to zero.}
 
 \item{verbose}{Logical Currently ignired.}

@@ -4,12 +4,12 @@
 \alias{set_descriptor_irrad_mult}
 \title{Add spectral irradiance calibration}
 \usage{
-set_descriptor_irrad_mult(oo_descriptor, irrad.mult, wl.range = NULL,
+set_descriptor_irrad_mult(descriptor, irrad.mult, wl.range = NULL,
   start.date = lubridate::today() - lubridate::days(1),
   end.date = lubridate::today() + lubridate::days(1))
 }
 \arguments{
-\item{oo_descriptor}{list as returned by function \code{get_oo_descriptor}}
+\item{descriptor}{list as returned by function \code{get_oo_descriptor}}
 
 \item{irrad.mult}{numeric vector of the same length as the number of pixels
 or of length one.}

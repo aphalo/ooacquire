@@ -96,7 +96,7 @@ read_oo_pidata <- function(file,
   inst.settings[["tot.time"]] = with(inst.settings, integ.time * num.scans)
   inst.settings[["rel.signal"]] = NA
 
-  inst.descriptor <-
+  descriptor <-
     list(
       time = date,
       w = NA,
@@ -137,7 +137,7 @@ read_oo_pidata <- function(file,
   photobiology::setWhenMeasured(z, date)
   photobiology::setWhereMeasured(z, geocode)
   photobiology::setWhatMeasured(z, label)
-  photobiology::setInstrDesc(z, inst.descriptor)
+  photobiology::setInstrDesc(z, descriptor)
   photobiology::setInstrSettings(z, inst.settings)
   z
 }

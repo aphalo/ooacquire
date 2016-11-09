@@ -52,7 +52,7 @@ cases are also included in the package. Here it is important to remember that a 
 ## Functions
 
 | function name | role |
-| ---------|----------------------------------------------------------|
+| :---------|:----------------------------------------------------------|
 | **data acquisition** | |
 | `start_session` | search for connected instruments and obtain a handle to the driver |
 | `end_session` | close all connections and release handle |
@@ -68,6 +68,7 @@ cases are also included in the package. Here it is important to remember that a 
 | `tune_acq_settings` | tune the integration time and number of scans to the current radiation conditions |
 | `acq_raw_spct` | take one measurement (data point) |
 | `acq_raw_mspct` | take a sequence of spectral measurements (several data points) |
+| `acq_irrad_interactive` | interactively acquire spectral irradiance and save data and plots to disk |
 | **data procesing** | |
 | `trim_counts` | replace values from saturated array pixels with NAs |
 | `bleed_nas` | replace values from pixels neighbouring NAs with NAs |
@@ -80,9 +81,12 @@ cases are also included in the package. Here it is important to remember that a 
 | `slit_function_correction` | apply a correction for the 'long tails' of the slit function |
 | `filter_correction` | apply a correction for stray light based on the use of UV-cut-off or other selective filters |
 | `uvb_corrections` | apply corrections for reducing the impact of stray light and slit function on counts-per-second estimates. This function intelligently adjusts the processing method used based on the spectral data item supplied as `x` argument |
+| `which_descriptor` | select an instrument descriptor from a list based on the dates between which a calibration is valid |
 | `photobiology::cps2irrad` | methods to convert counts per second into spectral irradiance |
 | `photobiology::cps2Tfr` | methods to convert counts per second into transmittance |
 | `photobiology::cps2Rfr` | methods to convert counts per second into reflectance |
+| **calibration** | |
+| `compute_irrad_calibration` | compute irradiance calibration multipliers from raw counts data and polynomial coeffcicientes from standard lamp certificates using any of the different measuring protocols and data processing methods implemented in the package |
 | **file reading**  | |
 | `read_oo_ssdata` | read data from a 'SpectraSuite' output file with raw-counts data |
 | `read_oo_pidata` | read data from a 'XXXXXXXXX' output file with raw-counts data from a Raspberry Pi board |
@@ -156,8 +160,9 @@ The first example is very simple, we use a single spectrum, using for the dark c
 
 ```{r}
 my.spct <- s_irrad_corrected(x = list(light = "light-short.txt"),
-                             descriptor = maya_descriptor,
-                             method.data = maya_ylianttila,
+                             descriptor = which_descriptor("2016-10-11" , 
+                                                           MAYP11278_descriptors),
+                             method = MAYP11278_ylianttila.mthd,
                              locale = my.locale)
 ```
 
@@ -186,8 +191,9 @@ files_names <- list(light = c("light-short.txt",
 
 ```{r}
 my.spct <- s_irrad_corrected(x = files_names,
-                             descriptor = maya_descriptor,
-                             method.data = maya_ylianttila,
+                             descriptor = which_descriptor("2016-10-11" , 
+                                                           MAYP11278_descriptors),
+                             method = MAYP11278_ylianttila.mthd,
                              locale = my.locale)
 ```
 

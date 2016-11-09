@@ -73,7 +73,7 @@ get_oo_descriptor <- function(w, sr.index = 0L, ch.index = 0L) {
 #' A integer vector of indexes to bad pixels in the instrument array. Data from
 #' these array pixels will be discarded.
 #'
-#' @param oo_descriptor list as returned by function \code{get_oo_descriptor}
+#' @param descriptor list as returned by function \code{get_oo_descriptor}
 #' @param bad.pixs numeric vector of sorted wavelengths values corresponding to each
 #' pixel in the instrument array.
 #'
@@ -82,15 +82,15 @@ get_oo_descriptor <- function(w, sr.index = 0L, ch.index = 0L) {
 #'
 #' @export
 #'
-set_descriptor_bad_pixs <- function(oo_descriptor,
+set_descriptor_bad_pixs <- function(descriptor,
                                     bad.pixs) {
   # validate user input
   bad.pixs <- as.integer(bad.pixs)
   bad.pixs <- unique(sort(bad.pixs))
   stopifnot(min(bad.pixs) >= 1 &&
-              max(bad.pixs) <= length(oo_descriptor$wavelengths))
-  oo_descriptor$bad.pixs <- bad.pixs
-  oo_descriptor
+              max(bad.pixs) <= length(descriptor$wavelengths))
+  descriptor$bad.pixs <- bad.pixs
+  descriptor
 }
 
 #' Replace integration time limits in instrument descriptor
@@ -99,7 +99,7 @@ set_descriptor_bad_pixs <- function(oo_descriptor,
 #' the limits stored in the intrument firmware are wrong. In other cases in can
 #' be used to limit the range of values allowed to be set.
 #'
-#' @param oo_descriptor list as returned by function \code{get_oo_descriptor}
+#' @param descriptor list as returned by function \code{get_oo_descriptor}
 #' @param min.integ.time,max.integ.time numeric values in seconds in seconds.
 #' @param force.change If FALSE values outside the range returned by a query
 #' to the instrument trigger an error. If TRUE this test is overriden.
@@ -114,7 +114,7 @@ set_descriptor_bad_pixs <- function(oo_descriptor,
 #'
 #' @export
 #'
-set_descriptor_integ_time <- function(oo_descriptor,
+set_descriptor_integ_time <- function(descriptor,
                                       min.integ.time = NA_integer_,
                                       max.integ.time = NA_integer_,
                                       force.change = FALSE) {
@@ -125,19 +125,19 @@ set_descriptor_integ_time <- function(oo_descriptor,
     if (!force.change) {
       stopifnot(min.integ.time >=
         rOmniDriver::get_minimum_integration_time(
-          oo_descriptor$w, oo_descriptor$sr.index))
+          descriptor$w, descriptor$sr.index))
     }
-    oo_descriptor$min.integ.time <- min.integ.time
+    descriptor$min.integ.time <- min.integ.time
   }
   if (!is.na(max.integ.time)) {
     if (!force.change) {
       stopifnot(max.integ.time <=
                   rOmniDriver::get_maximum_integration_time(
-                    oo_descriptor$w, oo_descriptor$sr.index))
+                    descriptor$w, descriptor$sr.index))
     }
-    oo_descriptor$max.integ.time <- max.integ.time
+    descriptor$max.integ.time <- max.integ.time
   }
-  oo_descriptor
+  descriptor
 }
 
 #' Replace wavelength values in an instrument description
@@ -146,7 +146,7 @@ set_descriptor_integ_time <- function(oo_descriptor,
 #' spectrometer with new values if valid. (e.g. when wavelngth calibration
 #' is not stored in firmware).
 #'
-#' @param oo_descriptor list as returned by function \code{get_oo_descriptor}
+#' @param descriptor list as returned by function \code{get_oo_descriptor}
 #' @param wl numeric vector of sorted wavelengths values corresponding to each
 #' pixel in the instrument array.
 #'
@@ -155,13 +155,13 @@ set_descriptor_integ_time <- function(oo_descriptor,
 #'
 #' @export
 #'
-set_descriptor_wl <- function(oo_descriptor,
+set_descriptor_wl <- function(descriptor,
                               wl) {
-  old.wl <- oo_descriptor[["inst.calib"]][["wavelengths"]]
+  old.wl <- descriptor[["inst.calib"]][["wavelengths"]]
   stopifnot((is.null(old.wl) || length(old.wl) == length(wl)) &&
               !is.unsorted(wl, strictly = TRUE))
-  oo_descriptor[["wavelengths"]] <- wl
-  oo_descriptor
+  descriptor[["wavelengths"]] <- wl
+  descriptor
 }
 
 #' Replace linearization function in instrument description.
@@ -169,7 +169,7 @@ set_descriptor_wl <- function(oo_descriptor,
 #' Uses a user supplied function, possibly that supplied by a manufacturer
 #' like Ocean Optics stored in firmware or in any other form.
 #'
-#' @param oo_descriptor list as returned by function \code{get_oo_descriptor}
+#' @param descriptor list as returned by function \code{get_oo_descriptor}
 #' @param nl.fun A function or a polynom::polynomial object containing
 #'   the linearization to be applied.
 #'
@@ -178,7 +178,7 @@ set_descriptor_wl <- function(oo_descriptor,
 #'
 #' @export
 #'
-set_descriptor_nl <- function(oo_descriptor,
+set_descriptor_nl <- function(descriptor,
                               nl.fun)
 {
   # if polynomial supplied instead of function we convert it
@@ -186,15 +186,15 @@ set_descriptor_nl <- function(oo_descriptor,
     nl.fun <- as.function(nl.fun)
   }
   stopifnot(is.function(nl.fun))
-  oo_descriptor[["inst.calib"]][["nl.fun"]] <- nl.fun
-  oo_descriptor
+  descriptor[["inst.calib"]][["nl.fun"]] <- nl.fun
+  descriptor
 }
 
 #' Add spectral irradiance calibration
 #'
 #' Adds calibration data for each pixel as a numeric vector
 #'
-#' @param oo_descriptor list as returned by function \code{get_oo_descriptor}
+#' @param descriptor list as returned by function \code{get_oo_descriptor}
 #' @param irrad.mult numeric vector of the same length as the number of pixels
 #'   or of length one.
 #' @param wl.range numeric Range of wavelengths for which the calibration is
@@ -206,24 +206,24 @@ set_descriptor_nl <- function(oo_descriptor,
 #'
 #' @export
 #'
-set_descriptor_irrad_mult <- function(oo_descriptor,
+set_descriptor_irrad_mult <- function(descriptor,
                                       irrad.mult,
                                       wl.range = NULL,
                                       start.date = lubridate::today() - lubridate::days(1),
                                       end.date = lubridate::today() + lubridate::days(1))
 {
   stopifnot(length(irrad.mult) == 1 ||
-              length(irrad.mult) == length(oo_descriptor$wavelengths))
+              length(irrad.mult) == length(descriptor$wavelengths))
   if (length(irrad.mult) == 1) {
     warning("'irrad.mult' of length one will be recycled.")
   }
-  oo_descriptor[["inst.calib"]][["irrad.mult"]] <- irrad.mult
+  descriptor[["inst.calib"]][["irrad.mult"]] <- irrad.mult
   if (!is.null(range)) {
-    oo_descriptor[["inst.calib"]][["wl.range"]] <- range(wl.range)
+    descriptor[["inst.calib"]][["wl.range"]] <- range(wl.range)
   }
-  oo_descriptor[["inst.calib"]][["start.date"]] <- start.date
-  oo_descriptor[["inst.calib"]][["end.date"]] <- end.date
-  oo_descriptor
+  descriptor[["inst.calib"]][["start.date"]] <- start.date
+  descriptor[["inst.calib"]][["end.date"]] <- end.date
+  descriptor
 }
 
 #' Add function for slit correction
@@ -232,7 +232,7 @@ set_descriptor_irrad_mult <- function(oo_descriptor,
 #' correct counts per second data to remove the effect of the tails of
 #' the slit function of the instrument.
 #'
-#' @param oo_descriptor list as returned by function \code{get_oo_descriptor}
+#' @param descriptor list as returned by function \code{get_oo_descriptor}
 #' @param inv.slit.fun function with two first formal parameters taking numeric
 #'   vectors of wavelengths and counts that aoolies a correction suitable
 #'   for the instrument.
@@ -242,12 +242,12 @@ set_descriptor_irrad_mult <- function(oo_descriptor,
 #'
 #' @export
 #'
-set_descriptor_slit_fun <- function(oo_descriptor,
+set_descriptor_slit_fun <- function(descriptor,
                                     inv.slit.fun)
 {
   stopifnot(is.function(inv.slit.fun))
-  oo_descriptor[["inst.calib"]][["$slit.fun"]] <- inv.slit.fun
-  oo_descriptor
+  descriptor[["inst.calib"]][["$slit.fun"]] <- inv.slit.fun
+  descriptor
 }
 
 #' Get the current values of instrument settings
@@ -255,15 +255,15 @@ set_descriptor_slit_fun <- function(oo_descriptor,
 #' Query the spectrometer for the settings currently in use for corrections,
 #' smotthing and acquisition parameters integration time and number of scans.
 #'
-#' @param oo_descriptor list as returned by function \code{get_oo_descriptor}
+#' @param descriptor list as returned by function \code{get_oo_descriptor}
 #'
 #' @export
 #' @return a list
 #'
-get_oo_settings <- function(oo_descriptor) {
-  w <- oo_descriptor$w
-  sr.index <- oo_descriptor$sr.index
-  ch.index <- oo_descriptor$sr.index
+get_oo_settings <- function(descriptor) {
+  w <- descriptor$w
+  sr.index <- descriptor$sr.index
+  ch.index <- descriptor$sr.index
   list(
     time = lubridate::now(),
     w = w,

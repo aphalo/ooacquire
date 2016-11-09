@@ -4,10 +4,10 @@
 \alias{set_descriptor_slit_fun}
 \title{Add function for slit correction}
 \usage{
-set_descriptor_slit_fun(oo_descriptor, inv.slit.fun)
+set_descriptor_slit_fun(descriptor, inv.slit.fun)
 }
 \arguments{
-\item{oo_descriptor}{list as returned by function \code{get_oo_descriptor}}
+\item{descriptor}{list as returned by function \code{get_oo_descriptor}}
 
 \item{inv.slit.fun}{function with two first formal parameters taking numeric
 vectors of wavelengths and counts that aoolies a correction suitable

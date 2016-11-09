@@ -5,16 +5,20 @@
 \alias{s_irrad_corrected.default}
 \alias{s_irrad_corrected.list}
 \alias{s_irrad_corrected.raw_mspct}
+\alias{s_irrad_corrected.raw_spct}
 \title{Convert raw counts data into spectral irradiance}
 \usage{
 s_irrad_corrected(x, ...)
 
 \method{s_irrad_corrected}{default}(x, ...)
 
-\method{s_irrad_corrected}{list}(x, method.data, return.cps = FALSE,
-  descriptor, locale, verbose = FALSE, ...)
+\method{s_irrad_corrected}{list}(x, method, return.cps = FALSE, descriptor,
+  locale, verbose = FALSE, ...)
 
-\method{s_irrad_corrected}{raw_mspct}(x, method.data, return.cps = FALSE,
+\method{s_irrad_corrected}{raw_mspct}(x, method, return.cps = FALSE,
+  verbose = FALSE, ...)
+
+\method{s_irrad_corrected}{raw_spct}(x, method, return.cps = FALSE,
   verbose = FALSE, ...)
 }
 \arguments{
@@ -24,7 +28,7 @@ s_irrad_corrected(x, ...)
 \item{...}{Named argument passed to \code{photobiology::cps2irrad} which is
 the final calculation step.}
 
-\item{method.data}{A named list of constants and functions defining the
+\item{method}{A named list of constants and functions defining the
 method to be sued for stray light and dark signal corrections.}
 
 \item{return.cps}{logical Useful when there is no need to apply a calibration,
@@ -51,6 +55,8 @@ Convert raw counts data into spectral irradiance
 \item \code{list}: Default for generic function.
 
 \item \code{raw_mspct}: Default for generic function.
+
+\item \code{raw_spct}: Default for generic function.
 }}
 \note{
 Currently \code{s_irrad_corrected.list} allows processing of files

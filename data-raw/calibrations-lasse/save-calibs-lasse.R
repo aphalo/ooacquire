@@ -4,11 +4,11 @@ library(ooacquire)
 
 # create an object with the parameters for Lasse Ylianttila's method for Maya
 MAYP11278_ylianttila.mthd <- list(
-  method = "original",
+  stray.light.method = "original",
   stray.light.wl = c(218.5, 228.5),
   flt.dark.wl = c(193, 209.5),
   flt.ref.wl = c(360, 379.5),
-  worker_fun = ooacquire::maya_tail_correction,
+  worker.fun = ooacquire::maya_tail_correction,
   trim = 0
 )
 
@@ -33,11 +33,11 @@ for (f in files) {
   names(tmp) <- c("w.length", "irrad.mult")
   # replace calibration in a copy of the descriptor
   descriptor.tmp <- descriptor
-  set_descriptor_wl(oo_descriptor = descriptor.tmp,
+  set_descriptor_wl(descriptor = descriptor.tmp,
                     wl = tmp[["w.length"]])
   descriptor.tmp <-
-    set_descriptor_irrad_mult(oo_descriptor = descriptor.tmp,
-                              irrad.mult = tmp[["irrad.mult"]],
+    set_descriptor_irrad_mult(descriptor = descriptor.tmp,
+                              irrad.mult = tmp[["irrad.mult"]] * 1e4,
                               wl.range = c(251, 899),
                               start.date = MAYP11278_calib_dates.df[["start.date"]][date.row],
                               end.date = MAYP11278_calib_dates.df[["end.date"]][date.row])

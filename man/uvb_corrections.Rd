@@ -6,22 +6,22 @@
 \alias{uvb_corrections}
 \title{Apply filter-based stray-light correction}
 \usage{
-uvb_corrections(x, flt, dark, method = "original", stray.light.wl = c(218.5,
-  228.5), flt.dark.wl = c(193, 209.5), flt.ref.wl = c(360, 379.5),
-  worker_fun = ooacquire::maya_tail_correction, trim = 0, verbose = FALSE,
-  ...)
+uvb_corrections(x, flt, dark, stray.light.method = "original",
+  stray.light.wl = c(218.5, 228.5), flt.dark.wl = c(193, 209.5),
+  flt.ref.wl = c(360, 379.5), worker.fun = ooacquire::maya_tail_correction,
+  trim = 0, verbose = FALSE, ...)
 
-slit_function_correction(x, worker_fun = ooacquire::maya_tail_correction,
+slit_function_correction(x, worker.fun = ooacquire::maya_tail_correction,
   verbose = TRUE, ...)
 
-filter_correction(x, flt, method = "original", flt.dark.wl = c(193, 209.5),
-  flt.ref.wl = c(360, 379.5), trim = 0, verbose = FALSE)
+filter_correction(x, flt, stray.light.method = "original",
+  flt.dark.wl = c(193, 209.5), flt.ref.wl = c(360, 379.5), trim = 0,
+  verbose = FALSE)
 }
 \arguments{
 \item{x, flt, dark}{\code{cps_spct} objects.}
 
-\item{method}{Method variant used "original" (Ylianttila), "full" (Aphalo),
-"sun" (full with trimming).}
+\item{stray.light.method}{Method variant used "original" (Ylianttila).}
 
 \item{stray.light.wl}{numeric vector of length 2 giving the range of
 wavelengths to use for the final stray light correction.}
@@ -30,7 +30,7 @@ wavelengths to use for the final stray light correction.}
 of wavelengths to use for the "dark" and "illuminated" regions of the
 array in the filter correction.}
 
-\item{worker_fun}{function actually doing the correction on the w.lengths and
+\item{worker.fun}{function actually doing the correction on the w.lengths and
 counts per second vectors.}
 
 \item{trim}{a numeric value to be used as argument for mean}
@@ -38,7 +38,7 @@ counts per second vectors.}
 \item{verbose}{Logical indicating the level of warnings wanted. Defaults to
 \code{FALSE}.}
 
-\item{...}{additional params passed to worker_fun.}
+\item{...}{additional params passed to worker.fun.}
 }
 \value{
 A copy of \code{x} with the "cps" data replaced by the corrected
@@ -52,7 +52,7 @@ the mesurement as the effect of the filter itself on stray light is corrected
 for.
 }
 \note{
-The default \code{worker_fun} is just an example. Corrections are
+The default \code{worker.fun} is just an example. Corrections are
 specific to each individual spectrometer unit (not type or configuration)
 and need to be written for each use case. The slit function tail correction
 requires the characterization of the shape of the slit function by

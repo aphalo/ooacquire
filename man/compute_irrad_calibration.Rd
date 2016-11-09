@@ -4,27 +4,27 @@
 \alias{compute_irrad_calibration}
 \title{Compute calibration multipliers.}
 \usage{
-compute_irrad_calibration(FEL_raw_counts, D2_raw_counts,
-  pix_wavelengths = NULL, wl_range = c(250, 900), FEL_k, D2_k, method,
+compute_irrad_calibration(FEL.raw.counts, D2.raw.counts,
+  pix.wavelengths = NULL, wl.range = c(250, 900), FEL.k, D2.k, method,
   verbose = FALSE)
 }
 \arguments{
-\item{FEL_raw_counts}{source_mscpt The raw counts and integration time data
+\item{FEL.raw.counts}{source_mscpt The raw counts and integration time data
 for the FEL light source.}
 
-\item{D2_raw_counts}{source_mscpt The raw counts and integration time data
+\item{D2.raw.counts}{source_mscpt The raw counts and integration time data
 for the D2 light source.}
 
-\item{pix_wavelengths}{numeric vector The "true" wavelengths in nanometres at
+\item{pix.wavelengths}{numeric vector The "true" wavelengths in nanometres at
 each pixel in the detector array.}
 
-\item{wl_range}{numeric vector of length two Range of wavelengths for which
+\item{wl.range}{numeric vector of length two Range of wavelengths for which
 to compute the calibration.}
 
-\item{FEL_k}{numeric vector a numeric vector with n constants for the
+\item{FEL.k}{numeric vector a numeric vector with n constants for the
 polynomial for the FEL lamp.}
 
-\item{D2_k}{numeric vector a numeric vector with n constants for the
+\item{D2.k}{numeric vector a numeric vector with n constants for the
 polynomial for the D2 lamp.}
 
 \item{method}{list Method variant to be used.}

@@ -10,7 +10,7 @@
 #' @param geocode A data frame with columns \code{lon} and \code{lat}.
 #' @param label character string, but if \code{NULL} the value of \code{file} is
 #'   used, and if \code{NA} the "what.measured" attribute is not set.
-#' @param inst.descriptor list A list describing the instrument used.
+#' @param descriptor list A list describing the instrument used.
 #' @param tz character Time zone is by default read from the file.
 #' @param locale	The locale controls defaults that vary from place to place. The
 #'   default locale is US-centric (like R), but you can use
@@ -25,7 +25,7 @@ read_oo_ssdata <- function(file,
                            date = NULL,
                            geocode = NULL,
                            label = NULL,
-                           inst.descriptor = NULL,
+                           descriptor = NULL,
                            tz = NULL,
                            locale = readr::default_locale()) {
   if (is.null(tz)) {
@@ -80,7 +80,7 @@ read_oo_ssdata <- function(file,
   photobiology::setWhereMeasured(z, geocode)
   photobiology::setWhatMeasured(z, label)
   z <- set_oo_ssdata_descriptor(z,
-                                inst.descriptor = inst.descriptor,
+                                descriptor = descriptor,
                                 action = "overwrite")
   set_oo_ssdata_settings(z)
 }

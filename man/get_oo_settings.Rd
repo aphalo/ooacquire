@@ -4,10 +4,10 @@
 \alias{get_oo_settings}
 \title{Get the current values of instrument settings}
 \usage{
-get_oo_settings(oo_descriptor)
+get_oo_settings(descriptor)
 }
 \arguments{
-\item{oo_descriptor}{list as returned by function \code{get_oo_descriptor}}
+\item{descriptor}{list as returned by function \code{get_oo_descriptor}}
 }
 \value{
 a list

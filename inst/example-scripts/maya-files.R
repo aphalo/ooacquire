@@ -15,8 +15,8 @@ files1 <- list(light = "light-short.txt",
 files2 <- list(light = "light-short.txt")
 
 my.spct <- s_irrad_corrected(x = files2,
-                             descriptor = maya_descriptor,
-                             method.data = maya_ylianttila,
+                             descriptor = which_descriptor("2016-10-11"),
+                             method = MAYP11278_ylianttila.mthd,
                              locale = my.locale)
 
 plot(my.spct, unit.out = "photon")
@@ -37,8 +37,8 @@ filesBR1 <- list(light = c("light-short.txt",
                  filter = "flt-long.txt")
 
 my.spct <- s_irrad_corrected(x = filesBR1,
-                             descriptor = maya_descriptor,
-                             method.data = maya_ylianttila,
+                             descriptor = which_descriptor("2016-10-11"),
+                             method = MAYP11278_ylianttila.mthd,
                              locale = my.locale)
 
 plot(my.spct, unit.out = "photon")

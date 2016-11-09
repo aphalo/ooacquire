@@ -4,10 +4,10 @@
 \alias{set_descriptor_wl}
 \title{Replace wavelength values in an instrument description}
 \usage{
-set_descriptor_wl(oo_descriptor, wl)
+set_descriptor_wl(descriptor, wl)
 }
 \arguments{
-\item{oo_descriptor}{list as returned by function \code{get_oo_descriptor}}
+\item{descriptor}{list as returned by function \code{get_oo_descriptor}}
 
 \item{wl}{numeric vector of sorted wavelengths values corresponding to each
 pixel in the instrument array.}

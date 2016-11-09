@@ -12,9 +12,9 @@
 
 <meta name="author" content="Pedro J. Aphalo" />
 
-<meta name="date" content="2016-11-05" />
+<meta name="date" content="2016-11-08" />
 
-<title>ooacquire 0.1.0.9008 User Guide</title>
+<title>ooacquire 0.1.0.9011 User Guide</title>
 
 
 
@@ -68,9 +68,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 
 
-<h1 class="title toc-ignore"><code>ooacquire</code> 0.1.0.9008<br>User Guide</h1>
+<h1 class="title toc-ignore"><code>ooacquire</code> 0.1.0.9011<br>User Guide</h1>
 <h4 class="author"><em>Pedro J. Aphalo</em></h4>
-<h4 class="date"><em>2016-11-05</em></h4>
+<h4 class="date"><em>2016-11-08</em></h4>
 
 
 
@@ -88,177 +88,193 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </div>
 <div id="functions" class="section level2">
 <h2>Functions</h2>
-<table style="width:96%;">
+<table style="width:99%;">
 <colgroup>
-<col width="13%"></col>
-<col width="81%"></col>
+<col width="15%"></col>
+<col width="83%"></col>
 </colgroup>
 <thead>
 <tr class="header">
-<th>function name</th>
-<th>role</th>
+<th align="left">function name</th>
+<th align="left">role</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><strong>data acquisition</strong></td>
-<td></td>
+<td align="left"><strong>data acquisition</strong></td>
+<td align="left"></td>
 </tr>
 <tr class="even">
-<td><code>start_session</code></td>
-<td>search for connected instruments and obtain a handle to the driver</td>
+<td align="left"><code>start_session</code></td>
+<td align="left">search for connected instruments and obtain a handle to the driver</td>
 </tr>
 <tr class="odd">
-<td><code>end_session</code></td>
-<td>close all connections and release handle</td>
+<td align="left"><code>end_session</code></td>
+<td align="left">close all connections and release handle</td>
 </tr>
 <tr class="even">
-<td><code>list_instruments</code></td>
-<td>list all connected instruments</td>
+<td align="left"><code>list_instruments</code></td>
+<td align="left">list all connected instruments</td>
 </tr>
 <tr class="odd">
-<td><code>get_oo_descriptor</code></td>
-<td>get a descriptor for one of the possibly several connected instruments</td>
+<td align="left"><code>get_oo_descriptor</code></td>
+<td align="left">get a descriptor for one of the possibly several connected instruments</td>
 </tr>
 <tr class="even">
-<td><code>set_descriptor_wl</code></td>
-<td>replace the wavelength values</td>
+<td align="left"><code>set_descriptor_wl</code></td>
+<td align="left">replace the wavelength values</td>
 </tr>
 <tr class="odd">
-<td><code>set_descriptor_bad_pixs</code></td>
-<td>replace the indexes to bad array detector pixels</td>
+<td align="left"><code>set_descriptor_bad_pixs</code></td>
+<td align="left">replace the indexes to bad array detector pixels</td>
 </tr>
 <tr class="even">
-<td><code>set_descriptor_nl</code></td>
-<td>replace the function used to correct for array non-linearity</td>
+<td align="left"><code>set_descriptor_nl</code></td>
+<td align="left">replace the function used to correct for array non-linearity</td>
 </tr>
 <tr class="odd">
-<td><code>set_descriptor_calib_mult</code></td>
-<td>replace the vector of irradiance calibration multipliers</td>
+<td align="left"><code>set_descriptor_calib_mult</code></td>
+<td align="left">replace the vector of irradiance calibration multipliers</td>
 </tr>
 <tr class="even">
-<td><code>set_descriptor_integ_time</code></td>
-<td>replace the vector defining the range of valid integration times</td>
+<td align="left"><code>set_descriptor_integ_time</code></td>
+<td align="left">replace the vector defining the range of valid integration times</td>
 </tr>
 <tr class="odd">
-<td><code>get_oo_settings</code></td>
-<td>query the instrument to obtain its current settings</td>
+<td align="left"><code>get_oo_settings</code></td>
+<td align="left">query the instrument to obtain its current settings</td>
 </tr>
 <tr class="even">
-<td><code>acq_settings</code></td>
-<td>build a list of setting values</td>
+<td align="left"><code>acq_settings</code></td>
+<td align="left">build a list of setting values</td>
 </tr>
 <tr class="odd">
-<td><code>tune_acq_settings</code></td>
-<td>tune the integration time and number of scans to the current radiation conditions</td>
+<td align="left"><code>tune_acq_settings</code></td>
+<td align="left">tune the integration time and number of scans to the current radiation conditions</td>
 </tr>
 <tr class="even">
-<td><code>acq_raw_spct</code></td>
-<td>take one measurement (data point)</td>
+<td align="left"><code>acq_raw_spct</code></td>
+<td align="left">take one measurement (data point)</td>
 </tr>
 <tr class="odd">
-<td><code>acq_raw_mspct</code></td>
-<td>take a sequence of spectral measurements (several data points)</td>
+<td align="left"><code>acq_raw_mspct</code></td>
+<td align="left">take a sequence of spectral measurements (several data points)</td>
 </tr>
 <tr class="even">
-<td><strong>data procesing</strong></td>
-<td></td>
+<td align="left"><code>acq_irrad_interactive</code></td>
+<td align="left">interactively acquire spectral irradiance and save data and plots to disk</td>
 </tr>
 <tr class="odd">
-<td><code>trim_counts</code></td>
-<td>replace values from saturated array pixels with NAs</td>
+<td align="left"><strong>data procesing</strong></td>
+<td align="left"></td>
 </tr>
 <tr class="even">
-<td><code>bleed_nas</code></td>
-<td>replace values from pixels neighbouring NAs with NAs</td>
+<td align="left"><code>trim_counts</code></td>
+<td align="left">replace values from saturated array pixels with NAs</td>
 </tr>
 <tr class="odd">
-<td><code>linearize_counts</code></td>
-<td>linearize the raw counts</td>
+<td align="left"><code>bleed_nas</code></td>
+<td align="left">replace values from pixels neighbouring NAs with NAs</td>
 </tr>
 <tr class="even">
-<td><code>skip_bad_pixs</code></td>
-<td>replace bad pixels with interpolated raw counts</td>
+<td align="left"><code>linearize_counts</code></td>
+<td align="left">linearize the raw counts</td>
 </tr>
 <tr class="odd">
-<td><code>ref_correction</code></td>
-<td>subtract a reference (e.g. dark signal) from a measured spectrum</td>
+<td align="left"><code>skip_bad_pixs</code></td>
+<td align="left">replace bad pixels with interpolated raw counts</td>
 </tr>
 <tr class="even">
-<td><code>photobiology::fshift</code></td>
-<td>can be used to subtract a region of the same scan as an internal “dark” reference</td>
+<td align="left"><code>ref_correction</code></td>
+<td align="left">subtract a reference (e.g. dark signal) from a measured spectrum</td>
 </tr>
 <tr class="odd">
-<td><code>raw2cps</code></td>
-<td>methods to convert raw counts into counts per second. The method specialization for <code>raw_spct</code> returns a <code>cps_spct</code> object</td>
+<td align="left"><code>photobiology::fshift</code></td>
+<td align="left">can be used to subtract a region of the same scan as an internal “dark” reference</td>
 </tr>
 <tr class="even">
-<td><code>merge_cps</code></td>
-<td>method to do HDR merge of bracketed scans</td>
+<td align="left"><code>raw2cps</code></td>
+<td align="left">methods to convert raw counts into counts per second. The method specialization for <code>raw_spct</code> returns a <code>cps_spct</code> object</td>
 </tr>
 <tr class="odd">
-<td><code>slit_function_correction</code></td>
-<td>apply a correction for the ‘long tails’ of the slit function</td>
+<td align="left"><code>merge_cps</code></td>
+<td align="left">method to do HDR merge of bracketed scans</td>
 </tr>
 <tr class="even">
-<td><code>filter_correction</code></td>
-<td>apply a correction for stray light based on the use of UV-cut-off or other selective filters</td>
+<td align="left"><code>slit_function_correction</code></td>
+<td align="left">apply a correction for the ‘long tails’ of the slit function</td>
 </tr>
 <tr class="odd">
-<td><code>uvb_corrections</code></td>
-<td>apply corrections for reducing the impact of stray light and slit function on counts-per-second estimates. This function intelligently adjusts the processing method used based on the spectral data item supplied as <code>x</code> argument</td>
+<td align="left"><code>filter_correction</code></td>
+<td align="left">apply a correction for stray light based on the use of UV-cut-off or other selective filters</td>
 </tr>
 <tr class="even">
-<td><code>photobiology::cps2irrad</code></td>
-<td>methods to convert counts per second into spectral irradiance</td>
+<td align="left"><code>uvb_corrections</code></td>
+<td align="left">apply corrections for reducing the impact of stray light and slit function on counts-per-second estimates. This function intelligently adjusts the processing method used based on the spectral data item supplied as <code>x</code> argument</td>
 </tr>
 <tr class="odd">
-<td><code>photobiology::cps2Tfr</code></td>
-<td>methods to convert counts per second into transmittance</td>
+<td align="left"><code>which_descriptor</code></td>
+<td align="left">select an instrument descriptor from a list based on the dates between which a calibration is valid</td>
 </tr>
 <tr class="even">
-<td><code>photobiology::cps2Rfr</code></td>
-<td>methods to convert counts per second into reflectance</td>
+<td align="left"><code>photobiology::cps2irrad</code></td>
+<td align="left">methods to convert counts per second into spectral irradiance</td>
 </tr>
 <tr class="odd">
-<td><strong>file reading</strong></td>
-<td></td>
+<td align="left"><code>photobiology::cps2Tfr</code></td>
+<td align="left">methods to convert counts per second into transmittance</td>
 </tr>
 <tr class="even">
-<td><code>read_oo_ssdata</code></td>
-<td>read data from a ‘SpectraSuite’ output file with raw-counts data</td>
+<td align="left"><code>photobiology::cps2Rfr</code></td>
+<td align="left">methods to convert counts per second into reflectance</td>
 </tr>
 <tr class="odd">
-<td><code>read_oo_pidata</code></td>
-<td>read data from a ‘XXXXXXXXX’ output file with raw-counts data from a Raspberry Pi board</td>
+<td align="left"><strong>calibration</strong></td>
+<td align="left"></td>
 </tr>
 <tr class="even">
-<td><code>read_files2mspct</code></td>
-<td>read multiple data files and assemble from them into a <code>raw_maspct</code> object compatible to that obtained through direct data acquisition</td>
+<td align="left"><code>compute_irrad_calibration</code></td>
+<td align="left">compute irradiance calibration multipliers from raw counts data and polynomial coeffcicientes from standard lamp certificates using any of the different measuring protocols and data processing methods implemented in the package</td>
 </tr>
 <tr class="odd">
-<td><code>set_oo_ssdata_settings</code></td>
-<td>set the instrument settings attributes by decoding the header of text files saved from SpectraSuite</td>
+<td align="left"><strong>file reading</strong></td>
+<td align="left"></td>
 </tr>
 <tr class="even">
-<td><code>set_oo_ssdata_descriptor</code></td>
-<td>set the instrument descriptor attribute by decoding the header of text files saved from SpectraSuite and optionally merging these data incomplete with a <em>descriptor</em> supplied as argument</td>
+<td align="left"><code>read_oo_ssdata</code></td>
+<td align="left">read data from a ‘SpectraSuite’ output file with raw-counts data</td>
 </tr>
 <tr class="odd">
-<td><code>merge_raw_mspct</code></td>
-<td>Merge <code>raw_spct</code> objects members of a single <code>raw_mspct</code> object into a <code>raw_spct</code> object with multiple columns</td>
+<td align="left"><code>read_oo_pidata</code></td>
+<td align="left">read data from a ‘XXXXXXXXX’ output file with raw-counts data from a Raspberry Pi board</td>
 </tr>
 <tr class="even">
-<td><strong>high level method</strong></td>
-<td></td>
+<td align="left"><code>read_files2mspct</code></td>
+<td align="left">read multiple data files and assemble from them into a <code>raw_maspct</code> object compatible to that obtained through direct data acquisition</td>
 </tr>
 <tr class="odd">
-<td><code>raw2corr_cps</code></td>
-<td>higher level function that returns <strong>corrected</strong> counts per second useful for calculating spectral reflectance and spectral transmittamce.</td>
+<td align="left"><code>set_oo_ssdata_settings</code></td>
+<td align="left">set the instrument settings attributes by decoding the header of text files saved from SpectraSuite</td>
 </tr>
 <tr class="even">
-<td><code>s_irrad_corrected</code></td>
-<td>high-level method with specializations for files and <code>raw_mspct</code> objects returning spectral irradiance in a <code>source_spct</code> object.</td>
+<td align="left"><code>set_oo_ssdata_descriptor</code></td>
+<td align="left">set the instrument descriptor attribute by decoding the header of text files saved from SpectraSuite and optionally merging these data incomplete with a <em>descriptor</em> supplied as argument</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>merge_raw_mspct</code></td>
+<td align="left">Merge <code>raw_spct</code> objects members of a single <code>raw_mspct</code> object into a <code>raw_spct</code> object with multiple columns</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>high level method</strong></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left"><code>raw2corr_cps</code></td>
+<td align="left">higher level function that returns <strong>corrected</strong> counts per second useful for calculating spectral reflectance and spectral transmittamce.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>s_irrad_corrected</code></td>
+<td align="left">high-level method with specializations for files and <code>raw_mspct</code> objects returning spectral irradiance in a <code>source_spct</code> object.</td>
 </tr>
 </tbody>
 </table>
@@ -298,8 +314,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>We next set a list of file names to be read, with members named according to their role in the measuring protocol.</p>
 <p>The first example is very simple, we use a single spectrum, using for the dark correction pixels expected to receive no true excitation. For example, those in the UVC region of the spectrum when the light source is sunlight at ground level.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my.spct &lt;-<span class="st"> </span><span class="kw">s_irrad_corrected</span>(<span class="dt">x =</span> <span class="kw">list</span>(<span class="dt">light =</span> <span class="st">&quot;light-short.txt&quot;</span>),
-                             <span class="dt">descriptor =</span> maya_descriptor,
-                             <span class="dt">method.data =</span> maya_ylianttila,
+                             <span class="dt">descriptor =</span> <span class="kw">which_descriptor</span>(<span class="st">&quot;2016-10-11&quot;</span> , 
+                                                           MAYP11278_descriptors),
+                             <span class="dt">method.data =</span> MAYP11278_ylianttila.mthd,
                              <span class="dt">locale =</span> my.locale)</code></pre></div>
 <pre><code>## Parsed with column specification:
 ## cols(
@@ -321,8 +338,9 @@ my.spct &lt;-<span class="st"> </span><span class="kw">trim_wl</span>(my.spct, <
                     <span class="dt">dark =</span> <span class="kw">c</span>(<span class="st">&quot;dark-short.txt&quot;</span>,
                              <span class="st">&quot;dark-long.txt&quot;</span>))</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my.spct &lt;-<span class="st"> </span><span class="kw">s_irrad_corrected</span>(<span class="dt">x =</span> files_names,
-                             <span class="dt">descriptor =</span> maya_descriptor,
-                             <span class="dt">method.data =</span> maya_ylianttila,
+                             <span class="dt">descriptor =</span> <span class="kw">which_descriptor</span>(<span class="st">&quot;2016-10-11&quot;</span> , 
+                                                           MAYP11278_descriptors),
+                             <span class="dt">method.data =</span> MAYP11278_ylianttila.mthd,
                              <span class="dt">locale =</span> my.locale)</code></pre></div>
 <pre><code>## Parsed with column specification:
 ## cols(

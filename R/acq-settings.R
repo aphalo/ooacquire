@@ -4,7 +4,7 @@
 #' usable as input for functions \code{retune_acq_settings()}, \code{acq_sptc()},
 #' and \code{acq_mspct()}.
 #'
-#' @param oo_descriptor list as returned by function \code{get_oo_descriptor}
+#' @param descriptor list as returned by function \code{get_oo_descriptor}
 #' @param integ.time numeric vaue in seconds
 #' @param num.scans integer
 #' @param min.integ.time numeric vaue in seconds
@@ -12,7 +12,7 @@
 #' @param tot.time.range numeric vector of length two with values in seconds
 #' @param HDR.mult a numeric vector with integ.time multipliers to be used for
 #'   "bracketing".
-#' @param target.marging numeric (0..1)
+#' @param target.margin numeric (0..1)
 #' @param pix.selector a logical or numeric vector used as subscript to select
 #'   pixels
 #' @param corr.elect.dark,corr.sensor.nl  integer 0L (FALSE) or 1L (TRUE)
@@ -42,14 +42,14 @@
 #' @export
 #' @return a list.
 #'
-acq_settings <- function(oo_descriptor,
+acq_settings <- function(descriptor,
                          integ.time = 10e-3, # seconds
                          num.scans = 10L,
                          min.integ.time = -Inf, # seconds
                          max.integ.time = Inf, # seconds
                          tot.time.range = c(0, Inf), # seconds
                          HDR.mult = c(short = 1, long = 10),
-                         target.marging = 0.10, # fraction
+                         target.margin = 0.10, # fraction
                          pix.selector = TRUE,
                          corr.elect.dark = 0L,
                          corr.sensor.nl = 0L,
@@ -63,8 +63,8 @@ acq_settings <- function(oo_descriptor,
   max.integ.time <- max.integ.time * 1e6
   tot.time.range <- tot.time.range * 1e6
   # We check bounds and set the "fixed settings" (non-tunable)
-  min.integ.time <- max(min.integ.time, oo_descriptor$min.integ.time)
-  max.integ.time <- min(max.integ.time, oo_descriptor$max.integ.time)
+  min.integ.time <- max(min.integ.time, descriptor$min.integ.time)
+  max.integ.time <- min(max.integ.time, descriptor$max.integ.time)
   # Check bounds for integ.time value supplied by user
   integ.time <- ifelse(integ.time > max.integ.time, max.integ.time, integ.time)
   integ.time <- ifelse(integ.time < min.integ.time, min.integ.time, integ.time)
@@ -77,7 +77,7 @@ acq_settings <- function(oo_descriptor,
     warning("Using a smallest 'HDR.mult' value that is > 1 will cause clipping")
   }
   if (is.logical(pix.selector) && length(pix.selector) != 1) {
-    stopifnot(length(pix.selector) == length(oo_descriptor$wavelengths))
+    stopifnot(length(pix.selector) == length(descriptor$wavelengths))
   }
   # return a list
   list(
@@ -85,7 +85,7 @@ acq_settings <- function(oo_descriptor,
     pix.selector = pix.selector,
     # tunning settings
     HDR.mult = HDR.mult,
-    target.marging = target.marging,
+    target.margin = target.margin,
     max.integ.time = max.integ.time,
     min.integ.time = min.integ.time,
     tot.time.range = tot.time.range,
@@ -107,16 +107,16 @@ acq_settings <- function(oo_descriptor,
 #'
 #' Tag the settings as linearized
 #'
-#' @param acq_settings list as returned by function \code{acq_settings()}
+#' @param acq.settings list as returned by function \code{acq_settings()}
 #'
-#' @return a copy of the argument passed for \code{acq_settings} with the
+#' @return a copy of the argument passed for \code{acq.settings} with the
 #' linearized field of the settings data replaced by TRUE.
 #'
 #' @keywords internal
 #'
-set_linearized <- function(acq_settings) {
-  acq_settings$linearized <- TRUE
-  acq_settings
+set_linearized <- function(acq.settings) {
+  acq.settings$linearized <- TRUE
+  acq.settings
 }
 
 #' Tune settings for measurement
@@ -127,54 +127,54 @@ set_linearized <- function(acq_settings) {
 #' @rdname acq_settings
 #' @return a list.
 #'
-#' @param acq_settings list as returned by a previous call to \code{acq_settings()},
+#' @param acq.settings list as returned by a previous call to \code{acq_settings()},
 #'   or \code{tune_acq_settings()}.
 #'
 #' @export
 #'
-tune_acq_settings <- function(oo_descriptor,
-                              acq_settings,
+tune_acq_settings <- function(descriptor,
+                              acq.settings,
                               verbose = TRUE) {
-  x <- acq_settings
-  nl.fun <- oo_descriptor$inst.calib$nl.fun
+  x <- acq.settings
+  nl.fun <- descriptor$inst.calib$nl.fun
   # correction for electrical dark (in instrument using ocluded pixels in array)
-  rOmniDriver::set_correct_for_electrical_dark(oo_descriptor$w, x$corr.elect.dark,
-                                               oo_descriptor$sr.index,
-                                               oo_descriptor$ch.index)
+  rOmniDriver::set_correct_for_electrical_dark(descriptor$w, x$corr.elect.dark,
+                                               descriptor$sr.index,
+                                               descriptor$ch.index)
   # correction for sensor non-linearuty (in instrument)
-  rOmniDriver::set_correct_for_detector_nonlinearity(oo_descriptor$w,
+  rOmniDriver::set_correct_for_detector_nonlinearity(descriptor$w,
                                                      x$corr.sensor.nl,
-                                                     oo_descriptor$sr.index,
-                                                     oo_descriptor$ch.index)
+                                                     descriptor$sr.index,
+                                                     descriptor$ch.index)
   # moving window smoothing
-  rOmniDriver::set_boxcar_width(oo_descriptor$w,
+  rOmniDriver::set_boxcar_width(descriptor$w,
                                 x$boxcar.width,
-                                oo_descriptor$sr.index,
-                                oo_descriptor$ch.index)
+                                descriptor$sr.index,
+                                descriptor$ch.index)
   # to speed up tunning we set number of scans to one
-  rOmniDriver::set_scans_to_avg(oo_descriptor$w, 1L,
-                                oo_descriptor$sr.index,
-                                oo_descriptor$ch.index)
+  rOmniDriver::set_scans_to_avg(descriptor$w, 1L,
+                                descriptor$sr.index,
+                                descriptor$ch.index)
   # to more easily reach the target we linearize the counts before interpolation
-  nl.fun <- oo_descriptor$inst.calib$nl.fun
+  nl.fun <- descriptor$inst.calib$nl.fun
   # optimize parameters
   integ.time <- x$integ.time[1]
-  target.marging <- x$target.marging
-  target.min.counts <- nl.fun((1 - target.marging) * oo_descriptor$max.counts)
-  target.counts <- nl.fun((1 - target.marging / 2) * oo_descriptor$max.counts)
+  target.margin <- x$target.margin
+  target.min.counts <- nl.fun((1 - target.margin) * descriptor$max.counts)
+  target.counts <- nl.fun((1 - target.margin / 2) * descriptor$max.counts)
 
   i <- 0L
   repeat {
     if (verbose) {
       message("Integration time (ms): ", format(integ.time  * 1e-3))
     }
-    rOmniDriver::set_integration_time(oo_descriptor$w,
+    rOmniDriver::set_integration_time(descriptor$w,
                                       integ.time,
-                                      oo_descriptor$sr.index,
-                                      oo_descriptor$ch.index)
-    raw.counts <- rOmniDriver::get_spectrum(oo_descriptor$w,
-                                            oo_descriptor$sr.index,
-                                            oo_descriptor$ch.index)
+                                      descriptor$sr.index,
+                                      descriptor$ch.index)
+    raw.counts <- rOmniDriver::get_spectrum(descriptor$w,
+                                            descriptor$sr.index,
+                                            descriptor$ch.index)
     dark.counts <- nl.fun(min(raw.counts[x$pix.selector]))
     max.counts <- nl.fun(max(raw.counts[x$pix.selector]))
     while (max.counts > target.counts)
@@ -184,13 +184,13 @@ tune_acq_settings <- function(oo_descriptor,
         break()
       }
       if (verbose) message("Clipping! Trying (ms): ", format(integ.time  * 1e-3))
-      rOmniDriver::set_integration_time(oo_descriptor$w,
+      rOmniDriver::set_integration_time(descriptor$w,
                                         integ.time,
-                                        oo_descriptor$sr.index,
-                                        oo_descriptor$ch.index)
-      raw.counts <- rOmniDriver::get_spectrum(oo_descriptor$w,
-                                              oo_descriptor$sr.index,
-                                              oo_descriptor$ch.index)
+                                        descriptor$sr.index,
+                                        descriptor$ch.index)
+      raw.counts <- rOmniDriver::get_spectrum(descriptor$w,
+                                              descriptor$sr.index,
+                                              descriptor$ch.index)
       # subtracting the minimum counts as proxi for dark signal improves
       # the guess without much danger of overshooting
       dark.counts <- nl.fun(min(raw.counts[x$pix.selector]))
@@ -243,22 +243,22 @@ tune_acq_settings <- function(oo_descriptor,
   } else if (integ.time[1] > x$tot.time.range[2]) {
     integ.time <- x$tot.time.range[2]
   }
-  acq_settings$integ.time <- integ.time
-  acq_settings$num.scans <- num.scans
+  acq.settings$integ.time <- integ.time
+  acq.settings$num.scans <- num.scans
   #diagnosis
-  acq_settings$tot.time <- integ.time * num.scans
-  acq_settings$rel.signal = max.counts / nl.fun(oo_descriptor$max.counts)
+  acq.settings$tot.time <- integ.time * num.scans
+  acq.settings$rel.signal = max.counts / nl.fun(descriptor$max.counts)
 
   if (verbose) {
     message("Relative saturation: ",
-            format(acq_settings$rel.signal, width = 8), " ")
+            format(acq.settings$rel.signal, width = 8), " ")
     message("Integration times (ms): ",
-            format(acq_settings$integ.time * 1e-3, nsmall = 0, width = 8), " ")
+            format(acq.settings$integ.time * 1e-3, nsmall = 0, width = 8), " ")
     message("Numbers of scans:       ",
-            format(acq_settings$num.scans, width = 8), " ")
+            format(acq.settings$num.scans, width = 8), " ")
     message("Total time (s):         ",
-            format(acq_settings$tot.time * 1e-6,
+            format(acq.settings$tot.time * 1e-6,
                    digits = 3, width = 8), " ")
   }
-  acq_settings
+  acq.settings
 }

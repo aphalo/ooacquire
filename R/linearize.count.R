@@ -5,7 +5,7 @@
 #' a replacement set by the user.
 #'
 #' @param x raw_spct object.
-#' @param force_zero A logical indicating whether to change negative count
+#' @param force.zero A logical indicating whether to change negative count
 #'   values to zero.
 #' @param verbose Logical Currently ignired.
 #'
@@ -25,7 +25,7 @@
 #' @export
 #'
 linearize_counts <- function(x,
-                             force_zero = TRUE, verbose = FALSE) {
+                             force.zero = TRUE, verbose = FALSE) {
   # guard against attempts to reapply linearization
   settings <- getInstrSettings(x)
   if (is.null(settings[["linearized"]])) {
@@ -36,16 +36,16 @@ linearize_counts <- function(x,
     warning("Spectrum already linearized, returning as is.")
     return(x)
   }
-  oo_descriptor <- getInstrDesc(x)
-  if (is.null(oo_descriptor$inst.calib) ||
-      is.na(oo_descriptor$inst.calib) ||
-      !is.function(oo_descriptor$inst.calib$nl.fun)) {
+  descriptor <- getInstrDesc(x)
+  if (is.null(descriptor$inst.calib) ||
+      is.na(descriptor$inst.calib) ||
+      !is.function(descriptor$inst.calib$nl.fun)) {
     stop("Non-linearity correction function is not available")
   }
-  nl.fun <- oo_descriptor$inst.calib$nl.fun
+  nl.fun <- descriptor$inst.calib$nl.fun
   counts.cols <- names(x)[grep("^counts", names(x))]
   for (col in counts.cols) {
-    if (force_zero) {
+    if (force.zero) {
       x[[col]] <- ifelse(x[[col]] >= 0.0, x[[col]], 0.0)
       x[[col]] <- nl.fun(x[[col]])
     }

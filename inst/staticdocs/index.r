@@ -17,7 +17,8 @@ sd_section("Data acquisition",
     "get_oo_settings",
     "acq_settings",
     "acq_raw_spct",
-    "acq_raw_mspct")
+    "acq_raw_mspct",
+    "acq_irrad_interactive")
 )
 
 sd_section("Data processing", "",
@@ -29,7 +30,12 @@ sd_section("Data processing", "",
     "maya_tail_correction",
     "uvb_corrections",
     "raw2cps",
-    "merge_cps")
+    "merge_cps",
+    "which_descriptor")
+)
+
+sd_section("Data processing", "",
+           c("compute_irrad_calibration")
 )
 
 sd_section("File reading", "",
@@ -43,12 +49,13 @@ sd_section("File reading", "",
              "merge_raw_mspct")
 )
 
-sd_section("High level method", "",
+sd_section("High level function and method", "",
            c("raw2corr_cps",
              "s_irrad_corrected")
 )
 
 sd_section("Example data", "",
-           c("maya_descriptor",
-             "maya_ylianttila")
+           c("MAYP11278_descriptors",
+             "MAYP11278_ylianttila.mthd",
+             "MAYP11278_calib_dates.df")
 )

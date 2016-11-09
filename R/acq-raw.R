@@ -4,8 +4,8 @@
 #' on more than one raw spectrum meant to represent a SINGLE observation after
 #' conversion into calibrated data such as in the case of HDR.
 #'
-#' @param oo_descriptor list as returned by function \code{get_oo_descriptor}
-#' @param acq_settings list as returned by functions \code{tune_acq_settings}
+#' @param descriptor list as returned by function \code{get_oo_descriptor}
+#' @param acq.settings list as returned by functions \code{tune_acq_settings}
 #' @param what.measured value used to set attribute
 #' @param where.measured data.frame with at least columns "lon" and "lat" compatible
 #' with value returned by \code{ggmap::geocode()}
@@ -17,35 +17,35 @@
 #' @return a "raw_spct" object with one or more columns containing raw counts
 #' and one column with wavelength data.
 #'
-acq_raw_spct <- function(oo_descriptor,
-                         acq_settings,
+acq_raw_spct <- function(descriptor,
+                         acq.settings,
                          what.measured = NA,
                          where.measured = data.frame(lon = NA_real_, lat = NA_real_),
                          set.all = TRUE,
                          verbose = TRUE) {
-  x <- acq_settings
-  y <- oo_descriptor
+  x <- acq.settings
+  y <- descriptor
   num.readings <- length(x$integ.time)
   z <- dplyr::data_frame(w.length = y$wavelengths)
   start.time <- lubridate::now()
 
   if (set.all) {
-    # set according to acq_settings
+    # set according to acq.settings
     # correction for electrical dark (in instrument using ocluded pixels in array)
-    rOmniDriver::set_correct_for_electrical_dark(oo_descriptor$w,
+    rOmniDriver::set_correct_for_electrical_dark(descriptor$w,
                                                  x$corr.elect.dark,
-                                                 oo_descriptor$sr.index,
-                                                 oo_descriptor$ch.index)
+                                                 descriptor$sr.index,
+                                                 descriptor$ch.index)
     # correction for sensor non-linearuty (in instrument)
-    rOmniDriver::set_correct_for_detector_nonlinearity(oo_descriptor$w,
+    rOmniDriver::set_correct_for_detector_nonlinearity(descriptor$w,
                                                        x$corr.sensor.nl,
-                                                       oo_descriptor$sr.index,
-                                                       oo_descriptor$ch.index)
+                                                       descriptor$sr.index,
+                                                       descriptor$ch.index)
     # moving window smoothing
-    rOmniDriver::set_boxcar_width(oo_descriptor$w,
+    rOmniDriver::set_boxcar_width(descriptor$w,
                                   x$boxcar.width,
-                                  oo_descriptor$sr.index,
-                                  oo_descriptor$ch.index)
+                                  descriptor$sr.index,
+                                  descriptor$ch.index)
    }
 
   for (i in 1:num.readings) {
@@ -85,8 +85,8 @@ acq_raw_spct <- function(oo_descriptor,
 #' Take readings according to parameters from a list of settings and a protocol
 #' defined by a vector of names.
 #'
-#' @param oo_descriptor list as returned by function \code{get_oo_descriptor()}
-#' @param acq_settings list as returned by functions \code{tune_acq_settings()}
+#' @param descriptor list as returned by function \code{get_oo_descriptor()}
+#' @param acq.settings list as returned by functions \code{tune_acq_settings()}
 #'   or \code{retune_acq_settings()} or \code{acq_settings()}
 #' @param protocol vector of character strings
 #' @param user.label character string to set as label
@@ -103,8 +103,8 @@ acq_raw_spct <- function(oo_descriptor,
 #'   in \code{protocol}. The user can write other functions, for example for a
 #'   time delay.
 #'
-acq_raw_mspct <- function(oo_descriptor,
-                          acq_settings,
+acq_raw_mspct <- function(descriptor,
+                          acq.settings,
                           protocol = c("measure", "filter", "dark"),
                           user.label = "",
                           where.measured = data.frame(lon = NA_real_, lat = NA_real_),
@@ -133,8 +133,8 @@ acq_raw_mspct <- function(oo_descriptor,
       }
     }
     idx <- idx + 1
-    z[[idx]] <- acq_raw_spct(oo_descriptor = oo_descriptor,
-                             acq_settings = acq_settings,
+    z[[idx]] <- acq_raw_spct(descriptor = descriptor,
+                             acq.settings = acq.settings,
                              what.measured = list(what = p, user.label = user.label),
                              where.measured = where.measured)
   }
