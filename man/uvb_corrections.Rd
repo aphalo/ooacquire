@@ -2,21 +2,26 @@
 % Please edit documentation in R/uvb-corrections.R
 \name{uvb_corrections}
 \alias{filter_correction}
+\alias{no_filter_correction}
 \alias{slit_function_correction}
 \alias{uvb_corrections}
 \title{Apply filter-based stray-light correction}
 \usage{
 uvb_corrections(x, flt, dark, stray.light.method = "original",
   stray.light.wl = c(218.5, 228.5), flt.dark.wl = c(193, 209.5),
-  flt.ref.wl = c(360, 379.5), worker.fun = ooacquire::maya_tail_correction,
-  trim = 0, verbose = FALSE, ...)
+  flt.ref.wl = c(360, 379.5), inst.dark.pixs = c(1:4),
+  worker.fun = ooacquire::maya_tail_correction, trim = 0, verbose = FALSE,
+  ...)
 
 slit_function_correction(x, worker.fun = ooacquire::maya_tail_correction,
   verbose = TRUE, ...)
 
 filter_correction(x, flt, stray.light.method = "original",
-  flt.dark.wl = c(193, 209.5), flt.ref.wl = c(360, 379.5), trim = 0,
-  verbose = FALSE)
+  stray.light.wl = c(218.5, 228.5), flt.dark.wl = c(193, 209.5),
+  flt.ref.wl = c(360, 379.5), trim = 0, verbose = FALSE)
+
+no_filter_correction(x, stray.light.wl = c(218.5, 228.5),
+  flt.dark.wl = c(193, 209.5), trim = 0, verbose = FALSE)
 }
 \arguments{
 \item{x, flt, dark}{\code{cps_spct} objects.}
@@ -30,13 +35,15 @@ wavelengths to use for the final stray light correction.}
 of wavelengths to use for the "dark" and "illuminated" regions of the
 array in the filter correction.}
 
+\item{inst.dark.pixs}{numeric vector with indexes to array pixels that
+are in full drakness by instrument design.}
+
 \item{worker.fun}{function actually doing the correction on the w.lengths and
 counts per second vectors.}
 
 \item{trim}{a numeric value to be used as argument for mean}
 
-\item{verbose}{Logical indicating the level of warnings wanted. Defaults to
-\code{FALSE}.}
+\item{verbose}{Logical indicating the level of warnings wanted.}
 
 \item{...}{additional params passed to worker.fun.}
 }

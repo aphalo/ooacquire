@@ -46,7 +46,11 @@ trim_counts <- function(x,
 #'
 skip_bad_pixs <- function(x) {
   stopifnot(is.raw_spct(x))
-  bad.pixs <- getInstrDesc(x)$bad.pixs
+  bad.pixs <- getInstrDesc(x)[["bad.pixs"]]
+  if (length(bad.pixs) == 0) {
+    # nothing to do
+    return(x)
+  }
   counts.cols <- grep("^counts", names(x), value = TRUE)
   for (col in counts.cols) {
     x[bad.pixs, col] <-

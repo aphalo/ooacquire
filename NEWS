@@ -18,6 +18,7 @@ the raw spectral data passed as argument.
 Add function compute_irrad_calibration() accepting measurements of both D2 and
 FEL lamps and the coefficients for reconstructing the emission of the lamps.
 Add function acq_irrad_interactive().
+Ensure that all metadata is copied and at all processing steps.
 Add example data.
 Test and debug.
 

@@ -5,7 +5,7 @@
 #' retrieved and decoded.
 #'
 #' @param file character string
-#' @param date a \code{POSIXct} object, but if \code{NULL} the date stored in
+#' @param time a \code{POSIXct} object, but if \code{NULL} the date stored in
 #'   file is used, and if \code{NA} no date variable is added
 #' @param geocode A data frame with columns \code{lon} and \code{lat}.
 #' @param label character string, but if \code{NULL} the value of \code{file} is
@@ -17,32 +17,34 @@
 #'   \code{\link[readr]{locale}} to create your own locale that controls things
 #'   like the default time zone, encoding, decimal mark, big mark, and day/month
 #'   names.
+#' @param verbose Logical indicating the level of warnings wanted.
 #'
 #' @return A raw_spct object.
 #' @export
 #'
 read_oo_ssdata <- function(file,
-                           date = NULL,
+                           time = NULL,
                            geocode = NULL,
                            label = NULL,
                            descriptor = NULL,
                            tz = NULL,
-                           locale = readr::default_locale()) {
+                           locale = readr::default_locale(),
+                           verbose = FALSE) {
   if (is.null(tz)) {
     tz <- locale$tz
   }
   if (is.null(label)) {
     label <- paste("File:", file)
   }
-  line01 <- scan(file = file, nlines =  1, skip = 0, what = "character")
+  line01 <- scan(file = file, nlines =  1, skip = 0, what = "character", quiet = !verbose)
   if (line01[1] != "SpectraSuite") {
     warning("Input file was not created by SpectrSuite as expected: skipping")
     return(NA)
   }
   file_header <- scan(file = file, nlines = 20,
-                      skip = 0, what = "character", sep = "\n")
+                      skip = 0, what = "character", sep = "\n", quiet = !verbose)
 
-  if (is.null(date)) {
+  if (is.null(time)) {
     line03 <- sub("Date: [[:alpha:]]{3} ", "", file_header[3])
     if (is.null(tz)) {
       tz <- sub("^(.{16})([[:upper:]]{3,4})(.{5})$", "\\2", line03)
@@ -50,13 +52,19 @@ read_oo_ssdata <- function(file,
         tz <- sub("S", "", tz)
       }
     }
-    date <- lubridate::parse_date_time(line03, "mdHMSy", tz = tz)
-  } else if (is.na(date)) {
-    date <- as.POSIXct(NA_real_, origin = lubridate::origin)
+    time <- lubridate::parse_date_time(line03, "mdHMSy", tz = tz, locale = "C")
+    if (verbose) {
+      message("File '", basename(file), "' with header time: ", time)
+    }
+  } else if (is.na(time)) {
+    time <- as.POSIXct(NA_real_, origin = lubridate::origin)
+  } else if (verbose) {
+    message("File '", basename(file), "' with user time: ", time)
   }
 
   data.rows <- oofile_data_rows(file_header)
 
+  old.opts <- options(readr.num_columns = ifelse(verbose, 6, 0))
   z <- readr::read_tsv(
     file = file,
     col_names = c("w.length", "counts"),
@@ -64,6 +72,7 @@ read_oo_ssdata <- function(file,
     n_max = data.rows[["npixels"]],
     locale = locale
   )
+  options(old.opts)
 
   old.opts <- options("photobiology.strict.range" = NA)
   z <- photobiology::as.raw_spct(z)
@@ -76,7 +85,7 @@ read_oo_ssdata <- function(file,
                 lubridate::now(tzone = "UTC"), " UTC", sep = ""),
           sep = "\n")
 
-  photobiology::setWhenMeasured(z, date)
+  photobiology::setWhenMeasured(z, time)
   photobiology::setWhereMeasured(z, geocode)
   photobiology::setWhatMeasured(z, label)
   z <- set_oo_ssdata_descriptor(z,

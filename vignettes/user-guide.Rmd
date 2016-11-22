@@ -80,6 +80,7 @@ cases are also included in the package. Here it is important to remember that a 
 | `merge_cps` | method to do HDR merge of bracketed scans |
 | `slit_function_correction` | apply a correction for the 'long tails' of the slit function |
 | `filter_correction` | apply a correction for stray light based on the use of UV-cut-off or other selective filters |
+| `no_filter_correction` | apply a correction for stray light not based on the use of UV-cut-off or other selective filters |
 | `uvb_corrections` | apply corrections for reducing the impact of stray light and slit function on counts-per-second estimates. This function intelligently adjusts the processing method used based on the spectral data item supplied as `x` argument |
 | `which_descriptor` | select an instrument descriptor from a list based on the dates between which a calibration is valid |
 | `photobiology::cps2irrad` | methods to convert counts per second into spectral irradiance |

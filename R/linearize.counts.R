@@ -32,8 +32,8 @@ linearize_counts <- function(x,
     warning("Linearized attr is NULL, assuming FALSE")
   } else if (is.na(settings[["linearized"]])) {
     stop("Linearization status unknown")
-  } else if (settings[["linearized"]]) {
-    warning("Spectrum already linearized, returning as is.")
+  } else if (verbose && settings[["linearized"]]) {
+    message("Spectrum already linearized, returning as is.")
     return(x)
   }
   descriptor <- getInstrDesc(x)

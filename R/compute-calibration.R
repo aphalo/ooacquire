@@ -43,6 +43,11 @@ compute_irrad_calibration <-
            method,
            verbose = FALSE)
 {
+    # we use as dark reference only pixels that are physically blocked from
+    # receiving radiation. For the Maya2000 Pro, the first 4 pixels in the
+    # array detector.
+    method[["flt.ref.wl"]] <- range(method[["wavelengths"]][1:4])
+
     FEL_spct <- s_irrad_corrected(FEL.raw.counts,
                                   method = method,
                                   return.cps = TRUE,
@@ -73,13 +78,13 @@ compute_irrad_calibration <-
 
     FEL_calib_spct <- photobiology::FEL_spectrum(pix.wavelengths, FEL.k, fill = NA)
     FEL_mult <- ifelse(within_range,
-                      FEL_spct[["cps"]] / FEL_calib_spct[["s.e.irrad"]], NA)
-
-    D2_spct <- photobiology::D2_spectrum(pix.wavelengths, D2.k, fill = NA)
+                       FEL_calib_spct[["s.e.irrad"]][within_range] /
+                         FEL_spct[["cps"]][within_range], NA)
 
     D2_calib_spct <- photobiology::D2_spectrum(pix.wavelengths, D2.k, fill = NA)
     D2_mult <- ifelse(within_range,
-                      D2_spct[["cps"]] / D2_calib_spct[["s.e.irrad"]], NA)
+                      D2_calib_spct[["s.e.irrad"]][within_range] /
+                        D2_spct[["cps"]][within_range], NA)
 
     ovelaping <- pix.wavelengths >= 330 & pix.wavelengths <= 360
 
@@ -105,7 +110,7 @@ compute_irrad_calibration <-
                                 start.date = when.measured,
                                 end.date = when.measured + lubridate::years(2))
     comment(updated_descriptor) <-
-      paste("'ooacquire' version ", packageVersion("ooacquire"),
+      paste("'ooacquire' version ", utils::packageVersion("ooacquire"),
             " on ", lubridate::now(), "\n\nFEL spectrum:\n", comment(FEL_spct),
             "\n\nD2 spectrum:\n", comment(D2_spct),
             sep="")

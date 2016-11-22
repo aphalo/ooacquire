@@ -4,13 +4,14 @@
 \alias{read_oo_ssdata}
 \title{Read File Saved by Ocean Optics' SpectraSuite.}
 \usage{
-read_oo_ssdata(file, date = NULL, geocode = NULL, label = NULL,
-  descriptor = NULL, tz = NULL, locale = readr::default_locale())
+read_oo_ssdata(file, time = NULL, geocode = NULL, label = NULL,
+  descriptor = NULL, tz = NULL, locale = readr::default_locale(),
+  verbose = FALSE)
 }
 \arguments{
 \item{file}{character string}
 
-\item{date}{a \code{POSIXct} object, but if \code{NULL} the date stored in
+\item{time}{a \code{POSIXct} object, but if \code{NULL} the date stored in
 file is used, and if \code{NA} no date variable is added}
 
 \item{geocode}{A data frame with columns \code{lon} and \code{lat}.}
@@ -27,6 +28,8 @@ default locale is US-centric (like R), but you can use
 \code{\link[readr]{locale}} to create your own locale that controls things
 like the default time zone, encoding, decimal mark, big mark, and day/month
 names.}
+
+\item{verbose}{Logical indicating the level of warnings wanted.}
 }
 \value{
 A raw_spct object.

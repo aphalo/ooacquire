@@ -243,9 +243,9 @@ set_descriptor_irrad_mult <- function(descriptor,
 #' @export
 #'
 set_descriptor_slit_fun <- function(descriptor,
-                                    inv.slit.fun)
+                                    inv.slit.fun = NULL)
 {
-  stopifnot(is.function(inv.slit.fun))
+  stopifnot(is.function(inv.slit.fun) || is.null(inv.slit.fun))
   descriptor[["inst.calib"]][["$slit.fun"]] <- inv.slit.fun
   descriptor
 }

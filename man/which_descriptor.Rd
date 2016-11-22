@@ -5,12 +5,12 @@
 \title{Select which instrument descriptor to use}
 \usage{
 which_descriptor(date = lubridate::today(),
-  descriptors = ooacquire::MAYP11278_descriptors, verbose = FALSE, ...)
+  descriptors = ooacquire::MAYP11278_descriptors, verbose = NULL, ...)
 }
 \arguments{
-\item{date}{Any object that lubridate::as_date() will decode as a date or
-convert to a date. Used only to override the selection of the descriptor
-containing calibration data.}
+\item{date}{Any object that \code{anytime::anydate()} will decode as a date
+or convert to a date. Used to select a descriptor containing calibration
+data valid for a given day.}
 
 \item{descriptors}{A named list of descriptors of the characteristics of
 the spectrometer including calibration data.}
@@ -22,5 +22,15 @@ the spectrometer including calibration data.}
 \description{
 Select from a list of instrument descriptors which one to use based on
 date of measurement.
+}
+\note{
+The default argument for \code{verbose} is for this function
+  \code{TRUE} unless the argument to \code{date} is a date object, as
+  conversion of other objects to a date may fail.
+
+  If a character string is passed as argument to \code{date}, it must be
+  in a format suitable for \code{anytime::anydate()}. One needs to be
+  careful with months and days of the month when supplying them as numbers,
+  so using months names or their abbreviations may be safer.
 }
 

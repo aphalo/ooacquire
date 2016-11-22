@@ -4,7 +4,7 @@
 \alias{set_descriptor_slit_fun}
 \title{Add function for slit correction}
 \usage{
-set_descriptor_slit_fun(descriptor, inv.slit.fun)
+set_descriptor_slit_fun(descriptor, inv.slit.fun = NULL)
 }
 \arguments{
 \item{descriptor}{list as returned by function \code{get_oo_descriptor}}

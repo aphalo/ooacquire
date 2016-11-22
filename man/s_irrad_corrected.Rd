@@ -12,8 +12,8 @@ s_irrad_corrected(x, ...)
 
 \method{s_irrad_corrected}{default}(x, ...)
 
-\method{s_irrad_corrected}{list}(x, method, return.cps = FALSE, descriptor,
-  locale, verbose = FALSE, ...)
+\method{s_irrad_corrected}{list}(x, time = NULL, method, return.cps = FALSE,
+  descriptor, locale, verbose = FALSE, ...)
 
 \method{s_irrad_corrected}{raw_mspct}(x, method, return.cps = FALSE,
   verbose = FALSE, ...)
@@ -27,6 +27,9 @@ s_irrad_corrected(x, ...)
 
 \item{...}{Named argument passed to \code{photobiology::cps2irrad} which is
 the final calculation step.}
+
+\item{time}{a \code{POSIXct} object, but if \code{NULL} the date stored in
+file is used, and if \code{NA} no date variable is added}
 
 \item{method}{A named list of constants and functions defining the
 method to be sued for stray light and dark signal corrections.}
