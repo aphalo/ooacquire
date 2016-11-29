@@ -13,11 +13,13 @@ Parsing is quite flexible, so hopefully robust across versions of the software
 and spectrometer models and their possible configurations.
 Add generic s_irrad_corrected() with methods for raw_mspct objects and for
 lists of file names.
+Add generic s_fraction_corrected() with methods for raw_mspct objects and for
+lists of file names.
 Add automatic support for different protocols including bracketing based on the
 the raw spectral data passed as argument.
 Add function compute_irrad_calibration() accepting measurements of both D2 and
 FEL lamps and the coefficients for reconstructing the emission of the lamps.
-Add function acq_irrad_interactive().
+Add functions acq_irrad_interactive(), and acq_trans_interactive().
 Ensure that all metadata is copied and at all processing steps.
 Add example data.
 Test and debug.

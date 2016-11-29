@@ -28,21 +28,47 @@ read_oo_ssdata <- function(file,
                            label = NULL,
                            descriptor = NULL,
                            tz = NULL,
-                           locale = readr::default_locale(),
+                           locale = NULL,
                            verbose = FALSE) {
-  if (is.null(tz)) {
-    tz <- locale$tz
-  }
-  if (is.null(label)) {
-    label <- paste("File:", file)
-  }
-  line01 <- scan(file = file, nlines =  1, skip = 0, what = "character", quiet = !verbose)
+
+  label <- paste("File: ", basename(file), label, sep = "")
+
+  line01 <- scan(file = file, nlines =  1, skip = 0,
+                 what = "character", quiet = !verbose)
   if (line01[1] != "SpectraSuite") {
     warning("Input file was not created by SpectrSuite as expected: skipping")
     return(NA)
   }
   file_header <- scan(file = file, nlines = 20,
                       skip = 0, what = "character", sep = "\n", quiet = !verbose)
+
+  data.rows <- oofile_data_rows(file_header)
+
+  if (length(locale) == 0) {
+    locale <- readr::default_locale()
+    if (is.null(tz)) {
+      tz <- Sys.timezone()
+    }
+    locale[["tz"]] <- tz
+  }
+  row01 <- scan(file = file, nlines =  1, skip = data.rows[["skip"]],
+                what = "character", quiet = !verbose)
+  if (grepl("\\.", row01[1]) && locale[["decimal_mark"]] != ".") {
+    if (verbose) {
+      warning("Replacing locale's decimal mark with '.'")
+    }
+    locale[["decimal_mark"]] <- "."
+    locale[["grouping_mark"]] <- ","
+  } else if (grepl("\\,", row01[1])) {
+    if (verbose) {
+      warning("Replacing locale's decimal mark with ','")
+    }
+    locale[["decimal_mark"]] <- ","
+    locale[["grouping_mark"]] <- "."
+  }
+  if (is.null(tz) && !is.null(time)) {
+    tz <- locale$tz
+  }
 
   if (is.null(time)) {
     line03 <- sub("Date: [[:alpha:]]{3} ", "", file_header[3])

@@ -88,7 +88,7 @@ acq_settings <- function(descriptor,
     target.margin = target.margin,
     max.integ.time = max.integ.time,
     min.integ.time = min.integ.time,
-    tot.time.range = tot.time.range,
+    tot.time.range = range(tot.time.range), # fix length != 2
     # instrument settings
     integ.time = integ.time,
     num.scans = num.scans,

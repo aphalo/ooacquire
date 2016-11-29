@@ -5,8 +5,7 @@
 \title{Read File Saved by Ocean Optics' SpectraSuite.}
 \usage{
 read_oo_ssdata(file, time = NULL, geocode = NULL, label = NULL,
-  descriptor = NULL, tz = NULL, locale = readr::default_locale(),
-  verbose = FALSE)
+  descriptor = NULL, tz = NULL, locale = NULL, verbose = FALSE)
 }
 \arguments{
 \item{file}{character string}

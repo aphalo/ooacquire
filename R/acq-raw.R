@@ -49,7 +49,11 @@ acq_raw_spct <- function(descriptor,
    }
 
   for (i in 1:num.readings) {
-    counts.name <- paste("counts", i, sep = "_")
+    if (num.readings > 1) {
+      counts.name <- paste("counts", i, sep = "_")
+    } else {
+      counts.name <- "counts"
+    }
     rOmniDriver::set_integration_time(y$w, x$integ.time[i], y$sr.index, y$ch.index)
     actual.integ.time <- rOmniDriver::get_integration_time(y$w, y$sr.index, y$ch.index)
     # We need to
@@ -141,6 +145,7 @@ acq_raw_mspct <- function(descriptor,
   z <- photobiology::as.raw_mspct(z)
   photobiology::setWhenMeasured(z, start.time)
   photobiology::setWhereMeasured(z, where.measured)
+  names(z) <- protocol
   z
 }
 

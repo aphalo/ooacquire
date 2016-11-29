@@ -2,12 +2,18 @@
 % Please edit documentation in R/acq-interactive.R
 \name{acq_irrad_interactive}
 \alias{acq_irrad_interactive}
+\alias{acq_trans_interactive}
 \title{Acquire spectra interactively}
 \usage{
-acq_irrad_interactive(tot.time.range = c(1, 30), target.margin = 0.1,
+acq_irrad_interactive(tot.time.range = c(5, 15), target.margin = 0.1,
   HDR.mult = c(short = 1, long = 10),
   method = ooacquire::MAYP11278_ylianttila.mthd,
   descriptors = ooacquire::MAYP11278_descriptors)
+
+acq_trans_interactive(tot.time.range = c(5, 15), target.margin = 0.2,
+  HDR.mult = c(short = 1, long = 10),
+  method = ooacquire::MAYP11278_ylianttila.mthd,
+  descriptors = ooacquire::MAYP11278_descriptors, qty.out = "Tfr")
 }
 \arguments{
 \item{tot.time.range}{numeric vector Range of total times for a measurement
@@ -23,9 +29,12 @@ as a multiplier of the set or tuned integration time.}
 
 \item{descriptors}{list A list of instrument descriptors containing
 calibration data.}
+
+\item{qty.out}{chearacter One of "Tfr" (transmittance as a fraction of one)
+or "raw" (raw counts).}
 }
 \description{
-Function providing a simple interactive front-end to the functions in the
+Functions providing a simple interactive front-end to the functions in the
 package. Mostly as example code that can be modified for diferent
 uses.
 }

@@ -1,6 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-my-tests
+not-inst
 data-raw
 inst/example-scripts/*.html
 inst/example-scripts/*.pdf

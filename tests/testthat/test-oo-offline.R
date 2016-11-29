@@ -48,11 +48,11 @@ test_that("SpectraSuite comma", {
   expect_equal(sum(is.na(ss.spct[[2]])), 0)
   expect_is(ss.spct, "raw_spct")
   expect_named(ss.spct, c("w.length", "counts"))
-  # expect_equal(as.numeric(getWhenMeasured(ss.spct), tz = "EET"),
-  #              as.numeric(ymd_hms("2016-10-11 11:23:05", tz = "EET"), tz = "EET"))
+  expect_equivalent(getWhenMeasured(ss.spct),
+                    ymd_hms("2016-10-11 11:23:05", tz = "UTC"))
   expect_equal(getWhereMeasured(ss.spct),
                data.frame(lon = NA_real_, lat = NA_real_))
-  expect_equal(getWhatMeasured(ss.spct), "File: data-test/pheno1normal.txt")
+  expect_equal(getWhatMeasured(ss.spct), "File: pheno1normal.txt")
   expect_equal(getTimeUnit(ss.spct), NA)
   expect_gt(length(comment(ss.spct)), 0)
 })
@@ -83,11 +83,13 @@ test_that("SpectraSuite comma multiple", {
   expect_is(ss.mspct[["light"]], "raw_spct")
   expect_is(ss.mspct[["dark"]], "raw_spct")
   expect_named(ss.mspct[["light"]], c("w.length", "counts"))
-  # expect_equal(as.numeric(getWhenMeasured(ss.spct), tz = "EET"),
-  #              as.numeric(ymd_hms("2016-10-11 11:23:05", tz = "EET"), tz = "EET"))
+  expect_equivalent(getWhenMeasured(ss.mspct[["light"]]),
+                    ymd_hms("2016-10-11 11:23:05", tz = "UTC"))
+  expect_equivalent(getWhenMeasured(ss.mspct[["dark"]]),
+                    ymd_hms("2016-10-11 11:23:53", tz = "UTC"))
   expect_equal(getWhereMeasured(ss.mspct[["light"]]),
                data.frame(lon = NA_real_, lat = NA_real_))
-  expect_equal(getWhatMeasured(ss.mspct[["light"]]), "File: data-test/pheno1normal.txt")
+  expect_equal(getWhatMeasured(ss.mspct[["light"]]), "File: pheno1normal.txt")
   expect_equal(getTimeUnit(ss.mspct[["light"]]), NA)
   expect_gt(length(comment(ss.mspct[["light"]])), 0)
 })

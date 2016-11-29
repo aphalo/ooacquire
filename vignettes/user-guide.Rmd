@@ -69,6 +69,7 @@ cases are also included in the package. Here it is important to remember that a 
 | `acq_raw_spct` | take one measurement (data point) |
 | `acq_raw_mspct` | take a sequence of spectral measurements (several data points) |
 | `acq_irrad_interactive` | interactively acquire spectral irradiance and save data and plots to disk |
+| `acq_trans_interactive` | interactively acquire spectral transmittance and save data and plots to disk |
 | **data procesing** | |
 | `trim_counts` | replace values from saturated array pixels with NAs |
 | `bleed_nas` | replace values from pixels neighbouring NAs with NAs |
@@ -117,7 +118,7 @@ CCD arrays, especially if not cooled, have a significant dark signal. The best a
 
 The raw counts after linearisation followed by subtraction of the dark signal are still expressed in number of counts per integration period. As the duration of the integration time is variable, we need to re-express the raw counts as counts-per-second (_cps_). Once more, the integration time used for the acquisition is stored in the `cps_spct` object and the conversion can be done by method `raw2cps()` with just this object as input. The values returned, expressed as counts per second, are linearly proportional to the rate at which photons imping each detector pixel. Be aware that as detector quantum yield depends on wavelength, a different multiplier is needed for each pixel to be able to convert the counts-per-second data to units of photons-per-unit-time. 
 
-If bracketing for HDR has been used during acquisition, at this point, the values of the _cps_ for each of the bracketed spectra are expressed on the same scale. This means that they can simply be spliced together. The simplest approach possible, used by method `merge_cps()` is to replace the clipped data from saturated pixels (and possibly their neighbours) in the longer integration with data from the same pixels obtained with shorter integration. As we used `trim_counts()` and `bleed_nas` on the raw counts, those saturated pixels have already been replaced with `NA`'s making the operation easy to implement.
+If bracketing for HDR has been used during acquisition, at this point, the values of the _cps_ for each of the bracketed spectra are expressed on the same scale. This means that they can simply be spliced together. The simplest approach possible, used by method `merge_cps()` is to replace the clipped data from saturated pixels (and possibly their neighbours) in the longer integration with data from the same pixels obtained with shorter integration. As we used `trim_counts()` and `bleed_nas()` on the raw counts, those saturated pixels have already been replaced with `NA`'s making the operation easy to implement.
 
 After the preceding steps, if the _cps_ or merged _cps_ values are from an irradiance measurement the spectral data are now ready to be multiplied by the calibration constants corresponding to each individual pixel. If the values are to be used for calculation of transmittance or reflectance, all what is left to do is simple arithmetic.
 
@@ -130,57 +131,79 @@ The slit function describes how monochromatic light "reaches" adjacent pixels wh
 The slit function of a spectrometer can be estimated by measuring laser beams at different wavelengths and fitting suitable functions to the observed data. Here we explain how to apply such a function. The slit function is the result of an optical effect, and consequently independent of integration time and other detector settings. Consequently, can be applied to either the merged _cps_ values or after application of a calibration. **Obviously, the stage at which the slit correction is applied needs to match the stage of processing of the data used for estimating the slit function.**
 
 The correction to apply to a given pixel depends on the readings of nearby pixels. Some authors recommend to apply this correction recursively, however, we follow the simple approach of applying it only once as an approximation.
-
-## Examples
-
+ 
 ```{r "setup", include=FALSE}
 require("knitr")
-opts_knit$set(root.dir = system.file("extdata", package = "ooacquire"))
+opts_knit$set(root.dir = system.file("extdata/irradiance", package = "ooacquire"))
 ```
 
-### With data from files
+## Measurement of spectral irradiance
+
+Irradiance estimates are affected by calibration errors, dark electrical noise, dynamic range and stray light. In this section we assume that the available calibration is valid.  Random electrical and thermal noise can be averaged out by repeated measurement. Dynamic range depends both on the noise floor and on the resolution of the anologue to digital conversion electronics of the instrument. A way to increase the effective dynamic range is be bracketing intergartion time and splicing/merging the resulting spectra. This is what in digital photography is called HDR or high dynamic range images obtained by merging sets of images obtained at a series of different exposure values. In addition to improved optical design, stray light can be corrected for if it is possible to measure it by itself. This can be acieved by using an optical filter that tranmits radiation of wavelengths causing stray light, but that blocks radiation of wavelengths we are interested in.
+An additional correction that can be applied is for the slit function of the instrument. The slit function describes how a single wavelength peak (e.g.\ similar to a laser beam) broadens at the array detector.
+
+Which corrections are needed and which make little difference depends on the type of instrument, the characterisitcs of the light source and the region of the spectrum we are interseted in. Consequently, depending on the circumstances we may want to use different measurement propocols. The high-level functions in the package "guess" the protocol from the set of file names or set of spectra passed as argument. For irradiance calculations three named members are recognized as different measurements in a protocol: `"light"`, `"filter"` and `"dark"`, each of these can be bracketed for integration time. In the case of file names for any of these three members, a vector of file names, is interpreted as a bracketed measurement. In the case of collections of spectra, `raw_spct`  with multiple `counts` columns are interpreted as bracketed. Of course, at least a `"light"` member is required as input. If it is missing an empty `source_spct` object is returned.
+
+| Protocol  | `light` spct | `filter` spct | `dark` spct | signal level | signal range | speed |
+|:----------|--------------|---------------|-------------|--------------|--------------|-------|
+| minimal   | short        | -             | -           | high         | < 5e1 ??     | 1/1   |
+| normal    | short        | -             | short       | high         | < 1e2        | 1/2   |
+| corrected | short        | short         | short       | medium       | < 1e3        | 1/3   |
+| cor. brkt | short + long | short + long | short + long | low          | < 1e4        | 1/33  |
+
+### Examples
 
 We first load the packages to be used, and set the working directory to the
 location of the example data files included in the package.
+
 ```{r}
 library(photobiology)
+library(photobiologyWavebands)
 library(ggspectra)
 library(ooacquire)
 ```
 
-We set a locale matching that under which the files to be read were saved.
-```{r}
-my.locale <- readr::locale("en", decimal_mark = ",", tz = "EET")
+<hr>
+In special cases we may need to set a locale matching the language used in the files for month names is not English. In most cases month names are in English, an time zones and decimal markers will be inferred from the data files themselves, making it unnecessary to explicitly pass a locale defintion as argument to funcitons.
+<hr>
 
-```
+The first example is the one listed as "minimal" in the table above, we use a single spectrum, using for the dark correction pixels expected to receive no true excitation. For example, those in the UVC region of the spectrum when the light source is sunlight at ground level.
 
-We next set a list of file names to be read, with members named according
+We set a list of file names to be read, with members named according
 to their role in the measuring protocol.
 
-The first example is very simple, we use a single spectrum, using for the dark correction pixels expected to receive no true excitation. For example, those in the UVC region of the spectrum when the light source is sunlight at ground level.
-
 ```{r}
-my.spct <- s_irrad_corrected(x = list(light = "light-short.txt"),
-                             descriptor = which_descriptor("2016-10-11" , 
-                                                           MAYP11278_descriptors),
-                             method = MAYP11278_ylianttila.mthd,
-                             locale = my.locale)
+files_names <- list(light = "light-short.txt")
 ```
 
-As these measurements are of sunlight in a greenhouse we can remove noise from regions known to be zero.
+We subsequently compute the spectral irradiance.
 
 ```{r}
-# force to zero wavelengths < 290 nm use only for sunlight, and after checking plot
-my.spct <- trim_wl(my.spct, range = c(290, NA), use.hinges = FALSE, fill = 0)
+one_file.spct <- 
+  s_irrad_corrected(x = list(light = "light-short.txt"),
+                    descriptor = which_descriptor("2016-10-11" , 
+                                                  MAYP11278_descriptors),
+                    method = MAYP11278_ylianttila.mthd)
 ```
 
-We can now plot the result from simplest protocol.
+As these measurements are of sunlight in a greenhouse we can remove noise from regions known to be zero by replacing with zeros all spectral irradiance values form wavelengths shorter than 290 nm.
+
+```{r}
+one_file.spct <- trim_wl(one_file.spct, 
+                         range = c(290, NA), 
+                         use.hinges = FALSE, 
+                         fill = 0)
+```
+
+We plot the result from "minimal" protocol.
 
 ```{r, fig.height=5, fig.width=7}
-plot(my.spct, unit.out = "photon")
+plot(one_file.spct, unit.out = "photon")
 ```
 
-At the other extreme, we can use bracketing, a dark measurement, plus a measurement with a UV-absorbing filter (polycarbonate). The UV absorbing filter allows us to estimate stray light in the UV region.
+At the other extreme, we can use bracketing, a dark measurement, plus a measurement with a UV-absorbing filter (polycarbonate). The UV absorbing filter allows us to estimate stray light in the UV region. This is the protocol listed as corrected and bracketed (cor.\ brkt.) in the table above.
+
+We go exactly through the same steps as before, the only difference is the list of file names passed as argument to parameter `x`. 
 
 ```{r}
 files_names <- list(light = c("light-short.txt",
@@ -191,25 +214,71 @@ files_names <- list(light = c("light-short.txt",
 ```
 
 ```{r}
-my.spct <- s_irrad_corrected(x = files_names,
-                             descriptor = which_descriptor("2016-10-11" , 
-                                                           MAYP11278_descriptors),
-                             method = MAYP11278_ylianttila.mthd,
-                             locale = my.locale)
+five_files.spct <- 
+  s_irrad_corrected(x = files_names,
+                    descriptor = which_descriptor("2016-10-11" , 
+                                                  MAYP11278_descriptors),
+                    method = MAYP11278_ylianttila.mthd)
 ```
 
 As these measurements are of sunlight in a greenhouse we can remove noise from regions known to be zero as we did above.
 
 ```{r}
 # force to zero wavelengths < 290 nm use only for sunlight, and after checking plot
-my.spct <- trim_wl(my.spct, range = c(290, NA), use.hinges = FALSE, fill = 0)
+five_files.spct <- trim_wl(five_files.spct, 
+                           range = c(290, NA), 
+                           use.hinges = FALSE, 
+                           fill = 0)
 ```
 
 We can now plot the result from complex protocol.
 
 ```{r, fig.height=5, fig.width=7}
-plot(my.spct, unit.out = "photon")
+plot(five_files.spct, unit.out = "photon")
 ```
+
+These data are all from the same set of measurements, as one can apply the calculations for the "minimal" protocol to a subset of the data from the "corrected bracketed" protocol. We calculate the differences of the estimates from the "minimal" protocol compared to the complex one.
+
+```{r}
+(q_irrad(one_file.spct) / q_irrad(five_files.spct) - 1) * 100
+```
+
+Differences expressed as percentage for different wavelength ranges. 
+
+```{r}
+kable(
+  t((q_irrad(one_file.spct, c(UV_bands(), VIS_bands())) / 
+     q_irrad(five_files.spct, c(UV_bands(), VIS_bands())) - 1) * 100),
+  digits = 2
+)
+```
+
+## Measurement of spectral transmittance
+As for irradiance, transmittance estimates are affected by dark electrical noise, dynamic range and stray light. Random electrical and thermal noise can be averaged out by repeated measurement. Dynamic range depends both on the noise floor and on the resolution of the anologue to digital conversion electronics of the instrument. A way to increase the effective dynamic range is bracketing integrartion time and splicing/merging the resulting spectra. This is what in digital photography is called HDR or high dynamic range images obtained by merging sets of images obtained at a series of different exposure values. In addition to improved optical design, stray light can be corrected for if it is possible to measure it by itself. This can be achieved by use of an optical filter that transmits radiation of wavelengths causing stray light, but that blocks radiation of wavelengths we are interested in. An additional correction that can be applied is for the slit function of the instrument. The slit function describes how a single wavelength peak (e.g.\ similar to a laser beam) broadens at the array detector.
+
+Which corrections are needed and which make little difference depends on the type of instrument, the characterisitcs of the sample being measured and of the light source and the region of the spectrum we are interseted in. Consequently, depending on the circumstances we may want to use different measurement propocols. The high-level functions in the package "guess" the protocol from the set of file names or set of spectra passed as argument. For irradiance calculations three named members are recognized as different measurements in a protocol: `"sample"`, `"reference"`, `"filter"`,  and `"dark"`, each of these can be bracketed for integration time. In the case of file names for any of these three members, a vector of file names, is interpreted as a bracketed measurement. In the case of collections of spectra, `raw_spct`  with multiple `counts` columns are interpreted as bracketed. Of course, at least a `"sampel"` and `"reference"` members are required as input. If either or both are missing an empty `filter_spct` object is returned.
+
+| Protocol  | `sample` spct   | `reference` spct   | `filter` spct    | `dark` spct     | signal range | speed |
+|:----------|-----------------|--------------------|------------------|-----------------|--------------|--------------|-------|
+| minimal   | short        | short         | -           | -           | < 5e1 ??     | 1/1   |
+| normal    | short        | short         | -           | short       | < 1e2        | 1/3   |
+| nor. brkt | short + long | short + long | -             | short + long | < 1e3        | 1/33  |
+| (corrected) | short        | short         | short        | short       | < 1e3        | 1/5   |
+| (cor. brkt) | short + long  | short + long | short + long  | short      | < 5e3        | 1/55   |
+
+The last two prorocols, using a `"filter"` measurement seem unlikely to be useful in practice, but I intend to do some tests in the future to test this.
+
+### Examples
+
+<hr>
+In special cases we may need to set a locale matching the language used in the files for month names is not English. In most cases month names are in English, an time zones and decimal markers will be inferred from the data files themselves, making it unnecessary to explicitly pass a locale defintion as argument to funcitons.
+<hr>
+
+The first example is the one listed as "minimal" in the table above, we use two spectra, one for sample and one for reference, using for the dark correction pixels expected to receive no true excitation. For example, those in the UVC region of the spectrum when the light source is sunlight at ground level.
+
+We set a list of file names to be read, with members named according
+to their role in the measuring protocol. 
+
 
 ## Irradiance calibration
 

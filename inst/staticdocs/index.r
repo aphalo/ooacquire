@@ -49,9 +49,10 @@ sd_section("File reading", "",
              "merge_raw_mspct")
 )
 
-sd_section("High level function and method", "",
+sd_section("High level functions and methods", "",
            c("raw2corr_cps",
-             "s_irrad_corrected")
+             "s_irrad_corrected",
+             "s_fraction_corrected")
 )
 
 sd_section("Example data", "",
