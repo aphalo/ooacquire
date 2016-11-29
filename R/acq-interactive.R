@@ -159,7 +159,7 @@ acq_irrad_interactive <-
 
 #' @rdname acq_irrad_interactive
 #'
-#' @param qty.out chearacter One of "Tfr" (transmittance as a fraction of one)
+#' @param qty.out character One of "Tfr" (transmittance as a fraction of one)
 #'   or "raw" (raw counts).
 #'
 #' @export
