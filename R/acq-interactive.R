@@ -10,6 +10,7 @@
 #'   head space to leave.
 #' @param HDR.mult numeric the integration time for each bracketed integration
 #'   as a multiplier of the set or tuned integration time.
+#' @param protocols list of character vectors.
 #' @param method list The method to use when applying the calibration
 #' @param descriptors list A list of instrument descriptors containing
 #'   calibration data.
@@ -18,7 +19,10 @@
 #' @note The integration time is set automatically so that the peak number of
 #'   counts is close to 1 - \code{target.margin} of maximum range of the
 #'   instrument detector. The minmum \code{tot.time} is achieved by increasing
-#'   the number of scans.
+#'   the number of scans. The default protocols are usually suitable, if new
+#'   protocols are passed, each character vector must contain strings "light",
+#'   "filter" and "dark", or "sample", "reference", and "dark", depending on
+#'   the function.
 #'
 #' @examples
 #'
@@ -31,17 +35,20 @@ acq_irrad_interactive <-
   function(tot.time.range = c(5, 15),
            target.margin = 0.1,
            HDR.mult = c(short = 1, long = 10),
+           protocols = NULL,
            method = ooacquire::MAYP11278_ylianttila.mthd,
            descriptors = ooacquire::MAYP11278_descriptors) {
 
     descriptor <- which_descriptor(descriptors = descriptors)
 
     # define measurement protocols
-    protocols <- list(l = "light",
-                      ld = c("light", "dark"),
-                      lf = c("light", "filter"),
-                      lfd = c("light", "filter", "dark")
-    )
+    if (length(protocols) == 0) {
+      protocols <- list(l = "light",
+                        ld = c("light", "dark"),
+                        lf = c("light", "filter"),
+                        lfd = c("light", "filter", "dark")
+      )
+    }
 
     w <- start_session()
 
@@ -99,6 +106,10 @@ acq_irrad_interactive <-
                                  settings,
                                  protocol,
                                  user.label = obj.name)
+
+      if (length(raw.mspct) == 0) {
+        next()
+      }
 
       irrad.spct <- s_irrad_corrected(raw.mspct, method)
 
@@ -159,24 +170,42 @@ acq_irrad_interactive <-
 
 #' @rdname acq_irrad_interactive
 #'
+#' @param ref.value numeric or filter_spct/reflector_spct object.
 #' @param qty.out character One of "Tfr" (transmittance as a fraction of one)
 #'   or "raw" (raw counts).
+#' @param type character Type of transmittance or reflectance measured.
 #'
+#' @note The calculations for reflectance and transmittance are very similar,
+#'   so we provide a single function capable of handling both. For
+#'   transmittance the reference is usually direct exposure to radiation but
+#'   for reflectance a white reference patch is normally used. In some cases
+#'   one may want to use a grey reference. We provide an argument that allows
+#'   the user to supply a constant or a spectrum describing the properties of
+#'   the reference. It is also important to distinguish between total and
+#'   internal transmittance, and which of these is measured depends on the
+#'   measuring protocol.
 #' @export
 #'
-acq_trans_interactive <-
+acq_fraction_interactive <-
   function(tot.time.range = c(5, 15),
            target.margin = 0.2,
            HDR.mult = c(short = 1, long = 10),
+           protocols = NULL,
            method = ooacquire::MAYP11278_ylianttila.mthd,
            descriptors = ooacquire::MAYP11278_descriptors,
-           qty.out = "Tfr") {
+           ref.value = 1,
+           qty.out = "Tfr",
+           type = "total") {
+
+    stopifnot(qty.out %in% c("Trf", "Rfr", "raw"))
 
     descriptor <- which_descriptor(descriptors = descriptors)
 
     # define measurement protocols
-    protocols <- list(rsd = c("reference", "sample", "dark"),
-                      srd = c("sample", "reference", "dark"))
+    if (length(protocols) == 0L) {
+      protocols <- list(rsd = c("reference", "sample", "dark"),
+                        srd = c("sample", "reference", "dark"))
+    }
 
     w <- start_session()
 
@@ -234,6 +263,10 @@ acq_trans_interactive <-
                                  protocol,
                                  user.label = obj.name)
 
+      if (length(raw.mspct) == 0) {
+        next()
+      }
+
       assign(raw.name, raw.mspct)
 
       if (qty.out == "raw") {
@@ -246,7 +279,12 @@ acq_trans_interactive <-
         print(fig)
         save(list = raw.name, file = file.name)
       } else {
-        filter.spct <- s_fraction_corrected(raw.mspct, method = method, qty.out = "Tfr")
+        filter.spct <- s_fraction_corrected(raw.mspct,
+                                            ref.value = ref.value,
+                                            type = type,
+                                            method = method,
+                                            qty.out = qty.out,
+                                            ref.value = ref.value)
         assign(filter.name, filter.spct)
         save(list = c(raw.name, filter.name), file = file.name)
 
@@ -309,9 +347,11 @@ acq_trans_interactive <-
 #' @keywords internal
 #'
 tune_interactive <- function(descriptor, settings) {
+  old.settings <- settings
   tuned <- FALSE
   repeat{
-    answ <- readline("Ready to adjust integration time? t = tune, s = skip, m = margin, r = range (t/s/m/-): ")
+    cat("Ready to adjust integration time?\n")
+    answ <- readline("t = tune, s = skip, m = margin, r = range, h = HDR mult., u = undo (t/s/m/r/h/u/-): ")
     if (answ == "") {
       answ <- ifelse(tuned, "s", "t")
     }
@@ -326,9 +366,31 @@ tune_interactive <- function(descriptor, settings) {
       margin <- try(as.numeric(margin))
       if (!is.na(margin)) {
         settings[["target.margin"]] <- margin
+        tuned <- FALSE
+      } else {
+        print("Value not changed!")
       }
-    }  else if (answ == "a") {
-      return()
+    } else if (answ == "r") {
+      cat("Total time range (seconds), 2 numbers: ")
+      tot.time.range <- range(scan(nmax = 2)) * 1e6
+      if (tot.time.range[1] >= 0) {
+        settings[["tot.time.range"]] <- tot.time.range
+        tuned <- FALSE
+      } else {
+        cat("Value not changed!")
+      }
+    }  else if (answ == "h") {
+      cat("HDR multipliers, 1 to 4 numbers: ")
+      HDR.mult <- sort(scan(nmax = 4))
+      if (HDR.mult[1] >= 0  && HDR.mult[length(HDR.mult)] < 1000) {
+        settings[["HDR.mult"]] <- HDR.mult
+        tuned <- FALSE
+      } else {
+        cat("Value not changed!")
+      }
+    } else if (answ == "u") {
+      cat("Restoring previous settings!")
+      settings <- old.settings
     }
   }
   settings

@@ -11,12 +11,12 @@ s_fraction_corrected(x, ...)
 
 \method{s_fraction_corrected}{default}(x, ...)
 
-\method{s_fraction_corrected}{list}(x, ref.value = 1, ref.type = "internal",
+\method{s_fraction_corrected}{list}(x, ref.value = 1, type = "internal",
   time = NULL, method, qty.out = "Tfr", descriptor = NULL,
   locale = NULL, verbose = FALSE, ...)
 
 \method{s_fraction_corrected}{raw_mspct}(x, ref.value = 1,
-  ref.type = "internal", method, qty.out = "Tfr", verbose = FALSE, ...)
+  type = "internal", method, qty.out = "Tfr", verbose = FALSE, ...)
 }
 \arguments{
 \item{x}{A named list of one to three vectors of file names, with names
@@ -25,10 +25,10 @@ s_fraction_corrected(x, ...)
 \item{...}{Named argument passed to \code{photobiology::cps2irrad} which is
 the final calculation step.}
 
-\item{ref.value}{numeric the fractional transmittance or reflectance of the
-reference.}
+\item{ref.value}{numeric or filter_spct or reflector_spct object, with the
+fractional transmittance or reflectance of the reference.}
 
-\item{ref.type}{character One of "internal" or "total".}
+\item{type}{character One of "internal" or "total".}
 
 \item{time}{a \code{POSIXct} object, but if \code{NULL} the date stored in
 file is used, and if \code{NA} no date variable is added}

@@ -4,9 +4,9 @@
 #'
 #' @param x A named list of one to three vectors of file names, with names
 #'   "sample", "ref", and "dark".
-#' @param ref.value numeric the fractional transmittance or reflectance of the
-#'   reference.
-#' @param ref.type character One of "internal" or "total".
+#' @param ref.value numeric or filter_spct or reflector_spct object, with the
+#'   fractional transmittance or reflectance of the reference.
+#' @param type character One of "internal" or "total".
 #' @param method A named list of constants and functions defining the
 #'   method to be sued for stray light and dark signal corrections.
 #' @param qty.out character, one of "Tfr", "Rfr".
@@ -48,7 +48,7 @@ s_fraction_corrected.default <- function(x, ...) {
 #' @export
 s_fraction_corrected.list <- function(x,
                                       ref.value = 1,
-                                      ref.type = "internal",
+                                      type = "internal",
                                       time = NULL,
                                       method,
                                       qty.out = "Tfr",
@@ -60,21 +60,6 @@ s_fraction_corrected.list <- function(x,
                        sapply(x, paste, collapse = ", "),
                        sep = ": ", collapse = "\n")
 
-  # if (length(x[["sample"]]) == 0 || length(x[["reference"]]) == 0) {
-  #   if (verbose) {
-  #     warning("Filename(s) for 'sample' and/or 'reference' missing")
-  #   }
-  #   if (return.rfl) {
-  #     z <- reflector_spct()
-  #     comment(z) <- comment.txt
-  #     return(z)
-  #   } else {
-  #     z <- filter_spct()
-  #     comment(z) <- comment.txt
-  #     return(z)
-  #   }
-  # }
-
   raw.mspct <-
     ooacquire::read_files2mspct(x,
                                 time = time,
@@ -84,6 +69,7 @@ s_fraction_corrected.list <- function(x,
 
   fraction.spct <- s_fraction_corrected(x = raw.mspct,
                                         ref.value = ref.value,
+                                        type = type,
                                         method = method,
                                         qty.out = qty.out,
                                         verbose = verbose,
@@ -102,7 +88,7 @@ s_fraction_corrected.list <- function(x,
 #' @export
 s_fraction_corrected.raw_mspct <- function(x,
                                            ref.value = 1,
-                                           ref.type = "internal",
+                                           type = "internal",
                                            method,
                                            qty.out = "Tfr",
                                            verbose = FALSE,
@@ -110,7 +96,7 @@ s_fraction_corrected.raw_mspct <- function(x,
 
   if (length(x[["sample"]]) == 0 || length(x[["reference"]]) == 0) {
     if (verbose) {
-      warning("Filename(s) for 'sample' and/or 'reference' missing")
+      warning("Raw spectra for 'sample' and/or 'reference' missing")
     }
     if (qty.out == "Rfr") {
       z <- reflector_spct()
@@ -147,9 +133,9 @@ s_fraction_corrected.raw_mspct <- function(x,
 
   if (qty.out == "Rfr") {
     z <- photobiology::cps2Rfr(corrected_smp.spct, corrected_ref.spct / ref.value)
-    setRfrType(z, ref.type)
+    setRfrType(z, type)
   } else if (qty.out == "Tfr") {
     z <- photobiology::cps2Tfr(corrected_smp.spct, corrected_ref.spct / ref.value)
-    setRfrType(z, ref.type)
+    setRfrType(z, type)
   }
 }

@@ -94,7 +94,15 @@ uvb_corrections <- function(x,
     }
   }
 
-  if (!is.null(flt)) {
+  if (length(flt) > 0 &&
+        average_spct(clip_wl(x, range = flt.ref.wl)) < 0.1 * max(x[["cps"]])) {
+    warning("Too low cps in filter reference region, skipping filter correction.")
+    flt.flag <- FALSE
+  } else {
+    flt.flag <- TRUE
+  }
+
+  if (!is.null(flt) && flt.flag) {
     x <- filter_correction(x, flt,
                            stray.light.method = stray.light.method,
                            stray.light.wl = stray.light.wl,
@@ -254,7 +262,7 @@ filter_correction <- function(x,
     } else {
       if (verbose) message("mean_flt_ratio_short is ", signif(mean_flt_ratio_short, 4))
     }
-    selector <- x[["w.length"]] < 378
+    selector <- x[["w.length"]] < flt.ref.wl[2] & x[["w.length"]] > flt.dark.wl[2]
     # Apply correction
     x[selector, "cps"] <-
       x[selector, "cps"] - flt[selector, "cps"] / mean_flt_ratio_short
@@ -282,7 +290,7 @@ filter_correction <- function(x,
             signif(mean_flt_cs_medium / mean_flt_cs_short, 4))
   }
 
-  selector <- x[["w.length"]] >= 378
+  selector <- x[["w.length"]] >= flt.ref.wl[2]
   stray_light_correction <- mean_flt_cs_medium / mean_flt_ratio_short
   # Apply correction
   x[selector, "cps"] <-
@@ -300,6 +308,7 @@ filter_correction <- function(x,
 no_filter_correction <- function(x,
                                  stray.light.wl = c(218.5, 228.5),
                                  flt.dark.wl = c(193, 209.5),
+                                 flt.ref.wl = c(360, 379.5),
                                  trim = 0,
                                  verbose = FALSE) {
   stopifnot(is.null(attr(x, "straylight.corrected")) || !attr(x, "straylight.corrected"))
@@ -319,7 +328,7 @@ no_filter_correction <- function(x,
                           trim = trim, na.rm = TRUE)
 
   #
-  selector <- x[["w.length"]] < 378
+  selector <- x[["w.length"]] < flt.ref.wl[2] & x[["w.length"]] > flt.dark.wl[2]
   # Apply correction
   x[selector, "cps"] <-
     x[selector, "cps"] - mean_x_cs_short
@@ -337,13 +346,13 @@ no_filter_correction <- function(x,
                            trim = trim, na.rm = TRUE)
 
   if (verbose && ((mean_x_cs_medium / mean_x_cs_short) > 1.0)) {
-    message("There stronger signal at", stray.light.wl[1], " to ", stray.light.wl[2],
-            " nm than at ", stray.light.wl[1],
-            " to ", stray.light.wl[2], " nm, ratio: ",
+    message("There stronger signal at ", stray.light.wl[1], " to ", stray.light.wl[2],
+            " nm than at ", flt.dark.wl[1],
+            " to ", flt.dark.wl[2], " nm, ratio: ",
             signif(mean_x_cs_medium / mean_x_cs_short, 3))
   }
 
-  selector <- x[["w.length"]] >= 378
+  selector <- x[["w.length"]] >= flt.ref.wl[2]
   # Apply correction
   x[selector, "cps"] <-
     x[selector, "cps"] - mean_x_cs_medium

@@ -207,7 +207,8 @@ filesB2short <- list(light = "canopyb2normal.txt",
 
 my.spct <- s_irrad_corrected(x = filesB2short,
                              descriptor = which_descriptor("2016-11-17"),
-                             method = MAYP11278_ylianttila.mthd)
+                             method = MAYP11278_ylianttila.mthd,
+                             verbose = TRUE)
 
 plot(my.spct, unit.out = "photon")
 # force to zero wavelengths < 293 nm use only for sunlight, and after checking plot

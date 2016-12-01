@@ -21,7 +21,8 @@ filter_correction(x, flt, stray.light.method = "original",
   flt.ref.wl = c(360, 379.5), trim = 0, verbose = FALSE)
 
 no_filter_correction(x, stray.light.wl = c(218.5, 228.5),
-  flt.dark.wl = c(193, 209.5), trim = 0, verbose = FALSE)
+  flt.dark.wl = c(193, 209.5), flt.ref.wl = c(360, 379.5), trim = 0,
+  verbose = FALSE)
 }
 \arguments{
 \item{x, flt, dark}{\code{cps_spct} objects.}

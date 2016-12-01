@@ -109,7 +109,7 @@ acq_raw_spct <- function(descriptor,
 #'
 acq_raw_mspct <- function(descriptor,
                           acq.settings,
-                          protocol = c("measure", "filter", "dark"),
+                          protocol = c("light", "filter", "dark"),
                           user.label = "",
                           where.measured = data.frame(lon = NA_real_, lat = NA_real_),
                           pause.fun = NULL,
@@ -133,7 +133,7 @@ acq_raw_mspct <- function(descriptor,
     if (p != previous.protocol) {
       previous.protocol <- p
       if (!pause.fun(p, ...)) {
-        break()
+        return(raw_mspct())
       }
     }
     idx <- idx + 1
