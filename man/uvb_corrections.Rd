@@ -10,19 +10,20 @@
 uvb_corrections(x, flt, dark, stray.light.method = "original",
   stray.light.wl = c(218.5, 228.5), flt.dark.wl = c(193, 209.5),
   flt.ref.wl = c(360, 379.5), inst.dark.pixs = c(1:4),
-  worker.fun = ooacquire::maya_tail_correction, trim = 0, verbose = FALSE,
-  ...)
+  worker.fun = ooacquire::maya_tail_correction, trim = 0,
+  verbose = getOption("photobiology.verbose", default = FALSE), ...)
 
 slit_function_correction(x, worker.fun = ooacquire::maya_tail_correction,
-  verbose = TRUE, ...)
+  verbose = getOption("photobiology.verbose", default = FALSE), ...)
 
 filter_correction(x, flt, stray.light.method = "original",
   stray.light.wl = c(218.5, 228.5), flt.dark.wl = c(193, 209.5),
-  flt.ref.wl = c(360, 379.5), trim = 0, verbose = FALSE)
+  flt.ref.wl = c(360, 379.5), trim = 0,
+  verbose = getOption("photobiology.verbose", default = FALSE))
 
 no_filter_correction(x, stray.light.wl = c(218.5, 228.5),
   flt.dark.wl = c(193, 209.5), flt.ref.wl = c(360, 379.5), trim = 0,
-  verbose = FALSE)
+  verbose = getOption("photobiology.verbose", default = FALSE))
 }
 \arguments{
 \item{x, flt, dark}{\code{cps_spct} objects.}

@@ -46,7 +46,7 @@ s_irrad_corrected.list <- function(x,
                                    return.cps = FALSE,
                                    descriptor,
                                    locale = NULL,
-                                   verbose = FALSE,
+                                   verbose = getOption("photobiology.verbose", default = FALSE),
                                    ...) {
   comment.txt <- paste(names(x),
                        sapply(x, paste, collapse = ", "),
@@ -59,11 +59,13 @@ s_irrad_corrected.list <- function(x,
                                 descriptor = descriptor,
                                 verbose = verbose)
 
-  corrected.spct <- s_irrad_corrected(x = raw.mspct,
-                         method = method,
-                         return.cps = return.cps,
-                         verbose = verbose,
-                         ...)
+  corrected.spct <-
+    s_irrad_corrected(x = raw.mspct,
+                      method = method,
+                      return.cps = return.cps,
+                      verbose = verbose,
+                      ...)
+
   setWhatMeasured(comment.txt)
   comment(corrected.spct) <- paste("Processed on ", lubridate::today(),
                                    "\nwith 's_irrad_corrected()' from 'ooacquire' ver. ",
@@ -78,7 +80,7 @@ s_irrad_corrected.list <- function(x,
 s_irrad_corrected.raw_mspct <- function(x,
                                         method,
                                         return.cps = FALSE,
-                                        verbose = FALSE,
+                                        verbose = getOption("photobiology.verbose", default = FALSE),
                                         ...) {
   if (length(x[["light"]]) == 0) {
     if (verbose) {
@@ -115,7 +117,7 @@ s_irrad_corrected.raw_mspct <- function(x,
 s_irrad_corrected.raw_spct <- function(x,
                                        method,
                                        return.cps = FALSE,
-                                       verbose = FALSE,
+                                       verbose = getOption("photobiology.verbose", default = FALSE),
                                        ...) {
   raw.mspct <- raw_mspct(list(light = x))
   s_irrad_corrected(x = raw.mspct,

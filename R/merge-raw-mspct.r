@@ -23,7 +23,7 @@ merge_raw_mspct <- function(x) {
     return(x)
   }
 
-  # we sorth the members of the collection in ascending order of
+  # we sort the members of the collection in ascending order of
   # integration time. This allows use of a simpler algorithm.
   integ.times <-
     photobiology::msaply(x,
@@ -58,7 +58,7 @@ merge_raw_mspct <- function(x) {
   settings <- getInstrSettings(x[[1]])
   settings[["integ.time"]] <- integ.time
   settings[["num.scans"]] <- num.scans
-  settings[["total.time"]] <- integ.time * num.scans
+  settings[["tot.time"]] <- integ.time * num.scans
 
   photobiology::setInstrSettings(z, settings)
   z

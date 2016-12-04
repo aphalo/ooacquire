@@ -41,7 +41,7 @@ compute_irrad_calibration <-
            FEL.k,
            D2.k,
            method,
-           verbose = FALSE)
+           verbose = getOption("photobiology.verbose", default = FALSE))
 {
     # we use as dark reference only pixels that are physically blocked from
     # receiving radiation. For the Maya2000 Pro, the first 4 pixels in the

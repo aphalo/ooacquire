@@ -13,10 +13,12 @@ s_fraction_corrected(x, ...)
 
 \method{s_fraction_corrected}{list}(x, ref.value = 1, type = "internal",
   time = NULL, method, qty.out = "Tfr", descriptor = NULL,
-  locale = NULL, verbose = FALSE, ...)
+  locale = NULL, verbose = getOption("photobiology.verbose", default =
+  FALSE), ...)
 
 \method{s_fraction_corrected}{raw_mspct}(x, ref.value = 1,
-  type = "internal", method, qty.out = "Tfr", verbose = FALSE, ...)
+  type = "internal", method, qty.out = "Tfr",
+  verbose = getOption("photobiology.verbose", default = FALSE), ...)
 }
 \arguments{
 \item{x}{A named list of one to three vectors of file names, with names

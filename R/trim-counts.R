@@ -79,7 +79,7 @@ merge_cps <- function(x) {
   }
   instr.desc <- getInstrDesc(x)
   instr.settings <- getInstrSettings(x)
-  integ.times <- getInstrSettings(x)$integ.time
+  integ.times <- instr.settings[["integ.time"]]
   cols <- counts.cols[order(integ.times, decreasing = TRUE)]
   x[["cps"]] <- x[[cols[1]]]
   for (i in 2:length(cols)) {
@@ -87,10 +87,11 @@ merge_cps <- function(x) {
                           x[[cols[i]]],
                           x[["cps"]] )
   }
-  x <- x[ , c("w.length", "cps")]
-  setInstrDesc(x, instr.desc)
-  setInstrSettings(x, instr.settings)
-  x
+  z <- x[ , c("w.length", "cps")]
+  z <- photobiology::copy_attributes(x, z)
+#  setInstrDesc(z, instr.desc)
+#  setInstrSettings(z, instr.settings)
+  z
 }
 
 #' Expand NA's to neighbouring pixels

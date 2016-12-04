@@ -37,7 +37,7 @@ files_names <- list(light = c("light-short.txt",
 ## ------------------------------------------------------------------------
 five_files.spct <- 
   s_irrad_corrected(x = files_names,
-                    descriptor = which_descriptor("2016-10-11" , 
+                    descriptor = which_descriptor("2016-10-11", 
                                                   MAYP11278_descriptors),
                     method = MAYP11278_ylianttila.mthd)
 

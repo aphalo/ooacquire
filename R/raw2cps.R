@@ -47,21 +47,29 @@ raw2cps.raw_spct <- function(x,
     x <- linearize_counts(x)
   }
   acq_settings <- getInstrSettings(x)
-  integ.time <- acq_settings$integ.time
+  integ.time <- acq_settings[["integ.time"]]
   counts.cols <- names(x)[grep("^counts", names(x))]
   cps.cols <- gsub("^counts", "cps", counts.cols)
   stopifnot(length(counts.cols) == length(integ.time))
   other.cols <- setdiff(names(x), counts.cols)
   z <- as.generic_spct(x)[other.cols]
+  max.counts <- numeric(length(counts.cols))
   for (i in seq_along(counts.cols)) {
+    max.counts[i] <- max(x[[counts.cols[i]]], na.rm = TRUE)
     z[[cps.cols[i]]] <- x[[counts.cols[i]]] / integ.time[i] * 1e6
   }
   setCpsSpct(z)
-  setInstrDesc(z, getInstrDesc(x))
-  setInstrSettings(z, getInstrSettings(x))
+  descriptor <- getInstrDesc(x)
+  setInstrDesc(z, descriptor)
+  if (is.na(acq_settings[["rel.signal"]])) {
+    # e.g. when read from files
+    acq_settings[["rel.signal"]] <-
+      min(max.counts, na.rm = TRUE) / descriptor[["max.counts"]]
+  }
+  setInstrSettings(z, acq_settings)
   setWhenMeasured(z, getWhenMeasured(x))
   setWhereMeasured(z, getWhereMeasured(x))
-  setWhatMeasured(z, getWhatMeasured(z))
+  setWhatMeasured(z, getWhatMeasured(x))
   z
 }
 

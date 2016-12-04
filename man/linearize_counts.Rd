@@ -4,7 +4,8 @@
 \alias{linearize_counts}
 \title{Function to apply linearization correction to raw counts data.}
 \usage{
-linearize_counts(x, force.zero = TRUE, verbose = FALSE)
+linearize_counts(x, force.zero = TRUE,
+  verbose = getOption("photobiology.verbose", default = FALSE))
 }
 \arguments{
 \item{x}{raw_spct object.}

@@ -13,13 +13,14 @@ s_irrad_corrected(x, ...)
 \method{s_irrad_corrected}{default}(x, ...)
 
 \method{s_irrad_corrected}{list}(x, time = NULL, method, return.cps = FALSE,
-  descriptor, locale = NULL, verbose = FALSE, ...)
+  descriptor, locale = NULL, verbose = getOption("photobiology.verbose",
+  default = FALSE), ...)
 
 \method{s_irrad_corrected}{raw_mspct}(x, method, return.cps = FALSE,
-  verbose = FALSE, ...)
+  verbose = getOption("photobiology.verbose", default = FALSE), ...)
 
 \method{s_irrad_corrected}{raw_spct}(x, method, return.cps = FALSE,
-  verbose = FALSE, ...)
+  verbose = getOption("photobiology.verbose", default = FALSE), ...)
 }
 \arguments{
 \item{x}{A named list of one to hree vectors of file names, with names

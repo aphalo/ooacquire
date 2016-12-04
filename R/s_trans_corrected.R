@@ -54,7 +54,7 @@ s_fraction_corrected.list <- function(x,
                                       qty.out = "Tfr",
                                       descriptor = NULL,
                                       locale = NULL,
-                                      verbose = FALSE,
+                                      verbose = getOption("photobiology.verbose", default = FALSE),
                                       ...) {
   comment.txt <- paste(names(x),
                        sapply(x, paste, collapse = ", "),
@@ -91,7 +91,7 @@ s_fraction_corrected.raw_mspct <- function(x,
                                            type = "internal",
                                            method,
                                            qty.out = "Tfr",
-                                           verbose = FALSE,
+                                           verbose = getOption("photobiology.verbose", default = FALSE),
                                            ...) {
 
   if (length(x[["sample"]]) == 0 || length(x[["reference"]]) == 0) {

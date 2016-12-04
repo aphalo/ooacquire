@@ -47,7 +47,7 @@ irradiance, a calibration needs to be applied to the counts-per-second spectral 
 calibration data is also stored in the non-volatile memory of the spectrometer, but
 in some cases it is convenient to apply special algorithms or calibration data 
 that cannot be retrieved from the instrument itself. Functions for both the normal and special 
-cases are also included in the package. Here it is important to remember that a calibration will be valid only if the raw spectral data processing steps are exactly the same for the spectral data used for calibration and the measured data. **This in practice means that calibrations supplied by instrument manufacturers will almost never be usable if you process the measured data with this pacakge. You will need the reference lamp spectrum and the raw detector-counts data for the calibration event, to be able to calculte valid calibration coefficients for the exact same data-processing protocol you adopt for your actual measurements.** On the other hand, this also means that the functions in the present package, as each of them fulfils a simple and well defined step of data processing, are ideal for _in silico_ testing of alternative data processing approaches and measuring protocols. 
+cases are also included in the package. Here it is important to remember that a calibration will be valid only if the raw spectral data processing steps are exactly the same for the spectral data used for calibration and the measured data. **This in practice means that calibrations supplied by instrument manufacturers will almost never be usable if you process the measured data with this pacakge. You will need the reference lamp spectrum and the raw detector-counts data for the calibration event, to be able to calculate valid calibration coefficients for the best data-processing protocol you adopt for your actual measurements.** On the other hand, this also means that the functions in the present package, as each of them fulfils a simple and well defined step of data processing, are ideal for _in silico_ testing of alternative data processing approaches and measuring protocols. 
 
 ## Functions
 
@@ -163,6 +163,8 @@ library(ggspectra)
 library(ooacquire)
 ```
 
+#### From files
+
 <hr>
 In special cases we may need to set a locale matching the language used in the files for month names is not English. In most cases month names are in English, an time zones and decimal markers will be inferred from the data files themselves, making it unnecessary to explicitly pass a locale defintion as argument to funcitons.
 <hr>
@@ -195,10 +197,29 @@ one_file.spct <- trim_wl(one_file.spct,
                          fill = 0)
 ```
 
+```{r}
+one_file.spct
+```
+
 We plot the result from "minimal" protocol.
 
 ```{r, fig.height=5, fig.width=7}
 plot(one_file.spct, unit.out = "photon")
+```
+
+```{r}
+getWhenMeasured(one_file.spct)
+getWhatMeasured(one_file.spct)
+getWhereMeasured(one_file.spct)
+cat(comment(one_file.spct))
+```
+
+```{r}
+getInstrDesc(one_file.spct)
+```
+
+```{r}
+getInstrSettings(one_file.spct)
 ```
 
 At the other extreme, we can use bracketing, a dark measurement, plus a measurement with a UV-absorbing filter (polycarbonate). The UV absorbing filter allows us to estimate stray light in the UV region. This is the protocol listed as corrected and bracketed (cor.\ brkt.) in the table above.
@@ -216,7 +237,7 @@ files_names <- list(light = c("light-short.txt",
 ```{r}
 five_files.spct <- 
   s_irrad_corrected(x = files_names,
-                    descriptor = which_descriptor("2016-10-11" , 
+                    descriptor = which_descriptor("2016-10-11", 
                                                   MAYP11278_descriptors),
                     method = MAYP11278_ylianttila.mthd)
 ```
@@ -231,10 +252,29 @@ five_files.spct <- trim_wl(five_files.spct,
                            fill = 0)
 ```
 
+```{r}
+five_files.spct
+```
+
 We can now plot the result from complex protocol.
 
 ```{r, fig.height=5, fig.width=7}
 plot(five_files.spct, unit.out = "photon")
+```
+
+```{r}
+getWhenMeasured(five_files.spct)
+getWhatMeasured(five_files.spct)
+getWhereMeasured(five_files.spct)
+cat(comment(five_files.spct))
+```
+
+```{r}
+getInstrDesc(five_files.spct)
+```
+
+```{r}
+getInstrSettings(five_files.spct)
 ```
 
 These data are all from the same set of measurements, as one can apply the calculations for the "minimal" protocol to a subset of the data from the "corrected bracketed" protocol. We calculate the differences of the estimates from the "minimal" protocol compared to the complex one.
@@ -253,7 +293,42 @@ kable(
 )
 ```
 
+#### From `"raw_mspct"` objects
+
+```{r}
+descriptor <- 
+  which_descriptor(getWhenMeasured(warm_white_LED.raw_mspct$light))
+my.spct <- 
+  s_irrad_corrected(x = warm_white_LED.raw_mspct,
+                       descriptor = descriptor,
+                       method = MAYP11278_ylianttila.mthd)
+```
+
+```{r}
+my.spct
+```
+
+```{r, fig.height=5, fig.width=7}
+plot(my.spct, unit.out = "photon")
+```
+
+```{r}
+getWhenMeasured(my.spct)
+getWhereMeasured(my.spct)
+getWhatMeasured(my.spct)
+cat(comment(my.spct))
+```
+
+```{r}
+getInstrDesc(my.spct)
+```
+
+```{r}
+getInstrSettings(my.spct)
+```
+
 ## Measurement of spectral transmittance
+
 As for irradiance, transmittance estimates are affected by dark electrical noise, dynamic range and stray light. Random electrical and thermal noise can be averaged out by repeated measurement. Dynamic range depends both on the noise floor and on the resolution of the anologue to digital conversion electronics of the instrument. A way to increase the effective dynamic range is bracketing integrartion time and splicing/merging the resulting spectra. This is what in digital photography is called HDR or high dynamic range images obtained by merging sets of images obtained at a series of different exposure values. In addition to improved optical design, stray light can be corrected for if it is possible to measure it by itself. This can be achieved by use of an optical filter that transmits radiation of wavelengths causing stray light, but that blocks radiation of wavelengths we are interested in. An additional correction that can be applied is for the slit function of the instrument. The slit function describes how a single wavelength peak (e.g.\ similar to a laser beam) broadens at the array detector.
 
 Which corrections are needed and which make little difference depends on the type of instrument, the characterisitcs of the sample being measured and of the light source and the region of the spectrum we are interseted in. Consequently, depending on the circumstances we may want to use different measurement propocols. The high-level functions in the package "guess" the protocol from the set of file names or set of spectra passed as argument. For irradiance calculations three named members are recognized as different measurements in a protocol: `"sample"`, `"reference"`, `"filter"`,  and `"dark"`, each of these can be bracketed for integration time. In the case of file names for any of these three members, a vector of file names, is interpreted as a bracketed measurement. In the case of collections of spectra, `raw_spct`  with multiple `counts` columns are interpreted as bracketed. Of course, at least a `"sampel"` and `"reference"` members are required as input. If either or both are missing an empty `filter_spct` object is returned.
@@ -274,11 +349,56 @@ The last two prorocols, using a `"filter"` measurement seem unlikely to be usefu
 In special cases we may need to set a locale matching the language used in the files for month names is not English. In most cases month names are in English, an time zones and decimal markers will be inferred from the data files themselves, making it unnecessary to explicitly pass a locale defintion as argument to funcitons.
 <hr>
 
+#### From files
+
 The first example is the one listed as "minimal" in the table above, we use two spectra, one for sample and one for reference, using for the dark correction pixels expected to receive no true excitation. For example, those in the UVC region of the spectrum when the light source is sunlight at ground level.
 
 We set a list of file names to be read, with members named according
 to their role in the measuring protocol. 
 
+#### From a `"raw_mspct"` object
+
+A suitable `"raw_mspct"` can be acquired directly from a spectrometer using functions in this package, or built by reading files obtained using Ocean Optics SpectraSuite software. In the case of spectral objects we can query the measurement date and use it to find an instrument descriptor containing a valid calibration. Although for transmittance calculation the calubration multipliers for irradiance are not used, the calibrated wavelengths are. If the wavelength calibration stored in the spectrometer's non-volatile memory is valid, it is not necessary to pass a descriptor argument to the function.
+
+```{r}
+descriptor <- 
+  which_descriptor(getWhenMeasured(UQG_Blue.raw_mspct$sample))
+my.spct <- 
+  s_fraction_corrected(x = UQG_Blue.raw_mspct,
+                       descriptor = descriptor,
+                       method = MAYP11278_ylianttila.mthd)
+```
+
+```{r}
+my.spct
+```
+
+```{r, fig.height=5, fig.width=7}
+plot(my.spct)
+```
+
+```{r}
+my.spct <- clip_wl(my.spct, range = c(355, 1100))
+```
+
+```{r, fig.height=5, fig.width=7}
+plot(my.spct, unit.out = "photon")
+```
+
+```{r}
+getWhenMeasured(my.spct)
+getWhereMeasured(my.spct)
+getWhatMeasured(my.spct)
+cat(comment(my.spct))
+```
+
+```{r}
+getInstrDesc(my.spct)
+```
+
+```{r}
+getInstrSettings(my.spct)
+```
 
 ## Irradiance calibration
 

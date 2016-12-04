@@ -29,7 +29,7 @@ read_oo_ssdata <- function(file,
                            descriptor = NULL,
                            tz = NULL,
                            locale = NULL,
-                           verbose = FALSE) {
+                           verbose = getOption("photobiology.verbose", default = FALSE)) {
 
   label <- paste("File: ", basename(file), label, sep = "")
 

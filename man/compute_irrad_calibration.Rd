@@ -6,7 +6,7 @@
 \usage{
 compute_irrad_calibration(FEL.raw.counts, D2.raw.counts,
   pix.wavelengths = NULL, wl.range = c(250, 900), FEL.k, D2.k, method,
-  verbose = FALSE)
+  verbose = getOption("photobiology.verbose", default = FALSE))
 }
 \arguments{
 \item{FEL.raw.counts}{source_mscpt The raw counts and integration time data

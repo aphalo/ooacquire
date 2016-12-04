@@ -25,7 +25,8 @@
 #' @export
 #'
 linearize_counts <- function(x,
-                             force.zero = TRUE, verbose = FALSE) {
+                             force.zero = TRUE,
+                             verbose = getOption("photobiology.verbose", default = FALSE)) {
   # guard against attempts to reapply linearization
   settings <- getInstrSettings(x)
   if (is.null(settings[["linearized"]])) {

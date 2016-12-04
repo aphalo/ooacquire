@@ -45,7 +45,7 @@ uvb_corrections <- function(x,
                             inst.dark.pixs = c(1:4),
                             worker.fun = ooacquire::maya_tail_correction,
                             trim = 0,
-                            verbose = FALSE,
+                            verbose = getOption("photobiology.verbose", default = FALSE),
                             ...) {
 
   spct.worker <- function(x) {
@@ -66,12 +66,12 @@ uvb_corrections <- function(x,
     }
     return(source_spct())
   }
+  x <- spct.worker(x)
   when.measured <- getWhenMeasured(x)
   where.measured <- getWhereMeasured(x)
   what.measured <- getWhatMeasured(x)
   descriptor <- getInstrDesc(x)
   inst.settings <- getInstrSettings(x)
-  x <- spct.worker(x)
 
   if (length(dark) > 0) {
     dark <- spct.worker(dark)
@@ -142,7 +142,7 @@ uvb_corrections <- function(x,
 #'
 slit_function_correction <- function(x,
                                      worker.fun = ooacquire::maya_tail_correction,
-                                     verbose = TRUE,
+                                     verbose = getOption("photobiology.verbose", default = FALSE),
                                      ...) {
   stopifnot(is.cps_spct(x))
   stopifnot(is.null(attr(x, "slit.corrected")) || !attr(x, "slit.corrected"))
@@ -177,7 +177,7 @@ filter_correction <- function(x,
                               flt.dark.wl = c(193, 209.5),
                               flt.ref.wl = c(360, 379.5),
                               trim = 0,
-                              verbose = FALSE) {
+                              verbose = getOption("photobiology.verbose", default = FALSE)) {
   stopifnot(is.null(attr(x, "straylight.corrected")) || !attr(x, "straylight.corrected"))
   stopifnot(is.cps_spct(x) && is.cps_spct(flt))
   stopifnot(range(x) == range(flt) && length(x) == length(flt))
@@ -310,7 +310,7 @@ no_filter_correction <- function(x,
                                  flt.dark.wl = c(193, 209.5),
                                  flt.ref.wl = c(360, 379.5),
                                  trim = 0,
-                                 verbose = FALSE) {
+                                 verbose = getOption("photobiology.verbose", default = FALSE)) {
   stopifnot(is.null(attr(x, "straylight.corrected")) || !attr(x, "straylight.corrected"))
   stopifnot(is.cps_spct(x))
   counts.cols <- length(grep("^cps", names(x), value = TRUE))

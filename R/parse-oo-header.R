@@ -58,8 +58,8 @@ set_oo_ssdata_settings <- function(x,
   # processing flag
   inst.settings[["linearized"]] <- as.logical(inst.settings[["corr.sensor.nl"]])
   # diagnosis
-  inst.settings[["tot.time"]] = with(inst.settings, integ.time * num.scans)
-  inst.settings[["rel.signal"]] = NA
+  inst.settings[["tot.time"]] <- inst.settings[["integ.time"]] * inst.settings[["num.scans"]]
+  inst.settings[["rel.signal"]] <- NA
 
   photobiology::setInstrSettings(x, inst.settings)
   x
