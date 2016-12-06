@@ -139,12 +139,13 @@ acq_raw_mspct <- function(descriptor,
     idx <- idx + 1
     z[[idx]] <- acq_raw_spct(descriptor = descriptor,
                              acq.settings = acq.settings,
-                             what.measured = list(what = p, user.label = user.label),
+                             what.measured = user.label,
                              where.measured = where.measured)
   }
   z <- photobiology::as.raw_mspct(z)
   photobiology::setWhenMeasured(z, start.time)
   photobiology::setWhereMeasured(z, where.measured)
+  photobiology::setWhatMeasured(z, user.label)
   names(z) <- protocol
   z
 }

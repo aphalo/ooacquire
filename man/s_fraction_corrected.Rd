@@ -17,7 +17,7 @@ s_fraction_corrected(x, ...)
   FALSE), ...)
 
 \method{s_fraction_corrected}{raw_mspct}(x, ref.value = 1,
-  type = "internal", method, qty.out = "Tfr",
+  type = "internal", method, dyn.range = NULL, qty.out = "Tfr",
   verbose = getOption("photobiology.verbose", default = FALSE), ...)
 }
 \arguments{
@@ -50,6 +50,8 @@ like the default time zone, encoding, decimal mark, big mark, and day/month
 names.}
 
 \item{verbose}{Logical indicating the level of warnings wanted.}
+
+\item{dyn.range}{numeric Effective dynamic range of the spectrometer.}
 }
 \description{
 Convert raw counts data into spectral transmittance or spectral reflectance.

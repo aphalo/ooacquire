@@ -66,7 +66,7 @@ s_irrad_corrected.list <- function(x,
                       verbose = verbose,
                       ...)
 
-  setWhatMeasured(comment.txt)
+  setWhatMeasured(corrected.spct, comment.txt)
   comment(corrected.spct) <- paste("Processed on ", lubridate::today(),
                                    "\nwith 's_irrad_corrected()' from 'ooacquire' ver. ",
                                    utils::packageVersion("ooacquire"),

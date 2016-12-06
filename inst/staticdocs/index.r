@@ -58,5 +58,7 @@ sd_section("High level functions and methods", "",
 sd_section("Example data", "",
            c("MAYP11278_descriptors",
              "MAYP11278_ylianttila.mthd",
-             "MAYP11278_calib_dates.df")
+             "MAYP11278_calib_dates.df",
+             "UQG_Blue.raw_mspct",
+             "warm_white_LED.raw_mspct")
 )

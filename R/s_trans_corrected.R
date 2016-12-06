@@ -9,6 +9,7 @@
 #' @param type character One of "internal" or "total".
 #' @param method A named list of constants and functions defining the
 #'   method to be sued for stray light and dark signal corrections.
+#' @param dyn.range numeric Effective dynamic range of the spectrometer.
 #' @param qty.out character, one of "Tfr", "Rfr".
 #' @param descriptor A named list with a descriptor of the characteristics of
 #'   the spectrometer (if serial number does not agree an error is triggered).
@@ -85,11 +86,13 @@ s_fraction_corrected.list <- function(x,
 }
 
 #' @describeIn s_fraction_corrected Default for generic function.
+#'
 #' @export
 s_fraction_corrected.raw_mspct <- function(x,
                                            ref.value = 1,
                                            type = "internal",
                                            method,
+                                           dyn.range = NULL,
                                            qty.out = "Tfr",
                                            verbose = getOption("photobiology.verbose", default = FALSE),
                                            ...) {
@@ -132,10 +135,14 @@ s_fraction_corrected.raw_mspct <- function(x,
                                verbose = verbose)
 
   if (qty.out == "Rfr") {
-    z <- photobiology::cps2Rfr(corrected_smp.spct, corrected_ref.spct / ref.value)
+    z <- photobiology::cps2Rfr(corrected_smp.spct,
+                               corrected_ref.spct,
+                               dyn.range = dyn.range) / ref.value
     setRfrType(z, type)
   } else if (qty.out == "Tfr") {
-    z <- photobiology::cps2Tfr(corrected_smp.spct, corrected_ref.spct / ref.value)
+    z <- photobiology::cps2Tfr(corrected_smp.spct,
+                               corrected_ref.spct,
+                               dyn.range = dyn.range) / ref.value
     setRfrType(z, type)
   }
 }

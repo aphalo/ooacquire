@@ -209,7 +209,7 @@ plot(one_file.spct, unit.out = "photon")
 
 ```{r}
 getWhenMeasured(one_file.spct)
-getWhatMeasured(one_file.spct)
+cat(getWhatMeasured(one_file.spct))
 getWhereMeasured(one_file.spct)
 cat(comment(one_file.spct))
 ```
@@ -298,33 +298,33 @@ kable(
 ```{r}
 descriptor <- 
   which_descriptor(getWhenMeasured(warm_white_LED.raw_mspct$light))
-my.spct <- 
+irrad01.spct <- 
   s_irrad_corrected(x = warm_white_LED.raw_mspct,
                        descriptor = descriptor,
                        method = MAYP11278_ylianttila.mthd)
 ```
 
 ```{r}
-my.spct
+irrad01.spct
 ```
 
 ```{r, fig.height=5, fig.width=7}
-plot(my.spct, unit.out = "photon")
+plot(irrad01.spct, unit.out = "photon")
 ```
 
 ```{r}
-getWhenMeasured(my.spct)
-getWhereMeasured(my.spct)
-getWhatMeasured(my.spct)
-cat(comment(my.spct))
+getWhenMeasured(irrad01.spct)
+getWhereMeasured(irrad01.spct)
+getWhatMeasured(irrad01.spct)
+cat(comment(irrad01.spct))
 ```
 
 ```{r}
-getInstrDesc(my.spct)
+getInstrDesc(irrad01.spct)
 ```
 
 ```{r}
-getInstrSettings(my.spct)
+getInstrSettings(irrad01.spct)
 ```
 
 ## Measurement of spectral transmittance
@@ -363,41 +363,82 @@ A suitable `"raw_mspct"` can be acquired directly from a spectrometer using func
 ```{r}
 descriptor <- 
   which_descriptor(getWhenMeasured(UQG_Blue.raw_mspct$sample))
-my.spct <- 
+tfr01.spct <- 
   s_fraction_corrected(x = UQG_Blue.raw_mspct,
                        descriptor = descriptor,
-                       method = MAYP11278_ylianttila.mthd)
+                       method = MAYP11278_ylianttila.mthd,
+                       dyn.range = 3e2)
 ```
 
 ```{r}
-my.spct
+tfr01.spct
 ```
 
 ```{r, fig.height=5, fig.width=7}
-plot(my.spct)
+plot(tfr01.spct)
 ```
 
 ```{r}
-my.spct <- clip_wl(my.spct, range = c(355, 1100))
+tfr01.spct <- clip_wl(tfr01.spct, range = c(355, 1100))
 ```
 
 ```{r, fig.height=5, fig.width=7}
-plot(my.spct, unit.out = "photon")
+plot(tfr01.spct, unit.out = "photon", w.band = VIS_bands())
 ```
 
 ```{r}
-getWhenMeasured(my.spct)
-getWhereMeasured(my.spct)
-getWhatMeasured(my.spct)
-cat(comment(my.spct))
+getWhenMeasured(tfr01.spct)
+getWhereMeasured(tfr01.spct)
+getWhatMeasured(tfr01.spct)
+cat(comment(tfr01.spct))
 ```
 
 ```{r}
-getInstrDesc(my.spct)
+getInstrDesc(tfr01.spct)
 ```
 
 ```{r}
-getInstrSettings(my.spct)
+getInstrSettings(tfr01.spct)
+```
+
+#### From a `raw_mspct` object with a known reference
+
+In contrast to the previous example, we will here assume that the reference is not 100% clear, and that we know its transmittance to be 0.95.
+
+```{r}
+descriptor <- 
+  which_descriptor(getWhenMeasured(UQG_Blue.raw_mspct$sample))
+tfr02.spct <- 
+  s_fraction_corrected(x = UQG_Blue.raw_mspct,
+                       ref.value = 0.95,
+                       descriptor = descriptor,
+                       method = MAYP11278_ylianttila.mthd,
+                       dyn.range = 3e2)
+```
+
+```{r, fig.height=5, fig.width=7}
+plot(tfr02.spct)
+```
+
+In the next example, we use a spectrum to describe the reference's spectral properties.
+
+In contrast to the previous example where we calculated transmittance, we will here calculate reflectance assuming that the reference is not 100% white, and that we know its spectral reflectance.
+
+```{r}
+descriptor <- 
+  which_descriptor(getWhenMeasured(UQG_Blue.raw_mspct$sample))
+rfr01.spct <- 
+  s_fraction_corrected(x = UQG_Blue.raw_mspct,
+                       ref.value = as.reflector_spct(white_body.spct) * 0.97,
+                       descriptor = descriptor,
+                       method = MAYP11278_ylianttila.mthd,
+                       dyn.range = 3e2,
+                       qty.out = "Rfr",
+                       type = "total")
+```
+
+```{r, fig.height=5, fig.width=7}
+plot(rfr01.spct)
 ```
 
 ## Irradiance calibration

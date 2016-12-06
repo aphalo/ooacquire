@@ -74,7 +74,7 @@ ref_correction.raw_spct <- function(x,
   setInstrSettings(z, getInstrSettings(x))
   setWhenMeasured(z, getWhenMeasured(x))
   setWhereMeasured(z, getWhereMeasured(x))
-  setWhatMeasured(z, getWhatMeasured(z))
+  setWhatMeasured(z, getWhatMeasured(x))
   z
 }
 
@@ -117,7 +117,7 @@ ref_correction.cps_spct <- function(x,
   setInstrSettings(z, getInstrSettings(x))
   setWhenMeasured(z, getWhenMeasured(x))
   setWhereMeasured(z, getWhereMeasured(x))
-  setWhatMeasured(z, getWhatMeasured(z))
+  setWhatMeasured(z, getWhatMeasured(x))
   z
 }
 
