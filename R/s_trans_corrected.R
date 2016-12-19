@@ -4,7 +4,7 @@
 #'
 #' @param x A named list of one to three vectors of file names, with names
 #'   "sample", "ref", and "dark".
-#' @param ref.value numeric or filter_spct or reflector_spct object, with the
+#' @param reference.value numeric or filter_spct or reflector_spct object, with the
 #'   fractional transmittance or reflectance of the reference.
 #' @param type character One of "internal" or "total".
 #' @param method A named list of constants and functions defining the
@@ -48,7 +48,7 @@ s_fraction_corrected.default <- function(x, ...) {
 #'   file is used, and if \code{NA} no date variable is added
 #' @export
 s_fraction_corrected.list <- function(x,
-                                      ref.value = 1,
+                                      reference.value = 1,
                                       type = "internal",
                                       time = NULL,
                                       method,
@@ -69,7 +69,7 @@ s_fraction_corrected.list <- function(x,
                                 verbose = verbose)
 
   fraction.spct <- s_fraction_corrected(x = raw.mspct,
-                                        ref.value = ref.value,
+                                        reference.value = reference.value,
                                         type = type,
                                         method = method,
                                         qty.out = qty.out,
@@ -89,7 +89,7 @@ s_fraction_corrected.list <- function(x,
 #'
 #' @export
 s_fraction_corrected.raw_mspct <- function(x,
-                                           ref.value = 1,
+                                           reference.value = 1,
                                            type = "internal",
                                            method,
                                            dyn.range = NULL,
@@ -137,12 +137,12 @@ s_fraction_corrected.raw_mspct <- function(x,
   if (qty.out == "Rfr") {
     z <- photobiology::cps2Rfr(corrected_smp.spct,
                                corrected_ref.spct,
-                               dyn.range = dyn.range) / ref.value
+                               dyn.range = dyn.range) / reference.value
     setRfrType(z, type)
   } else if (qty.out == "Tfr") {
     z <- photobiology::cps2Tfr(corrected_smp.spct,
                                corrected_ref.spct,
-                               dyn.range = dyn.range) / ref.value
+                               dyn.range = dyn.range) / reference.value
     setRfrType(z, type)
   }
 }

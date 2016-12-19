@@ -197,7 +197,7 @@ acq_fraction_interactive <-
            qty.out = "Tfr",
            type = "total") {
 
-    stopifnot(qty.out %in% c("Trf", "Rfr", "raw"))
+    stopifnot(qty.out %in% c("Tfr", "Rfr", "raw"))
 
     descriptor <- which_descriptor(descriptors = descriptors)
 
