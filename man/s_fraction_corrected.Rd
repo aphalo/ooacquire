@@ -11,12 +11,12 @@ s_fraction_corrected(x, ...)
 
 \method{s_fraction_corrected}{default}(x, ...)
 
-\method{s_fraction_corrected}{list}(x, ref.value = 1, type = "internal",
-  time = NULL, method, qty.out = "Tfr", descriptor = NULL,
-  locale = NULL, verbose = getOption("photobiology.verbose", default =
-  FALSE), ...)
+\method{s_fraction_corrected}{list}(x, reference.value = 1,
+  type = "internal", time = NULL, method, qty.out = "Tfr",
+  descriptor = NULL, locale = NULL,
+  verbose = getOption("photobiology.verbose", default = FALSE), ...)
 
-\method{s_fraction_corrected}{raw_mspct}(x, ref.value = 1,
+\method{s_fraction_corrected}{raw_mspct}(x, reference.value = 1,
   type = "internal", method, dyn.range = NULL, qty.out = "Tfr",
   verbose = getOption("photobiology.verbose", default = FALSE), ...)
 }
@@ -27,7 +27,7 @@ s_fraction_corrected(x, ...)
 \item{...}{Named argument passed to \code{photobiology::cps2irrad} which is
 the final calculation step.}
 
-\item{ref.value}{numeric or filter_spct or reflector_spct object, with the
+\item{reference.value}{numeric or filter_spct or reflector_spct object, with the
 fractional transmittance or reflectance of the reference.}
 
 \item{type}{character One of "internal" or "total".}
