@@ -5,15 +5,27 @@
 
 using namespace Rcpp;
 
-// maya_tail_correction
-List maya_tail_correction(NumericVector w_length, NumericVector cts_second);
-RcppExport SEXP ooacquire_maya_tail_correction(SEXP w_lengthSEXP, SEXP cts_secondSEXP) {
+// MAYP11278_tail_correction
+List MAYP11278_tail_correction(NumericVector w_length, NumericVector cts_second);
+RcppExport SEXP ooacquire_MAYP11278_tail_correction(SEXP w_lengthSEXP, SEXP cts_secondSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericVector >::type w_length(w_lengthSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type cts_second(cts_secondSEXP);
-    rcpp_result_gen = Rcpp::wrap(maya_tail_correction(w_length, cts_second));
+    rcpp_result_gen = Rcpp::wrap(MAYP11278_tail_correction(w_length, cts_second));
+    return rcpp_result_gen;
+END_RCPP
+}
+// MAYP112785_tail_correction
+List MAYP112785_tail_correction(NumericVector w_length, NumericVector cts_second);
+RcppExport SEXP ooacquire_MAYP112785_tail_correction(SEXP w_lengthSEXP, SEXP cts_secondSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type w_length(w_lengthSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type cts_second(cts_secondSEXP);
+    rcpp_result_gen = Rcpp::wrap(MAYP112785_tail_correction(w_length, cts_second));
     return rcpp_result_gen;
 END_RCPP
 }

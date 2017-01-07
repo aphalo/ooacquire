@@ -13,7 +13,23 @@
 #'
 #' @export
 #'
-maya_tail_correction <- function(w_length, cts_second) {
-    .Call('ooacquire_maya_tail_correction', PACKAGE = 'ooacquire', w_length, cts_second)
+MAYP11278_tail_correction <- function(w_length, cts_second) {
+    .Call('ooacquire_MAYP11278_tail_correction', PACKAGE = 'ooacquire', w_length, cts_second)
+}
+
+#' Function to compute the tail correction
+#'
+#' @param w_length numeric vector of wavelengths in nm.
+#' @param cts_second numeric vector of counts per second (stray-light corrected).
+#'
+#' @return tail returned as numeric vector within a list.
+#'
+#' Tail correction is a reimplementation of the calculations developed by Lasse
+#' Ylianttila (STUK, Finland), originally in Excel.
+#'
+#' @export
+#'
+MAYP112785_tail_correction <- function(w_length, cts_second) {
+    .Call('ooacquire_MAYP112785_tail_correction', PACKAGE = 'ooacquire', w_length, cts_second)
 }
 

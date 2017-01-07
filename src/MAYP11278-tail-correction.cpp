@@ -16,7 +16,7 @@ using namespace std;
 //' @export
 //'
 // [[Rcpp::export]]
-List maya_tail_correction(NumericVector w_length, NumericVector cts_second) {
+List MAYP11278_tail_correction(NumericVector w_length, NumericVector cts_second) {
 
     const int window_width = 300L;
 

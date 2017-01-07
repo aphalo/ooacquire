@@ -8,7 +8,7 @@ MAYP11278_ylianttila.mthd <- list(
   stray.light.wl = c(218.5, 228.5),
   flt.dark.wl = c(193, 209.5),
   flt.ref.wl = c(360, 379.5),
-  worker.fun = ooacquire::maya_tail_correction,
+  worker.fun = ooacquire::MAYP11278_tail_correction,
   trim = 0
 )
 
@@ -16,12 +16,12 @@ MAYP11278_ylianttila.mthd <- list(
 load(file = "./data-raw/maya-descriptor/MAYP11278.Rda")
 
 # find calibration files
-files <- list.files("data-raw/calibrations-lasse",
+files <- list.files("data-raw/calibrations-MAYP11278",
                     pattern = "*.xlsx$",
                     full.names = TRUE)
 
 MAYP11278_calib_dates.df <-
-  read_csv("data-raw/calibrations-lasse/calibration-dates.csv", skip = 1)
+  read_csv("data-raw/calibrations-MAYP11278/calibration-dates.csv", skip = 1)
 
 # create a new descriptor for each calibration file
 descriptors <- list()
@@ -33,7 +33,8 @@ for (f in files) {
   names(tmp) <- c("w.length", "irrad.mult")
   # replace calibration in a copy of the descriptor
   descriptor.tmp <- descriptor
-  set_descriptor_wl(descriptor = descriptor.tmp,
+  descriptor.tmp <-
+    set_descriptor_wl(descriptor = descriptor.tmp,
                     wl = tmp[["w.length"]])
   descriptor.tmp <-
     set_descriptor_irrad_mult(descriptor = descriptor.tmp,

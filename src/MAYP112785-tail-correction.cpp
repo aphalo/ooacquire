@@ -16,7 +16,7 @@ using namespace std;
 //' @export
 //'
 // [[Rcpp::export]]
-List maya_tail_correction(NumericVector w_length, NumericVector cts_second) {
+List MAYP112785_tail_correction(NumericVector w_length, NumericVector cts_second) {
 
     const int window_width = 300L;
 
@@ -32,7 +32,7 @@ List maya_tail_correction(NumericVector w_length, NumericVector cts_second) {
     }
     *(dwl.begin()) = *(dwl.begin() + 1);
 
-    const double t1 = -7.27313, t2 = -0.05688;
+    const double t1 = -9.22574221, t2 = -0.035984385;
     for (vector<double>::iterator wl_o = wl.begin(), tail_o = tail.begin(); wl_o < wl.end(); wl_o++, tail_o++) {
       inner_bg = wl_o - window_width / 2L; if (inner_bg < wl.begin()) inner_bg = wl.begin();
       inner_nd = wl_o + window_width / 2L; if (inner_nd > wl.end()) inner_nd = wl.end();

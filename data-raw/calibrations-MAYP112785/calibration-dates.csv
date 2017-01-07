@@ -1,0 +1,4 @@
+## Calibration dates
+inst.sn, name, calib.date, start.date, end.date, coeffs.file
+MAYP112785, cal_2016a, 2016-12-22, 2016-12-01, 2018-12-22, cal-coeffs-2016a.xlsx
+
