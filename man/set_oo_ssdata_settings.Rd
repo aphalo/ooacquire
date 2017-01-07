@@ -4,7 +4,7 @@
 \alias{set_oo_ssdata_settings}
 \title{Set the values of instrument settings from file header}
 \usage{
-set_oo_ssdata_settings(x, file.header = comment(x), overwrite = FALSE)
+set_oo_ssdata_settings(x, file.header = comment(x), overwrite = TRUE)
 }
 \arguments{
 \item{x}{generic_spct, although with defaults only raw_spct.}
@@ -12,7 +12,7 @@ set_oo_ssdata_settings(x, file.header = comment(x), overwrite = FALSE)
 \item{file.header}{character string The header of the file output by
 SpectraSuite.}
 
-\item{overwrite}{logical A flag indicating if an existing instrument
+\item{overwrite}{logical A flag indicating if an existing valid instrument
 descriptor in \code{x} should be overwritten.}
 }
 \value{

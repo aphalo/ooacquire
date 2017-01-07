@@ -116,44 +116,6 @@ read_oo_ssdata <- function(file,
   photobiology::setWhatMeasured(z, label)
   z <- set_oo_ssdata_descriptor(z,
                                 descriptor = descriptor,
-                                action = "overwrite")
+                                action = ifelse(is.null(descriptor), "overwrite", "merge"))
   set_oo_ssdata_settings(z)
-}
-
-#' Read multiple files into raw_mspct object
-#'
-#' Read multiple files and return a collection of raw spectra as a raw_spct
-#' object.
-#'
-#' @param files a named list of character strings of file names
-#' @param read.f a function which expects in its first parameter a file name or
-#' file path
-#' @param ... additional arguments passed by name to the function passed as
-#' argument to \code{read.f}
-#'
-#' @note Depending of the function passed to \code{read.f} more or less complete
-#' metadata information will be stored as attributes in the raw_spct objects.
-#'
-#' @export
-#'
-read_files2mspct <- function(files, read.f = ooacquire::read_oo_ssdata, ...) {
-  stopifnot(is.list(files))
-  spectra.lst <- list()
-  i <- 0
-  for (f in files) {
-    i <- i + 1
-    if (length(f) == 1) {
-      spectra.lst[[ names(files)[i] ]] <- read.f(f, ...)
-    } else if (length(f > 1)) {
-      temp.lst <- list()
-      j <- 0
-      for (ff in f) {
-        j <- j + 1
-        temp.lst[[j]] <- read.f(ff, ...)
-      }
-      temp.mspct <- raw_mspct(temp.lst)
-      spectra.lst[[ names(files)[i] ]] <- merge_raw_mspct(temp.mspct)
-    }
-  }
-  raw_mspct(spectra.lst)
 }

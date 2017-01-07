@@ -4,8 +4,8 @@
 \alias{set_oo_ssdata_descriptor}
 \title{Set the instrument description.}
 \usage{
-set_oo_ssdata_descriptor(x, file.header = comment(x), descriptor = NULL,
-  action = "overwrite")
+set_oo_ssdata_descriptor(x, file.header = comment(x),
+  descriptor = photobiology::getInstrDesc(x), action = "merge")
 }
 \arguments{
 \item{x}{generic_spct, although with defaults only raw_spct.}
@@ -13,12 +13,13 @@ set_oo_ssdata_descriptor(x, file.header = comment(x), descriptor = NULL,
 \item{file.header}{character string The header of the file output by
 SpectraSuite.}
 
-\item{descriptor}{list An already built instrument descriptor,
-in which case \code{file.header} is used only to validate the serial
-number.}
+\item{descriptor}{list An already built instrument descriptor, to be
+used as basis when action == "merge" or action == "keep". Defaults,
+to that stored in \code{x}.}
 
 \item{action}{character A flag indicating if an existing instrument
-descriptor in \code{x} should be overwritten, merged or kept as is.}
+descriptor in \code{x} should be overwritten, merged or kept as is
+if present.}
 }
 \value{
 A copy of \code{x} with updated attributes.

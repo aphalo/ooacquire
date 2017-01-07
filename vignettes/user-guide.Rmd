@@ -177,14 +177,14 @@ We set a list of file names to be read, with members named according
 to their role in the measuring protocol.
 
 ```{r}
-files_names <- list(light = "light-short.txt")
+file_names <- list(light = "light-short.txt")
 ```
 
 We subsequently compute the spectral irradiance.
 
 ```{r}
 one_file.spct <- 
-  s_irrad_corrected(x = list(light = "light-short.txt"),
+  s_irrad_corrected(x = file_names,
                     descriptor = which_descriptor("2016-10-11" , 
                                                   MAYP11278_descriptors),
                     method = MAYP11278_ylianttila.mthd)
@@ -229,16 +229,16 @@ At the other extreme, we can use bracketing, a dark measurement, plus a measurem
 We go exactly through the same steps as before, the only difference is the list of file names passed as argument to parameter `x`. 
 
 ```{r}
-files_names <- list(light = c("light-short.txt",
-                              "light-long.txt"),
-                    filter = "flt-long.txt",
-                    dark = c("dark-short.txt",
-                             "dark-long.txt"))
+file_names <- list(light = c("light-short.txt",
+                             "light-long.txt"),
+                   filter = "flt-long.txt",
+                   dark = c("dark-short.txt",
+                            "dark-long.txt"))
 ```
 
 ```{r}
 five_files.spct <- 
-  s_irrad_corrected(x = files_names,
+  s_irrad_corrected(x = file_names,
                     descriptor = which_descriptor("2016-10-11", 
                                                   MAYP11278_descriptors),
                     method = MAYP11278_ylianttila.mthd)
@@ -293,6 +293,41 @@ kable(
      q_irrad(five_files.spct, c(UV_bands(), VIS_bands())) - 1) * 100),
   digits = 2
 )
+```
+
+#### From OceanView files
+
+Files output by SpectraSuite and OceanView have different header format, but they can be recognized automatically. Consequently there is no difference in the function calls.
+The filter measurment is not used as it is not suitable for the source spectrum measured, and would be ignored with a warning.
+
+```{r}
+file_names <- list(light = "light_MAYP112785.txt",
+#                    filter = "filter_MAYP112785.txt",
+                    dark = "dark_MAYP112785.txt")
+```
+
+In this case we use different descriptor and method definitions only because the files acquired with SpectraSuite and OceanView originated from different instruments.
+
+```{r}
+ov_files.spct <- 
+  s_irrad_corrected(x = file_names,
+                    descriptor = which_descriptor("2017-01-05", 
+                                                  MAYP112785_descriptors),
+                    method = MAYP112785_ylianttila.mthd)
+```
+
+
+```{r}
+ov_files.spct
+```
+
+We can now plot the result from the OceanView files.
+
+```{r, fig.height=5, fig.width=7}
+plot(ov_files.spct, unit.out = "photon")
+```
+```{r, fig.height=5, fig.width=7}
+plot(smooth_spct(ov_files.spct, strength = 5), unit.out = "photon")
 ```
 
 #### From `"raw_mspct"` objects

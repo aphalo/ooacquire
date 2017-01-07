@@ -50,7 +50,10 @@ uvb_corrections <- function(x,
 
   spct.worker <- function(x) {
     x <- skip_bad_pixs(x)
-    x <- trim_counts(x)
+    # avoid trimming negative counts
+    x <- trim_counts(x,
+                     range = c(NA, getInstrDesc(x)[["max.counts"]] - 1),
+                     fill = NA)
     x <- bleed_nas(x)
     x <- linearize_counts(x, verbose = verbose)
     if (length(inst.dark.pixs) && is.numeric(inst.dark.pixs)) {

@@ -36,11 +36,12 @@ read_oo_ovdata <- function(file,
   line01 <- scan(file = file, nlines =  1, skip = 0,
                  what = "character", quiet = !verbose)
   if (line01[1] == "SpectraSuite") {
-    warning("Input file was created by SpectrSuite as expected: skipping")
+    warning("Input file was created by SpectrSuite: skipping")
     return(NA)
   }
   file_header <- scan(file = file, nlines = 20,
-                      skip = 0, what = "character", sep = "\n", quiet = !verbose)
+                      skip = 0, what = "character", sep = "\n", quiet = !verbose,
+                      blank.lines.skip = FALSE)
 
   data.rows <- oofile_data_rows(file_header)
 
@@ -116,6 +117,6 @@ read_oo_ovdata <- function(file,
   photobiology::setWhatMeasured(z, label)
   z <- set_oo_ssdata_descriptor(z,
                                 descriptor = descriptor,
-                                action = "overwrite")
+                                action = ifelse(is.null(descriptor), "overwrite", "merge"))
   set_oo_ssdata_settings(z)
 }

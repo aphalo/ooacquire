@@ -45,7 +45,7 @@ for (f in files) {
                               wl.range = c(251, 899),
                               start.date = MAYP112785_calib_dates.df[["start.date"]][date.row],
                               end.date = MAYP112785_calib_dates.df[["end.date"]][date.row])
-
+  descriptor.tmp[["spectrometer.sn"]] <- "MAYP112785"
   descriptors[[name.f]] <- descriptor.tmp
 }
 
