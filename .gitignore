@@ -3,3 +3,5 @@
 .RData
 vignettes/user-guide_files
 not-inst
+src-i386
+src-x64

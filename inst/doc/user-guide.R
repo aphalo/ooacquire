@@ -9,11 +9,11 @@ library(ggspectra)
 library(ooacquire)
 
 ## ------------------------------------------------------------------------
-files_names <- list(light = "light-short.txt")
+file_names <- list(light = "light-short.txt")
 
 ## ------------------------------------------------------------------------
 one_file.spct <- 
-  s_irrad_corrected(x = list(light = "light-short.txt"),
+  s_irrad_corrected(x = file_names,
                     descriptor = which_descriptor("2016-10-11" , 
                                                   MAYP11278_descriptors),
                     method = MAYP11278_ylianttila.mthd)
@@ -43,15 +43,15 @@ getInstrDesc(one_file.spct)
 getInstrSettings(one_file.spct)
 
 ## ------------------------------------------------------------------------
-files_names <- list(light = c("light-short.txt",
-                              "light-long.txt"),
-                    filter = "flt-long.txt",
-                    dark = c("dark-short.txt",
-                             "dark-long.txt"))
+file_names <- list(light = c("light-short.txt",
+                             "light-long.txt"),
+                   filter = "flt-long.txt",
+                   dark = c("dark-short.txt",
+                            "dark-long.txt"))
 
 ## ------------------------------------------------------------------------
 five_files.spct <- 
-  s_irrad_corrected(x = files_names,
+  s_irrad_corrected(x = file_names,
                     descriptor = which_descriptor("2016-10-11", 
                                                   MAYP11278_descriptors),
                     method = MAYP11278_ylianttila.mthd)
@@ -90,6 +90,27 @@ kable(
      q_irrad(five_files.spct, c(UV_bands(), VIS_bands())) - 1) * 100),
   digits = 2
 )
+
+## ------------------------------------------------------------------------
+file_names <- list(light = "light_MAYP112785.txt",
+#                    filter = "filter_MAYP112785.txt",
+                    dark = "dark_MAYP112785.txt")
+
+## ------------------------------------------------------------------------
+ov_files.spct <- 
+  s_irrad_corrected(x = file_names,
+                    descriptor = which_descriptor("2017-01-05", 
+                                                  MAYP112785_descriptors),
+                    method = MAYP112785_ylianttila.mthd)
+
+## ------------------------------------------------------------------------
+ov_files.spct
+
+## ---- fig.height=5, fig.width=7------------------------------------------
+plot(ov_files.spct, unit.out = "photon")
+
+## ---- fig.height=5, fig.width=7------------------------------------------
+plot(smooth_spct(ov_files.spct, strength = 5), unit.out = "photon")
 
 ## ------------------------------------------------------------------------
 descriptor <- 
