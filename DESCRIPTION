@@ -27,7 +27,7 @@ Imports:
     utils,
     Rcpp (>= 0.12.6),
     ggplot2 (>= 2.1.0),
-    photobiology (>= 0.9.13),
+    photobiology (> 0.9.13),
     photobiologyWavebands (>= 0.4.1),
     ggspectra (>= 0.1.11),
     rOmniDriver (>= 0.1.11),
