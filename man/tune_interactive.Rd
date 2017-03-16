@@ -11,4 +11,3 @@ Adjust integration time settings, allowing the user to repeat the tunning,
 and to change some of the parameters used for tunning.
 }
 \keyword{internal}
-

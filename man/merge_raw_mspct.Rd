@@ -19,4 +19,3 @@ etc.
 The individual \code{raw_spct} objects contained in \code{x} must have
   identical values in \code{w.length}.
 }
-

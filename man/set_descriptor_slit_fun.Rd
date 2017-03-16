@@ -22,4 +22,3 @@ Adds a function to the instrument descriptor that can be used to
 correct counts per second data to remove the effect of the tails of
 the slit function of the instrument.
 }
-

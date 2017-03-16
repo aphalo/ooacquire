@@ -23,4 +23,3 @@ Model, configuration, serial number, and calibration data stored in the
 EEPROM of an Ocean Optics spectrometer are retrieved and returned in a
 list.
 }
-

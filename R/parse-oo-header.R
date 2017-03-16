@@ -27,7 +27,7 @@ set_oo_ssdata_settings <- function(x,
     }
   }
 
-  if (!overwrite && validInstrSettings(x)) {
+  if (!overwrite && isValidInstrSettings(x)) {
     return(x)
   }
 
@@ -96,7 +96,7 @@ set_oo_ssdata_settings <- function(x,
   inst.settings[["rel.signal"]] <- NA
 
   photobiology::setInstrSettings(x, inst.settings)
-  if (!validInstrSettings(x)) {
+  if (!isValidInstrSettings(x)) {
     warning("Setting of attribute \"instr.settings\" from fileheader has failed.")
   }
   x
@@ -174,7 +174,7 @@ set_oo_ssdata_descriptor <- function(x,
   }
 
   photobiology::setInstrDesc(x, descriptor)
-  if (!validInstrDesc(x)) {
+  if (!isValidInstrDesc(x)) {
     warning("Setting of attribute \"instr.desc\" from fileheader has failed.")
   }
   x

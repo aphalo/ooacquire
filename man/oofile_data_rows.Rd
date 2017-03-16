@@ -22,4 +22,3 @@ Ocean Optics files can have varying numbers of rows containing spectral
 This is a rather slow operation, so if all files to be read have
   the same format, it is inefficient to call this function for each file.
 }
-

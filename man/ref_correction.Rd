@@ -2,10 +2,10 @@
 % Please edit documentation in R/ref-correction.R
 \name{ref_correction}
 \alias{ref_correction}
-\alias{ref_correction.cps_spct}
 \alias{ref_correction.default}
 \alias{ref_correction.numeric}
 \alias{ref_correction.raw_spct}
+\alias{ref_correction.cps_spct}
 \title{Apply a correction to spectral data.}
 \usage{
 ref_correction(x, y, .oper, ...)
@@ -50,8 +50,8 @@ instrument counts.
 \item \code{cps_spct}: Method for spectral data expressed as
 counts per second.
 }}
+
 \note{
 In the case of objects of class "raw_spct" the columns with names
 starting with "counts" are processed. All other columns are left unchanded.
 }
-

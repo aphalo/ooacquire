@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+<title>acq_irrad_interactive. ooacquire 0.1.1.9001</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="">
+
+<link href="css/bootstrap.css" rel="stylesheet">
+<link href="css/bootstrap-responsive.css" rel="stylesheet">
+<link href="css/highlight.css" rel="stylesheet">
+<link href="css/staticdocs.css" rel="stylesheet">
+
+<!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+  </head>
+
+  <body>
+    <div class="navbar">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="brand" href="#">ooacquire 0.1.1.9001</a>
+      <div class="nav">
+        <ul class="nav">
+          <li><a href="index.html"><i class="icon-home icon-white"></i> Index</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <div class="container">
+      <header>
+        
+      </header>
+      
+      <h1>Acquire spectra interactively</h1>
+
+<div class="row">
+  <div class="span8">
+    <h2>Usage</h2>
+    <pre><div>acq_irrad_interactive(tot.time.range&nbsp;=&nbsp;c(5, 15), target.margin&nbsp;=&nbsp;0.1, HDR.mult&nbsp;=&nbsp;c(short&nbsp;=&nbsp;1, long&nbsp;=&nbsp;10), protocols&nbsp;=&nbsp;NULL, method&nbsp;=&nbsp;ooacquire::MAYP11278_ylianttila.mthd, descriptors&nbsp;=&nbsp;ooacquire::MAYP11278_descriptors)</div>
+<div>acq_fraction_interactive(tot.time.range&nbsp;=&nbsp;c(5, 15), target.margin&nbsp;=&nbsp;0.2, HDR.mult&nbsp;=&nbsp;c(short&nbsp;=&nbsp;1, long&nbsp;=&nbsp;10), protocols&nbsp;=&nbsp;NULL, method&nbsp;=&nbsp;ooacquire::MAYP11278_ylianttila.mthd, descriptors&nbsp;=&nbsp;ooacquire::MAYP11278_descriptors, ref.value&nbsp;=&nbsp;1, qty.out&nbsp;=&nbsp;"Tfr", type&nbsp;=&nbsp;"total")</div></pre>
+    
+    <h2>Arguments</h2>
+    <dl>
+      <dt>tot.time.range</dt>
+      <dd>numeric vector Range of total times for a measurement
+in seconds.</dd>
+      <dt>target.margin</dt>
+      <dd>numeric (0..1) when tuning integration time, how big a
+head space to leave.</dd>
+      <dt>HDR.mult</dt>
+      <dd>numeric the integration time for each bracketed integration
+as a multiplier of the set or tuned integration time.</dd>
+      <dt>protocols</dt>
+      <dd>list of character vectors.</dd>
+      <dt>method</dt>
+      <dd>list The method to use when applying the calibration</dd>
+      <dt>descriptors</dt>
+      <dd>list A list of instrument descriptors containing
+calibration data.</dd>
+      <dt>ref.value</dt>
+      <dd>numeric or filter_spct/reflector_spct object.</dd>
+      <dt>qty.out</dt>
+      <dd>character One of "Tfr" (transmittance as a fraction of one)
+or "raw" (raw counts).</dd>
+      <dt>type</dt>
+      <dd>character Type of transmittance or reflectance measured.</dd>
+    </dl>
+    
+    <div class="Description">
+      <h2>Description</h2>
+
+      <p>Functions providing a simple interactive front-end to the functions in the
+package. Mostly as example code that can be modified for diferent
+uses.</p>
+  
+    </div>
+
+    <div class="Note">
+      <h2>Note</h2>
+
+      <p>The integration time is set automatically so that the peak number of
+  counts is close to 1 - <code>target.margin</code> of maximum range of the
+  instrument detector. The minmum <code>tot.time</code> is achieved by increasing
+  the number of scans. The default protocols are usually suitable, if new
+  protocols are passed, each character vector must contain strings "light",
+  "filter" and "dark", or "sample", "reference", and "dark", depending on
+  the function.</p>
+  
+      <p>The calculations for reflectance and transmittance are very similar,
+  so we provide a single function capable of handling both. For
+  transmittance the reference is usually direct exposure to radiation but
+  for reflectance a white reference patch is normally used. In some cases
+  one may want to use a grey reference. We provide an argument that allows
+  the user to supply a constant or a spectrum describing the properties of
+  the reference. It is also important to distinguish between total and
+  internal transmittance, and which of these is measured depends on the
+  measuring protocol.</p>
+  
+    </div>
+    
+    <h2 id="examples">Examples</h2>
+    <pre class="examples"><div class='input'>
+## Not run: 
+# # requires an Ocean Optics spectrometer to be connected via USB
+# acquire_interactive()
+# ## End(Not run)
+
+</div></pre>
+  </div>
+  <div class="span4">
+    <!-- <ul>
+      <li>acq_irrad_interactive</li><li>acq_fraction_interactive</li>
+    </ul>
+    <ul>
+      
+    </ul> -->
+      
+        
+  </div>
+</div>
+      
+      <footer>
+      <p class="pull-right"><a href="#">Back to top</a></p>
+<p>Built by <a href="https://github.com/hadley/staticdocs">staticdocs</a>. Styled with <a href="https://getbootstrap.com/2.0.4/">bootstrap</a>.</p>
+      </footer>
+    </div>
+  </body>
+</html>

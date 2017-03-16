@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+<title>s_fraction_corrected. ooacquire 0.1.1.9001</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="">
+
+<link href="css/bootstrap.css" rel="stylesheet">
+<link href="css/bootstrap-responsive.css" rel="stylesheet">
+<link href="css/highlight.css" rel="stylesheet">
+<link href="css/staticdocs.css" rel="stylesheet">
+
+<!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+  </head>
+
+  <body>
+    <div class="navbar">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="brand" href="#">ooacquire 0.1.1.9001</a>
+      <div class="nav">
+        <ul class="nav">
+          <li><a href="index.html"><i class="icon-home icon-white"></i> Index</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <div class="container">
+      <header>
+        
+      </header>
+      
+      <h1>Convert raw counts data into a spectral fraction</h1>
+
+<div class="row">
+  <div class="span8">
+    <h2>Usage</h2>
+    <pre><div>s_fraction_corrected(x, ...)</div>
+<div>"s_fraction_corrected"(x, ...)</div>
+<div>"s_fraction_corrected"(x, reference.value&nbsp;=&nbsp;1, type&nbsp;=&nbsp;"internal", time&nbsp;=&nbsp;NULL, method, qty.out&nbsp;=&nbsp;"Tfr", descriptor&nbsp;=&nbsp;NULL, dyn.range&nbsp;=&nbsp;NULL, locale&nbsp;=&nbsp;NULL, verbose&nbsp;=&nbsp;getOption("photobiology.verbose", default&nbsp;=&nbsp;FALSE), ...)</div>
+<div>"s_fraction_corrected"(x, reference.value&nbsp;=&nbsp;1, type&nbsp;=&nbsp;"internal", method, dyn.range&nbsp;=&nbsp;NULL, qty.out&nbsp;=&nbsp;"Tfr", verbose&nbsp;=&nbsp;getOption("photobiology.verbose", default&nbsp;=&nbsp;FALSE), ...)</div></pre>
+    
+    <h2>Arguments</h2>
+    <dl>
+      <dt>x</dt>
+      <dd>A named list of one to three vectors of file names, with names
+"sample", "ref", and "dark".</dd>
+      <dt>...</dt>
+      <dd>Named argument passed to <code>photobiology::cps2irrad</code> which is
+the final calculation step.</dd>
+      <dt>reference.value</dt>
+      <dd>numeric or filter_spct or reflector_spct object, with the
+fractional transmittance or reflectance of the reference.</dd>
+      <dt>type</dt>
+      <dd>character One of "internal" or "total".</dd>
+      <dt>time</dt>
+      <dd>a <code>POSIXct</code> object, but if <code>NULL</code> the date stored in
+file is used, and if <code>NA</code> no date variable is added</dd>
+      <dt>method</dt>
+      <dd>A named list of constants and functions defining the
+method to be sued for stray light and dark signal corrections.</dd>
+      <dt>qty.out</dt>
+      <dd>character, one of "Tfr", "Rfr".</dd>
+      <dt>descriptor</dt>
+      <dd>A named list with a descriptor of the characteristics of
+the spectrometer (if serial number does not agree an error is triggered).</dd>
+      <dt>dyn.range</dt>
+      <dd>numeric Effective dynamic range of the spectrometer.</dd>
+      <dt>locale</dt>
+      <dd>The locale controls defaults that vary from place to place. The
+default locale is US-centric (like R), but you can use
+<code><a href='http://www.inside-r.org/packages/cran/readr/docs/locale'>locale</a></code> to create your own locale that controls things
+like the default time zone, encoding, decimal mark, big mark, and day/month
+names.</dd>
+      <dt>verbose</dt>
+      <dd>Logical indicating the level of warnings wanted.</dd>
+    </dl>
+    
+    <div class="Description">
+      <h2>Description</h2>
+
+      <p>Convert raw counts data into spectral transmittance or spectral reflectance.</p>
+  
+    </div>
+
+    <div class="Methods (by class)">
+      <h2>Methods (by class)</h2>
+
+      <p><ul>
+<li> <code>default</code>: Default for generic function.</p>
+  
+      <p></li>
+<li> <code>list</code>: Default for generic function.</p>
+  
+      <p></li>
+<li> <code>raw_mspct</code>: Default for generic function.
+</li>
+</ul></p>
+  
+    </div>
+
+    <div class="Note">
+      <h2>Note</h2>
+
+      <p>Currently <code>s_fraction_corrected.list</code> allows processing of files
+  written by OceanOptics' SpectraSuite software, from protocols with
+  integration-time bracketing or not, with a dark reference measurement or
+  not. Four measurements components are recognized: a "sample" measurement,
+  a "referenece" measurement using a clear or white, a "filter" measurement
+  with a UV-blocking filter in the light pass, and a "dark" measurement.
+  Only "sample" and "reference" are mandatory. Data should be raw counts,
+  either corrected for detector non-linearity or not. All three spectra
+  should be acquired using the same instrument settings to achieve good
+  accuracy.</p>
+  
+    </div>
+      </div>
+  <div class="span4">
+    <!-- <ul>
+      <li>s_fraction_corrected</li><li>s_fraction_corrected.default</li><li>s_fraction_corrected.list</li><li>s_fraction_corrected.raw_mspct</li>
+    </ul>
+    <ul>
+      
+    </ul> -->
+      
+        
+  </div>
+</div>
+      
+      <footer>
+      <p class="pull-right"><a href="#">Back to top</a></p>
+<p>Built by <a href="https://github.com/hadley/staticdocs">staticdocs</a>. Styled with <a href="https://getbootstrap.com/2.0.4/">bootstrap</a>.</p>
+      </footer>
+    </div>
+  </body>
+</html>

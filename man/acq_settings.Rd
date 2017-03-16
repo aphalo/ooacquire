@@ -78,4 +78,3 @@ Ocean Optics spectrometers can be queried for the maximum and minimum
   ignore bad pixels and to restrict integration-time tuning to the response
   from a range of pixels.
 }
-

@@ -14,4 +14,3 @@ contains constants and functions defining the method developed by Lasse
 Ylianttila.
 }
 \keyword{datasets}
-

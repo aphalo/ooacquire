@@ -20,4 +20,3 @@ wavelengths field of the calibration data replaced by the new values.
 Uses a user supplied function, possibly that supplied by a manufacturer
 like Ocean Optics stored in firmware or in any other form.
 }
-

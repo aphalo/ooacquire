@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+<title>uvb_corrections. ooacquire 0.1.1.9001</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="
+Algorithm for method &quot;original&quot; developed by Lasse Ylianttila. Other
+  methods are modified from Ylianttila's method by Pedro J. Aphalo.
+">
+
+<link href="css/bootstrap.css" rel="stylesheet">
+<link href="css/bootstrap-responsive.css" rel="stylesheet">
+<link href="css/highlight.css" rel="stylesheet">
+<link href="css/staticdocs.css" rel="stylesheet">
+
+<!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+  </head>
+
+  <body>
+    <div class="navbar">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="brand" href="#">ooacquire 0.1.1.9001</a>
+      <div class="nav">
+        <ul class="nav">
+          <li><a href="index.html"><i class="icon-home icon-white"></i> Index</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <div class="container">
+      <header>
+        
+      </header>
+      
+      <h1>Apply filter-based stray-light correction</h1>
+
+<div class="row">
+  <div class="span8">
+    <h2>Usage</h2>
+    <pre><div>uvb_corrections(x, flt, dark, stray.light.method&nbsp;=&nbsp;"original", stray.light.wl&nbsp;=&nbsp;c(218.5, 228.5), flt.dark.wl&nbsp;=&nbsp;c(193, 209.5), flt.ref.wl&nbsp;=&nbsp;c(360, 379.5), inst.dark.pixs&nbsp;=&nbsp;c(1:4), worker.fun&nbsp;=&nbsp;ooacquire::maya_tail_correction, trim&nbsp;=&nbsp;0, verbose&nbsp;=&nbsp;getOption("photobiology.verbose", default&nbsp;=&nbsp;FALSE), ...)</div>
+<div>slit_function_correction(x, worker.fun&nbsp;=&nbsp;ooacquire::maya_tail_correction, verbose&nbsp;=&nbsp;getOption("photobiology.verbose", default&nbsp;=&nbsp;FALSE), ...)</div>
+<div>filter_correction(x, flt, stray.light.method&nbsp;=&nbsp;"original", stray.light.wl&nbsp;=&nbsp;c(218.5, 228.5), flt.dark.wl&nbsp;=&nbsp;c(193, 209.5), flt.ref.wl&nbsp;=&nbsp;c(360, 379.5), trim&nbsp;=&nbsp;0, verbose&nbsp;=&nbsp;getOption("photobiology.verbose", default&nbsp;=&nbsp;FALSE))</div>
+<div>no_filter_correction(x, stray.light.wl&nbsp;=&nbsp;c(218.5, 228.5), flt.dark.wl&nbsp;=&nbsp;c(193, 209.5), flt.ref.wl&nbsp;=&nbsp;c(360, 379.5), trim&nbsp;=&nbsp;0, verbose&nbsp;=&nbsp;getOption("photobiology.verbose", default&nbsp;=&nbsp;FALSE))</div></pre>
+    
+    <h2>Arguments</h2>
+    <dl>
+      <dt>x, flt, dark</dt>
+      <dd><code>cps_spct</code> objects.</dd>
+      <dt>stray.light.method</dt>
+      <dd>Method variant used "original" (Ylianttila).</dd>
+      <dt>stray.light.wl</dt>
+      <dd>numeric vector of length 2 giving the range of
+wavelengths to use for the final stray light correction.</dd>
+      <dt>flt.dark.wl, flt.ref.wl</dt>
+      <dd>numeric vectors of length 2 giving the ranges
+of wavelengths to use for the "dark" and "illuminated" regions of the
+array in the filter correction.</dd>
+      <dt>inst.dark.pixs</dt>
+      <dd>numeric vector with indexes to array pixels that
+are in full drakness by instrument design.</dd>
+      <dt>worker.fun</dt>
+      <dd>function actually doing the correction on the w.lengths and
+counts per second vectors.</dd>
+      <dt>trim</dt>
+      <dd>a numeric value to be used as argument for mean</dd>
+      <dt>verbose</dt>
+      <dd>Logical indicating the level of warnings wanted.</dd>
+      <dt>...</dt>
+      <dd>additional params passed to worker.fun.</dd>
+    </dl>
+    
+    <div class="Value">
+      <h2>Value</h2>
+
+      <p><dl>
+A copy of <code>x</code> with the "cps" data replaced by the corrected
+  ones.
+</dl></p>
+  
+    </div>
+
+    <div class="Description">
+      <h2>Description</h2>
+
+      <p>Apply to a counts-per-second spectrum corrections based of a paired reading
+obtained with a polycarbonate filter (long-pass with cut-off at 400 nm). This
+is a bit more sofisticated than simple subtracting the filter reading from
+the mesurement as the effect of the filter itself on stray light is corrected
+for.</p>
+  
+    </div>
+
+    <div class="Note">
+      <h2>Note</h2>
+
+      <p>The default <code>worker.fun</code> is just an example. Corrections are
+specific to each individual spectrometer unit (not type or configuration)
+and need to be written for each use case. The slit function tail correction
+requires the characterization of the shape of the slit function by
+measuring one or more laser beams at suitable wavelengths.</p>
+  
+    </div>
+
+    <div class="References">
+      <h2>References</h2>
+
+      <p><a href = 'http://www.r4photobiology.info'>http://www.r4photobiology.info</a></p>
+  
+    </div>
+      </div>
+  <div class="span4">
+    <!-- <ul>
+      <li>uvb_corrections</li><li>slit_function_correction</li><li>filter_correction</li><li>no_filter_correction</li>
+    </ul>
+    <ul>
+      
+    </ul> -->
+      
+    
+    <h2>Author</h2>
+    
+Algorithm for method "original" developed by Lasse Ylianttila. Other
+  methods are modified from Ylianttila's method by Pedro J. Aphalo.
+
+    
+  </div>
+</div>
+      
+      <footer>
+      <p class="pull-right"><a href="#">Back to top</a></p>
+<p>Built by <a href="https://github.com/hadley/staticdocs">staticdocs</a>. Styled with <a href="https://getbootstrap.com/2.0.4/">bootstrap</a>.</p>
+      </footer>
+    </div>
+  </body>
+</html>

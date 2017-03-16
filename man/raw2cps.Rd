@@ -4,8 +4,8 @@
 \alias{raw2cps}
 \alias{raw2cps.default}
 \alias{raw2cps.numeric}
-\alias{raw2cps.raw_mspct}
 \alias{raw2cps.raw_spct}
+\alias{raw2cps.raw_mspct}
 \title{Convert raw detector counts into counts per second (cps).}
 \usage{
 raw2cps(x, ...)
@@ -46,9 +46,9 @@ for acquisition.
 
 \item \code{raw_mspct}: Method for collections of raw-counts spectra
 }}
+
 \note{
 In the case of objects of class "raw_spct" the columns with names
 starting with "counts" are processed and renamed to columns with names
 starting with "cps". All other columns are left unchanded.
 }
-

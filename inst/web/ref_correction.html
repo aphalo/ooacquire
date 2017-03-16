@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+<title>ref_correction. ooacquire 0.1.1.9001</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="">
+
+<link href="css/bootstrap.css" rel="stylesheet">
+<link href="css/bootstrap-responsive.css" rel="stylesheet">
+<link href="css/highlight.css" rel="stylesheet">
+<link href="css/staticdocs.css" rel="stylesheet">
+
+<!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+  </head>
+
+  <body>
+    <div class="navbar">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="brand" href="#">ooacquire 0.1.1.9001</a>
+      <div class="nav">
+        <ul class="nav">
+          <li><a href="index.html"><i class="icon-home icon-white"></i> Index</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <div class="container">
+      <header>
+        
+      </header>
+      
+      <h1>Apply a correction to spectral data.</h1>
+
+<div class="row">
+  <div class="span8">
+    <h2>Usage</h2>
+    <pre><div>ref_correction(x, y, .oper, ...)</div>
+<div>"ref_correction"(x, y, .oper, ...)</div>
+<div>"ref_correction"(x, y, .oper&nbsp;=&nbsp;`-`, ...)</div>
+<div>"ref_correction"(x, y, .oper&nbsp;=&nbsp;`-`, ...)</div>
+<div>"ref_correction"(x, y, .oper&nbsp;=&nbsp;`-`, ...)</div></pre>
+    
+    <h2>Arguments</h2>
+    <dl>
+      <dt>x, y</dt>
+      <dd>R objects</dd>
+      <dt>.oper</dt>
+      <dd>a function with its first two formal parameters accepting
+numerical vectors of equal length (e.g. a binary numerical operator).</dd>
+      <dt>...</dt>
+      <dd>not used in current version</dd>
+    </dl>
+    
+    <div class="Value">
+      <h2>Value</h2>
+
+      <p><dl>
+a numeric vector of the same length as x</p>
+  
+      <p>an object of class "cps_spct"</p>
+  
+      <p>an object of class "cps_spct"
+</dl></p>
+  
+    </div>
+
+    <div class="Description">
+      <h2>Description</h2>
+
+      <p>These functions simply subtract (by default) detector counts data (raw or cps)
+of one spectrum by the corresponding columns in another spectrum, or apply
+a user supplied operator or function to them.</p>
+  
+    </div>
+
+    <div class="Methods (by class)">
+      <h2>Methods (by class)</h2>
+
+      <p><ul>
+<li> <code>default</code>: Default method</p>
+  
+      <p></li>
+<li> <code>numeric</code>: Numeric method</p>
+  
+      <p></li>
+<li> <code>raw_spct</code>: Method for spectral data expressed as raw
+instrument counts.</p>
+  
+      <p></li>
+<li> <code>cps_spct</code>: Method for spectral data expressed as
+counts per second.
+</li>
+</ul></p>
+  
+    </div>
+
+    <div class="Note">
+      <h2>Note</h2>
+
+      <p>In the case of objects of class "raw_spct" the columns with names
+starting with "counts" are processed. All other columns are left unchanded.</p>
+  
+    </div>
+      </div>
+  <div class="span4">
+    <!-- <ul>
+      <li>ref_correction</li><li>ref_correction.default</li><li>ref_correction.numeric</li><li>ref_correction.raw_spct</li><li>ref_correction.cps_spct</li>
+    </ul>
+    <ul>
+      
+    </ul> -->
+      
+        
+  </div>
+</div>
+      
+      <footer>
+      <p class="pull-right"><a href="#">Back to top</a></p>
+<p>Built by <a href="https://github.com/hadley/staticdocs">staticdocs</a>. Styled with <a href="https://getbootstrap.com/2.0.4/">bootstrap</a>.</p>
+      </footer>
+    </div>
+  </body>
+</html>

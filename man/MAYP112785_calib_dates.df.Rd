@@ -13,4 +13,3 @@ This a data frame with data needed to process raw data acquired on different
 dates.
 }
 \keyword{datasets}
-

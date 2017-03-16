@@ -31,4 +31,3 @@ Take one spectral measurement which depending on the settings can consist
 on more than one raw spectrum meant to represent a SINGLE observation after
 conversion into calibrated data such as in the case of HDR.
 }
-

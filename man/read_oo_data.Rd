@@ -39,4 +39,3 @@ Reads and parses the header of a processed data file as output by
 SpectraSuite to extract the whole header remark field. The time field is
 retrieved and decoded.
 }
-

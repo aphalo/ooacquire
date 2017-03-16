@@ -13,4 +13,3 @@ This a list of instrument descriptors, each one containing the calibration
 data needed to read raw data acquired on different dates.
 }
 \keyword{datasets}
-

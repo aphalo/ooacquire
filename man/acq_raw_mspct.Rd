@@ -39,4 +39,3 @@ The default \code{pause.fun} prompts the user at each change of value
   in \code{protocol}. The user can write other functions, for example for a
   time delay.
 }
-

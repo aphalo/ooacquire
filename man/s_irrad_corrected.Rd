@@ -62,6 +62,7 @@ Convert raw counts data into spectral irradiance
 
 \item \code{raw_spct}: Default for generic function.
 }}
+
 \note{
 Currently \code{s_irrad_corrected.list} allows processing of files
   written by OceanOptics' SpectraSuite software, from protocols with
@@ -72,4 +73,3 @@ Currently \code{s_irrad_corrected.list} allows processing of files
   detector non-linearity or not. All three spectra should be acquired using
   the same instrument settings to achieve good accuracy.
 }
-

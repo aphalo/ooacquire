@@ -20,4 +20,3 @@ Ylianttila (STUK, Finland), originally in Excel.
 \description{
 Function to compute the tail correction
 }
-

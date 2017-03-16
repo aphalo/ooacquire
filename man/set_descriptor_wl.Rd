@@ -21,4 +21,3 @@ Replace wavelength values in an instrument descriptor for an Ocean Optics
 spectrometer with new values if valid. (e.g. when wavelngth calibration
 is not stored in firmware).
 }
-

@@ -23,4 +23,3 @@ A data frame with two variables, "feature" of class character, and
 Locate in which lines of the file header different metadata features are
   located.
 }
-

@@ -35,4 +35,3 @@ In contrast to other classes defined in package 'photobiology', class
   name starts with "counts" will have the intrument response linearization
   function applied.
 }
-

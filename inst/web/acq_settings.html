@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+<title>acq_settings. ooacquire 0.1.1.9001</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="">
+
+<link href="css/bootstrap.css" rel="stylesheet">
+<link href="css/bootstrap-responsive.css" rel="stylesheet">
+<link href="css/highlight.css" rel="stylesheet">
+<link href="css/staticdocs.css" rel="stylesheet">
+
+<!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+  </head>
+
+  <body>
+    <div class="navbar">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="brand" href="#">ooacquire 0.1.1.9001</a>
+      <div class="nav">
+        <ul class="nav">
+          <li><a href="index.html"><i class="icon-home icon-white"></i> Index</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <div class="container">
+      <header>
+        
+      </header>
+      
+      <h1>Settings for spectral measurement</h1>
+
+<div class="row">
+  <div class="span8">
+    <h2>Usage</h2>
+    <pre><div>acq_settings(descriptor, integ.time&nbsp;=&nbsp;0.01, num.scans&nbsp;=&nbsp;10L, min.integ.time&nbsp;=&nbsp;-Inf, max.integ.time&nbsp;=&nbsp;Inf, tot.time.range&nbsp;=&nbsp;c(0, Inf), HDR.mult&nbsp;=&nbsp;c(short&nbsp;=&nbsp;1, long&nbsp;=&nbsp;10), target.margin&nbsp;=&nbsp;0.1, pix.selector&nbsp;=&nbsp;TRUE, corr.elect.dark&nbsp;=&nbsp;0L, corr.sensor.nl&nbsp;=&nbsp;0L, boxcar.width&nbsp;=&nbsp;0L, verbose&nbsp;=&nbsp;TRUE)</div>
+<div>tune_acq_settings(descriptor, acq.settings, verbose&nbsp;=&nbsp;TRUE)</div></pre>
+    
+    <h2>Arguments</h2>
+    <dl>
+      <dt>descriptor</dt>
+      <dd>list as returned by function <code>get_oo_descriptor</code></dd>
+      <dt>integ.time</dt>
+      <dd>numeric vaue in seconds</dd>
+      <dt>num.scans</dt>
+      <dd>integer</dd>
+      <dt>min.integ.time</dt>
+      <dd>numeric vaue in seconds</dd>
+      <dt>max.integ.time</dt>
+      <dd>numeric vaue in seconds</dd>
+      <dt>tot.time.range</dt>
+      <dd>numeric vector of length two with values in seconds</dd>
+      <dt>HDR.mult</dt>
+      <dd>a numeric vector with integ.time multipliers to be used for
+"bracketing".</dd>
+      <dt>target.margin</dt>
+      <dd>numeric (0..1)</dd>
+      <dt>pix.selector</dt>
+      <dd>a logical or numeric vector used as subscript to select
+pixels</dd>
+      <dt>corr.elect.dark, corr.sensor.nl</dt>
+      <dd>integer 0L (FALSE) or 1L (TRUE)</dd>
+      <dt>boxcar.width</dt>
+      <dd>integer number of pixels to average</dd>
+      <dt>verbose</dt>
+      <dd>a logical to enable or disable warnings</dd>
+      <dt>acq.settings</dt>
+      <dd>list as returned by a previous call to <code>acq_settings()</code>,
+or <code>tune_acq_settings()</code>.</dd>
+    </dl>
+    
+    <div class="Value">
+      <h2>Value</h2>
+
+      <p><dl>
+a list.</p>
+  
+      <p>a list.
+</dl></p>
+  
+    </div>
+
+    <div class="Description">
+      <h2>Description</h2>
+
+      <p>Validate parameters for spectral measurements and return a list of values
+usable as input for functions <code>retune_acq_settings()</code>, <code>acq_sptc()</code>,
+and <code>acq_mspct()</code>.</p>
+  
+      <p>Find optimal settings for spectral measurements under a given measurement
+protocol.</p>
+  
+    </div>
+
+    <div class="Details">
+      <h2>Details</h2>
+
+      <p><code>acq_settings()</code> is used to manually save a complete set of
+  instrument settings in a way that they can be reused as needed for repated
+  acquisition of spectra. <code>tune_acq_settings()</code> and
+  <code>tune_acq_settings()</code> differ only in their formal parameters and
+  optimize settings to the current spectral irradiance.</p>
+  
+    </div>
+
+    <div class="Note">
+      <h2>Note</h2>
+
+      <p><code>pixel.selector</code> can be used for two different purposes: to
+  ignore bad pixels and to restrict integration-time tuning to the response
+  from a range of pixels. The interpretation of <code>tot.time.range</code> is
+  as follows: first value is minimum time, second value is maximum time.
+  If both values are the same, then an exact measurement time is computed.</p>
+  
+      <p>Ocean Optics spectrometers can be queried for the maximum and minimum
+  supported integration times. This function modifies the user supplied
+  values if outside these bounds. The defaults of -Inf and Inf force the use
+  of the whole valid range of integration time supported by the connected
+  intrument. <code>pixel.selector</code> can be used for two different purposes: to
+  ignore bad pixels and to restrict integration-time tuning to the response
+  from a range of pixels.</p>
+  
+    </div>
+      </div>
+  <div class="span4">
+    <!-- <ul>
+      <li>acq_settings</li><li>tune_acq_settings</li>
+    </ul>
+    <ul>
+      
+    </ul> -->
+      
+        
+  </div>
+</div>
+      
+      <footer>
+      <p class="pull-right"><a href="#">Back to top</a></p>
+<p>Built by <a href="https://github.com/hadley/staticdocs">staticdocs</a>. Styled with <a href="https://getbootstrap.com/2.0.4/">bootstrap</a>.</p>
+      </footer>
+    </div>
+  </body>
+</html>

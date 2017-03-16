@@ -4,7 +4,7 @@
 \name{ooacquire-package}
 \alias{ooacquire}
 \alias{ooacquire-package}
-\title{Acquire Spectral Data from Ocean Optics Spectrometers}
+\title{ooacquire: Acquire Spectral Data from Ocean Optics Spectrometers}
 \description{
 Functions to acquire data directly from spectrometers,
 automatically adjusting integration time and numbers of scans to average.
@@ -37,4 +37,26 @@ This package is provided \strong{without any warranty of suitability
   three different models of Ocean Optics spectrometers, each one with one of
   many possible configurations.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{http://www.r4photobiology.info}
+  \item \url{https://bitbucket.org/aphalo/ooacquire}
+  \item Report bugs at \url{https://bitbucket.org/aphalo/ooacquire/issues}
+}
 
+}
+\author{
+\strong{Maintainer}: Pedro J. Aphalo \email{pedro.aphalo@helsinki.fi} [translator]
+
+Authors:
+\itemize{
+  \item Lasse Ylianttila
+}
+
+Other contributors:
+\itemize{
+  \item Titta K. Kotilainen [contributor]
+}
+
+}

@@ -51,4 +51,3 @@ To calculate new multipliers we set the calibration multipliers equal
   to 1. Do the calculations as usual and calculate new multipliers based on
   the known spectral irradiance for the calibration lamps.
 }
-

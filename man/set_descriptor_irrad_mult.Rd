@@ -26,4 +26,3 @@ irrad.mult field of the calibration data replaced by the new values.
 \description{
 Adds calibration data for each pixel as a numeric vector
 }
-

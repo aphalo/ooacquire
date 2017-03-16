@@ -30,4 +30,3 @@ may fail or return the wrong value. Values should be within the range
 in the instrument's specifications. Setting wrong values can result in
 invalid data without an error being triggered.
 }
-

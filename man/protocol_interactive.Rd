@@ -11,4 +11,3 @@ Choose a protocol by name from a list of protocols, allowing the user to
 correct the selection if needed.
 }
 \keyword{internal}
-

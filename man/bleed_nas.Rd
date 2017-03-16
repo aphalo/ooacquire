@@ -30,4 +30,3 @@ Avoid using large n values as n pixels at each end of the array are
   Sony's ILxxx and 8 < n < 14 for Hamamatsu xxxx. At the moment we use
   a symetric window although "blooming" could be asymetric.
 }
-

@@ -23,4 +23,3 @@ reference, convert the raw counts for each integration time used into
 counts-per-second, if data from bracketed intergartion times is available,
 splice the different spectra.
 }
-

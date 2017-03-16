@@ -29,4 +29,3 @@ Model and serial number are retrieved from the file header, the remaining
 unknown parameter values are set to NA. These values are used to set
 the "inst.desc" atrribute of \code{x}.
 }
-

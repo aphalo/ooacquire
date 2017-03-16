@@ -13,4 +13,3 @@ end_session(w)
 Close the connection to the spectrometer pointed
 at by the Java object referenced in \code{x}.
 }
-

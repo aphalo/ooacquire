@@ -16,4 +16,3 @@ a list
 List all connected spectrometers by model name and serial number, plus
 the number of channels in each of them.
 }
-

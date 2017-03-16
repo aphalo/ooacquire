@@ -17,4 +17,3 @@ linearized field of the settings data replaced by TRUE.
 Tag the settings as linearized
 }
 \keyword{internal}
-

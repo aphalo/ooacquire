@@ -141,11 +141,13 @@ acq_raw_mspct <- function(descriptor,
                              acq.settings = acq.settings,
                              what.measured = user.label,
                              where.measured = where.measured)
+    photobiology::setWhenMeasured(z[[idx]], start.time)
+    photobiology::setWhereMeasured(z[[idx]], where.measured)
+    photobiology::setWhatMeasured(z[[idx]], paste(p, ":", user.label))
+    # remove dependency of object on rJava
+    trimInstrDesc(z[[idx]], c("-", "w"))
   }
   z <- photobiology::as.raw_mspct(z)
-  photobiology::setWhenMeasured(z, start.time)
-  photobiology::setWhereMeasured(z, where.measured)
-  photobiology::setWhatMeasured(z, user.label)
   names(z) <- protocol
   z
 }

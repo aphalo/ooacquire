@@ -23,4 +23,3 @@ Parse the header of the file returned by SpectraSuite for corrections,
 smotthing and acquisition parameters used. These values are used to set
 the "inst.settings" atrribute of \code{x}.
 }
-

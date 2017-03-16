@@ -23,4 +23,3 @@ object.
 Depending of the function passed to \code{read.f} more or less complete
 metadata information will be stored as attributes in the raw_spct objects.
 }
-

@@ -13,4 +13,3 @@ A household Osram LED STAR CLASSIC A 60 lamp measured at short distance. The
 spectrometer used was an Ocean Optics Maya2000 Pro.
 }
 \keyword{datasets}
-

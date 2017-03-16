@@ -20,4 +20,3 @@ wavelengths field of the calibration data replaced by the new values.
 A integer vector of indexes to bad pixels in the instrument array. Data from
 these array pixels will be discarded.
 }
-

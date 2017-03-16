@@ -17,4 +17,3 @@ a copy of x with values replaced as needed in all counts columns
 Replace bad pixels with the average of the counts from the two neighbouring
 pixels.
 }
-

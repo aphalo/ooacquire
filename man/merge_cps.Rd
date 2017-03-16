@@ -17,4 +17,3 @@ a copy of x with values replaced as needed in all counts columns
 Replace NAs in longer integration time cps with cps values from shorter
 integration.
 }
-

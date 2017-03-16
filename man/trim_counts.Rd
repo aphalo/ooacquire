@@ -23,4 +23,3 @@ a copy of x with values replaced as needed in all counts columns
 Trim out-of-range counts values in data stored in a "raw_spct" object. The
 values are replaced with the supplied \code{fill} value.
 }
-

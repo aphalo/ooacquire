@@ -16,4 +16,3 @@ a list
 Query the spectrometer for the settings currently in use for corrections,
 smotthing and acquisition parameters integration time and number of scans.
 }
-

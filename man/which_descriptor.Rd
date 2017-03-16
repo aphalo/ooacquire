@@ -33,4 +33,3 @@ The default argument for \code{verbose} is for this function
   careful with months and days of the month when supplying them as numbers,
   so using months names or their abbreviations may be safer.
 }
-

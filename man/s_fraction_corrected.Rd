@@ -64,6 +64,7 @@ Convert raw counts data into spectral transmittance or spectral reflectance.
 
 \item \code{raw_mspct}: Default for generic function.
 }}
+
 \note{
 Currently \code{s_fraction_corrected.list} allows processing of files
   written by OceanOptics' SpectraSuite software, from protocols with
@@ -76,4 +77,3 @@ Currently \code{s_fraction_corrected.list} allows processing of files
   should be acquired using the same instrument settings to achieve good
   accuracy.
 }
-
