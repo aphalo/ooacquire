@@ -1,6 +1,6 @@
 # R package 'ooacquire' #
 
-[![](http://www.r-pkg.org/badges/version/ooacquire)](https://cran.r-project.org/package=ooacquire) [![](http://cranlogs.r-pkg.org/badges/ooacquire)](http://cran.rstudio.com/web/packages/ooacquire/index.html) [![](http://cranlogs.r-pkg.org/badges/grand-total/ooacquire)](http://cran.rstudio.com/web/packages/ooacquire/index.html)
+[![](http://www.r-pkg.org/badges/version/ooacquire)](https://cran.r-project.org/package=ooacquire) [![](http://cranlogs.r-pkg.org/badges/ooacquire)](https://cran.r-project.org/package=ooacquire) [![](http://cranlogs.r-pkg.org/badges/grand-total/ooacquire)](https://cran.r-project.org/package=ooacquire)
 
 Package **ooacquire** provides a set of high level functions for spectral data acquisition built using package **rOmniDriver** as a base. It is very flexible with respect to measuring protocols. It caters for all steps involved in the acquisition of spectral data from connecting to the instrument(s) and retrieving information from its/their non-volatile memory, setting and adjusting acquisition parameters, acquiring raw counts and converting them into counts per second. It supports bracketing of the integration time for high dynamic range (HDR) protocols, both with respect to acquisition and merging of the data. It also supports protocols in which the total measuring time is kept constant by adjusting integration time and number of scans averaged in coordination. It works seamlessly together with package **photobiology** on which it also depends.
 
