@@ -4,10 +4,14 @@
 \alias{start_session}
 \title{Connect to Maya spectrometer}
 \usage{
-start_session()
+start_session(error.action = stop)
+}
+\arguments{
+\item{error.action}{function, usually one of \code{stop()}, \code{warning()}
+or \code{message()}.}
 }
 \value{
-a java wrapper which allows access to the driver with an open
+On success a java wrapper which allows access to the driver with an open
 connection to the instrument.
 }
 \description{

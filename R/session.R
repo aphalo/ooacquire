@@ -6,20 +6,24 @@
 #' and initialize an object with a reference to the
 #' Java object returned by Omni Driver.
 #'
-#' @return a java wrapper which allows access to the driver with an open
+#' @param error.action function, usually one of \code{stop()}, \code{warning()}
+#'   or \code{message()}.
+#'
+#' @return On success a java wrapper which allows access to the driver with an open
 #' connection to the instrument.
 #'
 #' @export
 #'
-start_session <- function() {
+start_session <- function(error.action = stop) {
   w <- rOmniDriver::init_srs()
   num.srs <- rOmniDriver::number_srs(w)
 
   # num.srs <- 1
   if (num.srs < 0) {
-    stop("Error in get number of SRs")
+    message_text <-
+    error.action("Error starting session: ", message_text)
   } else if (num.srs == 0) {
-    stop("No SR found")
+    error.action("No SR found")
   }
   w
 }

@@ -1,0 +1,192 @@
+---
+title: "`ooacquire` `r packageVersion('ooacquire')`<br>Algorithms"
+author: "Pedro J. Aphalo"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: yes
+vignette: >
+  %\VignetteIndexEntry{Algortihms}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Irradiance
+
+We will step through the different steps of the algorithm used, plotting the spectra at each step along the way. We use raw counts data, included in the package, to make building this vignette easier. At the same time we show how raw data acquire outwith R can be also processed with the package.
+
+## Interactive acquisition of spectral irradiance
+
+```{r, echo=FALSE, message=FALSE}
+require("knitr")
+dirpath <- system.file("extdata", package="ooacquire")
+opts_knit$set(autodep = TRUE, root.dir = dirpath, fig.width=8, fig.asp=0.5, out.width = '90%')
+
+```
+We first load the R packages to be used.
+
+```{r}
+library(ggplot2)
+library(ggspectra)
+library(photobiology)
+library(photobiologyWavebands)
+library(ooacquire)
+```
+
+We will read data from the measurement of the irradiance under a white LED light source. It was measured with a Ocean Optics, Maya 2000 Pro spectrometer, using the function `acquire_irrad_interactive()`. This function saves, to a single file both the raw counts data as a collection of spectra object of class `"raw_mspct"`, and the irradiance spectrum as computed in near-real-time as an object of class `"source_spct"`.
+
+```{r}
+load("white-LED-lamp.Rda")
+ls()
+```
+
+We first print and plot the irradiance spectrum as read from the file.
+
+```{r, fig.width=8, fig.asp=0.5}
+LED_lamp04_long.spct
+plot(LED_lamp04_long.spct)
+```
+
+We next print the collection of spectra containing raw counts data. The protocol used consisted in one light measurement and one dark measurement, each with bracketing of the integration time.
+
+```{r}
+LED_lamp04_long.raw_spct
+```
+Ploting the three bracketed spectra shows the raw data. The detector saturates at approximately 64000 counts.
+
+```{r, fig.width=8, fig.asp=0.5}
+plot(LED_lamp04_long.raw_spct[["light"]])
+```
+
+```{r, fig.width=8, fig.asp=0.5}
+plot(LED_lamp04_long.raw_spct[["dark"]])
+```
+
+The first step in the processing is removal of bad pixels, as recorded in the calibration data.
+
+```{r, fig.width=8, fig.asp=0.5}
+LED_lamp04_long.raw_spct[["light"]] <-
+  skip_bad_pixs(LED_lamp04_long.raw_spct[["light"]])
+plot(LED_lamp04_long.raw_spct[["light"]])
+```
+
+```{r, fig.width=8, fig.asp=0.5}
+LED_lamp04_long.raw_spct[["dark"]] <-
+  skip_bad_pixs(LED_lamp04_long.raw_spct[["dark"]])
+plot(LED_lamp04_long.raw_spct[["dark"]])
+```
+
+Next step is to replace saturated pixel data, with the missing data marked `NA`.
+
+```{r, fig.width=8, fig.asp=0.5}
+LED_lamp04_long.raw_spct[["light"]] <-
+  trim_counts(LED_lamp04_long.raw_spct[["light"]])
+plot(LED_lamp04_long.raw_spct[["light"]])
+```
+
+Saturated pixels can affect the readings from nearby pixels through charge migration, so we need to also tag as `NA`s these additional pixels.
+
+```{r, fig.width=8, fig.asp=0.5}
+LED_lamp04_long.raw_spct[["light"]] <-
+  bleed_nas(LED_lamp04_long.raw_spct[["light"]])
+plot(LED_lamp04_long.raw_spct[["light"]])
+```
+
+Next we need to apply a linearization function, as detector response is not linear---saturation is gradual.
+
+```{r, fig.width=8, fig.asp=0.5}
+LED_lamp04_long.raw_spct[["light"]] <-
+  linearize_counts(LED_lamp04_long.raw_spct[["light"]])
+plot(LED_lamp04_long.raw_spct[["light"]])
+```
+
+```{r, fig.width=8, fig.asp=0.5}
+LED_lamp04_long.raw_spct[["dark"]] <-
+  linearize_counts(LED_lamp04_long.raw_spct[["dark"]])
+plot(LED_lamp04_long.raw_spct[["dark"]])
+```
+
+We may next remove an estimate of dark signal based on reference pixels not expected to be exited. This step may apear redundant, but may help in cases when instrument temperature is not stable.
+
+```{r, fig.width=8, fig.asp=0.5}
+LED_lamp04_long.raw_spct[["light"]] <-
+  fshift(LED_lamp04_long.raw_spct[["light"]], range = c(250,290))
+plot(LED_lamp04_long.raw_spct[["light"]])
+```
+
+```{r, fig.width=8, fig.asp=0.5}
+LED_lamp04_long.raw_spct[["dark"]] <-
+  fshift(LED_lamp04_long.raw_spct[["dark"]], range = c(250,290))
+plot(LED_lamp04_long.raw_spct[["dark"]])
+```
+
+Now we can convert the raw counts into counts per second.
+
+```{r, fig.width=8, fig.asp=0.5}
+LED_lamp04_long.cps_spct <- cps_mspct()
+LED_lamp04_long.cps_spct[["light"]] <-
+  raw2cps(LED_lamp04_long.raw_spct[["light"]])
+plot(LED_lamp04_long.cps_spct[["light"]])
+
+```
+```{r, fig.width=8, fig.asp=0.5}
+ggplot(LED_lamp04_long.cps_spct[["light"]], aes(x = w.length)) +
+  geom_line(aes(y = cps_1), color = "blue") +
+  geom_line(aes(y = cps_2), color = "red") +
+  geom_line(aes(y = cps_3), color = "green")
+
+```
+
+```{r, fig.width=8, fig.asp=0.5}
+LED_lamp04_long.cps_spct[["dark"]] <-
+  raw2cps(LED_lamp04_long.raw_spct[["dark"]])
+plot(LED_lamp04_long.cps_spct[["dark"]])
+
+```
+
+```{r, fig.width=8, fig.asp=0.5}
+ggplot(LED_lamp04_long.cps_spct[["dark"]], aes(x = w.length)) +
+  geom_line(aes(y = cps_1), color = "blue") +
+  geom_line(aes(y = cps_2), color = "red") +
+  geom_line(aes(y = cps_3), color = "green")
+
+```
+
+Next splicing of the bracketed integrations.
+
+```{r, fig.width=8, fig.asp=0.5}
+LED_lamp04_long.cps_spct[["light"]] <-
+  merge_cps(LED_lamp04_long.cps_spct[["light"]])
+plot(LED_lamp04_long.cps_spct[["light"]])
+
+```
+
+```{r, fig.width=8, fig.asp=0.5}
+LED_lamp04_long.cps_spct[["dark"]] <-
+  merge_cps(LED_lamp04_long.cps_spct[["dark"]])
+plot(LED_lamp04_long.cps_spct[["dark"]])
+
+```
+
+```{r, fig.width=8, fig.asp=0.5}
+LED_lamp.cps_spct <- 
+  LED_lamp04_long.cps_spct[["light"]] - LED_lamp04_long.cps_spct[["dark"]]
+LED_lamp.cps_spct <- 
+  copy_attributes(LED_lamp04_long.cps_spct[["light"]],
+                  LED_lamp.cps_spct,
+                  copy.class = FALSE)
+plot(LED_lamp.cps_spct)
+```
+
+```{r, fig.width=8, fig.asp=0.5}
+LED_lamp.spct <- cps2irrad(LED_lamp.cps_spct)
+plot(LED_lamp.spct)
+```
+
+We can finally smooth-out some of the noise.
+
+```{r, fig.width=8, fig.asp=0.5}
+LED_lamp.spct <- smooth_spct(LED_lamp.spct)
+plot(LED_lamp.spct)
+```
+

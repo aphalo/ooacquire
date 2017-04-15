@@ -92,7 +92,7 @@ acq_irrad_interactive <-
     repeat { # with same settings
       repeat{
         obj.name <- readline("Give a name to the spectrum: ")
-        if (length(obj.name) > 0 && !exists(obj.name)) break()
+        if (length(obj.name) > 0 && obj.name != "") break()
         print("A valid and unique name is required, please try again...")
       }
       raw.name <- paste(obj.name, "raw_spct", sep = ".")

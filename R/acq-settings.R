@@ -251,14 +251,14 @@ tune_acq_settings <- function(descriptor,
 
   if (verbose) {
     message("Relative saturation: ",
-            format(acq.settings$rel.signal, width = 8), " ")
+            format(acq.settings$rel.signal, width = 10, digits = 3), " ")
     message("Integration times (ms): ",
-            format(acq.settings$integ.time * 1e-3, nsmall = 0, width = 8), " ")
+            format(acq.settings$integ.time * 1e-3, nsmall = 0, width = 10, digits = 3), " ")
     message("Numbers of scans:       ",
-            format(acq.settings$num.scans, width = 8), " ")
+            format(acq.settings$num.scans, width = 10, digits = 3), " ")
     message("Total time (s):         ",
             format(acq.settings$tot.time * 1e-6,
-                   digits = 3, width = 8), " ")
+                   digits = 3, width = 10), " ")
   }
   acq.settings
 }

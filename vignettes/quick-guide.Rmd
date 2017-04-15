@@ -1,0 +1,144 @@
+---
+title: "`ooacquire` `r packageVersion('ooacquire')`<br>Quick Start Guide"
+author: "Pedro J. Aphalo"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: yes
+vignette: >
+  %\VignetteIndexEntry{Quick Start Guide}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Introduction
+
+This short document only describes the high level functions, which allow spectral data acquisition. These are meant for interactive use as they provide many choices about instrument settings. We first show simple examples of their use, assuming That R, the needed R packages, Java JDE and Ocean Optics' free OmniDriver runtime are all installed (see this package's User Guide for details). Of course, to acquire irradiance, a suitable instrument calibration and method description should be also available. In the example below we use the examples included as part of the package. As the serial number stored with these data is validated against that retrieved from the instrument, the examples bellow will be usable as is only with our own instrument, rather than the one you may want to use.
+
+**NOTE:** This vignette can be built even if a spectrometer is not connected as the code chunks with code that "talk" with the instrument are by default not evaluated.
+
+## Interactive acquisition of spectral irradiance
+
+```{r, echo=FALSE, message=FALSE}
+require("knitr")
+opts_knit$set(autodep = TRUE)
+```
+We first load the R packages to be used.
+
+```{r}
+library(ggspectra)
+library(photobiology)
+library(photobiologyWavebands)
+library(ooacquire)
+
+# print warnings at the time they are triggered
+options(warn = 1)
+
+sr.online <- FALSE
+```
+
+
+```{r, eval=sr.online, echo=FALSE, message=FALSE, warning=FALSE}
+w <- start_session(error.action = warning)
+sr.online <- rOmniDriver::number_srs(w) > 0
+# is_valid_wrapper(w)
+```
+
+First plug in an Ocean Optics spectrometer to the USB port. Then loading the packages as above and executing the statement b elow above is all what is needed to start an interactive spectral-data acquisition session using default starting values for all settings. 
+
+```{r, eval=sr.online}
+acq_irrad_interactive(method = ooacquire::MAYP11278_ylianttila.mthd,
+                      descriptors = ooacquire::MAYP11278_descriptors)
+```
+
+These code is run at the R console. I normally use the RStudio IDE, but this is not required as longs as graphical display is enabled. Alternatively, the statements can saved into an R script (as plain-text file) and then the file `source`d from the R console. As scripts can be also run from the operating system shell or command prompt, it is possible, if desired to partly hide R from users' view.
+
+Within functions `acq_irrad_interactive()` and its companion `acq_fraction_interactive()` the user can modify settings through simple menus. These functions, however, have parameters which can be used to set initial settings to different values than their "built-in" defaults. In all cases when values supplied by the user fall outside those accepted by the connected instrument, these values will be adjusted to the nearest valid value.
+
+Although we here discuss these settings in relation to parameter arguments, the same setiings can be set interactively by the user. It should also be remembered that the functions described will in normal use set a suitable integration time automatically.
+
+Simplest settings. Using no integration time bracketing as a single numeric value for `HDR.mult` corresponds to aquisition using a single integration time. Maximum and minimum total integration time as short or as long as allowed by the instrument with no scan averaging. 
+
+```{r, eval=sr.online}
+acq_irrad_interactive(HDR.mult = 1,
+                      total.time.range = c(0, Inf),
+                      method = ooacquire::MAYP11278_ylianttila.mthd,
+                      descriptors = ooacquire::MAYP11278_descriptors)
+```
+
+It is possible to use in the example above a value larger than one for `HDR.mult` even if a single integration time is used. This is unusual, but if we indeed would like to force clipping of part of the spectrum, this would be the way to achieve it.
+
+For bracketing, one acquires spectral data with more than one integration time, and the resulting spectra are merged using the _most suitable_ integration time for each wavelength region. Although usually two values are a good compromise, there is no built-in limitaion in the package code. Using three or more values, combined with a very long total acquisition time of the order of minutes, can yield very good control of noise for light sources with stable output. Consequently, although the default setting `HDR.mult = c(1, 10)` tends to work well, settings like `HDR.mult = c(1, 5, 25)` may be useful in special circumstances.
+
+In the next example, we set bracketing, with two values for integration time, with the _long integration_ 10 times longer than the normal or _short_ one (the same as the default, in this case).
+We set total acquisition time to a fixed length of 10 seconds. Once this setting is active, each time the integration time is automatically set, both the integration time and number of scans are adjusted so that total acquisition time is exactly 10 seconds, for both short and long integration timess. This is useful when irradiance varies "randomly" with time and one desires to keep its effect on the acquired data stable.
+
+```{r, eval=sr.online}
+acq_irrad_interactive(HDR.mult = c(1, 10), 
+                      tot.time.range = 10,
+                      method = ooacquire::MAYP11278_ylianttila.mthd,
+                      descriptors = ooacquire::MAYP11278_descriptors)
+```
+
+If long integration times are needed, the setting above may result in the use of suboptimal integration times, as the desired integration time may have be to be shortened until it becomes an exact fraction of the total acquisition time. To avoid this, we can supply instead of a single fixed value for the total acquisition time, a range of values.
+
+```{r, eval=sr.online}
+acq_irrad_interactive(HDR.mult = c(1, 10), 
+                      tot.time.range = c(10, 20),
+                      method = ooacquire::MAYP11278_ylianttila.mthd,
+                      descriptors = ooacquire::MAYP11278_descriptors)
+```
+
+Sometimes we may want to avoid long integration times even at the cost of not using the whole dynamic range of the detector. For example, when following some fast kinetics, we would usually need the integration time not to exceed a certain time, say 50 milliseconds, we would simply use smaller values, such as `tot.time.range = c(0.03, 0.05)`. 
+
+One problem with automatic setting of integration time is that depending on the statibility of the light source we will need to set a different value for the target relative to the longest integration time that would result in no clipping during tuning. Parameter `target.margin` allows the user to set a _safety marging_ different from the default of 0.1 (or 10%). The example below could help prevent clipping in cases when irradiance changes so fast that it could be up to 25% higher during actual measurement than during the preceeding tunning of the integration time.
+
+```{r, eval=sr.online}
+acq_irrad_interactive(target.margin = 0.25,
+                      method = ooacquire::MAYP11278_ylianttila.mthd,
+                      descriptors = ooacquire::MAYP11278_descriptors)
+```
+
+
+## Interactive acquisition of ratio-based spectral
+
+Here we group the acquisition of data where the quantitis of interest are expressed relative to a reference. This is the case for transmittance, reflectance and absorptance. A single function allows the acquisition of transmittance and reflectance spectra. The same parameters as discussed for `acq_irrad_interactive()` in the section on irradiance are available in function `acq_fraction_interactive()`. We will here describe three additional parameters only present in this function. The first one is `ref.value` which needs to be supplied if the reference target is imperfect, such as a white reference patch which reflects less than 100%. The default is `ref.value = 1`, but this parameter not only accpects numeric values as argument but also transmittance or reflectance spectra for the target used as reference.
+
+```{r, eval=sr.online}
+acq_fraction_interactive(ref.value = 0.97,
+                         method = ooacquire::MAYP11278_ylianttila.mthd,
+                         descriptors = ooacquire::MAYP11278_descriptors)
+```
+
+Parameters `qty.out` and `type` determine the class of object and the quantity stored in the returned objects. If the optical set-up used is for measuring specular spectral reflectance, we use the following code. This information will also be used when plotting the data.
+
+```{r, eval=sr.online}
+acq_fraction_interactive(qty.out = "Rfr", type = "specular",
+                         method = ooacquire::MAYP11278_ylianttila.mthd,
+                         descriptors = ooacquire::MAYP11278_descriptors)
+```
+
+## Rolling your own
+
+The two functions described above, although useful for general spectral data acquisition, they are meant mainly as examples. In cases of routine measurements one could simplify menus by removing entries that are not needed, or even converting the functions to non-interactive, and possibly adding support for schedulled sequences of spectral data aquisitions. This should be fairly simple, not requiring advanced knowledge of the R language.
+
+## Using scripts
+
+It is also possibly to combine lower level functions using R scripts instead of through writing higher level R functions from them. Several example scripts are included with the package. I recommend that you open them, and save them to your own working directory before sourcing them and or editing them.
+
+You will need first to locate where in your computer's file system the 'ooacquire' package is installed, and the file you are interested in, and make a copy of it in your own workspace. Here we copy the script called `"irrad-acq-interac.R"`.
+
+```{r, eval=-2}
+filepath <- system.file("example-scripts", "irrad-acq-interac.R", package="ooacquire")
+file.copy(from = filepath, to = ".")
+```
+
+
+```{r, eval=-3}
+folderpath <- system.file("example-scripts", package="ooacquire")
+list.files(path = folderpath, pattern = ".*[.]R")
+file.copy(from = list.files(path = folderpath, pattern = ".*[.]R", full.names = TRUE), to = ".")
+```
+
+
+
