@@ -2,14 +2,25 @@
 % Please edit documentation in R/raw2corr-cps.R
 \name{raw2corr_cps}
 \alias{raw2corr_cps}
+\alias{raw2corr_cps.default}
+\alias{raw2corr_cps.raw_spct}
+\alias{raw2corr_cps.raw_mspct}
 \title{Convert raw detector counts into counts-per-second and correct}
 \usage{
-raw2corr_cps(x, ref.pixs.range = c(1, 100))
+raw2corr_cps(x, ref.pixs.range, ...)
+
+\method{raw2corr_cps}{default}(x, ref.pixs.range = NULL, ...)
+
+\method{raw2corr_cps}{raw_spct}(x, ref.pixs.range = c(1, 100), ...)
+
+\method{raw2corr_cps}{raw_mspct}(x, ref.pixs.range = c(1, 100), ...)
 }
 \arguments{
 \item{x}{raw_spct object.}
 
 \item{ref.pixs.range}{integer vector of length 2.}
+
+\item{...}{currently ignored.}
 }
 \value{
 a cps_spct object with one spectrum preserving the metadata present in
@@ -23,3 +34,12 @@ reference, convert the raw counts for each integration time used into
 counts-per-second, if data from bracketed intergartion times is available,
 splice the different spectra.
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{default}: Default method
+
+\item \code{raw_spct}: raw_spct method
+
+\item \code{raw_mspct}: raw_spct method
+}}
+

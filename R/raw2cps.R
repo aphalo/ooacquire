@@ -19,19 +19,7 @@ raw2cps <- function(x, ...) UseMethod("raw2cps")
 #' @export
 #'
 raw2cps.default <- function(x, ...) {
-  return(NA)
-}
-
-#' @describeIn raw2cps Numeric method
-#'
-#' @param integ.time numeric, the integration time used expressed in seconds.
-#'
-#' @export
-#'
-#' @return a numeric vector of the same length as x
-#'
-raw2cps.numeric <- function(x, integ.time, ...) {
-  return(NA)
+  cps_spct()
 }
 
 #' @describeIn raw2cps Method for spectral data expressed as raw instrument counts.

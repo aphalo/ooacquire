@@ -3,7 +3,6 @@
 \name{raw2cps}
 \alias{raw2cps}
 \alias{raw2cps.default}
-\alias{raw2cps.numeric}
 \alias{raw2cps.raw_spct}
 \alias{raw2cps.raw_mspct}
 \title{Convert raw detector counts into counts per second (cps).}
@@ -11,8 +10,6 @@
 raw2cps(x, ...)
 
 \method{raw2cps}{default}(x, ...)
-
-\method{raw2cps}{numeric}(x, integ.time, ...)
 
 \method{raw2cps}{raw_spct}(x, ...)
 
@@ -22,12 +19,8 @@ raw2cps(x, ...)
 \item{x}{an R object}
 
 \item{...}{not used in current version}
-
-\item{integ.time}{numeric, the integration time used expressed in seconds.}
 }
 \value{
-a numeric vector of the same length as x
-
 an object of class "cps_spct"
 
 an object of class "cps_mspct"
@@ -39,8 +32,6 @@ for acquisition.
 \section{Methods (by class)}{
 \itemize{
 \item \code{default}: Default method
-
-\item \code{numeric}: Numeric method
 
 \item \code{raw_spct}: Method for spectral data expressed as raw instrument counts.
 

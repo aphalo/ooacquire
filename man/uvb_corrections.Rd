@@ -9,16 +9,16 @@
 \usage{
 uvb_corrections(x, flt, dark, stray.light.method = "original",
   stray.light.wl = c(218.5, 228.5), flt.dark.wl = c(193, 209.5),
-  flt.ref.wl = c(360, 379.5), inst.dark.pixs = c(1:4),
-  worker.fun = ooacquire::maya_tail_correction, trim = 0,
+  flt.ref.wl = c(360, 379.5), flt.Tfr = 0.9, inst.dark.pixs = c(1:4),
+  worker.fun = NULL, trim = 0.05,
   verbose = getOption("photobiology.verbose", default = FALSE), ...)
 
-slit_function_correction(x, worker.fun = ooacquire::maya_tail_correction,
+slit_function_correction(x, worker.fun = NULL,
   verbose = getOption("photobiology.verbose", default = FALSE), ...)
 
 filter_correction(x, flt, stray.light.method = "original",
   stray.light.wl = c(218.5, 228.5), flt.dark.wl = c(193, 209.5),
-  flt.ref.wl = c(360, 379.5), trim = 0,
+  flt.ref.wl = c(360, 379.5), flt.Tfr = 1, trim = 0.05,
   verbose = getOption("photobiology.verbose", default = FALSE))
 
 no_filter_correction(x, stray.light.wl = c(218.5, 228.5),
@@ -28,7 +28,8 @@ no_filter_correction(x, stray.light.wl = c(218.5, 228.5),
 \arguments{
 \item{x, flt, dark}{\code{cps_spct} objects.}
 
-\item{stray.light.method}{Method variant used "original" (Ylianttila).}
+\item{stray.light.method}{Method variant used, "original" (Ylianttila),
+"simple", "full", "sun", "raw", "none".}
 
 \item{stray.light.wl}{numeric vector of length 2 giving the range of
 wavelengths to use for the final stray light correction.}
@@ -36,6 +37,9 @@ wavelengths to use for the final stray light correction.}
 \item{flt.dark.wl, flt.ref.wl}{numeric vectors of length 2 giving the ranges
 of wavelengths to use for the "dark" and "illuminated" regions of the
 array in the filter correction.}
+
+\item{flt.Tfr}{numeric fractional transmittance of the filter to the source
+of stray light, used only for method "simple".}
 
 \item{inst.dark.pixs}{numeric vector with indexes to array pixels that
 are in full drakness by instrument design.}
@@ -61,11 +65,13 @@ the mesurement as the effect of the filter itself on stray light is corrected
 for.
 }
 \note{
-The default \code{worker.fun} is just an example. Corrections are
-specific to each individual spectrometer unit (not type or configuration)
-and need to be written for each use case. The slit function tail correction
-requires the characterization of the shape of the slit function by
-measuring one or more laser beams at suitable wavelengths.
+\code{stray.light.method = "none"} is a valid argument only for
+  function \code{uvb_corrections()}. The default \code{worker.fun} is just an
+  example. Corrections are specific to each individual spectrometer unit (not
+  just type or configuration) and code needs to be written for most
+  individual use cases. The slit function tail correction requires the
+  characterization of the shape of the slit function by measuring one or more
+  laser beams at suitable wavelengths.
 }
 \references{
 \url{http://www.r4photobiology.info}

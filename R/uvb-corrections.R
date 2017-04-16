@@ -7,12 +7,15 @@
 #' for.
 #'
 #' @param x,flt,dark \code{cps_spct} objects.
-#' @param stray.light.method Method variant used "original" (Ylianttila).
+#' @param stray.light.method Method variant used, "original" (Ylianttila),
+#'   "simple", "full", "sun", "raw", "none".
 #' @param stray.light.wl numeric vector of length 2 giving the range of
 #'   wavelengths to use for the final stray light correction.
 #' @param flt.dark.wl,flt.ref.wl numeric vectors of length 2 giving the ranges
 #'   of wavelengths to use for the "dark" and "illuminated" regions of the
 #'   array in the filter correction.
+#' @param flt.Tfr numeric fractional transmittance of the filter to the source
+#'   of stray light, used only for method "simple".
 #' @param inst.dark.pixs numeric vector with indexes to array pixels that
 #'   are in full drakness by instrument design.
 #' @param worker.fun function actually doing the correction on the w.lengths and
@@ -29,11 +32,13 @@
 #'
 #' @references \url{http://www.r4photobiology.info}
 #'
-#' @note The default \code{worker.fun} is just an example. Corrections are
-#' specific to each individual spectrometer unit (not type or configuration)
-#' and need to be written for each use case. The slit function tail correction
-#' requires the characterization of the shape of the slit function by
-#' measuring one or more laser beams at suitable wavelengths.
+#' @note \code{stray.light.method = "none"} is a valid argument only for
+#'   function \code{uvb_corrections()}. The default \code{worker.fun} is just an
+#'   example. Corrections are specific to each individual spectrometer unit (not
+#'   just type or configuration) and code needs to be written for most
+#'   individual use cases. The slit function tail correction requires the
+#'   characterization of the shape of the slit function by measuring one or more
+#'   laser beams at suitable wavelengths.
 #'
 uvb_corrections <- function(x,
                             flt,
@@ -42,9 +47,10 @@ uvb_corrections <- function(x,
                             stray.light.wl = c(218.5, 228.5),
                             flt.dark.wl = c(193, 209.5),
                             flt.ref.wl = c(360, 379.5),
+                            flt.Tfr = 0.9,
                             inst.dark.pixs = c(1:4),
-                            worker.fun = ooacquire::maya_tail_correction,
-                            trim = 0,
+                            worker.fun = NULL,
+                            trim = 0.05,
                             verbose = getOption("photobiology.verbose", default = FALSE),
                             ...) {
 
@@ -62,6 +68,8 @@ uvb_corrections <- function(x,
     x <- raw2cps(x)
     merge_cps(x)
   }
+
+  flt.flag <- !is.na(stray.light.method) && stray.light.method != "none"
 
   if (length(x) == 0) {
     if (verbose) {
@@ -97,8 +105,8 @@ uvb_corrections <- function(x,
     }
   }
 
-  if (length(flt) > 0 &&
-        average_spct(clip_wl(x, range = flt.ref.wl)) < 0.1 * max(x[["cps"]])) {
+  if (flt.flag && length(flt) > 0 &&
+      average_spct(clip_wl(x, range = flt.ref.wl)) < 0.1 * max(x[["cps"]])) {
     warning("Too low cps in filter reference region, skipping filter correction.")
     flt.flag <- FALSE
   } else {
@@ -126,6 +134,9 @@ uvb_corrections <- function(x,
   }
 
   if (is.null(worker.fun)) {
+    if (verbose) {
+      warning("Skipping slit fucntion tail correction: no function available.")
+    }
     z <- x
   } else {
     z <- slit_function_correction(x, worker.fun = worker.fun, ...)
@@ -144,11 +155,17 @@ uvb_corrections <- function(x,
 #' @export
 #'
 slit_function_correction <- function(x,
-                                     worker.fun = ooacquire::maya_tail_correction,
+                                     worker.fun = NULL,
                                      verbose = getOption("photobiology.verbose", default = FALSE),
                                      ...) {
   stopifnot(is.cps_spct(x))
   stopifnot(is.null(attr(x, "slit.corrected")) || !attr(x, "slit.corrected"))
+  if (is.null(worker.fun)) {
+    if (verbose) {
+      warning("Skipping slit function tail correction: no function available.")
+    }
+    return(x)
+  }
   # check number of cps columns
   counts.cols <- grep("^cps", names(x), value = TRUE)
   if (length(counts.cols) > 1) {
@@ -179,7 +196,8 @@ filter_correction <- function(x,
                               stray.light.wl = c(218.5, 228.5),
                               flt.dark.wl = c(193, 209.5),
                               flt.ref.wl = c(360, 379.5),
-                              trim = 0,
+                              flt.Tfr = 1,
+                              trim = 0.05,
                               verbose = getOption("photobiology.verbose", default = FALSE)) {
   stopifnot(is.null(attr(x, "straylight.corrected")) || !attr(x, "straylight.corrected"))
   stopifnot(is.cps_spct(x) && is.cps_spct(flt))
@@ -207,10 +225,10 @@ filter_correction <- function(x,
   flt_clip_dark <- clip_wl(flt, range = flt.dark.wl)
   x_clip_dark <- clip_wl(x, range = flt.dark.wl)
 
-  # !! NEEDS TO BE CHANGED TO TEST ONLY RELEVANT wl range
-  if (verbose && any(flt_clip_dark[["cps"]] < 0.0)) {
-    warning(paste(sum(flt_clip_dark[["cps"]] < 0.0)),
-            ' negative values in flt_clip_dark[["cps"]].')
+  # We try to avoid spureous warnings by taking the mean
+  if (verbose && mean(flt_clip_dark[["cps"]]) < -1e4 * max_x_cs) {
+    warning("Negative mean cps in \"filter\" spectrum's internal dark reference: ",
+            mean(flt_clip_dark[["cps"]]))
   }
 
   mean_flt_cs_short <- mean(flt_clip_dark[["cps"]],
@@ -237,7 +255,10 @@ filter_correction <- function(x,
     } else {
       mean_flt_ratio_short <- mean_flt_cs_short / mean_x_cs_short
     }
-  } else {
+  } else if (stray.light.method == "simple") {
+    # trust filter spectral transmitatnce
+    mean_flt_ratio_short <- flt.Tfr
+  }else {
     stop(paste("method '", stray.light.method, "' not supported"))
   }
 
@@ -245,23 +266,23 @@ filter_correction <- function(x,
   if (is.na(mean_flt_ratio_short)) {
     warning("NA in mean_flt_ratio_short, skipping correction")
   } else {
-    if (mean_flt_ratio_short < 0.75) {
-      # This is a guess based on PC filter transmittance of about 83%.
+    if (mean_flt_ratio_short < 0.85) {
+      # This is a guess based on PC filter transmittance of about 90%.
       if (verbose || abs(mean_x_cs_short / max_x_cs) > 1e-3) {
-        warning("mean_flt_ratio_short < 0.75, was ",
+        warning("mean_flt_ratio_short < 0.85, was ",
                 signif(mean_flt_ratio_short, 4),
                 "; light source emits in UVC",
                 "; or instrument dark reading unstable",
-                ", using 0.85")
+                ", using 0.9")
       }
-      mean_flt_ratio_short <- 0.85 # we use the actual filter transmittance
-    } else if (mean_flt_ratio_short > 1.1) {
+      mean_flt_ratio_short <- 0.9 # we use the actual filter transmittance
+    } else if (mean_flt_ratio_short > 1) {
       # This could be set to 1.0 as it makes no sense to have more noise with the filter than without it!
       if (verbose || abs(mean_x_cs_short / max_x_cs) > 1e-3)
-        warning("mean_flt_ratio_short > 1.1, was ",
+        warning("mean_flt_ratio_short > 1, was ",
                 signif(mean_flt_ratio_short, 4),
-                "; instrument dark reading unstable")
-#      mean_flt_ratio_short <- 1.0
+                ", set to 1; instrument dark reading unstable")
+      mean_flt_ratio_short <- 1
     } else {
       if (verbose) message("mean_flt_ratio_short is ", signif(mean_flt_ratio_short, 4))
     }
@@ -364,3 +385,5 @@ no_filter_correction <- function(x,
 
   x
 }
+
+

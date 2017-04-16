@@ -95,7 +95,7 @@ acq_irrad_interactive <-
         if (length(obj.name) > 0 && obj.name != "") break()
         print("A valid and unique name is required, please try again...")
       }
-      raw.name <- paste(obj.name, "raw_spct", sep = ".")
+      raw.name <- paste(obj.name, "raw_mspct", sep = ".")
       irrad.name <- paste(obj.name, "spct", sep = ".")
       file.name <- paste(irrad.name, "Rda", sep = ".")
       pdf.name <- paste(irrad.name, "pdf", sep = ".")

@@ -9,15 +9,35 @@
 #'
 #' @param x raw_spct object.
 #' @param ref.pixs.range integer vector of length 2.
+#' @param ... currently ignored.
 #'
 #' @return a cps_spct object with one spectrum preserving the metadata present in
 #'   \code{x}.
 #'
+#' @export raw2corr_cps
+#'
+raw2corr_cps  <- function(x,
+                          ref.pixs.range,
+                          ...) UseMethod("raw2corr_cps")
+
+#' @describeIn raw2corr_cps Default method
+#'
 #' @export
 #'
-raw2corr_cps <- function(x,
-                         ref.pixs.range = c(1,100)) {
-  stopifnot(is.raw_spct(x))
+raw2corr_cps.default <- function(x,
+                                 ref.pixs.range = NULL,
+                                 ...) {
+  warning("Class ", class(x), " not supported")
+  cps_spct()
+}
+
+#' @describeIn raw2corr_cps raw_spct method
+#'
+#' @export
+#'
+raw2corr_cps.raw_spct <- function(x,
+                                  ref.pixs.range = c(1,100),
+                                  ...) {
   # replace bad data with NAs
   x <- trim_counts(x)
   x <- bleed_nas(x)
@@ -38,3 +58,15 @@ raw2corr_cps <- function(x,
   x <- slit_function_correction(x)
   x
 }
+
+#' @describeIn raw2corr_cps raw_spct method
+#'
+#' @export
+#'
+raw2corr_cps.raw_mspct <- function(x,
+                                   ref.pixs.range = c(1,100),
+                                   ...) {
+  msmsply(x, .fun = raw2corr_cps.raw_spct, ref.pixs.range = ref.pixs.range, ...)
+}
+
+

@@ -6,6 +6,7 @@
 \alias{ref_correction.numeric}
 \alias{ref_correction.raw_spct}
 \alias{ref_correction.cps_spct}
+\alias{ref_correction.cps_mspct}
 \title{Apply a correction to spectral data.}
 \usage{
 ref_correction(x, y, .oper, ...)
@@ -17,6 +18,9 @@ ref_correction(x, y, .oper, ...)
 \method{ref_correction}{raw_spct}(x, y, .oper = `-`, ...)
 
 \method{ref_correction}{cps_spct}(x, y, .oper = `-`, ...)
+
+\method{ref_correction}{cps_mspct}(x, y = x, .oper = `-`,
+  ref_name = "dark", ...)
 }
 \arguments{
 \item{x, y}{R objects}
@@ -25,6 +29,9 @@ ref_correction(x, y, .oper, ...)
 numerical vectors of equal length (e.g. a binary numerical operator).}
 
 \item{...}{not used in current version}
+
+\item{ref_name}{character Name of variable to substract from all other
+columns.}
 }
 \value{
 a numeric vector of the same length as x
@@ -32,6 +39,8 @@ a numeric vector of the same length as x
 an object of class "cps_spct"
 
 an object of class "cps_spct"
+
+an object of class "cps_mspct"
 }
 \description{
 These functions simply subtract (by default) detector counts data (raw or cps)
@@ -49,9 +58,17 @@ instrument counts.
 
 \item \code{cps_spct}: Method for spectral data expressed as
 counts per second.
+
+\item \code{cps_mspct}: Method for collections of spectral data objects
+containing data expressed as counts per second.
 }}
 
 \note{
 In the case of objects of class "raw_spct" the columns with names
 starting with "counts" are processed. All other columns are left unchanded.
+
+If \code{x} and \code{y} are both cps_mspct objects,
+  \code{y[[ref_name]]} will be used as reference, otherwise \code{y} itself
+  should be a cps_spct and will be used as is. In all cases variables in
+  ref.name will be skipped in \code{x}.
 }

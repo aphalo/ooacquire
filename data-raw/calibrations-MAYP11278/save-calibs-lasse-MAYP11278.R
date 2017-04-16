@@ -2,9 +2,32 @@ library(readxl)
 library(readr)
 library(ooacquire)
 
-# create an object with the parameters for Lasse Ylianttila's method for Maya
+# create an object with the parameters for Lasse Ylianttila's original method
+# for Maya suitable for sunlight
 MAYP11278_ylianttila.mthd <- list(
   stray.light.method = "original",
+  stray.light.wl = c(218.5, 228.5),
+  flt.dark.wl = c(193, 209.5),
+  flt.ref.wl = c(360, 379.5),
+  worker.fun = ooacquire::MAYP11278_tail_correction,
+  trim = 0
+)
+
+# create an object with the parameters for simple method for Maya
+# suitable for any light source, but not as good for sunlight
+MAYP11278_simple.mthd <- list(
+  stray.light.method = "simple",
+  stray.light.wl = c(218.5, 228.5),
+  flt.dark.wl = c(193, 209.5),
+  flt.ref.wl = c(360, 379.5),
+  worker.fun = ooacquire::MAYP11278_tail_correction,
+  trim = 0
+)
+
+# create an object with the parameters for a method good only for sunlight,
+# based on Lasse Ylianttila's original method suitable ONLY for sunlight.
+MAYP11278_sun.mthd <- list(
+  stray.light.method = "sun",
   stray.light.wl = c(218.5, 228.5),
   flt.dark.wl = c(193, 209.5),
   flt.ref.wl = c(360, 379.5),
@@ -55,6 +78,8 @@ stopifnot(basename(files) == MAYP11278_calib_dates.df[["coeffs.file"]])
 
 MAYP11278_descriptors <- descriptors
 save(MAYP11278_ylianttila.mthd,
+     MAYP11278_sun.mthd,
+     MAYP11278_simple.mthd,
      MAYP11278_descriptors,
      MAYP11278_calib_dates.df,
      file = "data/calibs-MAYP11278.rda")

@@ -21,6 +21,7 @@ ref_correction <- function(x, y, .oper, ...) UseMethod("ref_correction")
 #' @export
 #'
 ref_correction.default <- function(x, y, .oper, ...) {
+  warning("Class ", class(x), " not supported")
   NA
 }
 
@@ -122,6 +123,37 @@ ref_correction.cps_spct <- function(x,
 }
 
 
+#' @describeIn ref_correction Method for collections of spectral data objects
+#'   containing data expressed as counts per second.
+#' @param ref_name character Name of variable to substract from all other
+#'   columns.
+#'
+#' @export
+#'
+#' @return an object of class "cps_mspct"
+#'
+#' @note If \code{x} and \code{y} are both cps_mspct objects,
+#'   \code{y[[ref_name]]} will be used as reference, otherwise \code{y} itself
+#'   should be a cps_spct and will be used as is. In all cases variables in
+#'   ref.name will be skipped in \code{x}.
+#'
+ref_correction.cps_mspct <- function(x,
+                                     y = x,
+                                     .oper = `-`,
+                                     ref_name = "dark",
+                                     ...) {
+  if (is.cps_mspct(y)) {
+    y <- y[[ref_name]]
+  }
+  z <- cps_mspct()
+  for (m in setdiff(names(x), ref_name)) {
+    z[[m]] <- ref_correction(x = x[[m]],
+                             y = y,
+                             .oper = .oper,
+                             ...)
+  }
+  z
+}
 
 
 

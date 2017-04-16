@@ -23,6 +23,7 @@ dirpath <- system.file("extdata", package="ooacquire")
 opts_knit$set(autodep = TRUE, root.dir = dirpath, fig.width=8, fig.asp=0.5, out.width = '90%')
 
 ```
+
 We first load the R packages to be used.
 
 ```{r}
@@ -31,9 +32,12 @@ library(ggspectra)
 library(photobiology)
 library(photobiologyWavebands)
 library(ooacquire)
+library(magrittr)
 ```
 
-We will read data from the measurement of the irradiance under a white LED light source. It was measured with a Ocean Optics, Maya 2000 Pro spectrometer, using the function `acquire_irrad_interactive()`. This function saves, to a single file both the raw counts data as a collection of spectra object of class `"raw_mspct"`, and the irradiance spectrum as computed in near-real-time as an object of class `"source_spct"`.
+### Household white LED bulb
+
+We will read data from the measurement of the irradiance under a white LED light source---_Osram LED Star classic A 60 E27_. It was measured with a Ocean Optics, Maya 2000 Pro spectrometer, using the function `acquire_irrad_interactive()`. This function saves, to a single file both the raw counts data as a collection of spectra object of class `"raw_mspct"`, and the irradiance spectrum as computed in near-real-time as an object of class `"source_spct"`.
 
 ```{r}
 load("white-LED-lamp.Rda")
@@ -45,6 +49,18 @@ We first print and plot the irradiance spectrum as read from the file.
 ```{r, fig.width=8, fig.asp=0.5}
 LED_lamp04_long.spct
 plot(LED_lamp04_long.spct)
+plot(LED_lamp04_long.spct, range = c(250, 410))
+```
+
+We recalculate with current version of high-level fucntion.
+
+```{r, fig.width=8, fig.asp=0.5}
+LED_lamp04_long.raw_spct <-msmsply(LED_lamp04_long.raw_spct, setInstrDesc, MAYP11278_descriptors$cal_2016a)
+LED_lamp_recalc.spct <-
+  s_irrad_corrected(LED_lamp04_long.raw_spct, 
+                    method = ooacquire::MAYP11278_ylianttila.mthd)
+plot(LED_lamp_recalc.spct)
+plot(LED_lamp_recalc.spct, range = c(250, 410))
 ```
 
 We next print the collection of spectra containing raw counts data. The protocol used consisted in one light measurement and one dark measurement, each with bracketing of the integration time.
@@ -65,108 +81,81 @@ plot(LED_lamp04_long.raw_spct[["dark"]])
 The first step in the processing is removal of bad pixels, as recorded in the calibration data.
 
 ```{r, fig.width=8, fig.asp=0.5}
-LED_lamp04_long.raw_spct[["light"]] <-
-  skip_bad_pixs(LED_lamp04_long.raw_spct[["light"]])
-plot(LED_lamp04_long.raw_spct[["light"]])
-```
-
-```{r, fig.width=8, fig.asp=0.5}
-LED_lamp04_long.raw_spct[["dark"]] <-
-  skip_bad_pixs(LED_lamp04_long.raw_spct[["dark"]])
-plot(LED_lamp04_long.raw_spct[["dark"]])
+for (m in names(LED_lamp04_long.raw_spct)) {
+  LED_lamp04_long.raw_spct[[m]] <-
+    skip_bad_pixs(LED_lamp04_long.raw_spct[[m]])
+  print(plot(LED_lamp04_long.raw_spct[[m]]) + ggtitle(m))
+}
 ```
 
 Next step is to replace saturated pixel data, with the missing data marked `NA`.
 
 ```{r, fig.width=8, fig.asp=0.5}
-LED_lamp04_long.raw_spct[["light"]] <-
-  trim_counts(LED_lamp04_long.raw_spct[["light"]])
-plot(LED_lamp04_long.raw_spct[["light"]])
+for (m in names(LED_lamp04_long.raw_spct)) {
+  LED_lamp04_long.raw_spct[[m]] <-
+    trim_counts(LED_lamp04_long.raw_spct[[m]])
+  print(plot(LED_lamp04_long.raw_spct[[m]]) + ggtitle(m))
+}
 ```
 
 Saturated pixels can affect the readings from nearby pixels through charge migration, so we need to also tag as `NA`s these additional pixels.
 
 ```{r, fig.width=8, fig.asp=0.5}
-LED_lamp04_long.raw_spct[["light"]] <-
-  bleed_nas(LED_lamp04_long.raw_spct[["light"]])
-plot(LED_lamp04_long.raw_spct[["light"]])
+for (m in names(LED_lamp04_long.raw_spct)) {
+  LED_lamp04_long.raw_spct[[m]] <-
+    bleed_nas(LED_lamp04_long.raw_spct[[m]])
+  print(plot(LED_lamp04_long.raw_spct[[m]]) + ggtitle(m))
+}
 ```
 
 Next we need to apply a linearization function, as detector response is not linear---saturation is gradual.
 
 ```{r, fig.width=8, fig.asp=0.5}
-LED_lamp04_long.raw_spct[["light"]] <-
-  linearize_counts(LED_lamp04_long.raw_spct[["light"]])
-plot(LED_lamp04_long.raw_spct[["light"]])
+for (m in names(LED_lamp04_long.raw_spct)) {
+  LED_lamp04_long.raw_spct[[m]] <-
+    linearize_counts(LED_lamp04_long.raw_spct[[m]])
+  print(plot(LED_lamp04_long.raw_spct[[m]]) + ggtitle(m))
+}
 ```
 
-```{r, fig.width=8, fig.asp=0.5}
-LED_lamp04_long.raw_spct[["dark"]] <-
-  linearize_counts(LED_lamp04_long.raw_spct[["dark"]])
-plot(LED_lamp04_long.raw_spct[["dark"]])
-```
-
-We may next remove an estimate of dark signal based on reference pixels not expected to be exited. This step may apear redundant, but may help in cases when instrument temperature is not stable.
+We may next remove an estimate of dark signal based on reference pixels not expected to be excited. This step may apear redundant, but _might_ help in cases when instrument temperature is not stable.
 
 ```{r, fig.width=8, fig.asp=0.5}
-LED_lamp04_long.raw_spct[["light"]] <-
-  fshift(LED_lamp04_long.raw_spct[["light"]], range = c(250,290))
-plot(LED_lamp04_long.raw_spct[["light"]])
-```
-
-```{r, fig.width=8, fig.asp=0.5}
-LED_lamp04_long.raw_spct[["dark"]] <-
-  fshift(LED_lamp04_long.raw_spct[["dark"]], range = c(250,290))
-plot(LED_lamp04_long.raw_spct[["dark"]])
+for (m in names(LED_lamp04_long.raw_spct)) {
+  LED_lamp04_long.raw_spct[[m]] <-
+    fshift(LED_lamp04_long.raw_spct[[m]], range = c(250,290))
+  print(plot(LED_lamp04_long.raw_spct[[m]]) + ggtitle(m))
+}
 ```
 
 Now we can convert the raw counts into counts per second.
 
 ```{r, fig.width=8, fig.asp=0.5}
 LED_lamp04_long.cps_spct <- cps_mspct()
-LED_lamp04_long.cps_spct[["light"]] <-
-  raw2cps(LED_lamp04_long.raw_spct[["light"]])
-plot(LED_lamp04_long.cps_spct[["light"]])
-
-```
-```{r, fig.width=8, fig.asp=0.5}
-ggplot(LED_lamp04_long.cps_spct[["light"]], aes(x = w.length)) +
-  geom_line(aes(y = cps_1), color = "blue") +
-  geom_line(aes(y = cps_2), color = "red") +
-  geom_line(aes(y = cps_3), color = "green")
-
-```
-
-```{r, fig.width=8, fig.asp=0.5}
-LED_lamp04_long.cps_spct[["dark"]] <-
-  raw2cps(LED_lamp04_long.raw_spct[["dark"]])
-plot(LED_lamp04_long.cps_spct[["dark"]])
-
-```
-
-```{r, fig.width=8, fig.asp=0.5}
-ggplot(LED_lamp04_long.cps_spct[["dark"]], aes(x = w.length)) +
-  geom_line(aes(y = cps_1), color = "blue") +
-  geom_line(aes(y = cps_2), color = "red") +
-  geom_line(aes(y = cps_3), color = "green")
-
+for (m in names(LED_lamp04_long.raw_spct)) {
+  LED_lamp04_long.cps_spct[[m]] <-
+    raw2cps(LED_lamp04_long.raw_spct[[m]])
+  print(
+    ggplot(LED_lamp04_long.cps_spct[[m]], aes(x = w.length)) +
+      geom_line(aes(y = cps_1), color = "blue") +
+      geom_line(aes(y = cps_2), color = "red") +
+      geom_line(aes(y = cps_3), color = "green") +
+      ggtitle(m)
+  )
+}
 ```
 
 Next splicing of the bracketed integrations.
 
 ```{r, fig.width=8, fig.asp=0.5}
-LED_lamp04_long.cps_spct[["light"]] <-
-  merge_cps(LED_lamp04_long.cps_spct[["light"]])
-plot(LED_lamp04_long.cps_spct[["light"]])
-
+for (m in names(LED_lamp04_long.cps_spct)) {
+  LED_lamp04_long.cps_spct[[m]] <-
+    merge_cps(LED_lamp04_long.cps_spct[[m]])
+  print(plot(LED_lamp04_long.cps_spct[[m]]) + ggtitle(m))
+}
 ```
 
-```{r, fig.width=8, fig.asp=0.5}
-LED_lamp04_long.cps_spct[["dark"]] <-
-  merge_cps(LED_lamp04_long.cps_spct[["dark"]])
-plot(LED_lamp04_long.cps_spct[["dark"]])
-
-```
+We now subtract the dark signal from the light measurement.
 
 ```{r, fig.width=8, fig.asp=0.5}
 LED_lamp.cps_spct <- 
@@ -175,7 +164,7 @@ LED_lamp.cps_spct <-
   copy_attributes(LED_lamp04_long.cps_spct[["light"]],
                   LED_lamp.cps_spct,
                   copy.class = FALSE)
-plot(LED_lamp.cps_spct)
+plot(LED_lamp.cps_spct) + ggtitle("Dark subtracted")
 ```
 
 ```{r, fig.width=8, fig.asp=0.5}
@@ -189,4 +178,113 @@ We can finally smooth-out some of the noise.
 LED_lamp.spct <- smooth_spct(LED_lamp.spct)
 plot(LED_lamp.spct)
 ```
+With an LED source, at least in the case of our Maya 2000 Pro, we do not need to worry about stray light. However, when we measure light sources with a significant emission in the infra-red above 1000 nm, stray light becomes a problem. In addition sources with narrow peaks of emission may benefit from deconvolution of a measured slit function.
+
+### Tungsten halogen lamp
+
+```{r}
+load("halogen-lamp.Rda")
+ls()
+```
+
+We first print and plot the irradiance spectrum as read from the file.
+
+```{r, fig.width=8, fig.asp=0.5}
+Halogen.spct
+plot(Halogen.spct)
+plot(Halogen.spct, range = c(250, 410))
+```
+
+We recalculate with current version of high-level fucntion.
+
+```{r, fig.width=8, fig.asp=0.5}
+Halogen.raw_spct <-msmsply(Halogen.raw_spct, setInstrDesc, MAYP11278_descriptors$cal_2016a)
+Halogen_recalc.spct <-
+  s_irrad_corrected(Halogen.raw_spct, method = MAYP11278_simple.mthd)
+plot(Halogen_recalc.spct)
+plot(Halogen_recalc.spct, range = c(250, 410))
+```
+
+We print the object with the raw counts data. The protocol used, in this case included a measurement with a UV-pass filter (polycarbonate).
+
+```{r}
+Halogen.raw_spct
+```
+
+We first use a "pipe" to apply the same initial processing steps as for the LED bulb data in the previous section.
+
+```{r}
+Halogen.cps_spct <- cps_mspct()
+for (m in names(Halogen.raw_spct)) {
+  Halogen.raw_spct[[m]] %>%
+    skip_bad_pixs() %>%
+    trim_counts() %>%
+    bleed_nas() %>%
+    linearize_counts() %>%
+    fshift(range = c(200,250)) %>%
+    raw2cps() %>% 
+    merge_cps() -> Halogen.cps_spct[[m]]
+}
+Halogen.cps_spct
+```
+
+```{r, fig.width=8, fig.asp=0.5}
+for (m in names(Halogen.cps_spct)) {
+  print(plot(Halogen.cps_spct[[m]]) + ggtitle(m))
+  print(plot(Halogen.cps_spct[[m]], range = c(250, 410)) + ggtitle(m))
+  print(plot(Halogen.cps_spct[[m]], range = c(500, 520)) + ggtitle(m))
+}
+```
+
+We substract the dark reading from both the light and filter measurements, and copy attributes, including instrument settings and calibration data.
+
+```{r}
+Halogen01.cps_spct <- cps_mspct()
+for (m in setdiff(names(Halogen.cps_spct), "dark")) {
+  Halogen01.cps_spct[[m]] <- Halogen.cps_spct[[m]] - Halogen.cps_spct[["dark"]]
+  Halogen01.cps_spct[[m]] <- 
+    copy_attributes(Halogen.cps_spct[[m]],
+                    Halogen01.cps_spct[[m]],
+                    copy.class = FALSE)
+}
+Halogen01.cps_spct
+```
+
+```{r, fig.width=8, fig.asp=0.5}
+for (m in names(Halogen01.cps_spct)) {
+  print(plot(Halogen01.cps_spct[[m]]) + ggtitle(m))
+  print(plot(Halogen01.cps_spct[[m]], range = c(250, 410)) + ggtitle(m))
+}
+```
+
+As we can see in the plots above, a small amount of stray light is present in both spectra in the UV region. We apply a filter correction using a simple method based on a fixed transmittance value.
+
+```{r}
+Halogen_corrected.cps_spct <-
+  filter_correction(Halogen01.cps_spct[["light"]], 
+                    Halogen01.cps_spct[["filter"]],
+                    stray.light.method = "simple",
+                    flt.Tfr = 1)
+```
+
+```{r, fig.width=8, fig.asp=0.5}
+plot(Halogen_corrected.cps_spct)
+plot(Halogen_corrected.cps_spct, range = c(250, 410))
+mean(clip_wl(Halogen_corrected.cps_spct, range = c(250, 300))[["cps"]])
+```
+
+```{r}
+cps2irrad(Halogen_corrected.cps_spct) %>%
+  smooth_spct() -> Halogen.source_spct
+```
+
+```{r, fig.width=8, fig.asp=0.5}
+plot(Halogen.source_spct)
+plot(Halogen.source_spct, range = c(250, 410))
+```
+
+## Coming soon
+
+Step by step application of slit fucntion tail correction.
+
 
