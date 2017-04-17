@@ -16,7 +16,8 @@ s_irrad_corrected(x, ...)
   descriptor, locale = NULL, verbose = getOption("photobiology.verbose",
   default = FALSE), ...)
 
-\method{s_irrad_corrected}{raw_mspct}(x, method, return.cps = FALSE,
+\method{s_irrad_corrected}{raw_mspct}(x, spct.names = c(light = "light",
+  filter = "filter", dark = "dark"), method, return.cps = FALSE,
   verbose = getOption("photobiology.verbose", default = FALSE), ...)
 
 \method{s_irrad_corrected}{raw_spct}(x, method, return.cps = FALSE,

@@ -21,7 +21,7 @@ We will step through the different steps of the algorithm used, plotting the spe
 require("knitr")
 dirpath <- system.file("extdata", package="ooacquire")
 opts_knit$set(autodep = TRUE, root.dir = dirpath, fig.width=8, fig.asp=0.5, out.width = '90%')
-
+options(photobioloy.verbose = TRUE)
 ```
 
 We first load the R packages to be used.
@@ -55,7 +55,9 @@ plot(LED_lamp04_long.spct, range = c(250, 410))
 We recalculate with current version of high-level fucntion.
 
 ```{r, fig.width=8, fig.asp=0.5}
-LED_lamp04_long.raw_spct <-msmsply(LED_lamp04_long.raw_spct, setInstrDesc, MAYP11278_descriptors$cal_2016a)
+LED_lamp04_long.raw_spct <- 
+  msmsply(LED_lamp04_long.raw_spct, 
+          setInstrDesc,   MAYP11278_descriptors$cal_2016a)
 LED_lamp_recalc.spct <-
   s_irrad_corrected(LED_lamp04_long.raw_spct, 
                     method = ooacquire::MAYP11278_ylianttila.mthd)
@@ -200,9 +202,16 @@ We recalculate with current version of high-level fucntion.
 ```{r, fig.width=8, fig.asp=0.5}
 Halogen.raw_spct <-msmsply(Halogen.raw_spct, setInstrDesc, MAYP11278_descriptors$cal_2016a)
 Halogen_recalc.spct <-
-  s_irrad_corrected(Halogen.raw_spct, method = MAYP11278_simple.mthd)
+  s_irrad_corrected(Halogen.raw_spct, method = MAYP11278_ylianttila.mthd)
 plot(Halogen_recalc.spct)
 plot(Halogen_recalc.spct, range = c(250, 410))
+```
+
+```{r, fig.width=8, fig.asp=0.5}
+Halogen_recalc_simple.spct <-
+  s_irrad_corrected(Halogen.raw_spct, method = MAYP11278_simple.mthd)
+plot(Halogen_recalc_simple.spct)
+plot(Halogen_recalc_simple.spct, range = c(250, 410))
 ```
 
 We print the object with the raw counts data. The protocol used, in this case included a measurement with a UV-pass filter (polycarbonate).
@@ -221,7 +230,7 @@ for (m in names(Halogen.raw_spct)) {
     trim_counts() %>%
     bleed_nas() %>%
     linearize_counts() %>%
-    fshift(range = c(200,250)) %>%
+    fshift(range = c(187.82,189.26)) %>%
     raw2cps() %>% 
     merge_cps() -> Halogen.cps_spct[[m]]
 }
@@ -257,14 +266,14 @@ for (m in names(Halogen01.cps_spct)) {
 }
 ```
 
-As we can see in the plots above, a small amount of stray light is present in both spectra in the UV region. We apply a filter correction using a simple method based on a fixed transmittance value.
+As we can see in the plots above, a small amount of stray light is present in both spectra in the UV region. We apply a filter correction using a simple method based on a fixed transmittance value. By trial an error a flt.Tfr value > 1 gives best correction, which is odd...
 
 ```{r}
 Halogen_corrected.cps_spct <-
   filter_correction(Halogen01.cps_spct[["light"]], 
                     Halogen01.cps_spct[["filter"]],
-                    stray.light.method = "simple",
-                    flt.Tfr = 1)
+                    stray.light.method = "original",
+                    flt.Tfr = 1.4)
 ```
 
 ```{r, fig.width=8, fig.asp=0.5}

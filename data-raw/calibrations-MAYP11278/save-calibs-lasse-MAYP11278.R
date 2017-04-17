@@ -7,10 +7,12 @@ library(ooacquire)
 MAYP11278_ylianttila.mthd <- list(
   stray.light.method = "original",
   stray.light.wl = c(218.5, 228.5),
-  flt.dark.wl = c(193, 209.5),
-  flt.ref.wl = c(360, 379.5),
+  flt.dark.wl = c(193, 209.5),        # used for $N$2 in Lasse's calc worksheet
+  flt.ref.wl = c(360, 379.5),         # used for $N$3 in Lasse's calc worksheet
+  flt.Tfr = 1,
+  inst.dark.pixs = 1:4,
   worker.fun = ooacquire::MAYP11278_tail_correction,
-  trim = 0
+  trim = 0.05
 )
 
 # create an object with the parameters for simple method for Maya
@@ -20,8 +22,10 @@ MAYP11278_simple.mthd <- list(
   stray.light.wl = c(218.5, 228.5),
   flt.dark.wl = c(193, 209.5),
   flt.ref.wl = c(360, 379.5),
+  flt.Tfr = 1,
+  inst.dark.pixs = 1:4,
   worker.fun = ooacquire::MAYP11278_tail_correction,
-  trim = 0
+  trim = 0.05
 )
 
 # create an object with the parameters for a method good only for sunlight,
@@ -31,8 +35,10 @@ MAYP11278_sun.mthd <- list(
   stray.light.wl = c(218.5, 228.5),
   flt.dark.wl = c(193, 209.5),
   flt.ref.wl = c(360, 379.5),
+  flt.Tfr = 1,
+  inst.dark.pixs = 1:4,
   worker.fun = ooacquire::MAYP11278_tail_correction,
-  trim = 0
+  trim = 0.05
 )
 
 # load an instrument descriptor

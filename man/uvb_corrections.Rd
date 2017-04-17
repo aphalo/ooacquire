@@ -7,10 +7,10 @@
 \alias{no_filter_correction}
 \title{Apply filter-based stray-light correction}
 \usage{
-uvb_corrections(x, flt, dark, stray.light.method = "original",
-  stray.light.wl = c(218.5, 228.5), flt.dark.wl = c(193, 209.5),
-  flt.ref.wl = c(360, 379.5), flt.Tfr = 0.9, inst.dark.pixs = c(1:4),
-  worker.fun = NULL, trim = 0.05,
+uvb_corrections(x, spct.names = c(light = "light", filter = "filter", dark =
+  "dark"), stray.light.method = "original", stray.light.wl = c(218.5,
+  228.5), flt.dark.wl = c(193, 209.5), flt.ref.wl = c(360, 379.5),
+  flt.Tfr = 0.9, inst.dark.pixs = 1:4, worker.fun = NULL, trim = 0.05,
   verbose = getOption("photobiology.verbose", default = FALSE), ...)
 
 slit_function_correction(x, worker.fun = NULL,
@@ -22,11 +22,11 @@ filter_correction(x, flt, stray.light.method = "original",
   verbose = getOption("photobiology.verbose", default = FALSE))
 
 no_filter_correction(x, stray.light.wl = c(218.5, 228.5),
-  flt.dark.wl = c(193, 209.5), flt.ref.wl = c(360, 379.5), trim = 0,
+  flt.dark.wl = c(193, 209.5), flt.ref.wl = NULL, flt.Tfr = 1, trim = 0,
   verbose = getOption("photobiology.verbose", default = FALSE))
 }
 \arguments{
-\item{x, flt, dark}{\code{cps_spct} objects.}
+\item{x}{\code{raw_mspct} The raw counts from measurements.}
 
 \item{stray.light.method}{Method variant used, "original" (Ylianttila),
 "simple", "full", "sun", "raw", "none".}
@@ -52,10 +52,12 @@ counts per second vectors.}
 \item{verbose}{Logical indicating the level of warnings wanted.}
 
 \item{...}{additional params passed to worker.fun.}
+
+\item{var.names}{named character vector length three.}
 }
 \value{
-A copy of \code{x} with the "cps" data replaced by the corrected
-  ones.
+A \code{cps_spct} object with the corrected count-per-second values
+  in coulmn "cps".
 }
 \description{
 Apply to a counts-per-second spectrum corrections based of a paired reading

@@ -6,6 +6,14 @@ OOAcquire 0.1.2
 ===============
 
 Add support for OceanView files, and a second set of calibration data.
+Rewrite much of the uv_corrections() and s_irrad_corrected() code, and add
+support for remapping names of raw_mspct members' to "light", "filter" and
+"dark". In the process fixed bug that was causing overcorrection for stray
+light in the UVA region. Added additional data to the descriptor. Changed
+test for too low signal for original filter correction to be more permisive,
+and instead of skipping the filter correction we use newly added method
+"simple".
+Add two new vignettes: Quick Start Guide, and Algorithms.
 
 OOAcquire 0.1.1
 ===============

@@ -20,6 +20,7 @@
 #'
 #' @import photobiology
 #' @importFrom Rcpp evalCpp
+#' @import magrittr
 #' @useDynLib ooacquire
 #'
 "_PACKAGE"

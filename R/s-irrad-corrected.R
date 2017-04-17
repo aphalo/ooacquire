@@ -77,40 +77,43 @@ s_irrad_corrected.list <- function(x,
 
 #' @describeIn s_irrad_corrected Default for generic function.
 #' @export
-s_irrad_corrected.raw_mspct <- function(x,
-                                        method,
-                                        return.cps = FALSE,
-                                        verbose = getOption("photobiology.verbose", default = FALSE),
-                                        ...) {
-  if (length(x[["light"]]) == 0) {
-    if (verbose) {
-      warning("'raw_spct' object with name 'light' missing")
+s_irrad_corrected.raw_mspct <-
+  function(x,
+           spct.names = c(light = "light", filter = "filter", dark = "dark"),
+           method,
+           return.cps = FALSE,
+           verbose = getOption("photobiology.verbose", default = FALSE),
+           ...) {
+    if (length(x[[ spct.names["light"] ]]) == 0) {
+      if (verbose) {
+        warning("'raw_spct' object for 'light' scans missing")
+      }
+      if (return.cps) {
+        return(cps_spct())
+      } else {
+        return(source_spct())
+      }
     }
+
+    corrected.spct <-
+      ooacquire::uvb_corrections(x = x,
+                                 spct.names = spct.names,
+                                 stray.light.method = method[["stray.light.method"]],
+                                 stray.light.wl = method[["stray.light.wl"]],
+                                 flt.dark.wl = method[["flt.dark.wl"]],
+                                 flt.ref.wl = method[["flt.ref.wl"]],
+                                 flt.Tfr = method[["flt.Tfr"]],
+                                 inst.dark.pixs = method[["inst.dark.pixs"]],
+                                 worker.fun = method[["worker.fun"]],
+                                 trim = method[["trim"]],
+                                 verbose = verbose)
+
     if (return.cps) {
-      return(cps_spct())
+      corrected.spct
     } else {
-      return(source_spct())
+      photobiology::cps2irrad(corrected.spct, ...)
     }
   }
-
-  corrected.spct <-
-         ooacquire::uvb_corrections(x = x[["light"]],
-                                    flt = x[["filter"]],
-                                    dark = x[["dark"]],
-                                    stray.light.method = method[["stray.light.method"]],
-                                    stray.light.wl = method[["stray.light.wl"]],
-                                    flt.dark.wl = method[["flt.dark.wl"]],
-                                    flt.ref.wl = method[["flt.ref.wl"]],
-                                    worker.fun = method[["worker.fun"]],
-                                    trim = method[["trim"]],
-                                    verbose = verbose)
-
-  if (return.cps) {
-    corrected.spct
-  } else {
-    photobiology::cps2irrad(corrected.spct, ...)
-  }
-}
 
 #' @describeIn s_irrad_corrected Default for generic function.
 #' @export
