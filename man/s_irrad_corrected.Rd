@@ -25,7 +25,7 @@ s_irrad_corrected(x, ...)
 }
 \arguments{
 \item{x}{A named list of one to hree vectors of file names, with names
-"light", "filter", and "dark".}
+"light", "filter", and "dark". Or a raw_mspt object, or a raw_spct object.}
 
 \item{...}{Named argument passed to \code{photobiology::cps2irrad} which is
 the final calculation step.}
@@ -49,6 +49,8 @@ like the default time zone, encoding, decimal mark, big mark, and day/month
 names.}
 
 \item{verbose}{Logical indicating the level of warnings wanted.}
+
+\item{spct.names}{named character vector of length three.}
 }
 \description{
 Convert raw counts data into spectral irradiance

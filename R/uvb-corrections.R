@@ -7,7 +7,7 @@
 #' for.
 #'
 #' @param x \code{raw_mspct} The raw counts from measurements.
-#' @param var.names named character vector length three.
+#' @param spct.names named character vector of length three.
 #' @param stray.light.method Method variant used, "original" (Ylianttila),
 #'   "simple", "full", "sun", "raw", "none".
 #' @param stray.light.wl numeric vector of length 2 giving the range of
@@ -220,35 +220,35 @@ filter_correction <- function(x,
 
   # Find maximum cps
 
-  max_x_cs <- max(x[["cps"]], na.rm = TRUE)
+  max_x_cps <- max(x[["cps"]], na.rm = TRUE)
 
   # compute filter short wl "dark" cps
   flt_clip_dark <- clip_wl(flt, range = flt.dark.wl)
   x_clip_dark <- clip_wl(x, range = flt.dark.wl)
 
-  mean_flt_cs_short <- mean(flt_clip_dark[["cps"]],
+  mean_flt_cps_short <- mean(flt_clip_dark[["cps"]],
                             trim = trim, na.rm = TRUE)
-  mean_x_cs_short <- mean(x_clip_dark[["cps"]],
+  mean_x_cps_short <- mean(x_clip_dark[["cps"]],
                           trim = trim, na.rm = TRUE)
 
   # compute filter "reference" wl cps
   flt_clip_ref <- clip_wl(flt, range = flt.ref.wl)
   x_clip_ref <- clip_wl(x, range = flt.ref.wl)
 
-  mean_flt_cs_ref <- mean(flt_clip_ref[["cps"]],
+  mean_flt_cps_ref <- mean(flt_clip_ref[["cps"]],
                             trim = trim, na.rm = TRUE)
-  mean_x_cs_ref <- mean(x_clip_ref[["cps"]],
+  mean_x_cps_ref <- mean(x_clip_ref[["cps"]],
                           trim = trim, na.rm = TRUE)
 
   # We try to avoid spureous warnings by using the mean
-  if (verbose && mean_flt_cs_short < -1e4 * max_x_cs) {
+  if (verbose && mean_flt_cps_short < -1e4 * max_x_cps) {
     warning("Negative mean cps in \"filter\" spectrum's internal dark reference: ",
-            mean_flt_cs_short)
+            mean_flt_cps_short)
   }
 
-  if (verbose && mean_x_cs_short < -1e4 * max_x_cs) {
+  if (verbose && mean_x_cps_short < -1e4 * max_x_cps) {
     warning("Negative mean cps in \"measured\" spectrum's internal dark reference: ",
-            mean_x_cs_short)
+            mean_x_cps_short)
   }
 
   # Lasse's first correction
@@ -265,10 +265,10 @@ filter_correction <- function(x,
              stray.light.method == "sun" ||
              stray.light.method == "raw") {
     # attempt to avoid overcorrection
-    if ((mean_x_cs_short - mean_flt_cs_short) < 0.0) {
+    if ((mean_x_cps_short - mean_flt_cps_short) < 0.0) {
       mean_flt_ratio_short <- 1.0
     } else {
-      mean_flt_ratio_short <- mean_flt_cs_short / mean_x_cs_short
+      mean_flt_ratio_short <- mean_flt_cps_short / mean_x_cps_short
     }
   } else if (stray.light.method == "simple") {
     # trust filter spectral transmitatnce
@@ -283,7 +283,7 @@ filter_correction <- function(x,
   } else {
     if (mean_flt_ratio_short < 0.75) {
       # This is a guess based on PC filter transmittance of 90% or more in IR.
-      if (verbose || abs(mean_x_cs_short / max_x_cs) > 1e-3) {
+      if (verbose || abs(mean_x_cps_short / max_x_cps) > 1e-2) {
         warning("mean_flt_ratio_short < 0.75, was ",
                 signif(mean_flt_ratio_short, 4),
                 "; light source emits in UVC",
@@ -293,8 +293,8 @@ filter_correction <- function(x,
       mean_flt_ratio_short <- 0.85 # we use the actual filter transmittance
     } else if (mean_flt_ratio_short > 1.5) {
       # This is set to 1.5 as it makes no sense to have a lot more noise with the filter than without it!
-      if (verbose || abs(mean_x_cs_short / max_x_cs) > 1e-3)
-        warning("mean_flt_ratio_short > 1, was ",
+      if (verbose || abs(mean_x_cps_short / max_x_cps) > 1e-2)
+        warning("mean_flt_ratio_short > 1.5, was ",
                 signif(mean_flt_ratio_short, 4),
                 ", set to 1.5; possible stray light unstable")
       mean_flt_ratio_short <- 1.5
@@ -311,31 +311,31 @@ filter_correction <- function(x,
   flt_clip_ref <- clip_wl(flt, range = flt.ref.wl)
   x_clip_ref <- clip_wl(x, range = flt.ref.wl)
 
-  mean_flt_cs_medium <- mean(flt_clip_ref[["cps"]],
+  mean_flt_cps_medium <- mean(flt_clip_ref[["cps"]],
                             trim = trim, na.rm = TRUE)
-  mean_x_cs_medium <- mean(x_clip_ref[["cps"]],
+  mean_x_cps_medium <- mean(x_clip_ref[["cps"]],
                           trim = trim, na.rm = TRUE)
 
   # Because of pixel to pixel random noise this could easily be true per pixel
-  if (verbose && mean_flt_cs_medium < 0.0) {
-    warning("Mean cps of ", mean_flt_cs_medium,
+  if (verbose && mean_flt_cps_medium < 0.0) {
+    warning("Mean cps of ", mean_flt_cps_medium,
             " in reference region of \"filter\" scan!")
   }
 
-  if (verbose && mean_x_cs_medium < 0.0) {
-    warning("Mean cps of ", mean_x_cs_medium,
+  if (verbose && mean_x_cps_medium < 0.0) {
+    warning("Mean cps of ", mean_x_cps_medium,
             " in reference region of \"measurement\" scan!")
   }
 
-  if (verbose && ((mean_flt_cs_medium / mean_flt_cs_short) > 1.0)) {
+  if (verbose && ((mean_flt_cps_medium / mean_flt_cps_short) > 1.0)) {
     message("There is more noise at ", flt.ref.wl[1], " to ", flt.ref.wl[2],
             " nm than at ", flt.dark.wl[1],
             " to ", flt.dark.wl[2], " nm, ratio: ",
-            signif(mean_flt_cs_medium / mean_flt_cs_short, 4))
+            signif(mean_flt_cps_medium / mean_flt_cps_short, 4))
   }
 
   selector <- x[["w.length"]] >= flt.ref.wl[2]
-  stray_light_correction <- mean_flt_cs_medium / mean_flt_ratio_short
+  stray_light_correction <- mean_flt_cps_medium / mean_flt_ratio_short
   # Apply correction
   if (stray_light_correction > 0) {
     x[selector, "cps"] <-
@@ -373,20 +373,20 @@ no_filter_correction <- function(x,
   # Estimate for dark counts
   x_clip_dark <- clip_wl(x, range = flt.dark.wl)
 
-  mean_x_cs_short <- mean(x_clip_dark[["cps"]],
+  mean_x_cps_short <- mean(x_clip_dark[["cps"]],
                           trim = trim, na.rm = TRUE)
 
   # Estimate for stray light + dark count
   x_clip_stray <- clip_wl(x, range = stray.light.wl)
 
-  mean_x_cs_medium <- mean(x_clip_stray[["cps"]],
+  mean_x_cps_medium <- mean(x_clip_stray[["cps"]],
                            trim = trim, na.rm = TRUE)
 
   # We test whether any stray light has been detected
-  if (verbose && (mean_x_cs_medium - mean_x_cs_short) < 0.0) {
+  if (verbose && (mean_x_cps_medium - mean_x_cps_short) < 0.0) {
     warning("No stray light detected, skipping correction.")
   } else {
-    x <- x - mean_x_cs_medium
+    x <- x - mean_x_cps_medium
   }
 
   attr(x, "straylight.corrected") <- TRUE

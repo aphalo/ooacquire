@@ -95,9 +95,8 @@ ref_correction.cps_spct <- function(x,
               getInstrDesc(y)[["spectrometer.sn"]])
   # guard against differences in linearization
   stopifnot(attr(x, "linearized") == attr(y, "linearized"))
-  # check that measurement conditions were the same
-  stopifnot(all(getInstrSettings(x)[["integ.time"]] ==
-                  getInstrSettings(y)[["integ.time"]]))
+  # no need to check that integration times were the same
+  # We keep those from x only
   # check that the two spectra have equivalent spectral data
   cps.cols_x <- names(x)[grep("^cps", names(x))]
   cps.cols_y <- names(x)[grep("^cps", names(y))]

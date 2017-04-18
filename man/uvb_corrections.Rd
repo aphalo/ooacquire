@@ -28,6 +28,8 @@ no_filter_correction(x, stray.light.wl = c(218.5, 228.5),
 \arguments{
 \item{x}{\code{raw_mspct} The raw counts from measurements.}
 
+\item{spct.names}{named character vector of length three.}
+
 \item{stray.light.method}{Method variant used, "original" (Ylianttila),
 "simple", "full", "sun", "raw", "none".}
 
@@ -52,8 +54,6 @@ counts per second vectors.}
 \item{verbose}{Logical indicating the level of warnings wanted.}
 
 \item{...}{additional params passed to worker.fun.}
-
-\item{var.names}{named character vector length three.}
 }
 \value{
 A \code{cps_spct} object with the corrected count-per-second values

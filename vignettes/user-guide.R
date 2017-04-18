@@ -109,8 +109,9 @@ ov_files.spct
 ## ---- fig.height=5, fig.width=7------------------------------------------
 plot(ov_files.spct, unit.out = "photon")
 
-## ---- fig.height=5, fig.width=7------------------------------------------
-plot(smooth_spct(ov_files.spct, strength = 5), unit.out = "photon")
+## ---- fig.height=5, fig.width=7, eval=FALSE------------------------------
+#  ## error!
+#  plot(smooth_spct(ov_files.spct, strength = 5), unit.out = "photon")
 
 ## ------------------------------------------------------------------------
 descriptor <- 
@@ -144,7 +145,7 @@ descriptor <-
 tfr01.spct <- 
   s_fraction_corrected(x = UQG_Blue.raw_mspct,
                        descriptor = descriptor,
-                       method = MAYP11278_ylianttila.mthd,
+                       method = ooacquire::MAYP11278_ylianttila.mthd,
                        dyn.range = 3e2)
 
 ## ------------------------------------------------------------------------

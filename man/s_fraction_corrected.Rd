@@ -16,7 +16,8 @@ s_fraction_corrected(x, ...)
   descriptor = NULL, dyn.range = NULL, locale = NULL,
   verbose = getOption("photobiology.verbose", default = FALSE), ...)
 
-\method{s_fraction_corrected}{raw_mspct}(x, reference.value = 1,
+\method{s_fraction_corrected}{raw_mspct}(x, spct.names = c(sample = "sample",
+  reference = "reference", dark = "dark"), reference.value = 1,
   type = "internal", method, dyn.range = NULL, qty.out = "Tfr",
   verbose = getOption("photobiology.verbose", default = FALSE), ...)
 }

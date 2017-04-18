@@ -1,7 +1,8 @@
 #' Convert raw counts data into spectral irradiance
 #'
 #' @param x A named list of one to hree vectors of file names, with names
-#'   "light", "filter", and "dark".
+#'   "light", "filter", and "dark". Or a raw_mspt object, or a raw_spct object.
+#' @param spct.names named character vector of length three.
 #' @param method A named list of constants and functions defining the
 #'   method to be sued for stray light and dark signal corrections.
 #' @param return.cps logical Useful when there is no need to apply a calibration,
@@ -54,13 +55,16 @@ s_irrad_corrected.list <- function(x,
 
   raw.mspct <-
     ooacquire::read_files2mspct(x,
-                                time = time,
+                                 time = time,
                                 locale = locale,
                                 descriptor = descriptor,
                                 verbose = verbose)
 
   corrected.spct <-
     s_irrad_corrected(x = raw.mspct,
+                      spct.names = c(light = "light",
+                                     filter = "filter",
+                                     dark = "dark"),
                       method = method,
                       return.cps = return.cps,
                       verbose = verbose,
@@ -79,7 +83,9 @@ s_irrad_corrected.list <- function(x,
 #' @export
 s_irrad_corrected.raw_mspct <-
   function(x,
-           spct.names = c(light = "light", filter = "filter", dark = "dark"),
+           spct.names = c(light = "light",
+                          filter = "filter",
+                          dark = "dark"),
            method,
            return.cps = FALSE,
            verbose = getOption("photobiology.verbose", default = FALSE),

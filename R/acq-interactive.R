@@ -111,7 +111,7 @@ acq_irrad_interactive <-
         next()
       }
 
-      irrad.spct <- s_irrad_corrected(raw.mspct, method)
+      irrad.spct <- s_irrad_corrected(raw.mspct, method = method)
 
       assign(raw.name, raw.mspct)
       assign(irrad.name, irrad.spct)
