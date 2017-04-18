@@ -77,6 +77,8 @@ acq_raw_spct <- function(descriptor,
   z <- as.raw_spct(z)
   attr(z, "linearized") <- FALSE
   photobiology::setInstrDesc(z, y)
+  # we remove the Java wrapper so that RJava is not required to read the data
+  photobiology::trimInstrDesc(z, c("-", "w"))
   photobiology::setInstrSettings(z, x)
   photobiology::setWhenMeasured(z, start.time)
   photobiology::setWhereMeasured(z, where.measured)

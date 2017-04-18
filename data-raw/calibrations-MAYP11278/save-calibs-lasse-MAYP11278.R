@@ -11,6 +11,21 @@ MAYP11278_ylianttila.mthd <- list(
   flt.ref.wl = c(360, 379.5),         # used for $N$3 in Lasse's calc worksheet
   flt.Tfr = 1,
   inst.dark.pixs = 1:4,
+  tail.coeffs = c(-7.273130, -0.05688),
+  worker.fun = ooacquire::MAYP11278_tail_correction,
+  trim = 0
+)
+
+# create an object with the parameters for a method good only for sunlight,
+# based on Lasse Ylianttila's original method suitable ONLY for sunlight.
+MAYP11278_sun.mthd <- list(
+  stray.light.method = "sun",
+  stray.light.wl = c(218.5, 228.5),
+  flt.dark.wl = c(193, 209.5),
+  flt.ref.wl = c(360, 379.5),
+  flt.Tfr = 1,
+  inst.dark.pixs = 1:4,
+  tail.coeffs = c(-7.273130, -0.05688),
   worker.fun = ooacquire::MAYP11278_tail_correction,
   trim = 0.05
 )
@@ -24,19 +39,7 @@ MAYP11278_simple.mthd <- list(
   flt.ref.wl = c(360, 379.5),
   flt.Tfr = 1,
   inst.dark.pixs = 1:4,
-  worker.fun = ooacquire::MAYP11278_tail_correction,
-  trim = 0.05
-)
-
-# create an object with the parameters for a method good only for sunlight,
-# based on Lasse Ylianttila's original method suitable ONLY for sunlight.
-MAYP11278_sun.mthd <- list(
-  stray.light.method = "sun",
-  stray.light.wl = c(218.5, 228.5),
-  flt.dark.wl = c(193, 209.5),
-  flt.ref.wl = c(360, 379.5),
-  flt.Tfr = 1,
-  inst.dark.pixs = 1:4,
+  tail.coeffs = c(-7.273130, -0.05688),
   worker.fun = ooacquire::MAYP11278_tail_correction,
   trim = 0.05
 )

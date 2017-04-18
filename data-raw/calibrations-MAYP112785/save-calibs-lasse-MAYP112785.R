@@ -9,9 +9,39 @@ MAYP112785_ylianttila.mthd <- list(
   stray.light.wl = c(218.5, 228.5),
   flt.dark.wl = c(204.6, 219.1),
   flt.ref.wl = c(368.3, 388.3),
+  flt.Tfr = 1,
+  inst.dark.pixs = 1:4,
   tail.coeffs = c(-9.22574221, -0.035984385),
   worker.fun = ooacquire::MAYP112785_tail_correction,
   trim = 0
+)
+
+# create an object with the parameters for a method good only for sunlight,
+# based on Lasse Ylianttila's original method suitable ONLY for sunlight.
+MAYP112785_sun.mthd <- list(
+  stray.light.method = "sun",
+  stray.light.wl = c(218.5, 228.5),
+  flt.dark.wl = c(204.6, 219.1),
+  flt.ref.wl = c(368.3, 388.3),
+  flt.Tfr = 1,
+  inst.dark.pixs = 1:4,
+  tail.coeffs = c(-9.22574221, -0.035984385),
+  worker.fun = ooacquire::MAYP112785_tail_correction,
+  trim = 0.05
+)
+
+# create an object with the parameters for simple method for Maya
+# suitable for any light source, but not as good for sunlight
+MAYP112785_simple.mthd <- list(
+  stray.light.method = "simple",
+  stray.light.wl = c(218.5, 228.5),
+  flt.dark.wl = c(204.6, 219.1),
+  flt.ref.wl = c(368.3, 388.3),
+  flt.Tfr = 1,
+  inst.dark.pixs = 1:4,
+  tail.coeffs = c(-9.22574221, -0.035984385),
+  worker.fun = ooacquire::MAYP112785_tail_correction,
+  trim = 0.05
 )
 
 ## temporarily we load the old descriptor!!

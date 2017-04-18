@@ -108,7 +108,7 @@ sr.online &lt;-<span class="st"> </span><span class="ot">FALSE</span></code></pr
 <p>Although we here discuss these settings in relation to parameter arguments, the same setiings can be set interactively by the user. It should also be remembered that the functions described will in normal use set a suitable integration time automatically.</p>
 <p>Simplest settings. Using no integration time bracketing as a single numeric value for <code>HDR.mult</code> corresponds to aquisition using a single integration time. Maximum and minimum total integration time as short or as long as allowed by the instrument with no scan averaging.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">acq_irrad_interactive</span>(<span class="dt">HDR.mult =</span> <span class="dv">1</span>,
-                      <span class="dt">total.time.range =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="ot">Inf</span>),
+                      <span class="dt">tot.time.range =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="ot">Inf</span>),
                       <span class="dt">method =</span> ooacquire::MAYP11278_ylianttila.mthd,
                       <span class="dt">descriptors =</span> ooacquire::MAYP11278_descriptors)</code></pre></div>
 <p>It is possible to use in the example above a value larger than one for <code>HDR.mult</code> even if a single integration time is used. This is unusual, but if we indeed would like to force clipping of part of the spectrum, this would be the way to achieve it.</p>
@@ -152,13 +152,13 @@ sr.online &lt;-<span class="st"> </span><span class="ot">FALSE</span></code></pr
 ## file.copy(from = filepath, to = &quot;.&quot;)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">folderpath &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;example-scripts&quot;</span>, <span class="dt">package=</span><span class="st">&quot;ooacquire&quot;</span>)
 <span class="kw">list.files</span>(<span class="dt">path =</span> folderpath, <span class="dt">pattern =</span> <span class="st">&quot;.*[.]R&quot;</span>)</code></pre></div>
-<pre><code>##  [1] &quot;irrad-acq-interac.R&quot;              &quot;irrad-maya-acq-interac.R&quot;        
-##  [3] &quot;irrad-maya-acq.R&quot;                 &quot;irrad-maya-mspct-defaults.R&quot;     
-##  [5] &quot;maya-files-defaults.R&quot;            &quot;maya-files-steps-demo.R&quot;         
-##  [7] &quot;maya-files.R&quot;                     &quot;simple_acq.R&quot;                    
-##  [9] &quot;simple_maya_acq.R&quot;                &quot;trans-maya-mspct-defaults.R&quot;     
-## [11] &quot;transmittance-jaz-acq-interac.R&quot;  &quot;transmittance-maya-acq-interac.R&quot;
-## [13] &quot;two_channels_acq.R&quot;</code></pre>
+<pre><code>##  [1] &quot;Tfr-acq-interac.R&quot;                &quot;irrad-acq-interac.R&quot;             
+##  [3] &quot;irrad-maya-acq-interac.R&quot;         &quot;irrad-maya-acq.R&quot;                
+##  [5] &quot;irrad-maya-mspct-defaults.R&quot;      &quot;maya-files-defaults.R&quot;           
+##  [7] &quot;maya-files-steps-demo.R&quot;          &quot;maya-files.R&quot;                    
+##  [9] &quot;simple_acq.R&quot;                     &quot;simple_maya_acq.R&quot;               
+## [11] &quot;trans-maya-mspct-defaults.R&quot;      &quot;transmittance-jaz-acq-interac.R&quot; 
+## [13] &quot;transmittance-maya-acq-interac.R&quot; &quot;two_channels_acq.R&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## file.copy(from = list.files(path = folderpath, pattern = &quot;.*[.]R&quot;, full.names = TRUE), to = &quot;.&quot;)</code></pre></div>
 </div>
 

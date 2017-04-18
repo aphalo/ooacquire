@@ -24,7 +24,7 @@ sr.online <- FALSE
 
 ## ---- eval=sr.online-----------------------------------------------------
 #  acq_irrad_interactive(HDR.mult = 1,
-#                        total.time.range = c(0, Inf),
+#                        tot.time.range = c(0, Inf),
 #                        method = ooacquire::MAYP11278_ylianttila.mthd,
 #                        descriptors = ooacquire::MAYP11278_descriptors)
 

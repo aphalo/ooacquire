@@ -298,7 +298,7 @@ kable(
 #### From OceanView files
 
 Files output by SpectraSuite and OceanView have different header format, but they can be recognized automatically. Consequently there is no difference in the function calls.
-The filter measurment is not used as it is not suitable for the source spectrum measured, and would be ignored with a warning.
+The filter measurement is not used as it is not suitable for the source spectrum measured, and would be ignored with a warning.
 
 ```{r}
 file_names <- list(light = "light_MAYP112785.txt",
@@ -335,9 +335,9 @@ plot(smooth_spct(ov_files.spct, strength = 5), unit.out = "photon")
 
 ```{r}
 descriptor <- 
-  which_descriptor(getWhenMeasured(warm_white_LED.raw_mspct$light))
+  which_descriptor(getWhenMeasured(white_LED.raw_mspct$light))
 irrad01.spct <- 
-  s_irrad_corrected(x = warm_white_LED.raw_mspct,
+  s_irrad_corrected(x = white_LED.raw_mspct,
                        descriptor = descriptor,
                        method = MAYP11278_ylianttila.mthd)
 ```
@@ -400,9 +400,9 @@ A suitable `"raw_mspct"` can be acquired directly from a spectrometer using func
 
 ```{r}
 descriptor <- 
-  which_descriptor(getWhenMeasured(UQG_Blue.raw_mspct$sample))
+  which_descriptor(getWhenMeasured(blue_filter.raw_mspct$sample))
 tfr01.spct <- 
-  s_fraction_corrected(x = UQG_Blue.raw_mspct,
+  s_fraction_corrected(x = blue_filter.raw_mspct,
                        descriptor = descriptor,
                        method = ooacquire::MAYP11278_ylianttila.mthd,
                        dyn.range = 3e2)
@@ -445,9 +445,9 @@ In contrast to the previous example, we will here assume that the reference is n
 
 ```{r}
 descriptor <- 
-  which_descriptor(getWhenMeasured(UQG_Blue.raw_mspct$sample))
+  which_descriptor(getWhenMeasured(blue_filter.raw_mspct$sample))
 tfr02.spct <- 
-  s_fraction_corrected(x = UQG_Blue.raw_mspct,
+  s_fraction_corrected(x = blue_filter.raw_mspct,
                        ref.value = 0.95,
                        descriptor = descriptor,
                        method = MAYP11278_ylianttila.mthd,
@@ -464,9 +464,9 @@ In contrast to the previous example where we calculated transmittance, we will h
 
 ```{r}
 descriptor <- 
-  which_descriptor(getWhenMeasured(UQG_Blue.raw_mspct$sample))
+  which_descriptor(getWhenMeasured(blue_filter.raw_mspct$sample))
 rfr01.spct <- 
-  s_fraction_corrected(x = UQG_Blue.raw_mspct,
+  s_fraction_corrected(x = blue_filter.raw_mspct,
                        ref.value = as.reflector_spct(white_body.spct) * 0.97,
                        descriptor = descriptor,
                        method = MAYP11278_ylianttila.mthd,

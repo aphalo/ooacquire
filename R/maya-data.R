@@ -32,6 +32,30 @@
 #'
 "MAYP11278_ylianttila.mthd"
 
+#' Correction method definition
+#'
+#' This a list with data needed to process raw data in the example files. It
+#' contains constants and functions defining the method developed by Lasse
+#' Ylianttila.
+#'
+#' @docType data
+#' @keywords datasets
+#' @format A list.
+#'
+"MAYP11278_sun.mthd"
+
+#' Correction method definition
+#'
+#' This a list with data needed to process raw data in the example files. It
+#' contains constants and functions defining the method developed by Lasse
+#' Ylianttila.
+#'
+#' @docType data
+#' @keywords datasets
+#' @format A list.
+#'
+"MAYP11278_simple.mthd"
+
 #' Instrument descriptors for a Maya2000 Pro  spectrometer
 #'
 #' This a list of instrument descriptors, each one containing the calibration
@@ -65,3 +89,27 @@
 #' @format A list.
 #'
 "MAYP112785_ylianttila.mthd"
+
+#' Correction method definition
+#'
+#' This a list with data needed to process raw data in the example files. It
+#' contains constants and functions defining the method developed by Lasse
+#' Ylianttila.
+#'
+#' @docType data
+#' @keywords datasets
+#' @format A list.
+#'
+"MAYP112785_sun.mthd"
+
+#' Correction method definition
+#'
+#' This a list with data needed to process raw data in the example files. It
+#' contains constants and functions defining the method developed by Lasse
+#' Ylianttila.
+#'
+#' @docType data
+#' @keywords datasets
+#' @format A list.
+#'
+"MAYP112785_simple.mthd"
