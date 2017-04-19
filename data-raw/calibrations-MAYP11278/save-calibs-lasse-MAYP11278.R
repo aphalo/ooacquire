@@ -47,6 +47,8 @@ MAYP11278_simple.mthd <- list(
 # load an instrument descriptor
 load(file = "./data-raw/maya-descriptor/MAYP11278.Rda")
 
+descriptor$w <- NULL
+
 # find calibration files
 files <- list.files("data-raw/calibrations-MAYP11278",
                     pattern = "*.xlsx$",

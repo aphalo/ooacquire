@@ -10,7 +10,7 @@ MAYP112785_ylianttila.mthd <- list(
   flt.dark.wl = c(204.6, 219.1),
   flt.ref.wl = c(368.3, 388.3),
   flt.Tfr = 1,
-  inst.dark.pixs = 1:4,
+  inst.dark.pixs = 2:4,
   tail.coeffs = c(-9.22574221, -0.035984385),
   worker.fun = ooacquire::MAYP112785_tail_correction,
   trim = 0
@@ -24,7 +24,7 @@ MAYP112785_sun.mthd <- list(
   flt.dark.wl = c(204.6, 219.1),
   flt.ref.wl = c(368.3, 388.3),
   flt.Tfr = 1,
-  inst.dark.pixs = 1:4,
+  inst.dark.pixs = 2:4,
   tail.coeffs = c(-9.22574221, -0.035984385),
   worker.fun = ooacquire::MAYP112785_tail_correction,
   trim = 0.05
@@ -38,7 +38,7 @@ MAYP112785_simple.mthd <- list(
   flt.dark.wl = c(204.6, 219.1),
   flt.ref.wl = c(368.3, 388.3),
   flt.Tfr = 1,
-  inst.dark.pixs = 1:4,
+  inst.dark.pixs = 2:4,
   tail.coeffs = c(-9.22574221, -0.035984385),
   worker.fun = ooacquire::MAYP112785_tail_correction,
   trim = 0.05
@@ -48,6 +48,11 @@ MAYP112785_simple.mthd <- list(
 ## this needs to be replaced so as to get correct values!!!!
 # load an instrument descriptor
 load(file = "./data-raw/maya-descriptor/MAYP11278.Rda")
+
+descriptor$w <- NULL
+descriptor$sr.index <- NULL
+descriptor$spectrometer.sn <- "MAYP112785"
+descriptor$bad.pixs <- numeric()
 
 # find calibration files
 files <- list.files("data-raw/calibrations-MAYP112785",

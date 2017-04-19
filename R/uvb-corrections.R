@@ -274,7 +274,7 @@ filter_correction <- function(x,
     # trust filter spectral transmitatnce
     mean_flt_ratio_short <- flt.Tfr
   }else {
-    stop(paste("method '", stray.light.method, "' not supported"))
+    stop(paste("stray.light.method '", stray.light.method, "' not supported"))
   }
 
   # diagnosis and correction of bad estimates

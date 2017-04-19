@@ -146,7 +146,7 @@ We now subtract the dark signal from the light measurement.
 ```{r, fig.width=8, fig.asp=0.5}
 white_LED_2min.cps_spct <- 
   white_LED_2min.cps_mspct[["light"]] - white_LED_2min.cps_mspct[["dark"]]
-LED_lamp.cps_spct <- 
+white_LED_2min.cps_spct <- 
   copy_attributes(white_LED_2min.raw_mspct[["light"]],
                   white_LED_2min.cps_spct,
                   copy.class = FALSE)

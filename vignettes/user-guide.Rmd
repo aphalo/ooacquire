@@ -187,7 +187,7 @@ one_file.spct <-
   s_irrad_corrected(x = file_names,
                     descriptor = which_descriptor("2016-10-11" , 
                                                   MAYP11278_descriptors),
-                    method = MAYP11278_ylianttila.mthd)
+                    correction.method = MAYP11278_ylianttila.mthd)
 ```
 
 As these measurements are of sunlight in a greenhouse we can remove noise from regions known to be zero by replacing with zeros all spectral irradiance values form wavelengths shorter than 290 nm.
@@ -241,7 +241,7 @@ five_files.spct <-
   s_irrad_corrected(x = file_names,
                     descriptor = which_descriptor("2016-10-11", 
                                                   MAYP11278_descriptors),
-                    method = MAYP11278_ylianttila.mthd)
+                    correction.method = MAYP11278_ylianttila.mthd)
 ```
 
 As these measurements are of sunlight in a greenhouse we can remove noise from regions known to be zero as we did above.
@@ -306,14 +306,31 @@ file_names <- list(light = "light_MAYP112785.txt",
                     dark = "dark_MAYP112785.txt")
 ```
 
-In this case we use different descriptor and method definitions only because the files acquired with SpectraSuite and OceanView originated from different instruments.
+In this case we use a different descriptor definition only because the files acquired with SpectraSuite and OceanView originated from different instruments.
+
+```{r}
+ov_files.raw_mspct <- 
+  ooacquire::read_files2mspct(file_names,
+                              descriptor = which_descriptor("2017-01-05", 
+                                                            MAYP112785_descriptors))
+summary(ov_files.raw_mspct[[1]])
+summary(ov_files.raw_mspct[[2]])
+```
+
+In this case we use a different `correction.method` definition only because the files acquired with SpectraSuite and OceanView originated from different instruments.
+
+```{r}
+ov_files.spct <- 
+  s_irrad_corrected(x = ov_files.raw_mspct,
+                    correction.method = ooacquire::MAYP112785_ylianttila.mthd)
+```
 
 ```{r}
 ov_files.spct <- 
   s_irrad_corrected(x = file_names,
                     descriptor = which_descriptor("2017-01-05", 
                                                   MAYP112785_descriptors),
-                    method = MAYP112785_ylianttila.mthd)
+                    correction.method = ooacquire::MAYP112785_ylianttila.mthd)
 ```
 
 
@@ -339,7 +356,7 @@ descriptor <-
 irrad01.spct <- 
   s_irrad_corrected(x = white_LED.raw_mspct,
                        descriptor = descriptor,
-                       method = MAYP11278_ylianttila.mthd)
+                       correction.method = MAYP11278_ylianttila.mthd)
 ```
 
 ```{r}
@@ -404,7 +421,7 @@ descriptor <-
 tfr01.spct <- 
   s_fraction_corrected(x = blue_filter.raw_mspct,
                        descriptor = descriptor,
-                       method = ooacquire::MAYP11278_ylianttila.mthd,
+                       correction.method = ooacquire::MAYP11278_ylianttila.mthd,
                        dyn.range = 3e2)
 ```
 
@@ -450,7 +467,7 @@ tfr02.spct <-
   s_fraction_corrected(x = blue_filter.raw_mspct,
                        ref.value = 0.95,
                        descriptor = descriptor,
-                       method = MAYP11278_ylianttila.mthd,
+                       correction.method = MAYP11278_ylianttila.mthd,
                        dyn.range = 3e2)
 ```
 
@@ -469,7 +486,7 @@ rfr01.spct <-
   s_fraction_corrected(x = blue_filter.raw_mspct,
                        ref.value = as.reflector_spct(white_body.spct) * 0.97,
                        descriptor = descriptor,
-                       method = MAYP11278_ylianttila.mthd,
+                       correction.method = MAYP11278_ylianttila.mthd,
                        dyn.range = 3e2,
                        qty.out = "Rfr",
                        type = "total")

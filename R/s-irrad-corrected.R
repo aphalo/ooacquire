@@ -3,7 +3,7 @@
 #' @param x A named list of one to hree vectors of file names, with names
 #'   "light", "filter", and "dark". Or a raw_mspt object, or a raw_spct object.
 #' @param spct.names named character vector of length three.
-#' @param method A named list of constants and functions defining the
+#' @param correction.method A named list of constants and functions defining the
 #'   method to be sued for stray light and dark signal corrections.
 #' @param return.cps logical Useful when there is no need to apply a calibration,
 #'   such as when computing new calibration multipliers.
@@ -43,7 +43,7 @@ s_irrad_corrected.default <- function(x, ...) {
 #' @export
 s_irrad_corrected.list <- function(x,
                                    time = NULL,
-                                   method,
+                                   correction.method,
                                    return.cps = FALSE,
                                    descriptor,
                                    locale = NULL,
@@ -55,7 +55,7 @@ s_irrad_corrected.list <- function(x,
 
   raw.mspct <-
     ooacquire::read_files2mspct(x,
-                                 time = time,
+                                time = time,
                                 locale = locale,
                                 descriptor = descriptor,
                                 verbose = verbose)
@@ -65,7 +65,7 @@ s_irrad_corrected.list <- function(x,
                       spct.names = c(light = "light",
                                      filter = "filter",
                                      dark = "dark"),
-                      method = method,
+                      correction.method = correction.method,
                       return.cps = return.cps,
                       verbose = verbose,
                       ...)
@@ -86,7 +86,7 @@ s_irrad_corrected.raw_mspct <-
            spct.names = c(light = "light",
                           filter = "filter",
                           dark = "dark"),
-           method,
+           correction.method,
            return.cps = FALSE,
            verbose = getOption("photobiology.verbose", default = FALSE),
            ...) {
@@ -104,14 +104,14 @@ s_irrad_corrected.raw_mspct <-
     corrected.spct <-
       ooacquire::uvb_corrections(x = x,
                                  spct.names = spct.names,
-                                 stray.light.method = method[["stray.light.method"]],
-                                 stray.light.wl = method[["stray.light.wl"]],
-                                 flt.dark.wl = method[["flt.dark.wl"]],
-                                 flt.ref.wl = method[["flt.ref.wl"]],
-                                 flt.Tfr = method[["flt.Tfr"]],
-                                 inst.dark.pixs = method[["inst.dark.pixs"]],
-                                 worker.fun = method[["worker.fun"]],
-                                 trim = method[["trim"]],
+                                 stray.light.method = correction.method[["stray.light.method"]],
+                                 stray.light.wl = correction.method[["stray.light.wl"]],
+                                 flt.dark.wl = correction.method[["flt.dark.wl"]],
+                                 flt.ref.wl = correction.method[["flt.ref.wl"]],
+                                 flt.Tfr = correction.method[["flt.Tfr"]],
+                                 inst.dark.pixs = correction.method[["inst.dark.pixs"]],
+                                 worker.fun = correction.method[["worker.fun"]],
+                                 trim = correction.method[["trim"]],
                                  verbose = verbose)
 
     if (return.cps) {
@@ -124,13 +124,13 @@ s_irrad_corrected.raw_mspct <-
 #' @describeIn s_irrad_corrected Default for generic function.
 #' @export
 s_irrad_corrected.raw_spct <- function(x,
-                                       method,
+                                       correction.method,
                                        return.cps = FALSE,
                                        verbose = getOption("photobiology.verbose", default = FALSE),
                                        ...) {
   raw.mspct <- raw_mspct(list(light = x))
   s_irrad_corrected(x = raw.mspct,
-                    method = method,
+                    correction.method = correction.method,
                     return.cps = return.cps,
                     verbose = verbose,
                     ...)

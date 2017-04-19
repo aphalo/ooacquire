@@ -14,7 +14,7 @@
 #'   present.
 #'
 trim_counts <- function(x,
-                        range = c(0L, getInstrDesc(x)[["max.counts"]] - 1),
+                        range = c(NA, getInstrDesc(x)[["max.counts"]] - 1),
                         fill = NA) {
   if (is.na(range[1])) {
     range[1] <- -Inf
@@ -25,6 +25,10 @@ trim_counts <- function(x,
   stopifnot(is.raw_spct(x))
   counts.cols <- grep("^counts", names(x), value = TRUE)
   for (col in counts.cols) {
+    if (min(x[[col]]) < 0) {
+      warning("Negative raw counts in data!\n",
+              "These are not raw detector counts.")
+    }
     x[[col]] <- ifelse(x[[col]] < range[1] | x[[col]] > range[2],
                        fill,
                        x[[col]])

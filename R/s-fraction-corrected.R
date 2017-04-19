@@ -7,7 +7,7 @@
 #' @param reference.value numeric or filter_spct or reflector_spct object, with the
 #'   fractional transmittance or reflectance of the reference.
 #' @param type character One of "internal" or "total".
-#' @param method A named list of constants and functions defining the
+#' @param correction.method A named list of constants and functions defining the
 #'   method to be sued for stray light and dark signal corrections.
 #' @param dyn.range numeric Effective dynamic range of the spectrometer.
 #' @param qty.out character, one of "Tfr", "Rfr".
@@ -51,7 +51,7 @@ s_fraction_corrected.list <- function(x,
                                       reference.value = 1,
                                       type = "internal",
                                       time = NULL,
-                                      method,
+                                      correction.method,
                                       qty.out = "Tfr",
                                       descriptor = NULL,
                                       dyn.range = NULL,
@@ -75,7 +75,7 @@ s_fraction_corrected.list <- function(x,
                                                        dark = "dark"),
                                         reference.value = reference.value,
                                         type = type,
-                                        method = method,
+                                        correction.method = correction.method,
                                         dyn.range = dyn.range,
                                         qty.out = qty.out,
                                         verbose = verbose,
@@ -99,7 +99,7 @@ s_fraction_corrected.raw_mspct <- function(x,
                                                           dark = "dark"),
                                            reference.value = 1,
                                            type = "internal",
-                                           method,
+                                           correction.method,
                                            dyn.range = NULL,
                                            qty.out = "Tfr",
                                            verbose = getOption("photobiology.verbose", default = FALSE),
@@ -123,14 +123,14 @@ s_fraction_corrected.raw_mspct <- function(x,
   corrected_smp.spct <-
     ooacquire::uvb_corrections(x = x[spct.names[c("sample", "dark")]],
                                spct.names = smp.names,
-                               stray.light.method = method[["stray.light.method"]],
-                               stray.light.wl = method[["stray.light.wl"]],
-                               flt.dark.wl = method[["flt.dark.wl"]],
-                               flt.ref.wl = method[["flt.ref.wl"]],
-                               flt.Tfr = method[["flt.Tfr"]],
-                               inst.dark.pixs = method[["inst.dark.pixs"]],
-                               worker.fun = method[["worker.fun"]],
-                               trim = method[["trim"]],
+                               stray.light.method = correction.method[["stray.light.method"]],
+                               stray.light.wl = correction.method[["stray.light.wl"]],
+                               flt.dark.wl = correction.method[["flt.dark.wl"]],
+                               flt.ref.wl = correction.method[["flt.ref.wl"]],
+                               flt.Tfr = correction.method[["flt.Tfr"]],
+                               inst.dark.pixs = correction.method[["inst.dark.pixs"]],
+                               worker.fun = correction.method[["worker.fun"]],
+                               trim = correction.method[["trim"]],
                                verbose = verbose)
 
   ref.names <- spct.names[c("reference", "dark")]
@@ -138,14 +138,14 @@ s_fraction_corrected.raw_mspct <- function(x,
   corrected_ref.spct <-
     ooacquire::uvb_corrections(x = x[spct.names[c("reference", "dark")]],
                                spct.names = ref.names,
-                               stray.light.method = method[["stray.light.method"]],
-                               stray.light.wl = method[["stray.light.wl"]],
-                               flt.dark.wl = method[["flt.dark.wl"]],
-                               flt.ref.wl = method[["flt.ref.wl"]],
-                               flt.Tfr = method[["flt.Tfr"]],
-                               inst.dark.pixs = method[["inst.dark.pixs"]],
-                               worker.fun = method[["worker.fun"]],
-                               trim = method[["trim"]],
+                               stray.light.method = correction.method[["stray.light.method"]],
+                               stray.light.wl = correction.method[["stray.light.wl"]],
+                               flt.dark.wl = correction.method[["flt.dark.wl"]],
+                               flt.ref.wl = correction.method[["flt.ref.wl"]],
+                               flt.Tfr = correction.method[["flt.Tfr"]],
+                               inst.dark.pixs = correction.method[["inst.dark.pixs"]],
+                               worker.fun = correction.method[["worker.fun"]],
+                               trim = correction.method[["trim"]],
                                verbose = verbose)
 
   if (qty.out == "Rfr") {
