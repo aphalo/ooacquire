@@ -98,6 +98,8 @@ stopifnot(basename(files) == MAYP112785_calib_dates.df[["coeffs.file"]])
 
 MAYP112785_descriptors <- descriptors
 save(MAYP112785_ylianttila.mthd,
+     MAYP112785_sun.mthd,
+     MAYP112785_simple.mthd,
      MAYP112785_descriptors,
      MAYP112785_calib_dates.df,
      file = "data/calibs-MAYP112785.rda")

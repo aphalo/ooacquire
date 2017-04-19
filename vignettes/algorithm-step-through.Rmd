@@ -21,7 +21,7 @@ We will step through the different steps of the algorithm used, plotting the spe
 require("knitr")
 dirpath <- system.file("extdata", package="ooacquire")
 opts_knit$set(autodep = TRUE, root.dir = dirpath, fig.width=8, fig.asp=0.5, out.width = '90%')
-options(photobioloy.verbose = TRUE)
+# options(photobioloy.verbose = TRUE)
 ```
 
 We first load the R packages to be used.
