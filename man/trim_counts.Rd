@@ -4,7 +4,7 @@
 \alias{trim_counts}
 \title{Replace out-of-range instrument counts}
 \usage{
-trim_counts(x, range = c(0L, getInstrDesc(x)[["max.counts"]] - 1),
+trim_counts(x, range = c(NA, getInstrDesc(x)[["max.counts"]] - 1),
   fill = NA)
 }
 \arguments{

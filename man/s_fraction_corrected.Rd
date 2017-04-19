@@ -12,18 +12,18 @@ s_fraction_corrected(x, ...)
 \method{s_fraction_corrected}{default}(x, ...)
 
 \method{s_fraction_corrected}{list}(x, reference.value = 1,
-  type = "internal", time = NULL, method, qty.out = "Tfr",
+  type = "internal", time = NULL, correction.method, qty.out = "Tfr",
   descriptor = NULL, dyn.range = NULL, locale = NULL,
   verbose = getOption("photobiology.verbose", default = FALSE), ...)
 
 \method{s_fraction_corrected}{raw_mspct}(x, spct.names = c(sample = "sample",
   reference = "reference", dark = "dark"), reference.value = 1,
-  type = "internal", method, dyn.range = NULL, qty.out = "Tfr",
+  type = "internal", correction.method, dyn.range = NULL, qty.out = "Tfr",
   verbose = getOption("photobiology.verbose", default = FALSE), ...)
 }
 \arguments{
 \item{x}{A named list of one to three vectors of file names, with names
-"sample", "ref", and "dark".}
+"sample", "reference", and "dark". Or a raw_mspt object, or a raw_spct object.}
 
 \item{...}{Named argument passed to \code{photobiology::cps2irrad} which is
 the final calculation step.}
@@ -36,7 +36,7 @@ fractional transmittance or reflectance of the reference.}
 \item{time}{a \code{POSIXct} object, but if \code{NULL} the date stored in
 file is used, and if \code{NA} no date variable is added}
 
-\item{method}{A named list of constants and functions defining the
+\item{correction.method}{A named list of constants and functions defining the
 method to be sued for stray light and dark signal corrections.}
 
 \item{qty.out}{character, one of "Tfr", "Rfr".}
@@ -53,6 +53,9 @@ like the default time zone, encoding, decimal mark, big mark, and day/month
 names.}
 
 \item{verbose}{Logical indicating the level of warnings wanted.}
+
+\item{spct.names}{named character vector of length three, to map names in
+\code{x} to those expected.}
 }
 \description{
 Convert raw counts data into spectral transmittance or spectral reflectance.

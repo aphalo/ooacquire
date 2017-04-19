@@ -12,19 +12,19 @@ s_irrad_corrected(x, ...)
 
 \method{s_irrad_corrected}{default}(x, ...)
 
-\method{s_irrad_corrected}{list}(x, time = NULL, method, return.cps = FALSE,
-  descriptor, locale = NULL, verbose = getOption("photobiology.verbose",
-  default = FALSE), ...)
-
-\method{s_irrad_corrected}{raw_mspct}(x, spct.names = c(light = "light",
-  filter = "filter", dark = "dark"), method, return.cps = FALSE,
+\method{s_irrad_corrected}{list}(x, time = NULL, correction.method,
+  return.cps = FALSE, descriptor, locale = NULL,
   verbose = getOption("photobiology.verbose", default = FALSE), ...)
 
-\method{s_irrad_corrected}{raw_spct}(x, method, return.cps = FALSE,
+\method{s_irrad_corrected}{raw_mspct}(x, spct.names = c(light = "light",
+  filter = "filter", dark = "dark"), correction.method, return.cps = FALSE,
+  verbose = getOption("photobiology.verbose", default = FALSE), ...)
+
+\method{s_irrad_corrected}{raw_spct}(x, correction.method, return.cps = FALSE,
   verbose = getOption("photobiology.verbose", default = FALSE), ...)
 }
 \arguments{
-\item{x}{A named list of one to hree vectors of file names, with names
+\item{x}{A named list of one to three vectors of file names, with names
 "light", "filter", and "dark". Or a raw_mspt object, or a raw_spct object.}
 
 \item{...}{Named argument passed to \code{photobiology::cps2irrad} which is
@@ -33,7 +33,7 @@ the final calculation step.}
 \item{time}{a \code{POSIXct} object, but if \code{NULL} the date stored in
 file is used, and if \code{NA} no date variable is added}
 
-\item{method}{A named list of constants and functions defining the
+\item{correction.method}{A named list of constants and functions defining the
 method to be sued for stray light and dark signal corrections.}
 
 \item{return.cps}{logical Useful when there is no need to apply a calibration,
@@ -50,7 +50,8 @@ names.}
 
 \item{verbose}{Logical indicating the level of warnings wanted.}
 
-\item{spct.names}{named character vector of length three.}
+\item{spct.names}{named character vector of length three, to map names in
+\code{x} to those expected.}
 }
 \description{
 Convert raw counts data into spectral irradiance

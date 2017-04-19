@@ -44,7 +44,7 @@ We calculate irradiance from a set of raw-counts spectral data using a high-leve
 ```{r, fig.width=8, fig.asp=0.5}
 LED_lamp_recalc.spct <-
   s_irrad_corrected(white_LED_2min.raw_mspct, 
-                    method = ooacquire::MAYP11278_ylianttila.mthd)
+                    correction.method= ooacquire::MAYP11278_ylianttila.mthd)
 plot(LED_lamp_recalc.spct)
 plot(LED_lamp_recalc.spct, range = c(250, 410))
 ```
@@ -173,7 +173,7 @@ We calculate irradiance from a set of raw-counts spectral data using a high-leve
 
 ```{r, fig.width=8, fig.asp=0.5}
 halogen.spct <-
-  s_irrad_corrected(halogen.raw_mspct, method = MAYP11278_ylianttila.mthd)
+  s_irrad_corrected(halogen.raw_mspct, correction.method= MAYP11278_ylianttila.mthd)
 plot(halogen.spct)
 plot(halogen.spct, range = c(250, 410))
 ```

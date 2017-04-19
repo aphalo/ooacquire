@@ -1,8 +1,9 @@
 #' Convert raw counts data into spectral irradiance
 #'
-#' @param x A named list of one to hree vectors of file names, with names
+#' @param x A named list of one to three vectors of file names, with names
 #'   "light", "filter", and "dark". Or a raw_mspt object, or a raw_spct object.
-#' @param spct.names named character vector of length three.
+#' @param spct.names named character vector of length three, to map names in
+#'   \code{x} to those expected.
 #' @param correction.method A named list of constants and functions defining the
 #'   method to be sued for stray light and dark signal corrections.
 #' @param return.cps logical Useful when there is no need to apply a calibration,

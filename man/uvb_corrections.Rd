@@ -3,8 +3,6 @@
 \name{uvb_corrections}
 \alias{uvb_corrections}
 \alias{slit_function_correction}
-\alias{filter_correction}
-\alias{no_filter_correction}
 \title{Apply filter-based stray-light correction}
 \usage{
 uvb_corrections(x, spct.names = c(light = "light", filter = "filter", dark =
@@ -15,15 +13,6 @@ uvb_corrections(x, spct.names = c(light = "light", filter = "filter", dark =
 
 slit_function_correction(x, worker.fun = NULL,
   verbose = getOption("photobiology.verbose", default = FALSE), ...)
-
-filter_correction(x, flt, stray.light.method = "original",
-  stray.light.wl = c(218.5, 228.5), flt.dark.wl = c(193, 209.5),
-  flt.ref.wl = c(360, 379.5), flt.Tfr = 1, trim = 0.05,
-  verbose = getOption("photobiology.verbose", default = FALSE))
-
-no_filter_correction(x, stray.light.wl = c(218.5, 228.5),
-  flt.dark.wl = c(193, 209.5), flt.ref.wl = NULL, flt.Tfr = 1, trim = 0,
-  verbose = getOption("photobiology.verbose", default = FALSE))
 }
 \arguments{
 \item{x}{\code{raw_mspct} The raw counts from measurements.}

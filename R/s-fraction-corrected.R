@@ -3,7 +3,9 @@
 #' Convert raw counts data into spectral transmittance or spectral reflectance.
 #'
 #' @param x A named list of one to three vectors of file names, with names
-#'   "sample", "ref", and "dark".
+#'   "sample", "reference", and "dark". Or a raw_mspt object, or a raw_spct object.
+#' @param spct.names named character vector of length three, to map names in
+#'   \code{x} to those expected.
 #' @param reference.value numeric or filter_spct or reflector_spct object, with the
 #'   fractional transmittance or reflectance of the reference.
 #' @param type character One of "internal" or "total".

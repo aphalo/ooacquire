@@ -187,7 +187,24 @@ slit_function_correction <- function(x,
   x
 }
 
-#' @rdname uvb_corrections
+#' Correct for stray light
+#'
+#' Correct cps readings for stray light, using either masured stray light, or
+#' using a non-excited region of the detector array.
+#'
+#' @param x,flt cps_spct objects, containig spectral data from which to subtract
+#'    stray light, and measured stray light, respectively.
+#' @param stray.light.method Method variant used, "original" (Ylianttila),
+#'   "simple", "full", "sun", "raw", "none".
+#' @param stray.light.wl numeric vector of length 2 giving the range of
+#'   wavelengths to use for the final stray light correction.
+#' @param flt.dark.wl,flt.ref.wl numeric vectors of length 2 giving the ranges
+#'   of wavelengths to use for the "dark" and "illuminated" regions of the
+#'   array in the filter correction.
+#' @param flt.Tfr numeric fractional transmittance of the filter to the source
+#'   of stray light, used only for method "simple".
+#' @param trim a numeric value to be used as argument for mean
+#' @param verbose Logical indicating the level of warnings wanted.
 #'
 #' @export
 #'
@@ -349,7 +366,7 @@ filter_correction <- function(x,
   x
 }
 
-#' @rdname uvb_corrections
+#' @rdname filter_correction
 #'
 #' @export
 #'
