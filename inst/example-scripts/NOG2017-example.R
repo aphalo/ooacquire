@@ -1,16 +1,20 @@
-# Using an spectrometer with a single channel
-# Tested with a Maya 2000 Pro spectrometer
+#  Tested with a Maya 2000 Pro spectrometer
+#  Used for demonstrations at NOG2017 meeting in Helsinki
 
 library(ggspectra)
 library(photobiology)
 library(photobiologyWavebands)
 library(ooacquire)
 
-# print warnings when they are triggered
+# print warnings when they are triggered instead of at the end of the run of
+# the script
 options(warn = 1)
 
 # use default settings
 acq_irrad_interactive()
+
+## Examples below changing the defaults seen by users when the interactive
+## data collection starts.
 
 # # change safety margin or "head space" when automatically tuning the
 # # integration time, increasing its value is useful when irradiance changes fast

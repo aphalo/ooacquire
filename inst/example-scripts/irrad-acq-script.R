@@ -1,3 +1,6 @@
+# Using an spectrometer with a single channel
+# Tested with a Maya 2000 Pro spectrometer
+
 library(photobiology)
 library(ggspectra)
 library(ooacquire)
@@ -50,7 +53,10 @@ mspct_2 <- acq_raw_mspct(descriptor, settings,
                          protocol = c("light", "filter", "dark"),
                          user.label = "my.test")
 
-spct_2 <- s_irrad_corrected(mspct_2, method = MAYP11278_ylianttila.mthd, verbose = TRUE)
+spct_2 <-
+  s_irrad_corrected(mspct_2,
+                    correction.method = MAYP11278_ylianttila.mthd,
+                    verbose = TRUE)
 
 plot(spct_2, unit.out = "photon")
 
@@ -70,7 +76,10 @@ mspct_3 <- acq_raw_mspct(descriptor, settings,
                          protocol = c("light", "dark"),
                          user.label = "my.test")
 
-spct_3 <- s_irrad_corrected(mspct_3, method = MAYP11278_ylianttila.mthd, verbose = TRUE)
+spct_3 <-
+  s_irrad_corrected(mspct_3,
+                    correction.method = MAYP11278_ylianttila.mthd,
+                    verbose = TRUE)
 
 plot(spct_3, unit.out = "photon")
 
@@ -95,7 +104,9 @@ mspct_4 <- acq_raw_mspct(descriptor, settings,
                          protocol = c("light", "dark"),
                          user.label = "my.test")
 
-spct_4 <- s_irrad_corrected(mspct_4, method = MAYP11278_ylianttila.mthd)
+spct_4 <-
+  s_irrad_corrected(mspct_4,
+                    correction.method = MAYP11278_ylianttila.mthd)
 
 plot(spct_4, unit.out = "photon")
 

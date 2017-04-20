@@ -1,9 +1,21 @@
+# Using files saved with Ocean Optics sotware
+# Tested with files from a Maya 2000 Pro spectrometer
+
 library(photobiology)
 library(ggspectra)
 library(ooacquire)
 library(anytime)
 
+my.verbose <- FALSE
+# my.verbose <- TRUE
+
 oldwd <- setwd(system.file("extdata/irradiance", package = "ooacquire"))
+
+# locale where files were saved
+my.locale <- readr::locale("en", decimal_mark = ",", tz = "EET")
+# my.locale <- list()
+
+## SUMMER time
 
 # examples of use with no bracketing
 
@@ -12,7 +24,9 @@ files1 <- list(light = "light-short.txt",
 
 my.spct <- s_irrad_corrected(x = files1,
                              descriptor = which_descriptor("2016-10-11"),
-                             method = MAYP11278_ylianttila.mthd)
+                             correction.correction.method = MAYP11278_ylianttila.mthd,
+                             locale = my.locale,
+                             verbose = my.verbose)
 
 plot(my.spct, unit.out = "photon")
 # force to zero wavelengths < 290 nm use only for sunlight, and after checking plot
@@ -27,7 +41,9 @@ files2 <- list(light = "light-short.txt")
 
 my.spct <- s_irrad_corrected(x = files2,
                              descriptor = which_descriptor("2016-10-11"),
-                             method = MAYP11278_ylianttila.mthd)
+                             correction.method = MAYP11278_ylianttila.mthd,
+                             locale = my.locale,
+                             verbose = my.verbose)
 
 plot(my.spct, unit.out = "photon")
 # force to zero wavelengths < 290 nm use only for sunlight, and after checking plot
@@ -45,7 +61,9 @@ files1 <- list(light = "light-short-dot.txt",
 
 my.spct <- s_irrad_corrected(x = files1,
                              descriptor = which_descriptor("2016-10-11"),
-                             method = MAYP11278_ylianttila.mthd)
+                             correction.method = MAYP11278_ylianttila.mthd,
+                             locale = my.locale,
+                             verbose = my.verbose)
 
 plot(my.spct, unit.out = "photon")
 # force to zero wavelengths < 290 nm use only for sunlight, and after checking plot
@@ -66,7 +84,9 @@ filesBR0 <- list(light = c("light-short.txt",
 
 my.spct <- s_irrad_corrected(x = filesBR0,
                              descriptor = which_descriptor("2016-10-11"),
-                             method = MAYP11278_ylianttila.mthd)
+                             correction.method = MAYP11278_ylianttila.mthd,
+                             locale = my.locale,
+                             verbose = my.verbose)
 
 plot(my.spct, unit.out = "photon")
 # force to zero wavelengths < 293 nm use only for sunlight, and after checking plot
@@ -83,7 +103,9 @@ filesBR1 <- list(light = c("light-short.txt",
 
 my.spct <- s_irrad_corrected(x = filesBR1,
                              descriptor = which_descriptor("2016-10-11"),
-                             method = MAYP11278_ylianttila.mthd)
+                             correction.method = MAYP11278_ylianttila.mthd,
+                             locale = my.locale,
+                             verbose = my.verbose)
 
 plot(my.spct, unit.out = "photon")
 # force to zero wavelengths < 293 nm use only for sunlight, and after checking plot
@@ -105,7 +127,9 @@ filesUVA0 <- list(light = c("UVA365-light-short.txt",
 
 my.spct <- s_irrad_corrected(x = filesUVA0,
                              descriptor = which_descriptor("2014-03-10"),
-                             method = MAYP11278_ylianttila.mthd)
+                             correction.method = MAYP11278_ylianttila.mthd,
+                             locale = my.locale,
+                             verbose = my.verbose)
 
 plot(my.spct, unit.out = "photon")
 getWhenMeasured(my.spct)
@@ -121,7 +145,9 @@ filesUVA1 <- list(light = c("UVA365-light-short.txt",
 
 my.spct <- s_irrad_corrected(x = filesUVA1,
                              descriptor = which_descriptor("2014-03-10"),
-                             method = MAYP11278_ylianttila.mthd)
+                             correction.method = MAYP11278_ylianttila.mthd,
+                             locale = my.locale,
+                             verbose = my.verbose)
 
 plot(my.spct, unit.out = "photon")
 getWhenMeasured(my.spct)
@@ -137,7 +163,9 @@ filesUVA2 <- list(light = "UVA365-light-short.txt",
 
 my.spct <- s_irrad_corrected(x = filesUVA2,
                              descriptor = which_descriptor("2014-03-10"),
-                             method = MAYP11278_ylianttila.mthd)
+                             correction.method = MAYP11278_ylianttila.mthd,
+                             locale = my.locale,
+                             verbose = my.verbose)
 
 plot(my.spct, unit.out = "photon")
 getWhenMeasured(my.spct)
@@ -154,7 +182,9 @@ filesLED0 <- list(light = "led-light.txt",
 
 my.spct <- s_irrad_corrected(x = filesLED0,
                              descriptor = which_descriptor("2016-10-11"),
-                             method = MAYP11278_ylianttila.mthd)
+                             correction.method = MAYP11278_ylianttila.mthd,
+                             locale = my.locale,
+                             verbose = my.verbose)
 
 plot(my.spct, unit.out = "photon")
 # force to zero wavelengths < 293 nm use only for sunlight, and after checking plot
@@ -168,7 +198,9 @@ cat(comment(my.spct))
 my.spct <- s_irrad_corrected(x = filesLED0,
                              time = anytime("2016-11-10 12:00:00"),
                              descriptor = which_descriptor("2016-10-11"),
-                             method = MAYP11278_ylianttila.mthd)
+                             correction.method = MAYP11278_ylianttila.mthd,
+                             locale = my.locale,
+                             verbose = my.verbose)
 
 plot(my.spct, unit.out = "photon")
 # force to zero wavelengths < 293 nm use only for sunlight, and after checking plot
@@ -190,7 +222,8 @@ filesB2 <- list(light = c("canopyb2normal.txt",
 
 my.spct <- s_irrad_corrected(x = filesB2,
                              descriptor = which_descriptor("2016-11-17"),
-                             method = MAYP11278_ylianttila.mthd)
+                             correction.method = MAYP11278_ylianttila.mthd,
+                             verbose = my.verbose)
 
 plot(my.spct, unit.out = "photon")
 # force to zero wavelengths < 293 nm use only for sunlight, and after checking plot
@@ -207,8 +240,8 @@ filesB2short <- list(light = "canopyb2normal.txt",
 
 my.spct <- s_irrad_corrected(x = filesB2short,
                              descriptor = which_descriptor("2016-11-17"),
-                             method = MAYP11278_ylianttila.mthd,
-                             verbose = TRUE)
+                             correction.method = MAYP11278_ylianttila.mthd,
+                             verbose = my.verbose)
 
 plot(my.spct, unit.out = "photon")
 # force to zero wavelengths < 293 nm use only for sunlight, and after checking plot
@@ -220,3 +253,4 @@ getWhatMeasured(my.spct)
 cat(comment(my.spct))
 
 setwd(oldwd)
+

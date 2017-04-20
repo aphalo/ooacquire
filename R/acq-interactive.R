@@ -11,7 +11,7 @@
 #' @param HDR.mult numeric the integration time for each bracketed integration
 #'   as a multiplier of the set or tuned integration time.
 #' @param protocols list of character vectors.
-#' @param method list The method to use when applying the calibration
+#' @param correction.method list The method to use when applying the calibration
 #' @param descriptors list A list of instrument descriptors containing
 #'   calibration data.
 #' @export
@@ -36,7 +36,7 @@ acq_irrad_interactive <-
            target.margin = 0.1,
            HDR.mult = c(short = 1, long = 10),
            protocols = NULL,
-           method = ooacquire::MAYP11278_ylianttila.mthd,
+           correction.method = ooacquire::MAYP11278_ylianttila.mthd,
            descriptors = ooacquire::MAYP11278_descriptors) {
 
     descriptor <- which_descriptor(descriptors = descriptors)
@@ -111,7 +111,7 @@ acq_irrad_interactive <-
         next()
       }
 
-      irrad.spct <- s_irrad_corrected(raw.mspct, method = method)
+      irrad.spct <- s_irrad_corrected(raw.mspct, correction.method = correction.method)
 
       assign(raw.name, raw.mspct)
       assign(irrad.name, irrad.spct)
@@ -191,7 +191,7 @@ acq_fraction_interactive <-
            target.margin = 0.2,
            HDR.mult = c(short = 1, long = 10),
            protocols = NULL,
-           method = ooacquire::MAYP11278_ylianttila.mthd,
+           correction.method = ooacquire::MAYP11278_ylianttila.mthd,
            descriptors = ooacquire::MAYP11278_descriptors,
            ref.value = 1,
            qty.out = "Tfr",
@@ -282,7 +282,7 @@ acq_fraction_interactive <-
         filter.spct <- s_fraction_corrected(raw.mspct,
                                             ref.value = ref.value,
                                             type = type,
-                                            method = method,
+                                            correction.method = correction.method,
                                             qty.out = qty.out,
                                             ref.value = ref.value)
         assign(filter.name, filter.spct)

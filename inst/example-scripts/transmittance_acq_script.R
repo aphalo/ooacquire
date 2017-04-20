@@ -1,3 +1,6 @@
+# Using an spectrometer with two channels
+# Tested with a Jaz spectrometer
+
 library(photobiology)
 library(ooacquire)
 
