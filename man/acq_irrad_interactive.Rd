@@ -7,12 +7,11 @@
 \usage{
 acq_irrad_interactive(tot.time.range = c(5, 15), target.margin = 0.1,
   HDR.mult = c(short = 1, long = 10), protocols = NULL,
-  method = ooacquire::MAYP11278_ylianttila.mthd,
-  descriptors = ooacquire::MAYP11278_descriptors)
+  correction.method = NA, descriptors = NA)
 
 acq_fraction_interactive(tot.time.range = c(5, 15), target.margin = 0.2,
   HDR.mult = c(short = 1, long = 10), protocols = NULL,
-  method = ooacquire::MAYP11278_ylianttila.mthd,
+  correction.method = ooacquire::MAYP11278_ylianttila.mthd,
   descriptors = ooacquire::MAYP11278_descriptors, ref.value = 1,
   qty.out = "Tfr", type = "total")
 }
@@ -28,7 +27,7 @@ as a multiplier of the set or tuned integration time.}
 
 \item{protocols}{list of character vectors.}
 
-\item{method}{list The method to use when applying the calibration}
+\item{correction.method}{list The method to use when applying the calibration}
 
 \item{descriptors}{list A list of instrument descriptors containing
 calibration data.}

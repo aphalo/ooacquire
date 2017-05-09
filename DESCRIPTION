@@ -1,8 +1,8 @@
 Package: ooacquire
 Type: Package
 Title: Acquire Spectral Data from Ocean Optics Spectrometers
-Version: 0.1.2
-Date: 2017-04-19
+Version: 0.1.3
+Date: 2017-05-09
 Authors@R:
    c(
     person("Pedro J.", "Aphalo", email = "pedro.aphalo@helsinki.fi", role = c("aut", "trl", "cre")),

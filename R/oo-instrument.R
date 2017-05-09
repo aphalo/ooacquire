@@ -14,6 +14,7 @@
 #' @return a list
 #'
 get_oo_descriptor <- function(w, sr.index = 0L, ch.index = 0L) {
+
   get_calib <- function() {
     z <- list()
     inst.calib <-
@@ -22,8 +23,7 @@ get_oo_descriptor <- function(w, sr.index = 0L, ch.index = 0L) {
     oo.nl.poly <- inst.calib$getNlCoefficients()
     oo.nl.poly <- polynom::polynomial(oo.nl.poly)
     oo.nl.fun <- as.function(oo.nl.poly)
-    nl.fun <- function(x) {x / oo.nl.fun(x)}
-    z$nl.fun <- nl.fun
+    z$nl.fun <- compiler::cmpfun(function(x) {x / oo.nl.fun(x)})
     # stray light
     z$straylight.coeff <- inst.calib$getStrayLight()
     z$straylight.slope <- inst.calib$getStrayLightSlope()
@@ -44,6 +44,7 @@ get_oo_descriptor <- function(w, sr.index = 0L, ch.index = 0L) {
       z$start.date <- NA_real_
       z$end.date <- NA_real_
     }
+    z
   }
 
   bench <- rOmniDriver::get_bench(w, sr.index, ch.index)
@@ -157,9 +158,11 @@ set_descriptor_integ_time <- function(descriptor,
 #'
 set_descriptor_wl <- function(descriptor,
                               wl) {
-  old.wl <- descriptor[["inst.calib"]][["wavelengths"]]
-  stopifnot((is.null(old.wl) || length(old.wl) == length(wl)) &&
-              !is.unsorted(wl, strictly = TRUE))
+  if (exists("wavelengths", descriptor)) {
+      old.wl <- descriptor[["wavelengths"]]
+      stopifnot((is.null(old.wl) || length(old.wl) == length(wl)))
+  }
+  stopifnot(!is.unsorted(wl, strictly = TRUE))
   descriptor[["wavelengths"]] <- wl
   descriptor
 }
@@ -212,7 +215,7 @@ set_descriptor_irrad_mult <- function(descriptor,
                                       start.date = lubridate::today() - lubridate::days(1),
                                       end.date = lubridate::today() + lubridate::days(1))
 {
-  stopifnot(length(irrad.mult) == 1 ||
+  stopifnot(is.numeric(irrad.mult) && length(irrad.mult) == 1 ||
               length(irrad.mult) == length(descriptor$wavelengths))
   if (length(irrad.mult) == 1) {
     warning("'irrad.mult' of length one will be recycled.")

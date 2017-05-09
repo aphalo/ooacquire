@@ -18,6 +18,7 @@ Rename parameter "method" to "correction.method" for clarity.
 Add warning for cases when users supply spectra with negative values for
 raw-detector counts (electrical dark correction set to true).
 Add two new vignettes: Quick Start Guide, and Algorithms.
+Remove old sample scripts and rename the remaining ones.
 
 OOAcquire 0.1.1
 ===============

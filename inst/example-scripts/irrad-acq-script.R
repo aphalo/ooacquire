@@ -10,10 +10,14 @@ w <- start_session()
 list_instruments(w)
 
 # we use the descriptor stored in the package valid for "today"
-
-descriptor <- which_descriptor()
+## Run one of the two next statements
+## old Maya
+descriptor <- which_descriptor(descriptors = ooacquire::MAYP11278_descriptors)
+## new Maya
+descriptor <- which_descriptor(descriptors = ooacquire::MAYP112785_descriptors)
 
 descriptor[["w"]] <- w
+descriptor[["sr.index"]] <- 0
 
 # PROTOCOL 1
 # set measurement settings for automatic adjustment
@@ -34,7 +38,8 @@ plot(spct_1)
 
 # we use the high level function
 
-spct_1 <- s_irrad_corrected(spct_1, method = MAYP11278_ylianttila.mthd)
+spct_1 <- s_irrad_corrected(spct_1, correction.method = MAYP11278_ylianttila.mthd)
+# spct_1 <- s_irrad_corrected(spct_1, correction.method = MAYP112785_ylianttila.mthd)
 plot(spct_1, unit.out = "photon")
 
 ## PROTOCOL 2

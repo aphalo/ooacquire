@@ -136,7 +136,7 @@ tune_acq_settings <- function(descriptor,
                               acq.settings,
                               verbose = TRUE) {
   x <- acq.settings
-  nl.fun <- descriptor$inst.calib$nl.fun
+
   # correction for electrical dark (in instrument using ocluded pixels in array)
   rOmniDriver::set_correct_for_electrical_dark(descriptor$w, x$corr.elect.dark,
                                                descriptor$sr.index,
@@ -152,7 +152,8 @@ tune_acq_settings <- function(descriptor,
                                 descriptor$sr.index,
                                 descriptor$ch.index)
   # to speed up tunning we set number of scans to one
-  rOmniDriver::set_scans_to_avg(descriptor$w, 1L,
+  rOmniDriver::set_scans_to_avg(descriptor$w,
+                                1L,
                                 descriptor$sr.index,
                                 descriptor$ch.index)
   # to more easily reach the target we linearize the counts before interpolation
