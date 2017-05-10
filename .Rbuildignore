@@ -4,3 +4,4 @@ not-inst
 data-raw
 inst/example-scripts/*.html
 inst/example-scripts/*.pdf
+^docs$
