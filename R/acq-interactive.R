@@ -449,8 +449,8 @@ protocol_interactive <- function(protocols) {
                   ": ")
   repeat{
     user.input <- readline(prompt = prompt)
-    if (length(user.input[1]) == 0) {
-      protocol.name <- names(protocols)[[1]]
+    if (user.input[1] == "") {
+      user.input <- names(protocols)[[1]]
     }
     if (user.input[1] %in% names(protocols)) {
       protocol <- protocols[[user.input[1]]]

@@ -13,12 +13,12 @@ options(warn = 1)
 acq_irrad_interactive()
 
 # use default settings for old Maya
-acq_irrad_interactive(correction.method = ooacquire::MAYP11278_ylianttila.mthd,
-                      descriptors = ooacquire::MAYP11278_descriptors)
+# acq_irrad_interactive(correction.method = ooacquire::MAYP11278_ylianttila.mthd,
+#                       descriptors = ooacquire::MAYP11278_descriptors)
 
 # use default settings for new Maya
-acq_irrad_interactive(correction.method = ooacquire::MAYP112785_ylianttila.mthd,
-                      descriptors = ooacquire::MAYP112785_descriptors)
+# acq_irrad_interactive(correction.method = ooacquire::MAYP112785_ylianttila.mthd,
+#                       descriptors = ooacquire::MAYP112785_descriptors)
 
 # # change safety margin or "head space" when automatically tuning the
 # # integration time, increasing its value is useful when irradiance changes fast
