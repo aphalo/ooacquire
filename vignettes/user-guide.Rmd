@@ -1,5 +1,6 @@
 ---
-title: "`ooacquire` `r packageVersion('ooacquire')`<br>User Guide"
+title: "User Guide"
+subtitle: "`ooacquire` `r packageVersion('ooacquire')`"
 author: "Pedro J. Aphalo"
 date: "`r Sys.Date()`"
 output: 

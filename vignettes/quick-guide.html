@@ -12,9 +12,9 @@
 
 <meta name="author" content="Pedro J. Aphalo" />
 
-<meta name="date" content="2017-04-19" />
+<meta name="date" content="2017-05-10" />
 
-<title>ooacquire 0.1.2 Quick Start Guide</title>
+<title>Quick Start Guide</title>
 
 
 
@@ -68,9 +68,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 
 
-<h1 class="title toc-ignore"><code>ooacquire</code> 0.1.2<br>Quick Start Guide</h1>
+<h1 class="title toc-ignore">Quick Start Guide</h1>
+<h3 class="subtitle"><em><code>ooacquire</code> 0.1.3.9000</em></h3>
 <h4 class="author"><em>Pedro J. Aphalo</em></h4>
-<h4 class="date"><em>2017-04-19</em></h4>
+<h4 class="date"><em>2017-05-10</em></h4>
 
 
 <div id="TOC">
@@ -152,13 +153,9 @@ sr.online &lt;-<span class="st"> </span><span class="ot">FALSE</span></code></pr
 ## file.copy(from = filepath, to = &quot;.&quot;)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">folderpath &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;example-scripts&quot;</span>, <span class="dt">package=</span><span class="st">&quot;ooacquire&quot;</span>)
 <span class="kw">list.files</span>(<span class="dt">path =</span> folderpath, <span class="dt">pattern =</span> <span class="st">&quot;.*[.]R&quot;</span>)</code></pre></div>
-<pre><code>##  [1] &quot;Tfr-acq-interac.R&quot;                &quot;irrad-acq-interac.R&quot;             
-##  [3] &quot;irrad-maya-acq-interac.R&quot;         &quot;irrad-maya-acq.R&quot;                
-##  [5] &quot;irrad-maya-mspct-defaults.R&quot;      &quot;maya-files-defaults.R&quot;           
-##  [7] &quot;maya-files-steps-demo.R&quot;          &quot;maya-files.R&quot;                    
-##  [9] &quot;simple_acq.R&quot;                     &quot;simple_maya_acq.R&quot;               
-## [11] &quot;trans-maya-mspct-defaults.R&quot;      &quot;transmittance-jaz-acq-interac.R&quot; 
-## [13] &quot;transmittance-maya-acq-interac.R&quot; &quot;two_channels_acq.R&quot;</code></pre>
+<pre><code>## [1] &quot;NOG2017-example.R&quot;           &quot;irrad-acq-interac.R&quot;        
+## [3] &quot;irrad-acq-script.R&quot;          &quot;irrad-files.R&quot;              
+## [5] &quot;transmittance-acq-interac.R&quot; &quot;transmittance_acq_script.R&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## file.copy(from = list.files(path = folderpath, pattern = &quot;.*[.]R&quot;, full.names = TRUE), to = &quot;.&quot;)</code></pre></div>
 </div>
 
@@ -169,7 +166,7 @@ sr.online &lt;-<span class="st"> </span><span class="ot">FALSE</span></code></pr
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
 </script>
