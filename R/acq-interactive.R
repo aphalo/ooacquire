@@ -231,8 +231,8 @@ acq_fraction_interactive <-
            target.margin = 0.2,
            HDR.mult = c(short = 1, long = 10),
            protocols = NULL,
-           correction.method = ooacquire::MAYP11278_ylianttila.mthd,
-           descriptors = ooacquire::MAYP11278_descriptors,
+           correction.method = NA,
+           descriptors = NA,
            ref.value = 1,
            qty.out = "Tfr",
            type = "total") {
@@ -247,9 +247,52 @@ acq_fraction_interactive <-
                         srd = c("sample", "reference", "dark"))
     }
 
+
     w <- start_session()
 
-    list_instruments(w)
+    instruments <- list_instruments(w)
+    print(instruments)
+
+    serial_no <- as.character(instruments[1, 3])
+
+    message("Using instrument with serial number: ", serial_no)
+
+    if (nrow(instruments) > 1) {
+      warning("Other connected instruments ignored.")
+    }
+
+    if (anyNA(c(descriptors[[1]], correction.method[[1]]))) {
+      descriptor <-
+        switch(serial_no,
+               MAYP11278 = which_descriptor(descriptors = MAYP11278_descriptors),
+               MAYP112785 = which_descriptor(descriptors = MAYP112785_descriptors),
+               NA
+        )
+
+      descriptor[["sr.index"]] <- instruments[1, "idx"]
+      descriptor[["ch.index"]] <- 0L
+
+      correction.method <-
+        switch(serial_no,
+               MAYP11278 = MAYP11278_ylianttila.mthd,
+               MAYP112785 = MAYP112785_ylianttila.mthd,
+               NA
+        )
+
+    } else {
+      descriptor <- which_descriptor(descriptors = descriptors)
+      stopifnot(exists("spectrometer.name", descriptor))
+      if (!exists("sr.index", descriptor)) {
+        descriptor[["sr.index"]] <- 0L
+        descriptor[["ch.index"]] <- 0L
+      }
+    }
+
+    if (anyNA(c(descriptor[[1]], correction.method[[1]]))) {
+      stop("No callibration data found")
+    }
+
+    # We still check, really needed only for user supplied arguments
 
     descriptor.inst <- get_oo_descriptor(w)
 
