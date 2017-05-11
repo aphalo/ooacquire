@@ -24,6 +24,8 @@ acq_raw_spct <- function(descriptor,
                          set.all = TRUE,
                          verbose = TRUE) {
   x <- acq.settings
+  x$integ.time <- as.integer(x$integ.time) # integer microseconds
+
   y <- descriptor
   num.readings <- length(x$integ.time)
   z <- dplyr::data_frame(w.length = y$wavelengths)
@@ -57,7 +59,7 @@ acq_raw_spct <- function(descriptor,
     rOmniDriver::set_integration_time(y$w, x$integ.time[i], y$sr.index, y$ch.index)
     actual.integ.time <- rOmniDriver::get_integration_time(y$w, y$sr.index, y$ch.index)
     # We need to
-    if (x$integ.time[i] - actual.integ.time > x$integ.time[i] * 1e-5) {
+    if (as.integer(x$integ.time[i]) - actual.integ.time > x$integ.time[i] * 1e-5) {
       # We guard against failure to set integration time
       # It should never happen as we check validity value requested
       warning("The spectrometer has overridden the integration time!")

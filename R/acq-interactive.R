@@ -239,8 +239,6 @@ acq_fraction_interactive <-
 
     stopifnot(qty.out %in% c("Tfr", "Rfr", "raw"))
 
-    descriptor <- which_descriptor(descriptors = descriptors)
-
     # define measurement protocols
     if (length(protocols) == 0L) {
       protocols <- list(rsd = c("reference", "sample", "dark"),
