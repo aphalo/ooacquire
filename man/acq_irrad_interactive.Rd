@@ -7,12 +7,14 @@
 \usage{
 acq_irrad_interactive(tot.time.range = c(5, 15), target.margin = 0.1,
   HDR.mult = c(short = 1, long = 10), protocols = NULL,
-  correction.method = NA, descriptors = NA)
+  correction.method = NA, descriptors = NA, stray.light.method = "none",
+  save.pdfs = TRUE)
 
 acq_fraction_interactive(tot.time.range = c(5, 15), target.margin = 0.2,
   HDR.mult = c(short = 1, long = 10), protocols = NULL,
   correction.method = NA, descriptors = NA, ref.value = 1,
-  qty.out = "Tfr", type = "total")
+  qty.out = "Tfr", type = "total", stray.light.method = "none",
+  save.pdfs = TRUE)
 }
 \arguments{
 \item{tot.time.range}{numeric vector Range of total times for a measurement
@@ -30,6 +32,11 @@ as a multiplier of the set or tuned integration time.}
 
 \item{descriptors}{list A list of instrument descriptors containing
 calibration data.}
+
+\item{stray.light.method}{character Used only when the correction method is
+created on-the-fly.}
+
+\item{save.pdfs}{logical Whether to save PDFs to files or not.}
 
 \item{ref.value}{numeric or filter_spct/reflector_spct object.}
 

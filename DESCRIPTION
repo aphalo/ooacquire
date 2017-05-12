@@ -1,7 +1,7 @@
 Package: ooacquire
 Type: Package
 Title: Acquire Spectral Data from Ocean Optics Spectrometers
-Version: 0.1.4
+Version: 0.1.4.9000
 Date: 2017-05-11
 Authors@R:
    c(

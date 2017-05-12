@@ -14,6 +14,10 @@
 #' @param correction.method list The method to use when applying the calibration
 #' @param descriptors list A list of instrument descriptors containing
 #'   calibration data.
+#' @param stray.light.method character Used only when the correction method is
+#'   created on-the-fly.
+#' @param save.pdfs logical Whether to save PDFs to files or not.
+#'
 #' @export
 #'
 #' @note The integration time is set automatically so that the peak number of
@@ -37,7 +41,9 @@ acq_irrad_interactive <-
            HDR.mult = c(short = 1, long = 10),
            protocols = NULL,
            correction.method = NA,
-           descriptors = NA) {
+           descriptors = NA,
+           stray.light.method = "none",
+           save.pdfs = TRUE) {
 
     # define measurement protocols
     if (length(protocols) == 0) {
@@ -66,7 +72,8 @@ acq_irrad_interactive <-
         switch(serial_no,
                MAYP11278 = which_descriptor(descriptors = MAYP11278_descriptors),
                MAYP112785 = which_descriptor(descriptors = MAYP112785_descriptors),
-               NA
+               new_correction_method(descriptor,
+                                     stray.light.method = stray.light.method)
         )
 
       descriptor[["sr.index"]] <- instruments[1, "idx"]
@@ -76,7 +83,8 @@ acq_irrad_interactive <-
         switch(serial_no,
                MAYP11278 = MAYP11278_ylianttila.mthd,
                MAYP112785 = MAYP112785_ylianttila.mthd,
-               NA
+               new_correction_method(descriptor,
+                                     stray.light.method = stray.light.method)
         )
 
     } else {
@@ -99,6 +107,10 @@ acq_irrad_interactive <-
     stopifnot(descriptor[["spectrometer.sn"]] == descriptor.inst[["spectrometer.sn"]])
 
     descriptor[["w"]] <- w
+
+    # Before continuing we check that calibrations are available
+    stopifnot(length(descriptor[["walengths"]]) == descriptor[["num.pixs"]])
+    stopifnot(length(descriptor[["inst.calib"]][["irrad.mult"]]) == descriptor[["num.pixs"]])
 
     session.label <- paste("operator: ", readline("Operator's name: "),
                            ", instrument s.n.: ", descriptor[["spectrometer.sn"]])
@@ -185,9 +197,11 @@ acq_irrad_interactive <-
                next()},
                d = break()
         )
-        grDevices::pdf(file = pdf.name, width = 8, height = 6)
-        print(fig)
-        grDevices::dev.off()
+        if (save.pdfs) {
+          grDevices::pdf(file = pdf.name, width = 8, height = 6)
+          print(fig)
+          grDevices::dev.off()
+        }
         break()
       }
 
@@ -224,6 +238,7 @@ acq_irrad_interactive <-
 #'   the reference. It is also important to distinguish between total and
 #'   internal transmittance, and which of these is measured depends on the
 #'   measuring protocol.
+#'
 #' @export
 #'
 acq_fraction_interactive <-
@@ -235,7 +250,9 @@ acq_fraction_interactive <-
            descriptors = NA,
            ref.value = 1,
            qty.out = "Tfr",
-           type = "total") {
+           type = "total",
+           stray.light.method = "none",
+           save.pdfs = TRUE) {
 
     stopifnot(qty.out %in% c("Tfr", "Rfr", "raw"))
 
@@ -244,7 +261,6 @@ acq_fraction_interactive <-
       protocols <- list(rsd = c("reference", "sample", "dark"),
                         srd = c("sample", "reference", "dark"))
     }
-
 
     w <- start_session()
 
@@ -264,7 +280,8 @@ acq_fraction_interactive <-
         switch(serial_no,
                MAYP11278 = which_descriptor(descriptors = MAYP11278_descriptors),
                MAYP112785 = which_descriptor(descriptors = MAYP112785_descriptors),
-               NA
+               new_correction_method(descriptor,
+                                     stray.light.method = stray.light.method)
         )
 
       descriptor[["sr.index"]] <- instruments[1, "idx"]
@@ -274,7 +291,8 @@ acq_fraction_interactive <-
         switch(serial_no,
                MAYP11278 = MAYP11278_ylianttila.mthd,
                MAYP112785 = MAYP112785_ylianttila.mthd,
-               NA
+               new_correction_method(descriptor,
+                                     stray.light.method = stray.light.method)
         )
 
     } else {
@@ -297,6 +315,9 @@ acq_fraction_interactive <-
     stopifnot(descriptor[["spectrometer.sn"]] == descriptor.inst[["spectrometer.sn"]])
 
     descriptor[["w"]] <- w
+
+    # Before continuing we check that wavelength calibration is available
+    stopifnot(length(descriptor[["walengths"]]) == descriptor[["num.pixs"]])
 
     session.label <- paste("operator: ", readline("Operator's name: "),
                            ", instrument s.n.: ", descriptor[["spectrometer.sn"]],
@@ -399,9 +420,11 @@ acq_fraction_interactive <-
           break()
         }
       }
-      grDevices::pdf(file = pdf.name, width = 8, height = 6)
-      print(fig)
-      grDevices::dev.off()
+      if (save.pdfs) {
+        grDevices::pdf(file = pdf.name, width = 8, height = 6)
+        print(fig)
+        grDevices::dev.off()
+      }
 
       user.input <- readline("Next, change protocol, quit (-/p/q): ")
 

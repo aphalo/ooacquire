@@ -38,7 +38,7 @@ get_oo_descriptor <- function(w, sr.index = 0L, ch.index = 0L) {
       z$irrad.mult <-
         rOmniDriver::get_feature_irradiance_calibration_factor(w, sr.index)$getIrradianceCalibrationFactors()
       z$start.date <- lubridate::today() - lubridate::days(1)
-      z$end.date <- lubridate::today() + lubridate::days(1)
+      z$end.date <- lubridate::today() + lubridate::days(30)
     } else {
       z$irrad.mult <- NA_real_
       z$start.date <- NA_real_
@@ -59,6 +59,8 @@ get_oo_descriptor <- function(w, sr.index = 0L, ch.index = 0L) {
     bench.grating = bench$getGrating(),
     bench.filter = bench$getFilterWavelength(),
     bench.slit = bench$getSlitSize(),
+    num.pixs = rOmniDriver::get_number_of_pixels(w, sr.index, ch.index),
+    num.dark.pixs = rOmniDriver::get_number_of_dark_pixels(w, sr.index, ch.index),
     min.integ.time = rOmniDriver::get_minimum_integration_time(w, sr.index),
     max.integ.time = rOmniDriver::get_maximum_integration_time(w, sr.index),
     max.counts = rOmniDriver::get_maximum_intensity(w, sr.index),
