@@ -59,25 +59,21 @@ acq_irrad_interactive <-
     instruments <- list_instruments(w)
     print(instruments)
 
-    serial_no <- as.character(instruments[1, 3])
+    sr.index <- choose_sr_interactive(instruments)
+    ch.index <- choose_ch_interactive(instruments, sr.index)
 
-    message("Using instrument with serial number: ", serial_no)
+    serial_no <- as.character(instruments[sr.index + 1L, 3])
 
-    if (nrow(instruments) > 1) {
-      warning("Other connected instruments ignored.")
-    }
+    message("Using channel ", ch.index,
+            " from spectrometer with serial number: ", serial_no)
 
     if (anyNA(c(descriptors[[1]], correction.method[[1]]))) {
       descriptor <-
         switch(serial_no,
                MAYP11278 = which_descriptor(descriptors = MAYP11278_descriptors),
                MAYP112785 = which_descriptor(descriptors = MAYP112785_descriptors),
-               new_correction_method(descriptor,
-                                     stray.light.method = stray.light.method)
+               get_oo_descriptor(w, sr.index = sr.index, ch.index = ch.index)
         )
-
-      descriptor[["sr.index"]] <- instruments[1, "idx"]
-      descriptor[["ch.index"]] <- 0L
 
       correction.method <-
         switch(serial_no,
@@ -90,23 +86,20 @@ acq_irrad_interactive <-
     } else {
       descriptor <- which_descriptor(descriptors = descriptors)
       stopifnot(exists("spectrometer.name", descriptor))
-      if (!exists("sr.index", descriptor)) {
-        descriptor[["sr.index"]] <- 0L
-        descriptor[["ch.index"]] <- 0L
-      }
     }
+
+    # needed only for descriptors retrieved from data
+    descriptor[["w"]] <- w
+    descriptor[["sr.index"]] <- sr.index
+    descriptor[["ch.index"]] <- ch.index
 
     if (anyNA(c(descriptor[[1]], correction.method[[1]]))) {
       stop("No callibration data found")
     }
 
-    # We still check, really needed only for user supplied arguments
-
+    # We still check serial numbers, really needed only for user supplied descriptors
     descriptor.inst <- get_oo_descriptor(w)
-
     stopifnot(descriptor[["spectrometer.sn"]] == descriptor.inst[["spectrometer.sn"]])
-
-    descriptor[["w"]] <- w
 
     # Before continuing we check that calibrations are available
     stopifnot(length(descriptor[["walengths"]]) == descriptor[["num.pixs"]])
@@ -259,7 +252,7 @@ acq_fraction_interactive <-
     # define measurement protocols
     if (length(protocols) == 0L) {
       protocols <- list(rsd = c("reference", "sample", "dark"),
-                        srd = c("sample", "reference", "dark"))
+                        rs = c("reference", "sample"))
     }
 
     w <- start_session()
@@ -267,25 +260,21 @@ acq_fraction_interactive <-
     instruments <- list_instruments(w)
     print(instruments)
 
-    serial_no <- as.character(instruments[1, 3])
+    sr.index <- choose_sr_interactive(instruments)
+    ch.index <- choose_ch_interactive(instruments, sr.index)
 
-    message("Using instrument with serial number: ", serial_no)
+    serial_no <- as.character(instruments[sr.index + 1L, 3])
 
-    if (nrow(instruments) > 1) {
-      warning("Other connected instruments ignored.")
-    }
+    message("Using channel ", ch.index,
+            " from spectrometer with serial number: ", serial_no)
 
     if (anyNA(c(descriptors[[1]], correction.method[[1]]))) {
       descriptor <-
         switch(serial_no,
                MAYP11278 = which_descriptor(descriptors = MAYP11278_descriptors),
                MAYP112785 = which_descriptor(descriptors = MAYP112785_descriptors),
-               new_correction_method(descriptor,
-                                     stray.light.method = stray.light.method)
+               get_oo_descriptor(w, sr.index = sr.index, ch.index = ch.index)
         )
-
-      descriptor[["sr.index"]] <- instruments[1, "idx"]
-      descriptor[["ch.index"]] <- 0L
 
       correction.method <-
         switch(serial_no,
@@ -298,23 +287,21 @@ acq_fraction_interactive <-
     } else {
       descriptor <- which_descriptor(descriptors = descriptors)
       stopifnot(exists("spectrometer.name", descriptor))
-      if (!exists("sr.index", descriptor)) {
-        descriptor[["sr.index"]] <- 0L
-        descriptor[["ch.index"]] <- 0L
-      }
     }
+
+    # needed only for descriptors retrieved from data
+    descriptor[["w"]] <- w
+    descriptor[["sr.index"]] <- sr.index
+    descriptor[["ch.index"]] <- ch.index
 
     if (anyNA(c(descriptor[[1]], correction.method[[1]]))) {
       stop("No callibration data found")
     }
 
-    # We still check, really needed only for user supplied arguments
-
+    # We still check serial numbers, really needed only for user supplied descriptors
     descriptor.inst <- get_oo_descriptor(w)
-
     stopifnot(descriptor[["spectrometer.sn"]] == descriptor.inst[["spectrometer.sn"]])
 
-    descriptor[["w"]] <- w
 
     # Before continuing we check that wavelength calibration is available
     stopifnot(length(descriptor[["walengths"]]) == descriptor[["num.pixs"]])
@@ -527,4 +514,86 @@ protocol_interactive <- function(protocols) {
   }
   protocol
 }
+
+#' Interactively select an instrument
+#'
+#' Choice of spectrometer by name from a list of serial numbers, allowing the
+#' user to correct the selection if needed.
+#'
+#' @param instruments the returm value of \code{list_instruments(w)}.
+#'
+#' @keywords internal
+#'
+choose_sr_interactive <- function(instruments) {
+  # if instruments has names these would not be needed
+  sn.idx <- 3
+
+  print("Connected spectrometers")
+  # check availability
+  repeat {
+    num.inst <- nrow(instruments)
+    if (num.inst < 1) {
+      print("No spectrometer found. Please connect one, or abort.")
+      if (readline("abort, retry (-/a)") != "a") {
+        next()
+      } else {
+        stop("Aborting as requested! Bye.")
+      }
+    }
+    # select instrument
+    if (num.inst > 1) {
+      prompt <- paste(1:nrow(instruments), ": ", instruments[[sn.idx]],
+                      " (choose by index): ", sep = "")
+      repeat{
+        sr.idx <- as.integer(readline(prompt = prompt))
+        if (sr.idx[1] == "") {
+          sr.idx <- 1L
+        }
+        if (sr.idx[1] %in% 1L:nrow(instruments)) {
+          sr.index <- sr.idx - 1L
+          break()
+        } else {
+          print("A number between 1 and ", num.inst, " is required.")
+        }
+      }
+    }
+  }
+  sr.index
+}
+
+
+#' Interactively select a channel
+#'
+#' Choice of channel to be used if spectrometer has more than one channel.
+#'
+#' @param instruments the returm value of \code{list_instruments(w)}
+#' @param sr.index integer The index to the spectrometer, starting from zero,
+#'   following C conventions instead of R indexing conventions.
+#'
+#' @keywords internal
+#'
+choose_ch_interactive <- function(instruments, sr.index = 0L) {
+  stopifnot(nrow(instruments) > 0)
+
+  num.ch.idx <- 4
+
+  num.channels <- instruments[sr.index + 1L, num.ch.idx]
+  if (num.channels > 1) {
+    repeat {
+      prompt <- paste("Channels available: ", 1:num.channels,
+                      " (choose by index): ", sep = "")
+      ch.idx <- as.integer(readline(prompt = prompt))
+      if (ch.idx %in% 1:num.channels) {
+        ch.index <- ch.idx - 1L
+        break()
+      } else {
+        print("A number between 1 and ", num.channels, " is required.")
+      }
+    }
+  } else {
+    ch.index <- 0L
+  }
+}
+
+
 
