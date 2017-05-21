@@ -2,6 +2,12 @@ TODO
 
 Add test cases. Complete writing of vignettes.
 
+ooacquire 0.1.5
+===============
+
+Add functions choose_sr_interactive() and choose_ch_interactive() and edit
+acq_irrad_interactive() and acq_fraction_interactive() to make use of them.
+
 ooacquire 0.1.4
 ===============
 
