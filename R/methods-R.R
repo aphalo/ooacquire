@@ -42,6 +42,8 @@ new_correction_method <- function(descriptor,
   if (anyNA(c(wl.range, wl.method)) ||
       wl.range[1] > wl.method[1] ||
       wl.range[2] < wl.method[2]) {
+    wl.method[1] <- ifelse(wl.range[1] > wl.method[1], wl.range[1], wl.method[1])
+    wl.method[2] <- ifelse(wl.range[2] < wl.method[2], wl.range[2], wl.method[2])
     stray.light.method = "none"
     warning("Invalid wavelengths for instrument: stray-light correction diabled!")
   }

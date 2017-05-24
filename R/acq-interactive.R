@@ -57,7 +57,7 @@ acq_irrad_interactive <-
     w <- start_session()
 
     instruments <- list_instruments(w)
-    print(instruments)
+#    print(instruments)
 
     sr.index <- choose_sr_interactive(instruments)
     ch.index <- choose_ch_interactive(instruments, sr.index)
@@ -102,7 +102,7 @@ acq_irrad_interactive <-
     stopifnot(descriptor[["spectrometer.sn"]] == descriptor.inst[["spectrometer.sn"]])
 
     # Before continuing we check that calibrations are available
-    stopifnot(length(descriptor[["walengths"]]) == descriptor[["num.pixs"]])
+    stopifnot(length(descriptor[["wavelengths"]]) == descriptor[["num.pixs"]])
     stopifnot(length(descriptor[["inst.calib"]][["irrad.mult"]]) == descriptor[["num.pixs"]])
 
     session.label <- paste("operator: ", readline("Operator's name: "),
@@ -304,7 +304,7 @@ acq_fraction_interactive <-
 
 
     # Before continuing we check that wavelength calibration is available
-    stopifnot(length(descriptor[["walengths"]]) == descriptor[["num.pixs"]])
+    stopifnot(length(descriptor[["wavelengths"]]) == descriptor[["num.pixs"]])
 
     session.label <- paste("operator: ", readline("Operator's name: "),
                            ", instrument s.n.: ", descriptor[["spectrometer.sn"]],
@@ -530,7 +530,7 @@ choose_sr_interactive <- function(instruments) {
 
   print("Connected spectrometers")
   # check availability
-  repeat {
+#  repeat {
     num.inst <- nrow(instruments)
     if (num.inst < 1) {
       print("No spectrometer found. Please connect one, or abort.")
@@ -556,8 +556,12 @@ choose_sr_interactive <- function(instruments) {
           print("A number between 1 and ", num.inst, " is required.")
         }
       }
+    } else { # num.inst == 1
+      sr.idx <- 1L
+      sr.index <- sr.idx - 1L
     }
-  }
+#  }
+  print(instruments[sr.idx, ])
   sr.index
 }
 
@@ -593,6 +597,7 @@ choose_ch_interactive <- function(instruments, sr.index = 0L) {
   } else {
     ch.index <- 0L
   }
+  ch.index
 }
 
 
