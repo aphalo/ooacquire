@@ -5,7 +5,7 @@
 \title{Make default method from descriptor}
 \usage{
 new_correction_method(descriptor, stray.light.method = "none",
-  stray.light.wl = c(220, 230), flt.dark.wl = c(193, 209.5),
+  stray.light.wl = c(220, 230), flt.dark.wl = c(200, 210),
   flt.ref.wl = c(360, 379.5), flt.Tfr = 1)
 }
 \arguments{

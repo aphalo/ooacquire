@@ -26,7 +26,7 @@
 new_correction_method <- function(descriptor,
                        stray.light.method = "none",
                        stray.light.wl = c(220, 230),
-                       flt.dark.wl = c(193, 209.5),
+                       flt.dark.wl = c(200, 210),
                        flt.ref.wl = c(360, 379.5),
                        flt.Tfr = 1) {
   ## Configuration is not known
@@ -45,14 +45,14 @@ new_correction_method <- function(descriptor,
     wl.method[1] <- ifelse(wl.range[1] > wl.method[1], wl.range[1], wl.method[1])
     wl.method[2] <- ifelse(wl.range[2] < wl.method[2], wl.range[2], wl.method[2])
     stray.light.method = "none"
-    warning("Invalid wavelengths for instrument: stray-light correction diabled!")
+    warning("Invalid wavelengths for instrument: stray-light correction disabled!")
   }
 
   if (!stray.light.method %in% c("original", "sun", "simple")) {
     stray.light.wl <- flt.dark.wl <- flt.ref.wl <- NA_real_
     if (stray.light.method != "none") {
       stray.light.method <- "none"
-      warning("Unknown stray-light method: stray-light correction diabled!")
+      warning("Unknown stray-light method: stray-light correction disabled!")
     }
   }
 

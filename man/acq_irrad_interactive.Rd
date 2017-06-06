@@ -13,7 +13,7 @@ acq_irrad_interactive(tot.time.range = c(5, 15), target.margin = 0.1,
 acq_fraction_interactive(tot.time.range = c(5, 15), target.margin = 0.2,
   HDR.mult = c(short = 1, long = 10), protocols = NULL,
   correction.method = NA, descriptors = NA, ref.value = 1,
-  qty.out = "Tfr", type = "total", stray.light.method = "none",
+  qty.out = "Tfr", type = "total", stray.light.method = "simple",
   save.pdfs = TRUE)
 }
 \arguments{

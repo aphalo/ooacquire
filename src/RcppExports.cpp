@@ -29,3 +29,14 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+
+static const R_CallMethodDef CallEntries[] = {
+    {"ooacquire_MAYP11278_tail_correction", (DL_FUNC) &ooacquire_MAYP11278_tail_correction, 2},
+    {"ooacquire_MAYP112785_tail_correction", (DL_FUNC) &ooacquire_MAYP112785_tail_correction, 2},
+    {NULL, NULL, 0}
+};
+
+RcppExport void R_init_ooacquire(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
+}

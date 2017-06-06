@@ -44,8 +44,6 @@ MAYP112785_simple.mthd <- list(
   trim = 0.05
 )
 
-## temporarily we load the old descriptor!!
-## this needs to be replaced so as to get correct values!!!!
 # load an instrument descriptor
 load(file = "./data-raw/maya-descriptor/MAYP112785.Rda")
 
@@ -71,14 +69,6 @@ for (f in files) {
   names(tmp) <- c("w.length", "irrad.mult")
   # make a copy of the descriptor
   descriptor.tmp <- descriptor
-  # # replace non-linearity correction function
-  # oo.nl.poly <-
-  #   polynom::polynomial(c(1.00071E+00,	-6.54883E-08,	-1.47894E-11,	5.96205E-16,
-  #                         -2.59771E-21,	-3.20659E-25,	6.55573E-30,	-3.79252E-35))
-  # oo.nl.fun <- as.function(oo.nl.poly)
-  # nl.fun <- function(x) {x / oo.nl.fun(x)}
-  # descriptor.tmp$inst.calib$nl.fun <- nl.fun
-  # replace calibration
   descriptor.tmp <-
     set_descriptor_wl(descriptor = descriptor.tmp,
                       wl = tmp[["w.length"]])

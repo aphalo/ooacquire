@@ -57,7 +57,6 @@ acq_irrad_interactive <-
     w <- start_session()
 
     instruments <- list_instruments(w)
-#    print(instruments)
 
     sr.index <- choose_sr_interactive(instruments)
     ch.index <- choose_ch_interactive(instruments, sr.index)
@@ -70,15 +69,15 @@ acq_irrad_interactive <-
     if (anyNA(c(descriptors[[1]], correction.method[[1]]))) {
       descriptor <-
         switch(serial_no,
-               MAYP11278 = which_descriptor(descriptors = MAYP11278_descriptors),
-               MAYP112785 = which_descriptor(descriptors = MAYP112785_descriptors),
+               MAYP11278 = which_descriptor(descriptors = ooacquire::MAYP11278_descriptors),
+               MAYP112785 = which_descriptor(descriptors = ooacquire::MAYP112785_descriptors),
                get_oo_descriptor(w, sr.index = sr.index, ch.index = ch.index)
         )
 
       correction.method <-
         switch(serial_no,
-               MAYP11278 = MAYP11278_ylianttila.mthd,
-               MAYP112785 = MAYP112785_ylianttila.mthd,
+               MAYP11278 = ooacquire::MAYP11278_ylianttila.mthd,
+               MAYP112785 = ooacquire::MAYP112785_ylianttila.mthd,
                new_correction_method(descriptor,
                                      stray.light.method = stray.light.method)
         )
@@ -244,7 +243,7 @@ acq_fraction_interactive <-
            ref.value = 1,
            qty.out = "Tfr",
            type = "total",
-           stray.light.method = "none",
+           stray.light.method = "simple",
            save.pdfs = TRUE) {
 
     stopifnot(qty.out %in% c("Tfr", "Rfr", "raw"))
@@ -271,15 +270,29 @@ acq_fraction_interactive <-
     if (anyNA(c(descriptors[[1]], correction.method[[1]]))) {
       descriptor <-
         switch(serial_no,
-               MAYP11278 = which_descriptor(descriptors = MAYP11278_descriptors),
-               MAYP112785 = which_descriptor(descriptors = MAYP112785_descriptors),
+               MAYP11278 = which_descriptor(descriptors = ooacquire::MAYP11278_descriptors),
+               MAYP112785 = which_descriptor(descriptors = ooacquire::MAYP112785_descriptors),
+               JAZA3098 =
+               { if (ch.index == 0L) {
+                 ooacquire::JAZA3098_ch1_descriptors[[1]]
+               } else {
+                 ooacquire::JAZA3098_ch2_descriptors[[1]]
+               }
+               },
                get_oo_descriptor(w, sr.index = sr.index, ch.index = ch.index)
         )
 
       correction.method <-
         switch(serial_no,
-               MAYP11278 = MAYP11278_ylianttila.mthd,
-               MAYP112785 = MAYP112785_ylianttila.mthd,
+               MAYP11278 = ooacquire::MAYP11278_ylianttila.mthd,
+               MAYP112785 = ooacquire::MAYP112785_ylianttila.mthd,
+               JAZA3098 =
+               { if (ch.index == 0L) {
+                 ooacquire::JAZA3098_ch1_none.mthd
+               } else {
+                 ooacquire::JAZA3098_ch2_none.mthd
+               }
+               },
                new_correction_method(descriptor,
                                      stray.light.method = stray.light.method)
         )
@@ -529,38 +542,35 @@ choose_sr_interactive <- function(instruments) {
   sn.idx <- 3
 
   print("Connected spectrometers")
-  # check availability
-#  repeat {
-    num.inst <- nrow(instruments)
-    if (num.inst < 1) {
-      print("No spectrometer found. Please connect one, or abort.")
-      if (readline("abort, retry (-/a)") != "a") {
-        next()
+  num.inst <- nrow(instruments)
+  if (num.inst < 1) {
+    print("No spectrometer found. Please connect one, or abort.")
+    if (readline("abort, retry (-/a)") != "a") {
+      next()
+    } else {
+      stop("Aborting as requested! Bye.")
+    }
+  }
+  # select instrument
+  if (num.inst > 1) {
+    prompt <- paste(1:nrow(instruments), ": ", instruments[[sn.idx]],
+                    " (choose by index): ", sep = "")
+    repeat{
+      sr.idx <- as.integer(readline(prompt = prompt))
+      if (sr.idx[1] == "") {
+        sr.idx <- 1L
+      }
+      if (sr.idx[1] %in% 1L:nrow(instruments)) {
+        sr.index <- sr.idx - 1L
+        break()
       } else {
-        stop("Aborting as requested! Bye.")
+        print("A number between 1 and ", num.inst, " is required.")
       }
     }
-    # select instrument
-    if (num.inst > 1) {
-      prompt <- paste(1:nrow(instruments), ": ", instruments[[sn.idx]],
-                      " (choose by index): ", sep = "")
-      repeat{
-        sr.idx <- as.integer(readline(prompt = prompt))
-        if (sr.idx[1] == "") {
-          sr.idx <- 1L
-        }
-        if (sr.idx[1] %in% 1L:nrow(instruments)) {
-          sr.index <- sr.idx - 1L
-          break()
-        } else {
-          print("A number between 1 and ", num.inst, " is required.")
-        }
-      }
-    } else { # num.inst == 1
-      sr.idx <- 1L
-      sr.index <- sr.idx - 1L
-    }
-#  }
+  } else { # num.inst == 1
+    sr.idx <- 1L
+    sr.index <- sr.idx - 1L
+  }
   print(instruments[sr.idx, ])
   sr.index
 }
@@ -584,14 +594,14 @@ choose_ch_interactive <- function(instruments, sr.index = 0L) {
   num.channels <- instruments[sr.index + 1L, num.ch.idx]
   if (num.channels > 1) {
     repeat {
-      prompt <- paste("Channels available: ", 1:num.channels,
+      prompt <- paste("Channels available: ", paste(format(1:num.channels, digits = 0L), collapse = ", "),
                       " (choose by index): ", sep = "")
       ch.idx <- as.integer(readline(prompt = prompt))
       if (ch.idx %in% 1:num.channels) {
         ch.index <- ch.idx - 1L
         break()
       } else {
-        print("A number between 1 and ", num.channels, " is required.")
+        print(paste("A number between 1 and ", num.channels, " is required.", sep = ""))
       }
     }
   } else {

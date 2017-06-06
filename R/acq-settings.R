@@ -200,13 +200,9 @@ tune_acq_settings <- function(descriptor,
     if (verbose) message(paste("max.counts[", i, "]: ", format(max.counts)))
     if (max.counts < target.min.counts && integ.time < x$max.integ.time) {
       if (verbose) message("max count <", round(target.min.counts))
-#      if (max.counts < target.min.counts) {
-        integ.time <- round(integ.time *
-                              (target.counts - dark.counts) /
-                              (max.counts - dark.counts), 0)
-      # } else {
-      #   integ.time <- round(integ.time * 1.1, 0)
-      # }
+      integ.time <- round(integ.time *
+                            (target.counts - dark.counts) /
+                            (max.counts - dark.counts), 0)
     }
 
     if (integ.time >= x$max.integ.time) {
