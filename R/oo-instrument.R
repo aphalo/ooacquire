@@ -20,16 +20,18 @@ get_oo_descriptor <- function(w, sr.index = 0L, ch.index = 0L) {
     inst.calib <-
       rOmniDriver::get_calibration_coefficients_from_buffer(w, sr.index, ch.index)
     # linearization
-    oo.nl.poly <- inst.calib$getNlCoefficients()
-    oo.nl.poly <- polynom::polynomial(oo.nl.poly)
+    oo.nl.coeff <- inst.calib$getNlCoefficients()
+    z$nl.coeff <- oo.nl.coeff
+    oo.nl.poly <- polynom::polynomial(oo.nl.coeff)
     oo.nl.fun <- as.function(oo.nl.poly)
     z$nl.fun <- compiler::cmpfun(function(x) {x / oo.nl.fun(x)})
     # stray light
     z$straylight.coeff <- inst.calib$getStrayLight()
     z$straylight.slope <- inst.calib$getStrayLightSlope()
     # wavelength calibration
-    wl.poly <- inst.calib$getWlCoefficients()
-    wl.poly <- polynom::polynomial(wl.poly)
+    wl.coeff <- inst.calib$getWlCoefficients()
+    z$wl.coeff
+    wl.poly <- polynom::polynomial(wl.coeff)
     z$wl.fun <- as.function(wl.poly)
     # slit function
     z$slit.fun <- NA
@@ -175,6 +177,8 @@ set_descriptor_wl <- function(descriptor,
 #' like Ocean Optics stored in firmware or in any other form.
 #'
 #' @param descriptor list as returned by function \code{get_oo_descriptor}
+#' @param nl.coeff numeric vector, if nl.fun is missing, assumed to be a
+#'   polynomial.
 #' @param nl.fun A function or a polynom::polynomial object containing
 #'   the linearization to be applied.
 #'
@@ -184,13 +188,23 @@ set_descriptor_wl <- function(descriptor,
 #' @export
 #'
 set_descriptor_nl <- function(descriptor,
-                              nl.fun)
+                              nl.coeff = NA_real_,
+                              nl.fun = NULL)
 {
+  stopifnot(!is.null(nl.coeff) || !is.null(nl.fun))
+
+  # if a vector of polynomial coefficients is supplied, but no function we
+  # build a polynomial from it
+  if (is.null(nl.fun)) {
+    nl.fun <- polynom::polynomial(nl.coeff)
+  }
+
   # if polynomial supplied instead of function we convert it
   if (polynom::is.polynomial(nl.fun)) {
     nl.fun <- as.function(nl.fun)
   }
   stopifnot(is.function(nl.fun))
+  descriptor[["inst.calib"]][["nl.coeff"]] <- nl.coeff
   descriptor[["inst.calib"]][["nl.fun"]] <- nl.fun
   descriptor
 }

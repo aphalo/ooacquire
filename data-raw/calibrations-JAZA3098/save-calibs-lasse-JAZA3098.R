@@ -81,6 +81,8 @@ load(file = "./data-raw/jaz-descriptor/JAZA3098.Rda")
 descriptor_ch1$w <- NULL
 descriptor_ch2$w <- NULL
 
+
+
 # we do not have calibration files for this spectrometer
 
 # create a new descriptor for each channel with 1 as calibration multipliers
@@ -91,7 +93,7 @@ for (d in names(descriptors)) {
   descriptor.tmp <-
     set_descriptor_irrad_mult(descriptor = descriptor.tmp,
                               irrad.mult = rep(1, length(descriptor.tmp[["wavelengths"]])),
-                              wl.range = c(250, 1100),
+                              wl.range = c(250, 890), # 190..250 used as reference
                               start.date = lubridate::ymd("2014-01-01"),
                               end.date = lubridate::ymd("2024-01-01"))
   descriptors[[d]] <- descriptor.tmp

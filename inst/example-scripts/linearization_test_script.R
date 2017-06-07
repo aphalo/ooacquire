@@ -11,9 +11,11 @@ w <- start_session()
 list_instruments(w)
 
 descriptor_ch1 <- get_oo_descriptor(w, ch.index = 0L)
-# descriptor_ch1$max.counts <- 50000
+descriptor_ch1$max.counts
+descriptor_ch1$max.counts <- 65000
 descriptor_ch2 <- get_oo_descriptor(w, ch.index = 1L)
-# descriptor_ch2$max.counts <- 50000
+descriptor_ch2$max.counts
+descriptor_ch2$max.counts <- 65000
 
 # measure reflectance
 
@@ -23,7 +25,7 @@ descriptor <- descriptor_ch1
 # about 30 % so as to have several puxels saturated at the longest integration
 # time.
 settings <- acq_settings(descriptor,
-                         HDR.mult = c(30:1) / 30 * 1.3,
+                         HDR.mult = c(30:1) / 30,
                          target.margin = 0.1,
                          tot.time.range = c(5, 15),
                          corr.elect.dark = 0L,
@@ -35,15 +37,17 @@ settings <- tune_acq_settings(descriptor, settings)
 
 raw_dose_mspct <- acq_raw_mspct(descriptor, settings, protocol = c("light", "dark"))
 names(raw_dose_mspct)
-plot(raw_dose_mspct[["light"]])
-plot(raw_dose_mspct[["dark"]])
+plot(raw_dose_mspct[["light"]], annotations = c("-", "peaks"))
+plot(raw_dose_mspct[["dark"]], annotations = c("-", "peaks"))
 # We replace with NAs the clipped readings
 raw_dose_mspct <- msmsply(raw_dose_mspct, trim_counts)
-plot(raw_dose_mspct[["light"]])
-plot(raw_dose_mspct[["dark"]])
+plot(raw_dose_mspct[["light"]], annotations = c("-", "peaks"))
+plot(raw_dose_mspct[["dark"]], annotations = c("-", "peaks"))
 
 # convert to counts per second
 cps_dose_mspct <- raw2cps(raw_dose_mspct)
+plot(cps_dose_mspct[["light"]], annotations = c("-", "peaks"))
+plot(cps_dose_mspct[["dark"]], annotations = c("-", "peaks"))
 
 # if sensor response were linear, then the cps would be the same for all
 # integration times. In practice this never the case, and we need to
@@ -52,7 +56,8 @@ cps_dose_mspct <- raw2cps(raw_dose_mspct)
 # source used.
 all.w.lengths <- cps_dose_mspct[["light"]][["w.length"]]
 # target.pixs <- 600 + 1:10 * 20
-target.pixs <- 600
+target.pixs <- 570
+all.w.lengths[target.pixs]
 
 # print the integration times, total times, and possible saturation
 

@@ -9,24 +9,24 @@ w <- start_session()
 list_instruments(w)
 
 descriptor_ch1 <- get_oo_descriptor(w, ch.index = 0L)
-descriptor_ch1$max.counts <- 50000
+descriptor_ch1$max.counts <- 65000
 descriptor_ch2 <- get_oo_descriptor(w, ch.index = 1L)
-descriptor_ch2$max.counts <- 50000
+descriptor_ch2$max.counts <- 65000
 
 # measure reflectance
 
 descriptor <- descriptor_ch1
 
 settings <- acq_settings(descriptor,
-                         HDR.mult = c(1,4,16),
-                         tot.time.range = c(25,25))
+                         HDR.mult = c(1,10),
+                         tot.time.range = c(5,30))
 
 settings <- tune_acq_settings(descriptor, settings)
 # settings
 
-mspct_1 <- acq_raw_mspct(descriptor, settings, protocol = c("reference", "filter", "dark"))
+mspct_1 <- acq_raw_mspct(descriptor, settings, protocol = c("reference", "sample", "dark"))
 names(mspct_1)
-plot(mspct_1[[1]])
+plot(mspct_1[[1]], range = c(200, 1100))
 plot(mspct_1[[2]])
 plot(mspct_1[[3]])
 getWhatMeasured(mspct_1)
@@ -36,7 +36,7 @@ plot(mspct_01[[1]])
 plot(mspct_01[[2]])
 plot(mspct_01[[3]])
 
-spct_filter <- raw2cps(mspct_01$filter)
+spct_filter <- raw2cps(mspct_01$sample)
 spct_reference <- raw2cps(mspct_01$reference)
 spct_dark <- raw2cps(mspct_01$dark)
 
@@ -76,13 +76,13 @@ plot(reflectance.spct)
 descriptor <- descriptor_ch2
 
 settings <- acq_settings(descriptor,
-                         HDR.mult = c(1,5,25),
-                         tot.time.range = c(30,30))
+                         HDR.mult = c(1,10),
+                         tot.time.range = c(5,30))
 
 settings <- tune_acq_settings(descriptor, settings)
 # settings
 
-mspct_1 <- acq_raw_mspct(descriptor, settings, protocol = c("reference", "filter", "dark"))
+mspct_1 <- acq_raw_mspct(descriptor, settings, protocol = c("reference", "sample", "dark"))
 names(mspct_1)
 plot(mspct_1[[1]])
 plot(mspct_1[[2]])
@@ -94,7 +94,7 @@ plot(mspct_01[[1]])
 plot(mspct_01[[2]])
 plot(mspct_01[[3]])
 
-spct_filter <- merge_cps(raw2cps(mspct_01$filter))
+spct_filter <- merge_cps(raw2cps(mspct_01$sample))
 spct_reference <- merge_cps(raw2cps(mspct_01$reference))
 spct_dark <- merge_cps(raw2cps(mspct_01$dark))
 
