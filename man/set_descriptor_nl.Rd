@@ -4,10 +4,13 @@
 \alias{set_descriptor_nl}
 \title{Replace linearization function in instrument description.}
 \usage{
-set_descriptor_nl(descriptor, nl.fun)
+set_descriptor_nl(descriptor, nl.coeff = NA_real_, nl.fun = NULL)
 }
 \arguments{
 \item{descriptor}{list as returned by function \code{get_oo_descriptor}}
+
+\item{nl.coeff}{numeric vector, if nl.fun is missing, assumed to be a
+polynomial.}
 
 \item{nl.fun}{A function or a polynom::polynomial object containing
 the linearization to be applied.}

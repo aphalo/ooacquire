@@ -4,13 +4,16 @@
 \alias{choose_ch_interactive}
 \title{Interactively select a channel}
 \usage{
-choose_ch_interactive(instruments, sr.index = 0L)
+choose_ch_interactive(instruments, sr.index = 0L,
+  prompt.text = "Channels available: ")
 }
 \arguments{
 \item{instruments}{the returm value of \code{list_instruments(w)}}
 
 \item{sr.index}{integer The index to the spectrometer, starting from zero,
 following C conventions instead of R indexing conventions.}
+
+\item{prompt.text}{character string to use as prompt.}
 }
 \description{
 Choice of channel to be used if spectrometer has more than one channel.

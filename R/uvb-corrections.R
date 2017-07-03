@@ -240,13 +240,18 @@ filter_correction <- function(x,
   max_x_cps <- max(x[["cps"]], na.rm = TRUE)
 
   # compute filter short wl "dark" cps
-  flt_clip_dark <- clip_wl(flt, range = flt.dark.wl)
-  x_clip_dark <- clip_wl(x, range = flt.dark.wl)
+  if (anyNA(flt.dark.wl)) {
+    mean_flt_cps_short <- 0
+    mean_x_cps_short <- 0
+  } else {
+    flt_clip_dark <- clip_wl(flt, range = flt.dark.wl)
+    x_clip_dark <- clip_wl(x, range = flt.dark.wl)
 
-  mean_flt_cps_short <- mean(flt_clip_dark[["cps"]],
-                            trim = trim, na.rm = TRUE)
-  mean_x_cps_short <- mean(x_clip_dark[["cps"]],
-                          trim = trim, na.rm = TRUE)
+    mean_flt_cps_short <- mean(flt_clip_dark[["cps"]],
+                               trim = trim, na.rm = TRUE)
+    mean_x_cps_short <- mean(x_clip_dark[["cps"]],
+                             trim = trim, na.rm = TRUE)
+  }
 
   # compute filter "reference" wl cps
   flt_clip_ref <- clip_wl(flt, range = flt.ref.wl)

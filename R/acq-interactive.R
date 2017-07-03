@@ -583,10 +583,13 @@ choose_sr_interactive <- function(instruments) {
 #' @param instruments the returm value of \code{list_instruments(w)}
 #' @param sr.index integer The index to the spectrometer, starting from zero,
 #'   following C conventions instead of R indexing conventions.
+#' @param prompt.text character string to use as prompt.
 #'
 #' @keywords internal
 #'
-choose_ch_interactive <- function(instruments, sr.index = 0L) {
+choose_ch_interactive <- function(instruments,
+                                  sr.index = 0L,
+                                  prompt.text = "Channels available: ") {
   stopifnot(nrow(instruments) > 0)
 
   num.ch.idx <- 4
@@ -594,7 +597,7 @@ choose_ch_interactive <- function(instruments, sr.index = 0L) {
   num.channels <- instruments[sr.index + 1L, num.ch.idx]
   if (num.channels > 1) {
     repeat {
-      prompt <- paste("Channels available: ", paste(format(1:num.channels, digits = 0L), collapse = ", "),
+      prompt <- paste(prompt.text, paste(format(1:num.channels, digits = 0L), collapse = ", "),
                       " (choose by index): ", sep = "")
       ch.idx <- as.integer(readline(prompt = prompt))
       if (ch.idx %in% 1:num.channels) {
@@ -609,6 +612,269 @@ choose_ch_interactive <- function(instruments, sr.index = 0L) {
   }
   ch.index
 }
+
+
+# simple fraction interactive ---------------------------------------------
+
+#' @rdname acq_irrad_interactive
+#'
+#' @param ref.value numeric or filter_spct/reflector_spct object.
+#' @param qty.out character One of "Tfr" (transmittance as a fraction of one)
+#'   or "raw" (raw counts).
+#' @param type character Type of transmittance or reflectance measured.
+#'
+#' @note The calculations for reflectance and transmittance are very similar,
+#'   so we provide a single function capable of handling both. For
+#'   transmittance the reference is usually direct exposure to radiation but
+#'   for reflectance a white reference patch is normally used. In some cases
+#'   one may want to use a grey reference. We provide an argument that allows
+#'   the user to supply a constant or a spectrum describing the properties of
+#'   the reference. It is also important to distinguish between total and
+#'   internal transmittance, and which of these is measured depends on the
+#'   measuring protocol.
+#'
+#' @export
+#'
+acq_rfr_tfr_interactive <-
+  function(tot.time.range = c(10, 15),
+           target.margin = 0.1,
+           HDR.mult = c(1, 10),
+           descriptors = NA,
+           ref.value = 1,
+           save.pdfs = TRUE,
+           qty.out = "Tfr") {
+
+    # define measurement protocols
+    protocols <- list(rsd = c("reference", "sample", "dark"),
+                      rs = c("reference", "sample"))
+
+    w <- start_session()
+
+    instruments <- list_instruments(w)
+    print(instruments)
+
+    sr.index <- 0L
+    rfr.ch.index <- 0L
+    tfr.ch.index <- 1L
+
+    serial_no <- as.character(instruments[sr.index + 1L, 3])
+
+    message("Channels: ", rfr.ch.index, "for Rfr, and ", tfr.ch.index,
+            " for Tfr; ",
+            "spectrometer with s.n.: ", serial_no)
+
+    rfr.descriptor <- ooacquire::JAZA3098_ch1_descriptors[[1]]
+    tfr.descriptor <- ooacquire::JAZA3098_ch2_descriptors[[1]]
+
+    # needed only for descriptors retrieved from data
+    rfr.descriptor[["w"]] <- w
+    rfr.descriptor[["sr.index"]] <- sr.index
+    rfr.descriptor[["ch.index"]] <- rfr.ch.index
+
+    tfr.descriptor[["w"]] <- w
+    tfr.descriptor[["sr.index"]] <- sr.index
+    tfr.descriptor[["ch.index"]] <- tfr.ch.index
+
+    # We still check serial numbers, really needed only for user supplied descriptors
+    descriptor.inst <- get_oo_descriptor(w)
+    stopifnot(rfr.descriptor[["spectrometer.sn"]] == descriptor.inst[["spectrometer.sn"]])
+
+    # Before continuing we check that wavelength calibration is available
+    stopifnot(length(rfr.descriptor[["wavelengths"]]) == rfr.descriptor[["num.pixs"]])
+    stopifnot(length(tfr.descriptor[["wavelengths"]]) == tfr.descriptor[["num.pixs"]])
+
+    session.label <- paste("operator: ", readline("Operator's name: "),
+                           ", instrument s.n.: ", rfr.descriptor[["spectrometer.sn"]],
+                           sep = "")
+
+    folder.name <- readline("Enter folder name (use forward slashes '/' instead of '\'): ")
+    if (length(folder.name == 0)) {
+      folder.name <- "."
+    }
+    # need to add folder.name sanitation
+    if (!file.exists(folder.name)) {
+      message("Folder does not exist, creating it...")
+      dir.create(folder.name)
+    }
+    oldwd <- setwd(folder.name)
+    message("Files will be saved to '", folder.name, "'", sep="")
+
+    protocol <- protocol_interactive(protocols)
+
+    start.int.time <- 0.5 # seconds
+
+    rfr.settings <-
+      acq_settings(rfr.descriptor,
+                   start.int.time,
+                   target.margin = target.margin,
+                   tot.time.range = tot.time.range,
+                   HDR.mult = HDR.mult)
+
+    tfr.settings <-
+      acq_settings(tfr.descriptor,
+                   start.int.time,
+                   target.margin = target.margin,
+                   tot.time.range = tot.time.range,
+                   HDR.mult = HDR.mult)
+
+    # save current value as starting value for next iteration
+
+    repeat {
+      repeat{
+        obj.name <- readline("Give a name to the spectrum: ")
+        if (length(obj.name) > 0 && !exists(obj.name)) break()
+        print("A valid and unique name is required, please try again...")
+      }
+      rfr.raw.name <- paste(obj.name, "rfr_raw_spct", sep = ".")
+      tfr.raw.name <- paste(obj.name, "tfr_raw_spct", sep = ".")
+      rfr.name <- paste(obj.name, "rfr_spct", sep = ".")
+      tfr.name <- paste(obj.name, "tfr_spct", sep = ".")
+      spct.name <- paste(obj.name, "spct", sep = ".")
+      file.name <- paste(obj.name, "Rda", sep = ".")
+      pdf.name <- paste(obj.name, "pdf", sep = ".")
+
+      cat("REFLECTANCE:\n")
+      rfr.settings <- tune_interactive(descriptor = rfr.descriptor,
+                                       settings = rfr.settings)
+
+      rfr.raw.mspct <- acq_raw_mspct(rfr.descriptor,
+                                     rfr.settings,
+                                     protocol,
+                                     user.label = spct.name)
+
+      if (length(rfr.raw.mspct) == 0) {
+        next()
+      }
+
+      assign(rfr.raw.name, rfr.raw.mspct)
+
+      cat("TRANSMITANCE:\n")
+      tfr.settings <- tune_interactive(descriptor = tfr.descriptor,
+                                       settings = tfr.settings)
+
+      tfr.raw.mspct <- acq_raw_mspct(tfr.descriptor,
+                                     tfr.settings,
+                                     protocol,
+                                     user.label = spct.name)
+
+      if (length(tfr.raw.mspct) == 0) {
+        next()
+      }
+
+      assign(tfr.raw.name, tfr.raw.mspct)
+
+      # processing
+
+      if (qty.out == "raw") {
+        save(list = c(rfr.raw.name, tfr.raw.name),
+             file = file.name)
+      } else {
+        # reflectance
+        rfr.raw.mspct %>%
+          msmsply(trim_counts) %>%
+          msmsply(linearize_counts) %>%
+          raw2cps() %>%
+          msmsply(merge_cps) -> rfr.cps.mspct
+
+        cps2Rfr(rfr.cps.mspct$sample,
+                rfr.cps.mspct$reference,
+                rfr.cps.mspct$dark) -> rfr.spct
+
+        assign(rfr.name, rfr.spct)
+
+        # transmitance
+        tfr.raw.mspct %>%
+          msmsply(trim_counts) %>%
+          msmsply(linearize_counts) %>%
+          raw2cps() %>%
+          msmsply(merge_cps) -> tfr.cps.mspct
+
+        cps2Tfr(tfr.cps.mspct$sample,
+                tfr.cps.mspct$reference,
+                tfr.cps.mspct$dark) -> tfr.spct
+
+        assign(tfr.name, tfr.spct)
+
+        object.spct <-
+          object_spct(w.length = rfr.spct[["w.length"]],
+                      Rfr = rfr.spct[["Rfr"]],
+                      Tfr = tfr.spct[["Tfr"]],
+                      Rfr.type = "total",
+                      Tfr.type = "total",
+                      comment = obj.name)
+
+        object.spct <-
+          copy_attributes(rfr.spct, object.spct,
+                          c("what_measured", "when_measured", "instr_desc"))
+
+        object.spct <- clip_wl(object.spct)
+
+        assign(spct.name, object.spct)
+
+        save(list = c(rfr.raw.name, tfr.raw.name, spct.name, rfr.name, tfr.name),
+             file = file.name)
+
+        repeat {
+          fig1 <- graphics::plot(rfr.spct, range = c(280, 850)) +
+            ggplot2::labs(title = spct.name,
+                          subtitle = paste(photobiology::getWhenMeasured(rfr.spct), " UTC, ",
+                                           session.label, sep = ""),
+                          caption = paste("ooacquire", utils::packageVersion("ooacquire"))) +
+            ggplot2::theme_bw()
+          fig2 <- graphics::plot(tfr.spct, range = c(280, 850)) +
+            ggplot2::labs(title = spct.name,
+                          subtitle = paste(photobiology::getWhenMeasured(tfr.spct), " UTC, ",
+                                           session.label, sep = ""),
+                          caption = paste("ooacquire", utils::packageVersion("ooacquire"))) +
+            ggplot2::theme_bw()
+
+          print(ggspectra::multiplot(fig1, fig2))
+
+          answer <- readline("Change wavebands/discard/save and continue (/w/d/-): ")
+          switch(answer,
+                 # p = {options(photobiology.radiation.unit = "photon"); next()},
+                 # e = {options(photobiology.radiation.unit = "energy"); next()},
+                 w = {answer1 <- readline("Waveband set to use, UV+PAR, plants, visible, total, default (u/p/v/t/-)")
+                 switch(answer1,
+                        u = options(photobiology.plot.bands =
+                                      list(photobiologyWavebands::UVC(),
+                                           photobiologyWavebands::UVB(),
+                                           photobiologyWavebands::UVA(),
+                                           photobiologyWavebands::PAR())),
+                        p = options(photobiology.plot.bands = photobiologyWavebands::Plant_bands()),
+                        v = options(photobiology.plot.bands = photobiologyWavebands::VIS_bands()),
+                        t = options(photobiology.plot.bands =
+                                      list(new_waveband(min(object.spct), max(object.spct), wb.name = "Total"))),
+                        options(photobiology.plot.bands = NULL))
+                 next()},
+                 d = break()
+          )
+          break()
+        }
+      }
+      if (save.pdfs) {
+        grDevices::pdf(file = pdf.name, width = 8, height = 6, onefile = TRUE)
+        print(fig1)
+        print(fig2)
+        grDevices::dev.off()
+      }
+
+      user.input <- readline("Next, change protocol, quit (-/p/q): ")
+
+      if (user.input[1] == "") {
+        next()
+      } else if (user.input[1] == "p") {
+        protocol <- protocol_interactive(protocols)
+      } else if (user.input[1] == "q") {
+        break()
+      }
+    }
+    print("Ending...")
+    end_session(w)
+    setwd(oldwd)
+    message("Folder reset to: ", getwd())
+    message("Bye!")
+  }
 
 
 

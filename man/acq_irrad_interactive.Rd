@@ -3,6 +3,7 @@
 \name{acq_irrad_interactive}
 \alias{acq_irrad_interactive}
 \alias{acq_fraction_interactive}
+\alias{acq_rfr_tfr_interactive}
 \title{Acquire spectra interactively}
 \usage{
 acq_irrad_interactive(tot.time.range = c(5, 15), target.margin = 0.1,
@@ -15,6 +16,10 @@ acq_fraction_interactive(tot.time.range = c(5, 15), target.margin = 0.2,
   correction.method = NA, descriptors = NA, ref.value = 1,
   qty.out = "Tfr", type = "total", stray.light.method = "simple",
   save.pdfs = TRUE)
+
+acq_rfr_tfr_interactive(tot.time.range = c(10, 15), target.margin = 0.1,
+  HDR.mult = c(1, 10), descriptors = NA, ref.value = 1,
+  save.pdfs = TRUE, qty.out = "Tfr")
 }
 \arguments{
 \item{tot.time.range}{numeric vector Range of total times for a measurement
@@ -44,6 +49,13 @@ created on-the-fly.}
 or "raw" (raw counts).}
 
 \item{type}{character Type of transmittance or reflectance measured.}
+
+\item{ref.value}{numeric or filter_spct/reflector_spct object.}
+
+\item{qty.out}{character One of "Tfr" (transmittance as a fraction of one)
+or "raw" (raw counts).}
+
+\item{type}{character Type of transmittance or reflectance measured.}
 }
 \description{
 Functions providing a simple interactive front-end to the functions in the
@@ -58,6 +70,16 @@ The integration time is set automatically so that the peak number of
   protocols are passed, each character vector must contain strings "light",
   "filter" and "dark", or "sample", "reference", and "dark", depending on
   the function.
+
+The calculations for reflectance and transmittance are very similar,
+  so we provide a single function capable of handling both. For
+  transmittance the reference is usually direct exposure to radiation but
+  for reflectance a white reference patch is normally used. In some cases
+  one may want to use a grey reference. We provide an argument that allows
+  the user to supply a constant or a spectrum describing the properties of
+  the reference. It is also important to distinguish between total and
+  internal transmittance, and which of these is measured depends on the
+  measuring protocol.
 
 The calculations for reflectance and transmittance are very similar,
   so we provide a single function capable of handling both. For
