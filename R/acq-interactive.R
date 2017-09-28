@@ -131,6 +131,9 @@ acq_irrad_interactive <-
                              tot.time.range = tot.time.range,
                              HDR.mult = HDR.mult)
 
+    seq.settings <- list(step = 0,
+                         num.steps = 1L)
+
     # save current value as starting value for next iteration
 
     repeat { # with same settings
@@ -145,6 +148,7 @@ acq_irrad_interactive <-
       pdf.name <- paste(irrad.name, "pdf", sep = ".")
 
       settings <- tune_interactive(descriptor = descriptor, settings = settings)
+      seq.settings <- set_seq_interactive(seq.settings)
 
       raw.mspct <- acq_raw_mspct(descriptor,
                                  settings,
@@ -611,6 +615,46 @@ choose_ch_interactive <- function(instruments,
     ch.index <- 0L
   }
   ch.index
+}
+
+#' Interactively set sequential measurements
+#'
+#' Adjust integration time settings, allowing the user to repeat the tunning,
+#' and to change some of the parameters used for tunning.
+#'
+#' @keywords internal
+#'
+set_seq_interactive <- function(seq.settings) {
+  old.seq.settings <- seq.settings
+  repeat{
+    cat("Ready to set sequence parameters?\n")
+    answ <- readline("s = step size, n = step number, u = undo (s/n/u/-): ")
+    if (answ == "") {
+      break()
+    }
+    if (answ == "s") {
+      step <- readline(sprintf("Step = %.g2 seconds, new: ",
+                                 seq.settings[["step"]]))
+      step <- try(as.numeric(step))
+      if (!is.na(step)) {
+        seq.settings[["step"]] <- step
+      } else {
+        print("Value not changed!")
+      }
+    } else if (answ == "n") {
+      cat(sprintf("Number of steps = %i, new: "))
+      num.steps <- scan(what = integer, nmax = 1)
+      if (num.steps < 1L || num.steps > 10000L) {
+        warning("Number of steps must be in range 1..10000. Value not changed!")
+      } else {
+        seq.settings[[num.steps]] <- num.steps
+      }
+    } else if (answ == "u") {
+      cat("Restoring previous settings!")
+      seq.settings <- old.seq.settings
+    }
+  }
+  seq.settings
 }
 
 

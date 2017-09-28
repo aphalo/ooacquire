@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 // MAYP11278_tail_correction
 List MAYP11278_tail_correction(NumericVector w_length, NumericVector cts_second);
-RcppExport SEXP ooacquire_MAYP11278_tail_correction(SEXP w_lengthSEXP, SEXP cts_secondSEXP) {
+RcppExport SEXP _ooacquire_MAYP11278_tail_correction(SEXP w_lengthSEXP, SEXP cts_secondSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -19,7 +19,7 @@ END_RCPP
 }
 // MAYP112785_tail_correction
 List MAYP112785_tail_correction(NumericVector w_length, NumericVector cts_second);
-RcppExport SEXP ooacquire_MAYP112785_tail_correction(SEXP w_lengthSEXP, SEXP cts_secondSEXP) {
+RcppExport SEXP _ooacquire_MAYP112785_tail_correction(SEXP w_lengthSEXP, SEXP cts_secondSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -31,8 +31,8 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"ooacquire_MAYP11278_tail_correction", (DL_FUNC) &ooacquire_MAYP11278_tail_correction, 2},
-    {"ooacquire_MAYP112785_tail_correction", (DL_FUNC) &ooacquire_MAYP112785_tail_correction, 2},
+    {"_ooacquire_MAYP11278_tail_correction", (DL_FUNC) &_ooacquire_MAYP11278_tail_correction, 2},
+    {"_ooacquire_MAYP112785_tail_correction", (DL_FUNC) &_ooacquire_MAYP112785_tail_correction, 2},
     {NULL, NULL, 0}
 };
 

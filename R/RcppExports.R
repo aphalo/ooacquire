@@ -14,7 +14,7 @@
 #' @export
 #'
 MAYP11278_tail_correction <- function(w_length, cts_second) {
-    .Call('ooacquire_MAYP11278_tail_correction', PACKAGE = 'ooacquire', w_length, cts_second)
+    .Call('_ooacquire_MAYP11278_tail_correction', PACKAGE = 'ooacquire', w_length, cts_second)
 }
 
 #' Function to compute the tail correction
@@ -30,6 +30,6 @@ MAYP11278_tail_correction <- function(w_length, cts_second) {
 #' @export
 #'
 MAYP112785_tail_correction <- function(w_length, cts_second) {
-    .Call('ooacquire_MAYP112785_tail_correction', PACKAGE = 'ooacquire', w_length, cts_second)
+    .Call('_ooacquire_MAYP112785_tail_correction', PACKAGE = 'ooacquire', w_length, cts_second)
 }
 

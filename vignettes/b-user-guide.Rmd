@@ -470,6 +470,8 @@ tfr02.spct <-
                        descriptor = descriptor,
                        correction.method = MAYP11278_ylianttila.mthd,
                        dyn.range = 3e2)
+tfr02.spct <- trim_wl(tfr02.spct, c(460, 1000))
+tfr02.spct
 ```
 
 ```{r, fig.height=5, fig.width=7}
@@ -491,11 +493,18 @@ rfr01.spct <-
                        dyn.range = 3e2,
                        qty.out = "Rfr",
                        type = "total")
+rfr01.spct <- trim_wl(rfr01.spct, c(460, 1000))
+rfr01.spct
 ```
 
 ```{r, fig.height=5, fig.width=7}
 plot(rfr01.spct)
+plot(tfr02.spct)
 ```
+
+## Assembling spectral data for an object
+
+Once we have total spectral reflectance and total spectral transmittance, we can compute internal spectral transmittance and spectral absorptance. These are straightforward calculations when the spectra have been measured at the same wavelengths, which is not the case when using a two-channel array spectrometer. In either case, to create an object_spct object we can use function `merge2object_spct()` from package 'photobiology', which maps the spectra to the same wavelength values if needed.
 
 ## Irradiance calibration
 

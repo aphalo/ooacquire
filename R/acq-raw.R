@@ -113,12 +113,17 @@ acq_raw_spct <- function(descriptor,
 #'
 acq_raw_mspct <- function(descriptor,
                           acq.settings,
+                          seq.settings = NULL,
                           protocol = c("light", "filter", "dark"),
                           user.label = "",
                           where.measured = data.frame(lon = NA_real_, lat = NA_real_),
                           pause.fun = NULL,
                           verbose = TRUE,
                           ...) {
+
+  if (is.null(seq.settings)) {
+    seq.settings <- list(step = 0, num.steps = 1L)
+  }
 
   default_pause_fun <- function(acq.what, ...) {
     answ <- readline(paste("Ready to acquire", acq.what,
@@ -129,6 +134,7 @@ acq_raw_mspct <- function(descriptor,
   if (is.null(pause.fun)) {
     pause.fun <- default_pause_fun
   }
+
   previous.protocol <- "none"
   z <- list()
   idx <- 0
