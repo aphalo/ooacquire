@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Replace linearization function in instrument description. — set_descriptor_nl â€¢ ooacquire</title>
+<title>Dates for which the different descriptors contain valid calibrations. — JAZA3098_calib_dates.df â€¢ ooacquire</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -71,48 +71,27 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Replace linearization function in instrument description.</h1>
+    <h1>Dates for which the different descriptors contain valid calibrations.</h1>
     </div>
 
     
-    <p>Uses a user supplied function, possibly that supplied by a manufacturer
-like Ocean Optics stored in firmware or in any other form.</p>
+    <p>This is a data frame with data needed to process raw data acquired on different
+dates.</p>
     
 
-    <pre class="usage"><span class='fu'>set_descriptor_nl</span>(<span class='no'>descriptor</span>, <span class='kw'>nl.coeff</span> <span class='kw'>=</span> <span class='fl'>NA_real_</span>, <span class='kw'>nl.fun</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
-    
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>descriptor</th>
-      <td><p>list as returned by function <code>get_oo_descriptor</code></p></td>
-    </tr>
-    <tr>
-      <th>nl.coeff</th>
-      <td><p>numeric vector, if nl.fun is missing, assumed to be a
-polynomial.</p></td>
-    </tr>
-    <tr>
-      <th>nl.fun</th>
-      <td><p>A function or a polynom::polynomial object containing
-the linearization to be applied.</p></td>
-    </tr>
-    </table>
-    
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+    <pre class="usage"><span class='no'>JAZA3098_calib_dates.df</span></pre>
+        
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
 
-    <p>A copy of the argument passed for <code>oo_descriptor</code> with the
-wavelengths field of the calibration data replaced by the new values.</p>
+    <p>A list.</p>
     
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
       
-      <li><a href="#value">Value</a></li>
+      <li><a href="#format">Format</a></li>
           </ul>
 
   </div>

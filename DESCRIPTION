@@ -1,8 +1,8 @@
 Package: ooacquire
 Type: Package
 Title: Acquire Spectral Data from Ocean Optics Spectrometers
-Version: 0.1.4.9002
-Date: 2017-06-07
+Version: 0.1.4.9003
+Date: 2017-09-28
 Authors@R:
    c(
     person("Pedro J.", "Aphalo", email = "pedro.aphalo@helsinki.fi", role = c("aut", "trl", "cre")),
@@ -25,7 +25,7 @@ Imports:
     grDevices,
     graphics,
     utils,
-    Rcpp (>= 0.12.11),
+    Rcpp (>= 0.12.12),
     ggplot2 (>= 2.2.1),
     photobiology (>= 0.9.15),
     photobiologyWavebands (>= 0.4.2),

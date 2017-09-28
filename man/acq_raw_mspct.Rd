@@ -4,9 +4,10 @@
 \alias{acq_raw_mspct}
 \title{Take one set of spectral readings}
 \usage{
-acq_raw_mspct(descriptor, acq.settings, protocol = c("light", "filter",
-  "dark"), user.label = "", where.measured = data.frame(lon = NA_real_, lat
-  = NA_real_), pause.fun = NULL, verbose = TRUE, ...)
+acq_raw_mspct(descriptor, acq.settings, seq.settings = NULL,
+  protocol = c("light", "filter", "dark"), user.label = "",
+  where.measured = data.frame(lon = NA_real_, lat = NA_real_),
+  pause.fun = NULL, verbose = TRUE, ...)
 }
 \arguments{
 \item{descriptor}{list as returned by function \code{get_oo_descriptor()}}

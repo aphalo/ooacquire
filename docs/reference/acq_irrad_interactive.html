@@ -82,12 +82,18 @@ uses.</p>
 
     <pre class="usage"><span class='fu'>acq_irrad_interactive</span>(<span class='kw'>tot.time.range</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>5</span>, <span class='fl'>15</span>), <span class='kw'>target.margin</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
   <span class='kw'>HDR.mult</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='kw'>short</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>long</span> <span class='kw'>=</span> <span class='fl'>10</span>), <span class='kw'>protocols</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>correction.method</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>descriptors</span> <span class='kw'>=</span> <span class='fl'>NA</span>)
+  <span class='kw'>correction.method</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>descriptors</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>stray.light.method</span> <span class='kw'>=</span> <span class='st'>"none"</span>,
+  <span class='kw'>save.pdfs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
 <span class='fu'>acq_fraction_interactive</span>(<span class='kw'>tot.time.range</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>5</span>, <span class='fl'>15</span>), <span class='kw'>target.margin</span> <span class='kw'>=</span> <span class='fl'>0.2</span>,
   <span class='kw'>HDR.mult</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='kw'>short</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>long</span> <span class='kw'>=</span> <span class='fl'>10</span>), <span class='kw'>protocols</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>correction.method</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>descriptors</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>ref.value</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>qty.out</span> <span class='kw'>=</span> <span class='st'>"Tfr"</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"total"</span>)</pre>
+  <span class='kw'>qty.out</span> <span class='kw'>=</span> <span class='st'>"Tfr"</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"total"</span>, <span class='kw'>stray.light.method</span> <span class='kw'>=</span> <span class='st'>"simple"</span>,
+  <span class='kw'>save.pdfs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+
+<span class='fu'>acq_rfr_tfr_interactive</span>(<span class='kw'>tot.time.range</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>10</span>, <span class='fl'>15</span>), <span class='kw'>target.margin</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
+  <span class='kw'>HDR.mult</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>1</span>, <span class='fl'>10</span>), <span class='kw'>descriptors</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>ref.value</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>save.pdfs</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>qty.out</span> <span class='kw'>=</span> <span class='st'>"Tfr"</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
@@ -121,6 +127,28 @@ as a multiplier of the set or tuned integration time.</p></td>
 calibration data.</p></td>
     </tr>
     <tr>
+      <th>stray.light.method</th>
+      <td><p>character Used only when the correction method is
+created on-the-fly.</p></td>
+    </tr>
+    <tr>
+      <th>save.pdfs</th>
+      <td><p>logical Whether to save PDFs to files or not.</p></td>
+    </tr>
+    <tr>
+      <th>ref.value</th>
+      <td><p>numeric or filter_spct/reflector_spct object.</p></td>
+    </tr>
+    <tr>
+      <th>qty.out</th>
+      <td><p>character One of "Tfr" (transmittance as a fraction of one)
+or "raw" (raw counts).</p></td>
+    </tr>
+    <tr>
+      <th>type</th>
+      <td><p>character Type of transmittance or reflectance measured.</p></td>
+    </tr>
+    <tr>
       <th>ref.value</th>
       <td><p>numeric or filter_spct/reflector_spct object.</p></td>
     </tr>
@@ -144,6 +172,15 @@ or "raw" (raw counts).</p></td>
   protocols are passed, each character vector must contain strings "light",
   "filter" and "dark", or "sample", "reference", and "dark", depending on
   the function.</p>
+<p>The calculations for reflectance and transmittance are very similar,
+  so we provide a single function capable of handling both. For
+  transmittance the reference is usually direct exposure to radiation but
+  for reflectance a white reference patch is normally used. In some cases
+  one may want to use a grey reference. We provide an argument that allows
+  the user to supply a constant or a spectrum describing the properties of
+  the reference. It is also important to distinguish between total and
+  internal transmittance, and which of these is measured depends on the
+  measuring protocol.</p>
 <p>The calculations for reflectance and transmittance are very similar,
   so we provide a single function capable of handling both. For
   transmittance the reference is usually direct exposure to radiation but

@@ -386,7 +386,6 @@ acq_fraction_interactive <-
         save(list = raw.name, file = file.name)
       } else {
         filter.spct <- s_fraction_corrected(raw.mspct,
-                                            ref.value = ref.value,
                                             type = type,
                                             correction.method = correction.method,
                                             qty.out = qty.out,

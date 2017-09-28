@@ -14,7 +14,7 @@ vignette: >
 
 ## Introduction
 
-This short document only describes the high level functions, which allow spectral data acquisition. These are meant for interactive use as they provide many choices about instrument settings. We first show simple examples of their use, assuming That R, the needed R packages, Java JDE and Ocean Optics' free OmniDriver runtime are all installed (see this package's User Guide for details). Of course, to acquire irradiance, a suitable instrument calibration and correction method description should be also available. In the example below we use the examples included as part of the package. As the serial number stored with these data is validated against that retrieved from the instrument, the examples bellow will be usable as is only with our own instrument, rather than the one you may want to use.
+This short document only describes the high level functions, which allow spectral data acquisition. These are meant for interactive use as they provide many choices about instrument settings. We first show simple examples of their use, assuming That R, the needed R packages, Java JDE and Ocean Optics' free OmniDriver runtime are all installed (see this package's User Guide for details). Of course, to acquire irradiance, a suitable instrument calibration and method description should be also available. In the example below we use the examples included as part of the package. As the serial number stored with these data is validated against that retrieved from the instrument, the examples bellow will be usable as is only with our own instrument, rather than the one you may want to use.
 
 **NOTE:** This vignette can be built even if a spectrometer is not connected as the code chunks with code that "talk" with the instrument are by default not evaluated.
 
@@ -48,7 +48,7 @@ sr.online <- rOmniDriver::number_srs(w) > 0
 First plug in an Ocean Optics spectrometer to the USB port. Then loading the packages as above and executing the statement b elow above is all what is needed to start an interactive spectral-data acquisition session using default starting values for all settings. 
 
 ```{r, eval=sr.online}
-acq_irrad_interactive(correction.method = ooacquire::MAYP11278_ylianttila.mthd,
+acq_irrad_interactive(method = ooacquire::MAYP11278_ylianttila.mthd,
                       descriptors = ooacquire::MAYP11278_descriptors)
 ```
 
@@ -63,7 +63,7 @@ Simplest settings. Using no integration time bracketing as a single numeric valu
 ```{r, eval=sr.online}
 acq_irrad_interactive(HDR.mult = 1,
                       tot.time.range = c(0, Inf),
-                      correction.method = ooacquire::MAYP11278_ylianttila.mthd,
+                      method = ooacquire::MAYP11278_ylianttila.mthd,
                       descriptors = ooacquire::MAYP11278_descriptors)
 ```
 
@@ -77,7 +77,7 @@ We set total acquisition time to a fixed length of 10 seconds. Once this setting
 ```{r, eval=sr.online}
 acq_irrad_interactive(HDR.mult = c(1, 10), 
                       tot.time.range = 10,
-                      correction.method = ooacquire::MAYP11278_ylianttila.mthd,
+                      method = ooacquire::MAYP11278_ylianttila.mthd,
                       descriptors = ooacquire::MAYP11278_descriptors)
 ```
 
@@ -86,7 +86,7 @@ If long integration times are needed, the setting above may result in the use of
 ```{r, eval=sr.online}
 acq_irrad_interactive(HDR.mult = c(1, 10), 
                       tot.time.range = c(10, 20),
-                      correction.method = ooacquire::MAYP11278_ylianttila.mthd,
+                      method = ooacquire::MAYP11278_ylianttila.mthd,
                       descriptors = ooacquire::MAYP11278_descriptors)
 ```
 
@@ -96,7 +96,7 @@ One problem with automatic setting of integration time is that depending on the 
 
 ```{r, eval=sr.online}
 acq_irrad_interactive(target.margin = 0.25,
-                      correction.method = ooacquire::MAYP11278_ylianttila.mthd,
+                      method = ooacquire::MAYP11278_ylianttila.mthd,
                       descriptors = ooacquire::MAYP11278_descriptors)
 ```
 
@@ -107,7 +107,7 @@ Here we group the acquisition of data where the quantitis of interest are expres
 
 ```{r, eval=sr.online}
 acq_fraction_interactive(ref.value = 0.97,
-                         correction.method = ooacquire::MAYP11278_ylianttila.mthd,
+                         method = ooacquire::MAYP11278_ylianttila.mthd,
                          descriptors = ooacquire::MAYP11278_descriptors)
 ```
 
@@ -115,7 +115,7 @@ Parameters `qty.out` and `type` determine the class of object and the quantity s
 
 ```{r, eval=sr.online}
 acq_fraction_interactive(qty.out = "Rfr", type = "specular",
-                         correction.method = ooacquire::MAYP11278_ylianttila.mthd,
+                         method = ooacquire::MAYP11278_ylianttila.mthd,
                          descriptors = ooacquire::MAYP11278_descriptors)
 ```
 

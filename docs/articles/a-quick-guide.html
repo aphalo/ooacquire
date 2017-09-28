@@ -49,10 +49,10 @@
     <div class="page-header toc-ignore">
       <h1>Quick Start Guide</h1>
             <h3 class="subtitle">
-<code>ooacquire</code> 0.1.3.9000</h3>
+<code>ooacquire</code> 0.1.4.9002</h3>
                         <h4 class="author">Pedro J. Aphalo</h4>
             
-            <h4 class="date">2017-05-10</h4>
+            <h4 class="date">2017-09-28</h4>
           </div>
 
     
@@ -78,45 +78,45 @@
 
 sr.online &lt;-<span class="st"> </span><span class="ot">FALSE</span></code></pre></div>
 <p>First plug in an Ocean Optics spectrometer to the USB port. Then loading the packages as above and executing the statement b elow above is all what is needed to start an interactive spectral-data acquisition session using default starting values for all settings.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/acq_irrad_interactive.html">acq_irrad_interactive</a></span>(<span class="dt">method =</span> ooacquire::MAYP11278_ylianttila.mthd,
-                      <span class="dt">descriptors =</span> ooacquire::MAYP11278_descriptors)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/acq_irrad_interactive.html">acq_irrad_interactive</a></span>(<span class="dt">method =</span> ooacquire<span class="op">::</span>MAYP11278_ylianttila.mthd,
+                      <span class="dt">descriptors =</span> ooacquire<span class="op">::</span>MAYP11278_descriptors)</code></pre></div>
 <p>These code is run at the R console. I normally use the RStudio IDE, but this is not required as longs as graphical display is enabled. Alternatively, the statements can saved into an R script (as plain-text file) and then the file <code>source</code>d from the R console. As scripts can be also run from the operating system shell or command prompt, it is possible, if desired to partly hide R from users’ view.</p>
 <p>Within functions <code><a href="../reference/acq_irrad_interactive.html">acq_irrad_interactive()</a></code> and its companion <code><a href="../reference/acq_irrad_interactive.html">acq_fraction_interactive()</a></code> the user can modify settings through simple menus. These functions, however, have parameters which can be used to set initial settings to different values than their “built-in” defaults. In all cases when values supplied by the user fall outside those accepted by the connected instrument, these values will be adjusted to the nearest valid value.</p>
 <p>Although we here discuss these settings in relation to parameter arguments, the same setiings can be set interactively by the user. It should also be remembered that the functions described will in normal use set a suitable integration time automatically.</p>
 <p>Simplest settings. Using no integration time bracketing as a single numeric value for <code>HDR.mult</code> corresponds to aquisition using a single integration time. Maximum and minimum total integration time as short or as long as allowed by the instrument with no scan averaging.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/acq_irrad_interactive.html">acq_irrad_interactive</a></span>(<span class="dt">HDR.mult =</span> <span class="dv">1</span>,
                       <span class="dt">tot.time.range =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="ot">Inf</span>),
-                      <span class="dt">method =</span> ooacquire::MAYP11278_ylianttila.mthd,
-                      <span class="dt">descriptors =</span> ooacquire::MAYP11278_descriptors)</code></pre></div>
+                      <span class="dt">method =</span> ooacquire<span class="op">::</span>MAYP11278_ylianttila.mthd,
+                      <span class="dt">descriptors =</span> ooacquire<span class="op">::</span>MAYP11278_descriptors)</code></pre></div>
 <p>It is possible to use in the example above a value larger than one for <code>HDR.mult</code> even if a single integration time is used. This is unusual, but if we indeed would like to force clipping of part of the spectrum, this would be the way to achieve it.</p>
 <p>For bracketing, one acquires spectral data with more than one integration time, and the resulting spectra are merged using the <em>most suitable</em> integration time for each wavelength region. Although usually two values are a good compromise, there is no built-in limitaion in the package code. Using three or more values, combined with a very long total acquisition time of the order of minutes, can yield very good control of noise for light sources with stable output. Consequently, although the default setting <code>HDR.mult = c(1, 10)</code> tends to work well, settings like <code>HDR.mult = c(1, 5, 25)</code> may be useful in special circumstances.</p>
 <p>In the next example, we set bracketing, with two values for integration time, with the <em>long integration</em> 10 times longer than the normal or <em>short</em> one (the same as the default, in this case). We set total acquisition time to a fixed length of 10 seconds. Once this setting is active, each time the integration time is automatically set, both the integration time and number of scans are adjusted so that total acquisition time is exactly 10 seconds, for both short and long integration timess. This is useful when irradiance varies “randomly” with time and one desires to keep its effect on the acquired data stable.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/acq_irrad_interactive.html">acq_irrad_interactive</a></span>(<span class="dt">HDR.mult =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">10</span>), 
                       <span class="dt">tot.time.range =</span> <span class="dv">10</span>,
-                      <span class="dt">method =</span> ooacquire::MAYP11278_ylianttila.mthd,
-                      <span class="dt">descriptors =</span> ooacquire::MAYP11278_descriptors)</code></pre></div>
+                      <span class="dt">method =</span> ooacquire<span class="op">::</span>MAYP11278_ylianttila.mthd,
+                      <span class="dt">descriptors =</span> ooacquire<span class="op">::</span>MAYP11278_descriptors)</code></pre></div>
 <p>If long integration times are needed, the setting above may result in the use of suboptimal integration times, as the desired integration time may have be to be shortened until it becomes an exact fraction of the total acquisition time. To avoid this, we can supply instead of a single fixed value for the total acquisition time, a range of values.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/acq_irrad_interactive.html">acq_irrad_interactive</a></span>(<span class="dt">HDR.mult =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">10</span>), 
                       <span class="dt">tot.time.range =</span> <span class="kw">c</span>(<span class="dv">10</span>, <span class="dv">20</span>),
-                      <span class="dt">method =</span> ooacquire::MAYP11278_ylianttila.mthd,
-                      <span class="dt">descriptors =</span> ooacquire::MAYP11278_descriptors)</code></pre></div>
+                      <span class="dt">method =</span> ooacquire<span class="op">::</span>MAYP11278_ylianttila.mthd,
+                      <span class="dt">descriptors =</span> ooacquire<span class="op">::</span>MAYP11278_descriptors)</code></pre></div>
 <p>Sometimes we may want to avoid long integration times even at the cost of not using the whole dynamic range of the detector. For example, when following some fast kinetics, we would usually need the integration time not to exceed a certain time, say 50 milliseconds, we would simply use smaller values, such as <code>tot.time.range = c(0.03, 0.05)</code>.</p>
 <p>One problem with automatic setting of integration time is that depending on the statibility of the light source we will need to set a different value for the target relative to the longest integration time that would result in no clipping during tuning. Parameter <code>target.margin</code> allows the user to set a <em>safety marging</em> different from the default of 0.1 (or 10%). The example below could help prevent clipping in cases when irradiance changes so fast that it could be up to 25% higher during actual measurement than during the preceeding tunning of the integration time.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/acq_irrad_interactive.html">acq_irrad_interactive</a></span>(<span class="dt">target.margin =</span> <span class="fl">0.25</span>,
-                      <span class="dt">method =</span> ooacquire::MAYP11278_ylianttila.mthd,
-                      <span class="dt">descriptors =</span> ooacquire::MAYP11278_descriptors)</code></pre></div>
+                      <span class="dt">method =</span> ooacquire<span class="op">::</span>MAYP11278_ylianttila.mthd,
+                      <span class="dt">descriptors =</span> ooacquire<span class="op">::</span>MAYP11278_descriptors)</code></pre></div>
 </div>
 <div id="interactive-acquisition-of-ratio-based-spectral" class="section level2">
 <h2 class="hasAnchor">
 <a href="#interactive-acquisition-of-ratio-based-spectral" class="anchor"></a>Interactive acquisition of ratio-based spectral</h2>
 <p>Here we group the acquisition of data where the quantitis of interest are expressed relative to a reference. This is the case for transmittance, reflectance and absorptance. A single function allows the acquisition of transmittance and reflectance spectra. The same parameters as discussed for <code><a href="../reference/acq_irrad_interactive.html">acq_irrad_interactive()</a></code> in the section on irradiance are available in function <code><a href="../reference/acq_irrad_interactive.html">acq_fraction_interactive()</a></code>. We will here describe three additional parameters only present in this function. The first one is <code>ref.value</code> which needs to be supplied if the reference target is imperfect, such as a white reference patch which reflects less than 100%. The default is <code>ref.value = 1</code>, but this parameter not only accpects numeric values as argument but also transmittance or reflectance spectra for the target used as reference.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/acq_irrad_interactive.html">acq_fraction_interactive</a></span>(<span class="dt">ref.value =</span> <span class="fl">0.97</span>,
-                         <span class="dt">method =</span> ooacquire::MAYP11278_ylianttila.mthd,
-                         <span class="dt">descriptors =</span> ooacquire::MAYP11278_descriptors)</code></pre></div>
+                         <span class="dt">method =</span> ooacquire<span class="op">::</span>MAYP11278_ylianttila.mthd,
+                         <span class="dt">descriptors =</span> ooacquire<span class="op">::</span>MAYP11278_descriptors)</code></pre></div>
 <p>Parameters <code>qty.out</code> and <code>type</code> determine the class of object and the quantity stored in the returned objects. If the optical set-up used is for measuring specular spectral reflectance, we use the following code. This information will also be used when plotting the data.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="../reference/acq_irrad_interactive.html">acq_fraction_interactive</a></span>(<span class="dt">qty.out =</span> <span class="st">"Rfr"</span>, <span class="dt">type =</span> <span class="st">"specular"</span>,
-                         <span class="dt">method =</span> ooacquire::MAYP11278_ylianttila.mthd,
-                         <span class="dt">descriptors =</span> ooacquire::MAYP11278_descriptors)</code></pre></div>
+                         <span class="dt">method =</span> ooacquire<span class="op">::</span>MAYP11278_ylianttila.mthd,
+                         <span class="dt">descriptors =</span> ooacquire<span class="op">::</span>MAYP11278_descriptors)</code></pre></div>
 </div>
 <div id="rolling-your-own" class="section level2">
 <h2 class="hasAnchor">
@@ -133,8 +133,9 @@ sr.online &lt;-<span class="st"> </span><span class="ot">FALSE</span></code></pr
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">folderpath &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">"example-scripts"</span>, <span class="dt">package=</span><span class="st">"ooacquire"</span>)
 <span class="kw">list.files</span>(<span class="dt">path =</span> folderpath, <span class="dt">pattern =</span> <span class="st">".*[.]R"</span>)</code></pre></div>
 <pre><code>## [1] "irrad-acq-interac.R"         "irrad-acq-script.R"         
-## [3] "irrad-files.R"               "NOG2017-example.R"          
-## [5] "transmittance-acq-interac.R" "transmittance_acq_script.R"</code></pre>
+## [3] "irrad-files.R"               "linearization_test_script.R"
+## [5] "NOG2017-example.R"           "object-acq-interac.R"       
+## [7] "transmittance-acq-interac.R" "transmittance_acq_script.R"</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## file.copy(from = list.files(path = folderpath, pattern = ".*[.]R", full.names = TRUE), to = ".")</code></pre></div>
 </div>
 </div>
