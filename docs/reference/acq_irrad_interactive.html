@@ -148,19 +148,6 @@ or "raw" (raw counts).</p></td>
       <th>type</th>
       <td><p>character Type of transmittance or reflectance measured.</p></td>
     </tr>
-    <tr>
-      <th>ref.value</th>
-      <td><p>numeric or filter_spct/reflector_spct object.</p></td>
-    </tr>
-    <tr>
-      <th>qty.out</th>
-      <td><p>character One of "Tfr" (transmittance as a fraction of one)
-or "raw" (raw counts).</p></td>
-    </tr>
-    <tr>
-      <th>type</th>
-      <td><p>character Type of transmittance or reflectance measured.</p></td>
-    </tr>
     </table>
     
     <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>Note</h2>
@@ -172,15 +159,6 @@ or "raw" (raw counts).</p></td>
   protocols are passed, each character vector must contain strings "light",
   "filter" and "dark", or "sample", "reference", and "dark", depending on
   the function.</p>
-<p>The calculations for reflectance and transmittance are very similar,
-  so we provide a single function capable of handling both. For
-  transmittance the reference is usually direct exposure to radiation but
-  for reflectance a white reference patch is normally used. In some cases
-  one may want to use a grey reference. We provide an argument that allows
-  the user to supply a constant or a spectrum describing the properties of
-  the reference. It is also important to distinguish between total and
-  internal transmittance, and which of these is measured depends on the
-  measuring protocol.</p>
 <p>The calculations for reflectance and transmittance are very similar,
   so we provide a single function capable of handling both. For
   transmittance the reference is usually direct exposure to radiation but

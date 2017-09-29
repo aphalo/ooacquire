@@ -73,7 +73,7 @@
     <div class="page-header">
       <h1>
         Reference
-        <small>version&nbsp;0.1.4.9002</small>
+        <small>version&nbsp;0.1.4.9003</small>
       </h1>
     </div>
 
@@ -88,52 +88,30 @@
       <tbody>
         <tr>
           <th colspan="2">
-            <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
+            <h2 id="section-package-overview" class="hasAnchor"><a href="#section-package-overview" class="anchor"></a>Package overview</h2>
             <p class="section-desc"></p>
           </th>
         </tr>
         <tr>
           <!--  -->
           <td>
-            <p><code><a href="acq_irrad_interactive.html">acq_irrad_interactive</a></code> <code><a href="acq_irrad_interactive.html">acq_fraction_interactive</a></code> <code><a href="acq_irrad_interactive.html">acq_rfr_tfr_interactive</a></code> </p>
+            <p><code><a href="ooacquire-package.html">ooacquire-package</a></code> </p>
           </td>
-          <td><p>Acquire spectra interactively</p></td>
-        </tr><tr>
+          <td><p>ooacquire: Acquire Spectral Data from Ocean Optics Spectrometers</p></td>
+        </tr>
+      </tbody><tbody>
+        <tr>
+          <th colspan="2">
+            <h2 id="section-data-acquisition" class="hasAnchor"><a href="#section-data-acquisition" class="anchor"></a>Data acquisition</h2>
+            <p class="section-desc"><p>Functions related to direct acquisition of spectral data from array spectrometers from within R.</p></p>
+          </th>
+        </tr>
+        <tr>
           <!--  -->
           <td>
-            <p><code><a href="acq_raw_mspct.html">acq_raw_mspct</a></code> </p>
+            <p><code><a href="start_session.html">start_session</a></code> </p>
           </td>
-          <td><p>Take one set of spectral readings</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="acq_raw_spct.html">acq_raw_spct</a></code> </p>
-          </td>
-          <td><p>Measure one raw spectrum</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="acq_settings.html">acq_settings</a></code> <code><a href="acq_settings.html">tune_acq_settings</a></code> </p>
-          </td>
-          <td><p>Settings for spectral measurement</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="bleed_nas.html">bleed_nas</a></code> </p>
-          </td>
-          <td><p>Expand NA's to neighbouring pixels</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="blue_filter.raw_mspct.html">blue_filter.raw_mspct</a></code> </p>
-          </td>
-          <td><p>Raw counts data for a filter measurement</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="compute_irrad_calibration.html">compute_irrad_calibration</a></code> </p>
-          </td>
-          <td><p>Compute calibration multipliers.</p></td>
+          <td><p>Connect to Maya spectrometer</p></td>
         </tr><tr>
           <!--  -->
           <td>
@@ -143,9 +121,9 @@
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="filter_correction.html">filter_correction</a></code> <code><a href="filter_correction.html">no_filter_correction</a></code> </p>
+            <p><code><a href="list_instruments.html">list_instruments</a></code> </p>
           </td>
-          <td><p>Correct for stray light</p></td>
+          <td><p>List connected spectrometers</p></td>
         </tr><tr>
           <!--  -->
           <td>
@@ -155,81 +133,89 @@
         </tr><tr>
           <!--  -->
           <td>
+            <p><code><a href="set_descriptor_wl.html">set_descriptor_wl</a></code> </p>
+          </td>
+          <td><p>Replace wavelength values in an instrument description</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="set_descriptor_bad_pixs.html">set_descriptor_bad_pixs</a></code> </p>
+          </td>
+          <td><p>Add bad pixel informatoin to an instrument description</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="set_descriptor_nl.html">set_descriptor_nl</a></code> </p>
+          </td>
+          <td><p>Replace linearization function in instrument description.</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="set_descriptor_irrad_mult.html">set_descriptor_irrad_mult</a></code> </p>
+          </td>
+          <td><p>Add spectral irradiance calibration</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="set_descriptor_integ_time.html">set_descriptor_integ_time</a></code> </p>
+          </td>
+          <td><p>Replace integration time limits in instrument descriptor</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
             <p><code><a href="get_oo_settings.html">get_oo_settings</a></code> </p>
           </td>
           <td><p>Get the current values of instrument settings</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="halogen.raw_mspct.html">halogen.raw_mspct</a></code> </p>
+            <p><code><a href="acq_settings.html">acq_settings</a></code> <code><a href="acq_settings.html">tune_acq_settings</a></code> </p>
           </td>
-          <td><p>Raw counts data for a lamp measurement.</p></td>
+          <td><p>Settings for spectral measurement</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="JAZA3098_calib_dates.df.html">JAZA3098_calib_dates.df</a></code> </p>
+            <p><code><a href="acq_raw_spct.html">acq_raw_spct</a></code> </p>
           </td>
-          <td><p>Dates for which the different descriptors contain valid calibrations.</p></td>
+          <td><p>Measure one raw spectrum</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="JAZA3098_ch1_descriptors.html">JAZA3098_ch1_descriptors</a></code> </p>
+            <p><code><a href="acq_raw_mspct.html">acq_raw_mspct</a></code> </p>
           </td>
-          <td><p>Instrument descriptors for a JAZ  spectrometer</p></td>
+          <td><p>Take one set of spectral readings</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="JAZA3098_ch1_none.mthd.html">JAZA3098_ch1_none.mthd</a></code> </p>
+            <p><code><a href="acq_irrad_interactive.html">acq_irrad_interactive</a></code> <code><a href="acq_irrad_interactive.html">acq_fraction_interactive</a></code> <code><a href="acq_irrad_interactive.html">acq_rfr_tfr_interactive</a></code> </p>
           </td>
-          <td><p>Correction method definition</p></td>
+          <td><p>Acquire spectra interactively</p></td>
+        </tr>
+      </tbody><tbody>
+        <tr>
+          <th colspan="2">
+            <h2 id="section-low-level-processing-functions-" class="hasAnchor"><a href="#section-low-level-processing-functions-" class="anchor"></a>Low level processing functions.</h2>
+            <p class="section-desc"><p>Individual functions implementing different steps in the conversion of raw-counts data.</p></p>
+          </th>
+        </tr>
+        <tr>
+          <!--  -->
+          <td>
+            <p><code><a href="merge_raw_mspct.html">merge_raw_mspct</a></code> </p>
+          </td>
+          <td><p>Merge raw spectra into a single multicolumn spectrum</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="JAZA3098_ch1_simple.mthd.html">JAZA3098_ch1_simple.mthd</a></code> </p>
+            <p><code><a href="trim_counts.html">trim_counts</a></code> </p>
           </td>
-          <td><p>Correction method definition</p></td>
+          <td><p>Replace out-of-range instrument counts</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="JAZA3098_ch1_sun.mthd.html">JAZA3098_ch1_sun.mthd</a></code> </p>
+            <p><code><a href="bleed_nas.html">bleed_nas</a></code> </p>
           </td>
-          <td><p>Correction method definition</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="JAZA3098_ch1_ylianttila.mthd.html">JAZA3098_ch1_ylianttila.mthd</a></code> </p>
-          </td>
-          <td><p>Correction method definition</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="JAZA3098_ch2_descriptors.html">JAZA3098_ch2_descriptors</a></code> </p>
-          </td>
-          <td><p>Instrument descriptors for a JAZ  spectrometer</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="JAZA3098_ch2_none.mthd.html">JAZA3098_ch2_none.mthd</a></code> </p>
-          </td>
-          <td><p>Correction method definition</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="JAZA3098_ch2_simple.mthd.html">JAZA3098_ch2_simple.mthd</a></code> </p>
-          </td>
-          <td><p>Correction method definition</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="JAZA3098_ch2_sun.mthd.html">JAZA3098_ch2_sun.mthd</a></code> </p>
-          </td>
-          <td><p>Correction method definition</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="JAZA3098_ch2_ylianttila.mthd.html">JAZA3098_ch2_ylianttila.mthd</a></code> </p>
-          </td>
-          <td><p>Correction method definition</p></td>
+          <td><p>Expand NA's to neighbouring pixels</p></td>
         </tr><tr>
           <!--  -->
           <td>
@@ -239,123 +225,21 @@
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="list_instruments.html">list_instruments</a></code> </p>
+            <p><code><a href="ref_correction.html">ref_correction</a></code> </p>
           </td>
-          <td><p>List connected spectrometers</p></td>
+          <td><p>Apply a correction to spectral data.</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="map_oofile_header_rows.html">map_oofile_header_rows</a></code> </p>
+            <p><code><a href="filter_correction.html">filter_correction</a></code> <code><a href="filter_correction.html">no_filter_correction</a></code> </p>
           </td>
-          <td><p>Set the instrument description.</p></td>
+          <td><p>Correct for stray light</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="MAYP11278_calib_dates.df.html">MAYP11278_calib_dates.df</a></code> </p>
+            <p><code><a href="uvb_corrections.html">uvb_corrections</a></code> <code><a href="uvb_corrections.html">slit_function_correction</a></code> </p>
           </td>
-          <td><p>Dates for which the different descriptors conatin valid calibrations.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="MAYP11278_descriptors.html">MAYP11278_descriptors</a></code> </p>
-          </td>
-          <td><p>Instrument descriptors for a Maya2000 Pro  spectrometer</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="MAYP11278_simple.mthd.html">MAYP11278_simple.mthd</a></code> </p>
-          </td>
-          <td><p>Correction method definition</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="MAYP11278_sun.mthd.html">MAYP11278_sun.mthd</a></code> </p>
-          </td>
-          <td><p>Correction method definition</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="MAYP11278_tail_correction.html">MAYP11278_tail_correction</a></code> </p>
-          </td>
-          <td><p>Function to compute the tail correction</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="MAYP11278_ylianttila.mthd.html">MAYP11278_ylianttila.mthd</a></code> </p>
-          </td>
-          <td><p>Correction method definition</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="MAYP112785_calib_dates.df.html">MAYP112785_calib_dates.df</a></code> </p>
-          </td>
-          <td><p>Dates for which the different descriptors conatin valid calibrations.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="MAYP112785_descriptors.html">MAYP112785_descriptors</a></code> </p>
-          </td>
-          <td><p>Instrument descriptors for a Maya2000 Pro  spectrometer</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="MAYP112785_simple.mthd.html">MAYP112785_simple.mthd</a></code> </p>
-          </td>
-          <td><p>Correction method definition</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="MAYP112785_sun.mthd.html">MAYP112785_sun.mthd</a></code> </p>
-          </td>
-          <td><p>Correction method definition</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="MAYP112785_tail_correction.html">MAYP112785_tail_correction</a></code> </p>
-          </td>
-          <td><p>Function to compute the tail correction</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="MAYP112785_ylianttila.mthd.html">MAYP112785_ylianttila.mthd</a></code> </p>
-          </td>
-          <td><p>Correction method definition</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="merge_cps.html">merge_cps</a></code> </p>
-          </td>
-          <td><p>Merge counts per second data</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="merge_raw_mspct.html">merge_raw_mspct</a></code> </p>
-          </td>
-          <td><p>Merge raw spectra into a single multicolumn spectrum</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="new_correction_method.html">new_correction_method</a></code> </p>
-          </td>
-          <td><p>Make default method from descriptor</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="ooacquire-package.html">ooacquire-package</a></code> </p>
-          </td>
-          <td><p>ooacquire: Acquire Spectral Data from Ocean Optics Spectrometers</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="oofile_data_rows.html">oofile_data_rows</a></code> </p>
-          </td>
-          <td><p>Find range of lines in file containing spectral data.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="raw2corr_cps.html">raw2corr_cps</a></code> </p>
-          </td>
-          <td><p>Convert raw detector counts into counts-per-second and correct</p></td>
+          <td><p>Apply filter-based stray-light correction</p></td>
         </tr><tr>
           <!--  -->
           <td>
@@ -365,15 +249,49 @@
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="read_files2mspct.html">read_files2mspct</a></code> </p>
+            <p><code><a href="merge_cps.html">merge_cps</a></code> </p>
           </td>
-          <td><p>Read multiple files into raw_mspct object</p></td>
+          <td><p>Merge counts per second data</p></td>
         </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="new_correction_method.html">new_correction_method</a></code> </p>
+          </td>
+          <td><p>Make default method from descriptor</p></td>
+        </tr>
+      </tbody><tbody>
+        <tr>
+          <th colspan="2">
+            <h2 id="section-compute-calibration-coefficients" class="hasAnchor"><a href="#section-compute-calibration-coefficients" class="anchor"></a>Compute calibration coefficients</h2>
+            <p class="section-desc"><p>(NOT YET WORKING!) Compute a calibration coefficients from raw counts and calibration lamps’ emission spectra.</p></p>
+          </th>
+        </tr>
+        <tr>
+          <!--  -->
+          <td>
+            <p><code><a href="compute_irrad_calibration.html">compute_irrad_calibration</a></code> </p>
+          </td>
+          <td><p>Compute calibration multipliers.</p></td>
+        </tr>
+      </tbody><tbody>
+        <tr>
+          <th colspan="2">
+            <h2 id="section-raw-data-input-from-files" class="hasAnchor"><a href="#section-raw-data-input-from-files" class="anchor"></a>Raw data input from files</h2>
+            <p class="section-desc"><p>Functions for reading raw-counts output files from <strong>OceanView</strong>, <strong>SpectraSuite</strong>, Raspberry Pi software and the inbuilt-firmware of the Jaz modular spectrometer.</p></p>
+          </th>
+        </tr>
+        <tr>
           <!--  -->
           <td>
             <p><code><a href="read_oo_data.html">read_oo_data</a></code> </p>
           </td>
           <td><p>Read Files Saved by Ocean Optics' instruments or software.</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="read_oo_ssdata.html">read_oo_ssdata</a></code> </p>
+          </td>
+          <td><p>Read File Saved by Ocean Optics' SpectraSuite.</p></td>
         </tr><tr>
           <!--  -->
           <td>
@@ -389,75 +307,21 @@
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="read_oo_ssdata.html">read_oo_ssdata</a></code> </p>
+            <p><code><a href="read_files2mspct.html">read_files2mspct</a></code> </p>
           </td>
-          <td><p>Read File Saved by Ocean Optics' SpectraSuite.</p></td>
+          <td><p>Read multiple files into raw_mspct object</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="red_filter.raw_mspct.html">red_filter.raw_mspct</a></code> </p>
-          </td>
-          <td><p>Raw counts data for a filter measurement</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="ref_correction.html">ref_correction</a></code> </p>
-          </td>
-          <td><p>Apply a correction to spectral data.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="s_fraction_corrected.html">s_fraction_corrected</a></code> </p>
-          </td>
-          <td><p>Convert raw counts data into a spectral fraction</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="s_irrad_corrected.html">s_irrad_corrected</a></code> </p>
-          </td>
-          <td><p>Convert raw counts data into spectral irradiance</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="set_descriptor_bad_pixs.html">set_descriptor_bad_pixs</a></code> </p>
-          </td>
-          <td><p>Add bad pixel informatoin to an instrument description</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="set_descriptor_integ_time.html">set_descriptor_integ_time</a></code> </p>
-          </td>
-          <td><p>Replace integration time limits in instrument descriptor</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="set_descriptor_irrad_mult.html">set_descriptor_irrad_mult</a></code> </p>
-          </td>
-          <td><p>Add spectral irradiance calibration</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="set_descriptor_nl.html">set_descriptor_nl</a></code> </p>
-          </td>
-          <td><p>Replace linearization function in instrument description.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="set_descriptor_slit_fun.html">set_descriptor_slit_fun</a></code> </p>
-          </td>
-          <td><p>Add function for slit correction</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="set_descriptor_wl.html">set_descriptor_wl</a></code> </p>
-          </td>
-          <td><p>Replace wavelength values in an instrument description</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="set_oo_ssdata_descriptor.html">set_oo_ssdata_descriptor</a></code> </p>
+            <p><code><a href="map_oofile_header_rows.html">map_oofile_header_rows</a></code> </p>
           </td>
           <td><p>Set the instrument description.</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="oofile_data_rows.html">oofile_data_rows</a></code> </p>
+          </td>
+          <td><p>Find range of lines in file containing spectral data.</p></td>
         </tr><tr>
           <!--  -->
           <td>
@@ -467,33 +331,159 @@
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="skip_bad_pixs.html">skip_bad_pixs</a></code> </p>
+            <p><code><a href="set_oo_ssdata_descriptor.html">set_oo_ssdata_descriptor</a></code> </p>
           </td>
-          <td><p>Replace bad pixels</p></td>
+          <td><p>Set the instrument description.</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="start_session.html">start_session</a></code> </p>
+            <p><code><a href="merge_raw_mspct.html">merge_raw_mspct</a></code> </p>
           </td>
-          <td><p>Connect to Maya spectrometer</p></td>
+          <td><p>Merge raw spectra into a single multicolumn spectrum</p></td>
+        </tr>
+      </tbody><tbody>
+        <tr>
+          <th colspan="2">
+            <h2 id="section-high-level-functions-and-methods" class="hasAnchor"><a href="#section-high-level-functions-and-methods" class="anchor"></a>High level functions and methods</h2>
+            <p class="section-desc"><p>Functions related to conversion of raw detector counts into counts-per-second and physical quantities.</p></p>
+          </th>
+        </tr>
+        <tr>
+          <!--  -->
+          <td>
+            <p><code><a href="raw2corr_cps.html">raw2corr_cps</a></code> </p>
+          </td>
+          <td><p>Convert raw detector counts into counts-per-second and correct</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="trim_counts.html">trim_counts</a></code> </p>
+            <p><code><a href="raw2cps.html">raw2cps</a></code> </p>
           </td>
-          <td><p>Replace out-of-range instrument counts</p></td>
+          <td><p>Convert raw detector counts into counts per second (cps).</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="uvb_corrections.html">uvb_corrections</a></code> <code><a href="uvb_corrections.html">slit_function_correction</a></code> </p>
+            <p><code><a href="s_irrad_corrected.html">s_irrad_corrected</a></code> </p>
           </td>
-          <td><p>Apply filter-based stray-light correction</p></td>
+          <td><p>Convert raw counts data into spectral irradiance</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="s_fraction_corrected.html">s_fraction_corrected</a></code> </p>
+          </td>
+          <td><p>Convert raw counts data into a spectral fraction</p></td>
         </tr><tr>
           <!--  -->
           <td>
             <p><code><a href="which_descriptor.html">which_descriptor</a></code> </p>
           </td>
           <td><p>Select which instrument descriptor to use</p></td>
+        </tr>
+      </tbody><tbody>
+        <tr>
+          <th colspan="2">
+            <h2 id="section-calibration-data-examples" class="hasAnchor"><a href="#section-calibration-data-examples" class="anchor"></a>Calibration data examples</h2>
+            <p class="section-desc"><p>Examples of individual instrument calibrations as used by the functions in this package, serving only as examples.</p></p>
+          </th>
+        </tr>
+        <tr>
+          <!--  -->
+          <td>
+            <p><code><a href="MAYP11278_calib_dates.df.html">MAYP11278_calib_dates.df</a></code> </p>
+          </td>
+          <td><p>Dates for which the different descriptors conatin valid calibrations.</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="MAYP11278_descriptors.html">MAYP11278_descriptors</a></code> </p>
+          </td>
+          <td><p>Instrument descriptors for a Maya2000 Pro  spectrometer</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="MAYP11278_ylianttila.mthd.html">MAYP11278_ylianttila.mthd</a></code> </p>
+          </td>
+          <td><p>Correction method definition</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="MAYP11278_tail_correction.html">MAYP11278_tail_correction</a></code> </p>
+          </td>
+          <td><p>Function to compute the tail correction</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="MAYP112785_calib_dates.df.html">MAYP112785_calib_dates.df</a></code> </p>
+          </td>
+          <td><p>Dates for which the different descriptors conatin valid calibrations.</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="MAYP112785_descriptors.html">MAYP112785_descriptors</a></code> </p>
+          </td>
+          <td><p>Instrument descriptors for a Maya2000 Pro  spectrometer</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="MAYP112785_ylianttila.mthd.html">MAYP112785_ylianttila.mthd</a></code> </p>
+          </td>
+          <td><p>Correction method definition</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="MAYP112785_tail_correction.html">MAYP112785_tail_correction</a></code> </p>
+          </td>
+          <td><p>Function to compute the tail correction</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="JAZA3098_calib_dates.df.html">JAZA3098_calib_dates.df</a></code> </p>
+          </td>
+          <td><p>Dates for which the different descriptors contain valid calibrations.</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="JAZA3098_ch1_descriptors.html">JAZA3098_ch1_descriptors</a></code> </p>
+          </td>
+          <td><p>Instrument descriptors for a JAZ  spectrometer</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="JAZA3098_ch1_ylianttila.mthd.html">JAZA3098_ch1_ylianttila.mthd</a></code> </p>
+          </td>
+          <td><p>Correction method definition</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="JAZA3098_ch2_descriptors.html">JAZA3098_ch2_descriptors</a></code> </p>
+          </td>
+          <td><p>Instrument descriptors for a JAZ  spectrometer</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="JAZA3098_ch2_ylianttila.mthd.html">JAZA3098_ch2_ylianttila.mthd</a></code> </p>
+          </td>
+          <td><p>Correction method definition</p></td>
+        </tr>
+      </tbody><tbody>
+        <tr>
+          <th colspan="2">
+            <h2 id="section-raw-spectral-data-examples" class="hasAnchor"><a href="#section-raw-spectral-data-examples" class="anchor"></a>Raw spectral data examples</h2>
+            <p class="section-desc"><p>Collections of raw-counts spectra stored as R objects of class <code>raw_mspct</code> defined in package ‘photobiology’.</p></p>
+          </th>
+        </tr>
+        <tr>
+          <!--  -->
+          <td>
+            <p><code><a href="blue_filter.raw_mspct.html">blue_filter.raw_mspct</a></code> </p>
+          </td>
+          <td><p>Raw counts data for a filter measurement</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="red_filter.raw_mspct.html">red_filter.raw_mspct</a></code> </p>
+          </td>
+          <td><p>Raw counts data for a filter measurement</p></td>
         </tr><tr>
           <!--  -->
           <td>
@@ -506,6 +496,12 @@
             <p><code><a href="white_LED_2min.raw_mspct.html">white_LED_2min.raw_mspct</a></code> </p>
           </td>
           <td><p>Raw counts data for a lamp measurement.</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="halogen.raw_mspct.html">halogen.raw_mspct</a></code> </p>
+          </td>
+          <td><p>Raw counts data for a lamp measurement.</p></td>
         </tr>
       </tbody>
       </table>
@@ -515,7 +511,14 @@
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#section-all-functions">All functions</a></li>
+      <li><a href="#section-package-overview">Package overview</a></li>
+      <li><a href="#section-data-acquisition">Data acquisition</a></li>
+      <li><a href="#section-low-level-processing-functions-">Low level processing functions.</a></li>
+      <li><a href="#section-compute-calibration-coefficients">Compute calibration coefficients</a></li>
+      <li><a href="#section-raw-data-input-from-files">Raw data input from files</a></li>
+      <li><a href="#section-high-level-functions-and-methods">High level functions and methods</a></li>
+      <li><a href="#section-calibration-data-examples">Calibration data examples</a></li>
+      <li><a href="#section-raw-spectral-data-examples">Raw spectral data examples</a></li>
     </ul>
   </div>
 </div>

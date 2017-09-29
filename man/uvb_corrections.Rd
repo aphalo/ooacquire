@@ -36,7 +36,7 @@ of stray light, used only for method "simple".}
 are in full drakness by instrument design.}
 
 \item{worker.fun}{function actually doing the correction on the w.lengths and
-counts per second vectors.}
+counts per second vectors, or the name of the function as a character string.}
 
 \item{trim}{a numeric value to be used as argument for mean}
 

@@ -164,3 +164,57 @@ tfr01.spct <-
 ## ------------------------------------------------------------------------
 tfr01.spct
 
+## ---- fig.height=5, fig.width=7------------------------------------------
+plot(tfr01.spct)
+
+## ------------------------------------------------------------------------
+tfr01.spct <- clip_wl(tfr01.spct, range = c(355, 1100))
+
+## ---- fig.height=5, fig.width=7------------------------------------------
+plot(tfr01.spct, unit.out = "photon", w.band = VIS_bands())
+
+## ------------------------------------------------------------------------
+getWhenMeasured(tfr01.spct)
+getWhereMeasured(tfr01.spct)
+getWhatMeasured(tfr01.spct)
+cat(comment(tfr01.spct))
+
+## ------------------------------------------------------------------------
+getInstrDesc(tfr01.spct)
+
+## ------------------------------------------------------------------------
+getInstrSettings(tfr01.spct)
+
+## ------------------------------------------------------------------------
+descriptor <- 
+  which_descriptor(getWhenMeasured(blue_filter.raw_mspct$sample))
+tfr02.spct <- 
+  s_fraction_corrected(x = blue_filter.raw_mspct,
+                       ref.value = 0.95,
+                       descriptor = descriptor,
+                       correction.method = MAYP11278_ylianttila.mthd,
+                       dyn.range = 3e2)
+tfr02.spct <- trim_wl(tfr02.spct, c(460, 1000))
+tfr02.spct
+
+## ---- fig.height=5, fig.width=7------------------------------------------
+plot(tfr02.spct)
+
+## ------------------------------------------------------------------------
+descriptor <- 
+  which_descriptor(getWhenMeasured(blue_filter.raw_mspct$sample))
+rfr01.spct <- 
+  s_fraction_corrected(x = blue_filter.raw_mspct,
+                       ref.value = as.reflector_spct(white_body.spct) * 0.97,
+                       descriptor = descriptor,
+                       correction.method = MAYP11278_ylianttila.mthd,
+                       dyn.range = 3e2,
+                       qty.out = "Rfr",
+                       type = "total")
+rfr01.spct <- trim_wl(rfr01.spct, c(460, 1000))
+rfr01.spct
+
+## ---- fig.height=5, fig.width=7------------------------------------------
+plot(rfr01.spct)
+plot(tfr02.spct)
+

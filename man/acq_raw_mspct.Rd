@@ -15,6 +15,9 @@ acq_raw_mspct(descriptor, acq.settings, seq.settings = NULL,
 \item{acq.settings}{list as returned by functions \code{tune_acq_settings()}
 or \code{retune_acq_settings()} or \code{acq_settings()}}
 
+\item{seq.settings}{list with members "step" numeric value in seconds,
+"num.steps" integer.}
+
 \item{protocol}{vector of character strings}
 
 \item{user.label}{character string to set as label}

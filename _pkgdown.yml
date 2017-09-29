@@ -1,0 +1,85 @@
+reference:
+  - title: Package overview
+    contents:
+    - '`ooacquire-package`'
+  - title: Acquire raw-counts data from spectrometers
+    desc: Functions related to direct acquisition of spectral data from array spectrometers from within R.
+    contents:
+    - start_session
+    - end_session
+    - list_instruments
+    - get_oo_descriptor
+    - set_descriptor_wl
+    - set_descriptor_bad_pixs
+    - set_descriptor_nl
+    - set_descriptor_irrad_mult
+    - set_descriptor_integ_time
+    - get_oo_settings
+    - acq_settings
+    - tune_acq_settings
+    - acq_raw_spct
+    - acq_raw_mspct
+    - acq_irrad_interactive
+  - title: Read raw-counts data from spectrometers
+    desc: Functions for reading raw-counts and metadata from output files from **OceanView**, **SpectraSuite**, Raspberry Pi software and the inbuilt-firmware of the Jaz modular spectrometer.
+    contents:
+    - read_oo_data
+    - read_oo_ssdata
+    - read_oo_ovdata
+    - read_oo_pidata
+    - read_files2mspct
+    - map_oofile_header_rows
+    - oofile_data_rows
+    - set_oo_ssdata_settings
+    - set_oo_ssdata_descriptor
+    - merge_raw_mspct
+  - title: High level conversion functions and methods.
+    desc: Functions related to conversion of raw detector counts into counts-per-second and physical quantities.
+    contents:
+    - raw2corr_cps
+    - raw2cps
+    - s_irrad_corrected
+    - s_fraction_corrected
+    - which_descriptor
+  - title: Low level conversion functions and methods.
+    desc: Individual functions implementing different steps in the conversion of raw-counts data.
+    contents:
+    - merge_raw_mspct
+    - trim_counts
+    - bleed_nas
+    - linearize_counts
+    - ref_correction
+    - filter_correction
+    - no_filter_correction
+    - uvb_corrections
+    - raw2cps
+  - title: Computation of calibration coefficients
+    desc: (NOT YET WORKING!) Compute a calibration coefficients from raw counts and calibration lamps' emission spectra.
+    contents:
+    - compute_irrad_calibration
+  - title: Raw spectral data examples
+    desc: Collections of raw-counts spectra stored as R objects of class `raw_mspct` defined in package 'photobiology'.
+    contents:
+    - blue_filter.raw_mspct
+    - red_filter.raw_mspct
+    - white_LED.raw_mspct
+    - white_LED_2min.raw_mspct
+    - halogen.raw_mspct
+    - merge_cps
+    - new_correction_method
+  - title: Calibration data examples
+    desc: Examples of individual instrument calibrations as used by the functions in this package, serving only as examples.
+    contents:
+    - MAYP11278_calib_dates.df
+    - MAYP11278_descriptors
+    - MAYP11278_ylianttila.mthd
+    - MAYP11278_tail_correction
+    - MAYP112785_calib_dates.df
+    - MAYP112785_descriptors
+    - MAYP112785_ylianttila.mthd
+    - MAYP112785_tail_correction
+    - JAZA3098_calib_dates.df
+    - JAZA3098_ch1_descriptors
+    - JAZA3098_ch1_ylianttila.mthd
+    - JAZA3098_ch2_descriptors
+    - JAZA3098_ch2_ylianttila.mthd

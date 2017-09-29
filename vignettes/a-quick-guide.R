@@ -19,40 +19,40 @@ sr.online <- FALSE
 #  # is_valid_wrapper(w)
 
 ## ---- eval=sr.online-----------------------------------------------------
-#  acq_irrad_interactive(method = ooacquire::MAYP11278_ylianttila.mthd,
+#  acq_irrad_interactive(correction.method = ooacquire::MAYP11278_ylianttila.mthd,
 #                        descriptors = ooacquire::MAYP11278_descriptors)
 
 ## ---- eval=sr.online-----------------------------------------------------
 #  acq_irrad_interactive(HDR.mult = 1,
 #                        tot.time.range = c(0, Inf),
-#                        method = ooacquire::MAYP11278_ylianttila.mthd,
+#                        correction.method = ooacquire::MAYP11278_ylianttila.mthd,
 #                        descriptors = ooacquire::MAYP11278_descriptors)
 
 ## ---- eval=sr.online-----------------------------------------------------
 #  acq_irrad_interactive(HDR.mult = c(1, 10),
 #                        tot.time.range = 10,
-#                        method = ooacquire::MAYP11278_ylianttila.mthd,
+#                        correction.method = ooacquire::MAYP11278_ylianttila.mthd,
 #                        descriptors = ooacquire::MAYP11278_descriptors)
 
 ## ---- eval=sr.online-----------------------------------------------------
 #  acq_irrad_interactive(HDR.mult = c(1, 10),
 #                        tot.time.range = c(10, 20),
-#                        method = ooacquire::MAYP11278_ylianttila.mthd,
+#                        correction.method = ooacquire::MAYP11278_ylianttila.mthd,
 #                        descriptors = ooacquire::MAYP11278_descriptors)
 
 ## ---- eval=sr.online-----------------------------------------------------
 #  acq_irrad_interactive(target.margin = 0.25,
-#                        method = ooacquire::MAYP11278_ylianttila.mthd,
+#                        correction.method = ooacquire::MAYP11278_ylianttila.mthd,
 #                        descriptors = ooacquire::MAYP11278_descriptors)
 
 ## ---- eval=sr.online-----------------------------------------------------
 #  acq_fraction_interactive(ref.value = 0.97,
-#                           method = ooacquire::MAYP11278_ylianttila.mthd,
+#                           correction.method = ooacquire::MAYP11278_ylianttila.mthd,
 #                           descriptors = ooacquire::MAYP11278_descriptors)
 
 ## ---- eval=sr.online-----------------------------------------------------
 #  acq_fraction_interactive(qty.out = "Rfr", type = "specular",
-#                           method = ooacquire::MAYP11278_ylianttila.mthd,
+#                           correction.method = ooacquire::MAYP11278_ylianttila.mthd,
 #                           descriptors = ooacquire::MAYP11278_descriptors)
 
 ## ---- eval=-2------------------------------------------------------------
