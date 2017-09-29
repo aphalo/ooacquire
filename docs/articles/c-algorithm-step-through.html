@@ -58,6 +58,21 @@
     
     
 <div class="contents">
+<div id="introdcution" class="section level2">
+<h2 class="hasAnchor">
+<a href="#introdcution" class="anchor"></a>Introdcution</h2>
+<p>In this vignette we will walk through the different steps used in the conversion of raw counts into physical quantites. Different protocols can be used, and not all those implemented are exemplified. The facilities in the package also allow users to implement their own measurement and correction protocols. <em>It must be, however, always kept in mind that protocols and calibrations go hand in han:</em> <strong>For each different protocol new calibration data will be required</strong>. In many cases new calibration and validation measurements will be needed, but sometimes just recalculation of new calibration constants from existing raw-counts and calibration-lamp data may be enough.</p>
+<hr>
+</div>
+<div id="code-examples" class="section level2">
+<h2 class="hasAnchor">
+<a href="#code-examples" class="anchor"></a>Code examples</h2>
+<p>All examples in vignettes use data and files included in the package. Data files in formats <em>foreign</em> to R, are stored in the <code>"extdata"</code> folder, as is the norm for R packages.</p>
+<p><em>To reproduce any of the examples which use files as data input, it is best to make a local copy of the whole <code>"extdata"</code> folder.</em> The files used in examples are organized into subfolders, but all example code assumes that its in being run with <code>"extdata"</code> or a copy of it as the current <em>working</em> folder.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">folderpath &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">"extdata"</span>,<span class="dt">package=</span><span class="st">"ooacquire"</span>)
+## file.copy(from = folderpath, to = ".", recursive = TRUE)</code></pre></div>
+<hr>
+</div>
 <div id="irradiance" class="section level2">
 <h2 class="hasAnchor">
 <a href="#irradiance" class="anchor"></a>Irradiance</h2>
@@ -86,9 +101,9 @@
 <pre><code>## Warning in range_check(x, cps.cols): Off-range cps values [-54.81..0.00]
 ## instead of [0..1]</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(LED_lamp_recalc.spct)</code></pre></div>
-<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-3-1.png" width="768"></p>
+<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-4-1.png" width="768"></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(LED_lamp_recalc.spct, <span class="dt">range =</span> <span class="kw">c</span>(<span class="dv">250</span>, <span class="dv">410</span>))</code></pre></div>
-<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-3-2.png" width="768"></p>
+<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-4-2.png" width="768"></p>
 <p>We next print the collection of spectra containing raw counts data. The protocol used consisted in one light measurement and one dark measurement, each with bracketing of the integration time.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">white_LED.raw_mspct</code></pre></div>
 <pre><code>## Object: raw_mspct [3 x 1]
@@ -174,16 +189,16 @@
 ## --- END ---</code></pre>
 <p>Ploting the three bracketed spectra shows the raw data. The detector saturates at approximately 64000 counts.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(white_LED_2min.raw_mspct[[<span class="st">"light"</span>]])</code></pre></div>
-<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-5-1.png" width="768"></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(white_LED_2min.raw_mspct[[<span class="st">"dark"</span>]])</code></pre></div>
 <p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-6-1.png" width="768"></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(white_LED_2min.raw_mspct[[<span class="st">"dark"</span>]])</code></pre></div>
+<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-7-1.png" width="768"></p>
 <p>The first step in the processing is removal of bad pixels, as recorded in the calibration data.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="cf">for</span> (m <span class="cf">in</span> <span class="kw">names</span>(white_LED_2min.raw_mspct)) {
   white_LED_2min.raw_mspct[[m]] &lt;-
 <span class="st">    </span><span class="kw"><a href="../reference/skip_bad_pixs.html">skip_bad_pixs</a></span>(white_LED_2min.raw_mspct[[m]])
   <span class="kw">print</span>(<span class="kw">plot</span>(white_LED_2min.raw_mspct[[m]]) <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(m))
 }</code></pre></div>
-<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-7-1.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-7-2.png" width="768"></p>
+<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-8-1.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-8-2.png" width="768"></p>
 <p>Next step is to replace saturated pixel data, with the missing data marked <code>NA</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="cf">for</span> (m <span class="cf">in</span> <span class="kw">names</span>(white_LED_2min.raw_mspct)) {
   white_LED_2min.raw_mspct[[m]] &lt;-
@@ -191,7 +206,7 @@
   <span class="kw">print</span>(<span class="kw">plot</span>(white_LED_2min.raw_mspct[[m]]) <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(m))
 }</code></pre></div>
 <pre><code>## Warning: Removed 844 rows containing non-finite values (stat_peaks).</code></pre>
-<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-8-1.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-8-2.png" width="768"></p>
+<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-9-1.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-9-2.png" width="768"></p>
 <p>Saturated pixels can affect the readings from nearby pixels through charge migration, so we need to also tag as <code>NA</code>s these additional pixels.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="cf">for</span> (m <span class="cf">in</span> <span class="kw">names</span>(white_LED_2min.raw_mspct)) {
   white_LED_2min.raw_mspct[[m]] &lt;-
@@ -199,7 +214,7 @@
   <span class="kw">print</span>(<span class="kw">plot</span>(white_LED_2min.raw_mspct[[m]]) <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(m))
 }</code></pre></div>
 <pre><code>## Warning: Removed 904 rows containing non-finite values (stat_peaks).</code></pre>
-<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-9-1.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-9-2.png" width="768"></p>
+<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-10-1.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-10-2.png" width="768"></p>
 <p>Next we need to apply a linearization function, as detector response is not linear—saturation is gradual.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="cf">for</span> (m <span class="cf">in</span> <span class="kw">names</span>(white_LED_2min.raw_mspct)) {
   white_LED_2min.raw_mspct[[m]] &lt;-
@@ -207,7 +222,7 @@
   <span class="kw">print</span>(<span class="kw">plot</span>(white_LED_2min.raw_mspct[[m]]) <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(m))
 }</code></pre></div>
 <pre><code>## Warning: Removed 904 rows containing non-finite values (stat_peaks).</code></pre>
-<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-10-1.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-10-2.png" width="768"></p>
+<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-11-1.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-11-2.png" width="768"></p>
 <p>We may next remove an estimate of dark signal based on reference pixels not expected to be excited. This step may apear redundant, but <em>might</em> help in cases when instrument temperature is not stable.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="cf">for</span> (m <span class="cf">in</span> <span class="kw">names</span>(white_LED_2min.raw_mspct)) {
   white_LED_2min.raw_mspct[[m]] &lt;-
@@ -215,7 +230,7 @@
   <span class="kw">print</span>(<span class="kw">plot</span>(white_LED_2min.raw_mspct[[m]]) <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(m))
 }</code></pre></div>
 <pre><code>## Warning: Removed 904 rows containing non-finite values (stat_peaks).</code></pre>
-<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-11-1.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-11-2.png" width="768"></p>
+<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-12-1.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-12-2.png" width="768"></p>
 <p>Now we can convert the raw counts into counts per second.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">white_LED_2min.cps_mspct &lt;-<span class="st"> </span><span class="kw">cps_mspct</span>()
 <span class="cf">for</span> (m <span class="cf">in</span> <span class="kw">names</span>(white_LED_2min.raw_mspct)) {
@@ -235,7 +250,7 @@
 ## [-1613.97..708.81] instead of [0..1]</code></pre>
 <pre><code>## Warning in range_check(x, cps.cols): Off-range cps values
 ## [-1630.93..714.15] instead of [0..1]</code></pre>
-<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-12-1.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-12-2.png" width="768"></p>
+<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-13-1.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-13-2.png" width="768"></p>
 <p>Next splicing of the bracketed integrations.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="cf">for</span> (m <span class="cf">in</span> <span class="kw">names</span>(white_LED_2min.cps_mspct)) {
   white_LED_2min.cps_mspct[[m]] &lt;-
@@ -247,7 +262,7 @@
 
 ## Warning in range_check(x, cps.cols): Off-range cps values
 ## [-1630.93..714.15] instead of [0..1]</code></pre>
-<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-13-1.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-13-2.png" width="768"></p>
+<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-14-1.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-14-2.png" width="768"></p>
 <p>We now subtract the dark signal from the light measurement.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">white_LED_2min.cps_spct &lt;-<span class="st"> </span>
 <span class="st">  </span>white_LED_2min.cps_mspct[[<span class="st">"light"</span>]] <span class="op">-</span><span class="st"> </span>white_LED_2min.cps_mspct[[<span class="st">"dark"</span>]]
@@ -256,16 +271,16 @@ white_LED_2min.cps_spct &lt;-<span class="st"> </span>
                   white_LED_2min.cps_spct,
                   <span class="dt">copy.class =</span> <span class="ot">FALSE</span>)
 <span class="kw">plot</span>(white_LED_2min.cps_spct) <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(<span class="st">"Dark subtracted"</span>)</code></pre></div>
-<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-14-1.png" width="768"></p>
+<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-15-1.png" width="768"></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">white_LED_2min.spct &lt;-<span class="st"> </span><span class="kw">cps2irrad</span>(white_LED_2min.cps_spct)
 <span class="kw">plot</span>(white_LED_2min.spct)</code></pre></div>
-<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-15-1.png" width="768"></p>
+<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-16-1.png" width="768"></p>
 <p>We can finally smooth-out some of the noise.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">white_LED_2min.spct &lt;-<span class="st"> </span><span class="kw">smooth_spct</span>(white_LED_2min.spct)</code></pre></div>
 <pre><code>## Warning in smooth_spct.source_spct(white_LED_2min.spct): 637 'bad'
 ## estimates in spectral irradiance</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(white_LED_2min.spct)</code></pre></div>
-<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-16-1.png" width="768"> With an LED source, at least in the case of our Maya 2000 Pro, we do not need to worry about stray light. However, when we measure light sources with a significant emission in the infra-red above 1000 nm, stray light becomes a problem. In addition sources with narrow peaks of emission may benefit from deconvolution of a measured slit function.</p>
+<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-17-1.png" width="768"> With an LED source, at least in the case of our Maya 2000 Pro, we do not need to worry about stray light. However, when we measure light sources with a significant emission in the infra-red above 1000 nm, stray light becomes a problem. In addition sources with narrow peaks of emission may benefit from deconvolution of a measured slit function.</p>
 </div>
 <div id="tungsten-halogen-lamp" class="section level3">
 <h3 class="hasAnchor">
@@ -274,9 +289,9 @@ white_LED_2min.cps_spct &lt;-<span class="st"> </span>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">halogen.spct &lt;-
 <span class="st">  </span><span class="kw"><a href="../reference/s_irrad_corrected.html">s_irrad_corrected</a></span>(halogen.raw_mspct, <span class="dt">correction.method=</span> MAYP11278_ylianttila.mthd)
 <span class="kw">plot</span>(halogen.spct)</code></pre></div>
-<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-17-1.png" width="768"></p>
+<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-18-1.png" width="768"></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(halogen.spct, <span class="dt">range =</span> <span class="kw">c</span>(<span class="dv">250</span>, <span class="dv">410</span>))</code></pre></div>
-<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-17-2.png" width="768"></p>
+<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-18-2.png" width="768"></p>
 <p>We print the object with the raw counts data. The protocol used, in this case included a measurement with a UV-pass filter (polycarbonate).</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">halogen.raw_mspct</code></pre></div>
 <pre><code>## Object: raw_mspct [3 x 1]
@@ -452,7 +467,7 @@ halogen.cps_mspct</code></pre></div>
   <span class="kw">print</span>(<span class="kw">plot</span>(halogen.cps_mspct[[m]]) <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(m))
   <span class="kw">print</span>(<span class="kw">plot</span>(halogen.cps_mspct[[m]], <span class="dt">range =</span> <span class="kw">c</span>(<span class="dv">250</span>, <span class="dv">410</span>)) <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(m))
 }</code></pre></div>
-<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-20-1.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-20-2.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-20-3.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-20-4.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-20-5.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-20-6.png" width="768"></p>
+<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-21-1.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-21-2.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-21-3.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-21-4.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-21-5.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-21-6.png" width="768"></p>
 <p>We substract the dark reading from both the light and filter measurements, and copy attributes, including instrument settings and calibration data.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">halogen01.cps_mspct &lt;-<span class="st"> </span><span class="kw">cps_mspct</span>()
 <span class="cf">for</span> (m <span class="cf">in</span> <span class="kw">setdiff</span>(<span class="kw">names</span>(halogen.cps_mspct), <span class="st">"dark"</span>)) {
@@ -520,7 +535,7 @@ halogen01.cps_mspct</code></pre></div>
   <span class="kw">print</span>(<span class="kw">plot</span>(halogen01.cps_mspct[[m]]) <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(m))
   <span class="kw">print</span>(<span class="kw">plot</span>(halogen01.cps_mspct[[m]], <span class="dt">range =</span> <span class="kw">c</span>(<span class="dv">250</span>, <span class="dv">410</span>)) <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(m))
 }</code></pre></div>
-<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-22-1.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-22-2.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-22-3.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-22-4.png" width="768"></p>
+<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-23-1.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-23-2.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-23-3.png" width="768"><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-23-4.png" width="768"></p>
 <p>As we can see in the plots above, a small amount of stray light is present in both spectra in the UV region. We apply a filter correction using a simple method based on a fixed transmittance value. By trial an error a flt.Tfr value &gt; 1 gives best correction, which is odd…</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">halogen_corrected.cps_spct &lt;-
 <span class="st">  </span><span class="kw"><a href="../reference/filter_correction.html">filter_correction</a></span>(halogen01.cps_mspct[[<span class="st">"light"</span>]], 
@@ -528,16 +543,16 @@ halogen01.cps_mspct</code></pre></div>
                     <span class="dt">stray.light.method =</span> <span class="st">"original"</span>,
                     <span class="dt">flt.Tfr =</span> <span class="fl">1.4</span>)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(halogen_corrected.cps_spct)</code></pre></div>
-<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-24-1.png" width="768"></p>
+<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-25-1.png" width="768"></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(halogen_corrected.cps_spct, <span class="dt">range =</span> <span class="kw">c</span>(<span class="dv">250</span>, <span class="dv">410</span>))</code></pre></div>
-<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-24-2.png" width="768"></p>
+<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-25-2.png" width="768"></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(<span class="kw">clip_wl</span>(halogen_corrected.cps_spct, <span class="dt">range =</span> <span class="kw">c</span>(<span class="dv">250</span>, <span class="dv">300</span>))[[<span class="st">"cps"</span>]])</code></pre></div>
 <pre><code>## [1] 2.747068</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cps2irrad</span>(halogen_corrected.cps_spct) -&gt;<span class="st"> </span>halogen.source_spct</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(halogen.source_spct)</code></pre></div>
-<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-26-1.png" width="768"></p>
+<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-27-1.png" width="768"></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(halogen.source_spct, <span class="dt">range =</span> <span class="kw">c</span>(<span class="dv">250</span>, <span class="dv">410</span>))</code></pre></div>
-<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-26-2.png" width="768"></p>
+<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-27-2.png" width="768"></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">q_ratio</span>(halogen.source_spct, <span class="kw">list</span>(<span class="kw">UVC</span>(), <span class="kw">UVB</span>(), <span class="kw">UVA</span>()), <span class="kw">PAR</span>()) <span class="op">*</span><span class="st"> </span><span class="fl">1e3</span></code></pre></div>
 <pre><code>##  UVC.ISO.tr.lo: PAR(q:q)        UVB.ISO: PAR(q:q)        UVA.ISO: PAR(q:q) 
 ##                0.1925562                0.3494061                3.2901570 
@@ -546,9 +561,9 @@ halogen01.cps_mspct</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cps2irrad</span>(halogen_corrected.cps_spct) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">smooth_spct</span>(<span class="dt">method =</span> <span class="st">"supsmu"</span>, <span class="dt">strength =</span> <span class="dv">3</span>) -&gt;<span class="st"> </span>halogen.source_spct</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(halogen.source_spct)</code></pre></div>
-<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-29-1.png" width="768"></p>
+<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-30-1.png" width="768"></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(halogen.source_spct, <span class="dt">range =</span> <span class="kw">c</span>(<span class="dv">250</span>, <span class="dv">410</span>))</code></pre></div>
-<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-29-2.png" width="768"></p>
+<p><img src="c-algorithm-step-through_files/figure-html/unnamed-chunk-30-2.png" width="768"></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">q_ratio</span>(halogen.source_spct, <span class="kw">list</span>(<span class="kw">UVC</span>(), <span class="kw">UVB</span>(), <span class="kw">UVA</span>()), <span class="kw">PAR</span>()) <span class="op">*</span><span class="st"> </span><span class="fl">1e3</span></code></pre></div>
 <pre><code>##  UVC.ISO.tr.lo: PAR(q:q)        UVB.ISO: PAR(q:q)        UVA.ISO: PAR(q:q) 
 ##                0.2395183                0.3434062                3.4877545 
@@ -568,7 +583,9 @@ halogen01.cps_mspct</code></pre></div>
         <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
-<li><a href="#irradiance">Irradiance</a></li>
+<li><a href="#introdcution">Introdcution</a></li>
+      <li><a href="#code-examples">Code examples</a></li>
+      <li><a href="#irradiance">Irradiance</a></li>
       <li><a href="#interactive-acquisition-of-spectral-irradiance">Interactive acquisition of spectral irradiance</a></li>
       <li><a href="#coming-soon">Coming soon</a></li>
       </ul>

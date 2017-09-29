@@ -1,6 +1,10 @@
 ## ----"setup", include=FALSE----------------------------------------------
 require("knitr")
-opts_knit$set(root.dir = system.file("extdata/irradiance", package = "ooacquire"))
+opts_knit$set(root.dir = system.file("extdata", package = "ooacquire"))
+
+## ---- eval=-2------------------------------------------------------------
+folderpath <- system.file("extdata",package="ooacquire")
+file.copy(from = folderpath, to = ".", recursive = TRUE)
 
 ## ------------------------------------------------------------------------
 library(photobiology)
@@ -9,7 +13,7 @@ library(ggspectra)
 library(ooacquire)
 
 ## ------------------------------------------------------------------------
-file_names <- list(light = "light-short.txt")
+file_names <- list(light = "irrad-files/light-short.txt")
 
 ## ------------------------------------------------------------------------
 one_file.spct <- 
@@ -43,11 +47,11 @@ getInstrDesc(one_file.spct)
 getInstrSettings(one_file.spct)
 
 ## ------------------------------------------------------------------------
-file_names <- list(light = c("light-short.txt",
-                             "light-long.txt"),
-                   filter = "flt-long.txt",
-                   dark = c("dark-short.txt",
-                            "dark-long.txt"))
+file_names <- list(light = c("irrad-files/light-short.txt",
+                             "irrad-files/light-long.txt"),
+                   filter = "irrad-files/flt-long.txt",
+                   dark = c("irrad-files/dark-short.txt",
+                            "irrad-files/dark-long.txt"))
 
 ## ------------------------------------------------------------------------
 five_files.spct <- 
@@ -92,9 +96,9 @@ kable(
 )
 
 ## ------------------------------------------------------------------------
-file_names <- list(light = "light_MAYP112785.txt",
-#                    filter = "filter_MAYP112785.txt",
-                    dark = "dark_MAYP112785.txt")
+file_names <- list(light = "irrad-files/light_MAYP112785.txt",
+#                    filter = "irrad-files/ilter_MAYP112785.txt",
+                    dark = "irrad-files/dark_MAYP112785.txt")
 
 ## ------------------------------------------------------------------------
 ov_files.raw_mspct <- 
