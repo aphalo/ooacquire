@@ -131,7 +131,9 @@ s_fraction_corrected.raw_mspct <- function(x,
                                flt.ref.wl = correction.method[["flt.ref.wl"]],
                                flt.Tfr = correction.method[["flt.Tfr"]],
                                inst.dark.pixs = correction.method[["inst.dark.pixs"]],
-                               worker.fun = correction.method[["worker.fun"]],
+                               worker.fun = get(correction.method[["worker.fun"]],
+                                                mode = "function",
+                                                envir = as.environment("package:ooacquire")),
                                trim = correction.method[["trim"]],
                                verbose = verbose)
 
@@ -146,7 +148,9 @@ s_fraction_corrected.raw_mspct <- function(x,
                                flt.ref.wl = correction.method[["flt.ref.wl"]],
                                flt.Tfr = correction.method[["flt.Tfr"]],
                                inst.dark.pixs = correction.method[["inst.dark.pixs"]],
-                               worker.fun = correction.method[["worker.fun"]],
+                               worker.fun = get(correction.method[["worker.fun"]],
+                                                mode = "function",
+                                                envir = as.environment("package:ooacquire")),
                                trim = correction.method[["trim"]],
                                verbose = verbose)
 

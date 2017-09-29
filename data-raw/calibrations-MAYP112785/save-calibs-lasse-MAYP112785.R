@@ -12,7 +12,7 @@ MAYP112785_ylianttila.mthd <- list(
   flt.Tfr = 1,
   inst.dark.pixs = 2:4,
   tail.coeffs = c(-9.22574221, -0.035984385),
-  worker.fun = ooacquire::MAYP112785_tail_correction,
+  worker.fun = "MAYP112785_tail_correction",
   trim = 0
 )
 
@@ -26,7 +26,7 @@ MAYP112785_sun.mthd <- list(
   flt.Tfr = 1,
   inst.dark.pixs = 2:4,
   tail.coeffs = c(-9.22574221, -0.035984385),
-  worker.fun = ooacquire::MAYP112785_tail_correction,
+  worker.fun = "MAYP112785_tail_correction",
   trim = 0.05
 )
 
@@ -40,7 +40,7 @@ MAYP112785_simple.mthd <- list(
   flt.Tfr = 1,
   inst.dark.pixs = 2:4,
   tail.coeffs = c(-9.22574221, -0.035984385),
-  worker.fun = ooacquire::MAYP112785_tail_correction,
+  worker.fun = "MAYP112785_tail_correction",
   trim = 0.05
 )
 

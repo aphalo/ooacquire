@@ -96,6 +96,8 @@ acq_raw_spct <- function(descriptor,
 #' @param descriptor list as returned by function \code{get_oo_descriptor()}
 #' @param acq.settings list as returned by functions \code{tune_acq_settings()}
 #'   or \code{retune_acq_settings()} or \code{acq_settings()}
+#' @param seq.settings list with members "step" numeric value in seconds,
+#'   "num.steps" integer.
 #' @param protocol vector of character strings
 #' @param user.label character string to set as label
 #' @param where.measured data.frame with at least columns "lon" and "lat"

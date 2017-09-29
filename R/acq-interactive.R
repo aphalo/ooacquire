@@ -656,25 +656,9 @@ set_seq_interactive <- function(seq.settings) {
   seq.settings
 }
 
-
 # simple fraction interactive ---------------------------------------------
 
 #' @rdname acq_irrad_interactive
-#'
-#' @param ref.value numeric or filter_spct/reflector_spct object.
-#' @param qty.out character One of "Tfr" (transmittance as a fraction of one)
-#'   or "raw" (raw counts).
-#' @param type character Type of transmittance or reflectance measured.
-#'
-#' @note The calculations for reflectance and transmittance are very similar,
-#'   so we provide a single function capable of handling both. For
-#'   transmittance the reference is usually direct exposure to radiation but
-#'   for reflectance a white reference patch is normally used. In some cases
-#'   one may want to use a grey reference. We provide an argument that allows
-#'   the user to supply a constant or a spectrum describing the properties of
-#'   the reference. It is also important to distinguish between total and
-#'   internal transmittance, and which of these is measured depends on the
-#'   measuring protocol.
 #'
 #' @export
 #'
@@ -918,6 +902,3 @@ acq_rfr_tfr_interactive <-
     message("Folder reset to: ", getwd())
     message("Bye!")
   }
-
-
-

@@ -245,30 +245,6 @@ set_descriptor_irrad_mult <- function(descriptor,
   descriptor
 }
 
-#' Add function for slit correction
-#'
-#' Adds a function to the instrument descriptor that can be used to
-#' correct counts per second data to remove the effect of the tails of
-#' the slit function of the instrument.
-#'
-#' @param descriptor list as returned by function \code{get_oo_descriptor}
-#' @param inv.slit.fun function with two first formal parameters taking numeric
-#'   vectors of wavelengths and counts that aoolies a correction suitable
-#'   for the instrument.
-#'
-#' @return A copy of the argument passed for \code{oo_descriptor} with the
-#' irrad.mult field of the calibration data replaced by the new values.
-#'
-#' @export
-#'
-set_descriptor_slit_fun <- function(descriptor,
-                                    inv.slit.fun = NULL)
-{
-  stopifnot(is.function(inv.slit.fun) || is.null(inv.slit.fun))
-  descriptor[["inst.calib"]][["$slit.fun"]] <- inv.slit.fun
-  descriptor
-}
-
 #' Get the current values of instrument settings
 #'
 #' Query the spectrometer for the settings currently in use for corrections,

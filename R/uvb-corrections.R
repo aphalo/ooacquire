@@ -20,7 +20,7 @@
 #' @param inst.dark.pixs numeric vector with indexes to array pixels that
 #'   are in full drakness by instrument design.
 #' @param worker.fun function actually doing the correction on the w.lengths and
-#'   counts per second vectors.
+#'   counts per second vectors, or the name of the function as a character string.
 #' @param trim a numeric value to be used as argument for mean
 #' @param verbose Logical indicating the level of warnings wanted.
 #' @param ... additional params passed to worker.fun.
@@ -55,6 +55,11 @@ uvb_corrections <- function(x,
                             verbose = getOption("photobiology.verbose", default = FALSE),
                             ...) {
   flt.flag <- !is.na(stray.light.method) && stray.light.method != "none"
+
+  if (is.character(worker.fun)) {
+    worker.fun = get(worker.fun,
+                     mode = "function")
+  }
 
   raw2merged_cps <- function(x, spct.names = spct.names) {
     spct.names <- intersect(spct.names, names(x))
@@ -166,6 +171,10 @@ slit_function_correction <- function(x,
                                      worker.fun = NULL,
                                      verbose = getOption("photobiology.verbose", default = FALSE),
                                      ...) {
+  if (is.character(worker.fun)) {
+    worker.fun = get(worker.fun,
+                     mode = "function")
+  }
   stopifnot(is.cps_spct(x))
   stopifnot(is.null(attr(x, "slit.corrected")) || !attr(x, "slit.corrected"))
   if (is.null(worker.fun)) {

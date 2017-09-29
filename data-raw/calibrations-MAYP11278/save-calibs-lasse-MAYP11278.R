@@ -12,7 +12,7 @@ MAYP11278_ylianttila.mthd <- list(
   flt.Tfr = 1,
   inst.dark.pixs = 1:4,
   tail.coeffs = c(-7.273130, -0.05688),
-  worker.fun = ooacquire::MAYP11278_tail_correction,
+  worker.fun = "MAYP11278_tail_correction",
   trim = 0
 )
 
@@ -26,7 +26,7 @@ MAYP11278_sun.mthd <- list(
   flt.Tfr = 1,
   inst.dark.pixs = 1:4,
   tail.coeffs = c(-7.273130, -0.05688),
-  worker.fun = ooacquire::MAYP11278_tail_correction,
+  worker.fun = "MAYP11278_tail_correction",
   trim = 0.05
 )
 
@@ -40,7 +40,7 @@ MAYP11278_simple.mthd <- list(
   flt.Tfr = 1,
   inst.dark.pixs = 1:4,
   tail.coeffs = c(-7.273130, -0.05688),
-  worker.fun = ooacquire::MAYP11278_tail_correction,
+  worker.fun = "MAYP11278_tail_correction",
   trim = 0.05
 )
 
@@ -69,7 +69,7 @@ for (f in files) {
   descriptor.tmp <- descriptor
   descriptor.tmp <-
     set_descriptor_wl(descriptor = descriptor.tmp,
-                    wl = tmp[["w.length"]])
+                      wl = tmp[["w.length"]])
   descriptor.tmp <-
     set_descriptor_irrad_mult(descriptor = descriptor.tmp,
                               irrad.mult = tmp[["irrad.mult"]] * 1e4,

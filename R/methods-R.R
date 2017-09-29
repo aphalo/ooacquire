@@ -24,11 +24,11 @@
 #' @return a list
 #'
 new_correction_method <- function(descriptor,
-                       stray.light.method = "none",
-                       stray.light.wl = c(220, 230),
-                       flt.dark.wl = c(200, 210),
-                       flt.ref.wl = c(360, 379.5),
-                       flt.Tfr = 1) {
+                                  stray.light.method = "none",
+                                  stray.light.wl = c(220, 230),
+                                  flt.dark.wl = c(200, 210),
+                                  flt.ref.wl = c(360, 379.5),
+                                  flt.Tfr = 1) {
   ## Configuration is not known
   # We find the dark pixels from the descriptor
   inst.dark.pixs <- 1:descriptor[["num.dark.pixs"]]
@@ -64,7 +64,7 @@ new_correction_method <- function(descriptor,
     flt.Tfr = flt.Tfr,
     inst.dark.pixs = inst.dark.pixs,
     tail.coeffs = NA_real_,
-    worker.fun = NA)
+    worker.fun = NA_character_)
 
   method[["trim"]] <-
     switch(stray.light.method,
