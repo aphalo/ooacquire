@@ -12,6 +12,23 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+## Introdcution
+
+In this vignette we will walk through the different steps used in the conversion of raw counts into physical quantites. Different protocols can be used, and not all those implemented are exemplified. The facilities in the package also allow users to implement their own measurement and correction protocols. _It must be, however, always kept in mind that protocols and calibrations go hand in han:_ **For each different protocol new calibration data will be required**. In many cases new calibration and validation measurements will be needed, but sometimes just recalculation of new calibration constants from existing raw-counts and calibration-lamp data may be enough.
+
+***
+## Code examples
+
+All examples in vignettes use data and files included in the package. Data files in formats _foreign_ to R, are stored in the `"extdata"` folder, as is the norm for R packages.
+
+_To reproduce any of the examples which use files as data input, it is best to make a local copy of the whole `"extdata"` folder._ The files used in examples are organized into subfolders, but all example code assumes that its in being run with `"extdata"` or a copy of it as the current _working_ folder.
+
+```{r, eval=-2}
+folderpath <- system.file("extdata",package="ooacquire")
+file.copy(from = folderpath, to = ".", recursive = TRUE)
+```
+***
+
 ## Irradiance
 
 We will step through the different steps of the algorithm used, plotting the spectra at each step along the way. We use raw counts data, included in the package, to make building this vignette easier. At the same time we show how raw data acquire outwith R can be also processed with the package.

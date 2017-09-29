@@ -1,16 +1,21 @@
-## ---- echo=FALSE, message=FALSE------------------------------------------
+## ---- eval=-2------------------------------------------------------------
+folderpath <- system.file("extdata",package="ooacquire")
+file.copy(from = folderpath, to = ".", recursive = TRUE)
+
+## ----"setup", include=FALSE----------------------------------------------
 require("knitr")
-opts_knit$set(autodep = TRUE)
+opts_knit$set(autodep = TRUE, root.dir = system.file("extdata", package = "ooacquire"))
 
 ## ------------------------------------------------------------------------
-library(ggspectra)
 library(photobiology)
 library(photobiologyWavebands)
+library(ggspectra)
 library(ooacquire)
 
 # print warnings at the time they are triggered
 options(warn = 1)
 
+# change this to TRUE to run acquisition examples
 sr.online <- FALSE
 
 ## ---- eval=sr.online, echo=FALSE, message=FALSE, warning=FALSE-----------
@@ -55,12 +60,29 @@ sr.online <- FALSE
 #                           correction.method = ooacquire::MAYP11278_ylianttila.mthd,
 #                           descriptors = ooacquire::MAYP11278_descriptors)
 
-## ---- eval=-2------------------------------------------------------------
-filepath <- system.file("example-scripts", "irrad-acq-interac.R", package="ooacquire")
-file.copy(from = filepath, to = ".")
+## ------------------------------------------------------------------------
+file_names <- list(light = c("irrad-files/light-short.txt",
+                             "irrad-files/light-long.txt"),
+                   filter = "irrad-files/flt-long.txt",
+                   dark = c("irrad-files/dark-short.txt",
+                            "irrad-files/dark-long.txt"))
 
-## ---- eval=-3------------------------------------------------------------
-folderpath <- system.file("example-scripts", package="ooacquire")
-list.files(path = folderpath, pattern = ".*[.]R")
-file.copy(from = list.files(path = folderpath, pattern = ".*[.]R", full.names = TRUE), to = ".")
+## ------------------------------------------------------------------------
+irrad.spct <- 
+  s_irrad_corrected(x = file_names,
+                    descriptor = which_descriptor("2016-10-11", 
+                                                  MAYP11278_descriptors),
+                    correction.method = MAYP11278_ylianttila.mthd)
+
+## ---- fig.height=5, fig.width=7------------------------------------------
+plot(irrad.spct)
+
+## ---- eval=FALSE---------------------------------------------------------
+#  filepath <- system.file("example-scripts", "irrad-acq-interac.R", package="ooacquire")
+#  file.copy(from = filepath, to = ".")
+
+## ---- eval=FALSE---------------------------------------------------------
+#  folderpath <- system.file("example-scripts", package="ooacquire")
+#  list.files(path = folderpath, pattern = ".*[.]R")
+#  file.copy(from = list.files(path = folderpath, pattern = ".*[.]R", full.names = TRUE), to = ".")
 

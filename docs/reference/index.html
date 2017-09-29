@@ -102,7 +102,7 @@
       </tbody><tbody>
         <tr>
           <th colspan="2">
-            <h2 id="section-data-acquisition" class="hasAnchor"><a href="#section-data-acquisition" class="anchor"></a>Data acquisition</h2>
+            <h2 id="section-acquire-raw-counts-data-from-spectrometers" class="hasAnchor"><a href="#section-acquire-raw-counts-data-from-spectrometers" class="anchor"></a>Acquire raw-counts data from spectrometers</h2>
             <p class="section-desc"><p>Functions related to direct acquisition of spectral data from array spectrometers from within R.</p></p>
           </th>
         </tr>
@@ -194,90 +194,8 @@
       </tbody><tbody>
         <tr>
           <th colspan="2">
-            <h2 id="section-low-level-processing-functions-" class="hasAnchor"><a href="#section-low-level-processing-functions-" class="anchor"></a>Low level processing functions.</h2>
-            <p class="section-desc"><p>Individual functions implementing different steps in the conversion of raw-counts data.</p></p>
-          </th>
-        </tr>
-        <tr>
-          <!--  -->
-          <td>
-            <p><code><a href="merge_raw_mspct.html">merge_raw_mspct</a></code> </p>
-          </td>
-          <td><p>Merge raw spectra into a single multicolumn spectrum</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="trim_counts.html">trim_counts</a></code> </p>
-          </td>
-          <td><p>Replace out-of-range instrument counts</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="bleed_nas.html">bleed_nas</a></code> </p>
-          </td>
-          <td><p>Expand NA's to neighbouring pixels</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="linearize_counts.html">linearize_counts</a></code> </p>
-          </td>
-          <td><p>Function to apply linearization correction to raw counts data.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="ref_correction.html">ref_correction</a></code> </p>
-          </td>
-          <td><p>Apply a correction to spectral data.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="filter_correction.html">filter_correction</a></code> <code><a href="filter_correction.html">no_filter_correction</a></code> </p>
-          </td>
-          <td><p>Correct for stray light</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="uvb_corrections.html">uvb_corrections</a></code> <code><a href="uvb_corrections.html">slit_function_correction</a></code> </p>
-          </td>
-          <td><p>Apply filter-based stray-light correction</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="raw2cps.html">raw2cps</a></code> </p>
-          </td>
-          <td><p>Convert raw detector counts into counts per second (cps).</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="merge_cps.html">merge_cps</a></code> </p>
-          </td>
-          <td><p>Merge counts per second data</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="new_correction_method.html">new_correction_method</a></code> </p>
-          </td>
-          <td><p>Make default method from descriptor</p></td>
-        </tr>
-      </tbody><tbody>
-        <tr>
-          <th colspan="2">
-            <h2 id="section-compute-calibration-coefficients" class="hasAnchor"><a href="#section-compute-calibration-coefficients" class="anchor"></a>Compute calibration coefficients</h2>
-            <p class="section-desc"><p>(NOT YET WORKING!) Compute a calibration coefficients from raw counts and calibration lamps’ emission spectra.</p></p>
-          </th>
-        </tr>
-        <tr>
-          <!--  -->
-          <td>
-            <p><code><a href="compute_irrad_calibration.html">compute_irrad_calibration</a></code> </p>
-          </td>
-          <td><p>Compute calibration multipliers.</p></td>
-        </tr>
-      </tbody><tbody>
-        <tr>
-          <th colspan="2">
-            <h2 id="section-raw-data-input-from-files" class="hasAnchor"><a href="#section-raw-data-input-from-files" class="anchor"></a>Raw data input from files</h2>
-            <p class="section-desc"><p>Functions for reading raw-counts output files from <strong>OceanView</strong>, <strong>SpectraSuite</strong>, Raspberry Pi software and the inbuilt-firmware of the Jaz modular spectrometer.</p></p>
+            <h2 id="section-read-raw-counts-data-from-spectrometers" class="hasAnchor"><a href="#section-read-raw-counts-data-from-spectrometers" class="anchor"></a>Read raw-counts data from spectrometers</h2>
+            <p class="section-desc"><p>Functions for reading raw-counts and metadata from output files from <strong>OceanView</strong>, <strong>SpectraSuite</strong>, Raspberry Pi software and the inbuilt-firmware of the Jaz modular spectrometer.</p></p>
           </th>
         </tr>
         <tr>
@@ -344,7 +262,7 @@
       </tbody><tbody>
         <tr>
           <th colspan="2">
-            <h2 id="section-high-level-functions-and-methods" class="hasAnchor"><a href="#section-high-level-functions-and-methods" class="anchor"></a>High level functions and methods</h2>
+            <h2 id="section-high-level-conversion-functions-and-methods-" class="hasAnchor"><a href="#section-high-level-conversion-functions-and-methods-" class="anchor"></a>High level conversion functions and methods.</h2>
             <p class="section-desc"><p>Functions related to conversion of raw detector counts into counts-per-second and physical quantities.</p></p>
           </th>
         </tr>
@@ -378,6 +296,126 @@
             <p><code><a href="which_descriptor.html">which_descriptor</a></code> </p>
           </td>
           <td><p>Select which instrument descriptor to use</p></td>
+        </tr>
+      </tbody><tbody>
+        <tr>
+          <th colspan="2">
+            <h2 id="section-low-level-conversion-functions-and-methods-" class="hasAnchor"><a href="#section-low-level-conversion-functions-and-methods-" class="anchor"></a>Low level conversion functions and methods.</h2>
+            <p class="section-desc"><p>Individual functions implementing different steps in the conversion of raw-counts data.</p></p>
+          </th>
+        </tr>
+        <tr>
+          <!--  -->
+          <td>
+            <p><code><a href="merge_raw_mspct.html">merge_raw_mspct</a></code> </p>
+          </td>
+          <td><p>Merge raw spectra into a single multicolumn spectrum</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="trim_counts.html">trim_counts</a></code> </p>
+          </td>
+          <td><p>Replace out-of-range instrument counts</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="bleed_nas.html">bleed_nas</a></code> </p>
+          </td>
+          <td><p>Expand NA's to neighbouring pixels</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="linearize_counts.html">linearize_counts</a></code> </p>
+          </td>
+          <td><p>Function to apply linearization correction to raw counts data.</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="ref_correction.html">ref_correction</a></code> </p>
+          </td>
+          <td><p>Apply a correction to spectral data.</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="filter_correction.html">filter_correction</a></code> <code><a href="filter_correction.html">no_filter_correction</a></code> </p>
+          </td>
+          <td><p>Correct for stray light</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="uvb_corrections.html">uvb_corrections</a></code> <code><a href="uvb_corrections.html">slit_function_correction</a></code> </p>
+          </td>
+          <td><p>Apply filter-based stray-light correction</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="raw2cps.html">raw2cps</a></code> </p>
+          </td>
+          <td><p>Convert raw detector counts into counts per second (cps).</p></td>
+        </tr>
+      </tbody><tbody>
+        <tr>
+          <th colspan="2">
+            <h2 id="section-computation-of-calibration-coefficients" class="hasAnchor"><a href="#section-computation-of-calibration-coefficients" class="anchor"></a>Computation of calibration coefficients</h2>
+            <p class="section-desc"><p>(NOT YET WORKING!) Compute a calibration coefficients from raw counts and calibration lamps’ emission spectra.</p></p>
+          </th>
+        </tr>
+        <tr>
+          <!--  -->
+          <td>
+            <p><code><a href="compute_irrad_calibration.html">compute_irrad_calibration</a></code> </p>
+          </td>
+          <td><p>Compute calibration multipliers.</p></td>
+        </tr>
+      </tbody><tbody>
+        <tr>
+          <th colspan="2">
+            <h2 id="section-raw-spectral-data-examples" class="hasAnchor"><a href="#section-raw-spectral-data-examples" class="anchor"></a>Raw spectral data examples</h2>
+            <p class="section-desc"><p>Collections of raw-counts spectra stored as R objects of class <code>raw_mspct</code> defined in package ‘photobiology’.</p></p>
+          </th>
+        </tr>
+        <tr>
+          <!--  -->
+          <td>
+            <p><code><a href="blue_filter.raw_mspct.html">blue_filter.raw_mspct</a></code> </p>
+          </td>
+          <td><p>Raw counts data for a filter measurement</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="red_filter.raw_mspct.html">red_filter.raw_mspct</a></code> </p>
+          </td>
+          <td><p>Raw counts data for a filter measurement</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="white_LED.raw_mspct.html">white_LED.raw_mspct</a></code> </p>
+          </td>
+          <td><p>Raw counts data for a lamp measurement.</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="white_LED_2min.raw_mspct.html">white_LED_2min.raw_mspct</a></code> </p>
+          </td>
+          <td><p>Raw counts data for a lamp measurement.</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="halogen.raw_mspct.html">halogen.raw_mspct</a></code> </p>
+          </td>
+          <td><p>Raw counts data for a lamp measurement.</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="merge_cps.html">merge_cps</a></code> </p>
+          </td>
+          <td><p>Merge counts per second data</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="new_correction_method.html">new_correction_method</a></code> </p>
+          </td>
+          <td><p>Make default method from descriptor</p></td>
         </tr>
       </tbody><tbody>
         <tr>
@@ -465,44 +503,6 @@
           </td>
           <td><p>Correction method definition</p></td>
         </tr>
-      </tbody><tbody>
-        <tr>
-          <th colspan="2">
-            <h2 id="section-raw-spectral-data-examples" class="hasAnchor"><a href="#section-raw-spectral-data-examples" class="anchor"></a>Raw spectral data examples</h2>
-            <p class="section-desc"><p>Collections of raw-counts spectra stored as R objects of class <code>raw_mspct</code> defined in package ‘photobiology’.</p></p>
-          </th>
-        </tr>
-        <tr>
-          <!--  -->
-          <td>
-            <p><code><a href="blue_filter.raw_mspct.html">blue_filter.raw_mspct</a></code> </p>
-          </td>
-          <td><p>Raw counts data for a filter measurement</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="red_filter.raw_mspct.html">red_filter.raw_mspct</a></code> </p>
-          </td>
-          <td><p>Raw counts data for a filter measurement</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="white_LED.raw_mspct.html">white_LED.raw_mspct</a></code> </p>
-          </td>
-          <td><p>Raw counts data for a lamp measurement.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="white_LED_2min.raw_mspct.html">white_LED_2min.raw_mspct</a></code> </p>
-          </td>
-          <td><p>Raw counts data for a lamp measurement.</p></td>
-        </tr><tr>
-          <!--  -->
-          <td>
-            <p><code><a href="halogen.raw_mspct.html">halogen.raw_mspct</a></code> </p>
-          </td>
-          <td><p>Raw counts data for a lamp measurement.</p></td>
-        </tr>
       </tbody>
       </table>
     </div>
@@ -512,13 +512,13 @@
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#section-package-overview">Package overview</a></li>
-      <li><a href="#section-data-acquisition">Data acquisition</a></li>
-      <li><a href="#section-low-level-processing-functions-">Low level processing functions.</a></li>
-      <li><a href="#section-compute-calibration-coefficients">Compute calibration coefficients</a></li>
-      <li><a href="#section-raw-data-input-from-files">Raw data input from files</a></li>
-      <li><a href="#section-high-level-functions-and-methods">High level functions and methods</a></li>
-      <li><a href="#section-calibration-data-examples">Calibration data examples</a></li>
+      <li><a href="#section-acquire-raw-counts-data-from-spectrometers">Acquire raw-counts data from spectrometers</a></li>
+      <li><a href="#section-read-raw-counts-data-from-spectrometers">Read raw-counts data from spectrometers</a></li>
+      <li><a href="#section-high-level-conversion-functions-and-methods-">High level conversion functions and methods.</a></li>
+      <li><a href="#section-low-level-conversion-functions-and-methods-">Low level conversion functions and methods.</a></li>
+      <li><a href="#section-computation-of-calibration-coefficients">Computation of calibration coefficients</a></li>
       <li><a href="#section-raw-spectral-data-examples">Raw spectral data examples</a></li>
+      <li><a href="#section-calibration-data-examples">Calibration data examples</a></li>
     </ul>
   </div>
 </div>

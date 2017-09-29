@@ -1,8 +1,8 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-not-inst
-data-raw
-inst/example-scripts/*.html
-inst/example-scripts/*.pdf
+^.Rdata$
+^.Rhistory$
+^not-inst$
+^data-raw$
 ^_pkgdown.yml$
 ^docs$

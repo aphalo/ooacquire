@@ -1,3 +1,7 @@
+## ---- eval=-2------------------------------------------------------------
+folderpath <- system.file("extdata",package="ooacquire")
+file.copy(from = folderpath, to = ".", recursive = TRUE)
+
 ## ---- echo=FALSE, message=FALSE------------------------------------------
 require("knitr")
 dirpath <- system.file("extdata", package="ooacquire")

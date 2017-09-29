@@ -82,6 +82,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li><a href="#additional-corrections">Additional corrections</a><ul>
 <li><a href="#apply-slit-function-correction">Apply slit function correction</a></li>
 </ul></li>
+<li><a href="#code-examples">Code examples</a></li>
 <li><a href="#measurement-of-spectral-irradiance">Measurement of spectral irradiance</a><ul>
 <li><a href="#examples">Examples</a></li>
 </ul></li>
@@ -317,8 +318,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>Once we know which instrument we want to address and its index, we must create an instrument descriptor with function <code>get_oo_descriptor()</code>. From this point onwards we will use this <em>descriptor</em> to address the instrument. The descriptor contains information about the instrument obtained initially by querying it. Instruments may have some pieces of information unavailable (e.g. not stored in there non-volatile memory), or the user may want to override the available information with that from a more recent or better calibration. <code>set_descriptor_nl()</code>, <code>set_descriptor_wl()</code>, <code>set_descriptor_bad_pixs()</code> and <code>set_descripto_integ_time()</code> can be used to set or override the function used for correcting for the non-linearity of the sensors, the wavelength values corresponding to each pixel, a vector of indexes (starting at one) corresponding to bad pixels in the array (pixel known to return bad data) and the range of integration times in ms that are valid input for the instrument. __It is always good to check against the specifications of the instrument whether the values stored in its</p>
 <p>As there are several settings needed for the acquisition of a spectrum, we will store sets of settings into objects that can reuse and modify. To create these objects we use function <code>acq_settings()</code>. The <em>settings</em> include both actual parameters that need to be set in the instrument by sending commands and parameters that our software may use to calculate suitable values for such settings. This function is quite flexible and allows the use of bracketing. In other words a single observation can consist in more than one data acquisition, each of these using different setting, with the aim of merging them into a single spectrum.</p>
 <p>Some settings need to be adjusted according to the current irradiance level so as to make full use of the dynamic range of the instrument. For this we use function <code>tune_acq_settings()</code>, which updates the settings stored in a list as created by <code>acq_settings()</code> or as returned by a previous call to <code>tune_acq_settings()</code>.</p>
-<p>Function <code>get_oo_settings()</code> can be used to query the instrument for the settings currently in use.</p>
-<p>To acquire spectral data we can use one of two functions, <code>acq_raw_spct()</code> to acquire a single spectrum, or <code>acq_raw_mspct()</code> to acquire a collection of spectra according to a user supplied protocol. In cases when we use HDR (bracketing) or <em>overexpose</em> some part of the spectrum the first data-processing step is to replace the data from the saturated pixels with <code>NA</code>’s using function <code>trim_counts()</code>—as the settings used in the acquisition and descriptor of the instrument are stored in the spectral object, this function needs only to be supplied a <code>raw_spct</code> object, unless the user wants to discard more pixels. As pixels neighbouring <em>overexposed</em> pixels are disturbed by the charge <em>overflowing</em> from the saturated wells, these pixels need also to be set as NAs by means of function <code>bleed_nas</code>. If the instrument array contains bad pixels, it is best to replace the data produced by them at this early stage. Function <code>skip_bad_pixs()</code> is useful here and it replaces the bad data with the average of the readings from the neighbouring pixels. The third step after data acquisition, unless the linearisation is done by the instrument, is to linearize the acquired <em>valid</em> raw counts by means of method <code>linearize_counts()</code>. The non-linearity of the detector is related to how “full” are its electron wells, irrespective of whether the electrons originate from measured photons or any other source, consequently the linearisation function should be applied to raw detector counts at this point.</p>
+<p>Function <code>get_oo_settings()</code> can be used to query the instrument for the settings currently in use. To acquire spectral data we can use one of two functions, <code>acq_raw_spct()</code> to acquire a single spectrum, or <code>acq_raw_mspct()</code> to acquire a collection of spectra according to a user supplied protocol. In cases when we use HDR (bracketing) or <em>overexpose</em> some part of the spectrum the first data-processing step is to replace the data from the saturated pixels with <code>NA</code>’s using function <code>trim_counts()</code>—as the settings used in the acquisition and descriptor of the instrument are stored in the spectral object, this function needs only to be supplied a <code>raw_spct</code> object, unless the user wants to discard more pixels. As pixels neighbouring <em>overexposed</em> pixels are disturbed by the charge <em>overflowing</em> from the saturated wells, these pixels need also to be set as NAs by means of function <code>bleed_nas</code>. If the instrument array contains bad pixels, it is best to replace the data produced by them at this early stage. Function <code>skip_bad_pixs()</code> is useful here and it replaces the bad data with the average of the readings from the neighbouring pixels. The third step after data acquisition, unless the linearisation is done by the instrument, is to linearize the acquired <em>valid</em> raw counts by means of method <code>linearize_counts()</code>. The non-linearity of the detector is related to how “full” are its electron wells, irrespective of whether the electrons originate from measured photons or any other source, consequently the linearisation function should be applied to raw detector counts at this point.</p>
 <p>CCD arrays, especially if not cooled, have a significant dark signal. The best approach to remove this <em>background</em> signal is to measure it—to take a spectral reading with the array not exposed to light. This <em>dark spectrum</em> is them subtracted from the one measured in the light. An alternative, with advantages and disadvantages, is to use the signal from pixels corresponding to wavelengths <strong>known</strong> <em>a priori</em> to be absent in the light source being measured. This calculation is done with the <strong>linearized</strong> raw counts by means of method <code>photobiology::fshift()</code> with a pair of suitable wavelength values for <code>range</code>. In the case of measuring transmittance (and absorbance) and reflectance we need to also measure a <em>clear</em> and <em>white</em> reference respectively.</p>
 <p>The raw counts after linearisation followed by subtraction of the dark signal are still expressed in number of counts per integration period. As the duration of the integration time is variable, we need to re-express the raw counts as counts-per-second (<em>cps</em>). Once more, the integration time used for the acquisition is stored in the <code>cps_spct</code> object and the conversion can be done by method <code>raw2cps()</code> with just this object as input. The values returned, expressed as counts per second, are linearly proportional to the rate at which photons imping each detector pixel. Be aware that as detector quantum yield depends on wavelength, a different multiplier is needed for each pixel to be able to convert the counts-per-second data to units of photons-per-unit-time.</p>
 <p>If bracketing for HDR has been used during acquisition, at this point, the values of the <em>cps</em> for each of the bracketed spectra are expressed on the same scale. This means that they can simply be spliced together. The simplest approach possible, used by method <code>merge_cps()</code> is to replace the clipped data from saturated pixels (and possibly their neighbours) in the longer integration with data from the same pixels obtained with shorter integration. As we used <code>trim_counts()</code> and <code>bleed_nas()</code> on the raw counts, those saturated pixels have already been replaced with <code>NA</code>’s making the operation easy to implement.</p>
@@ -331,7 +331,16 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>The slit function describes how monochromatic light “reaches” adjacent pixels which should have been in total darkness had the monochromator been perfect. This is a subtle correction, which will affect only regions of a spectrum where the change in signal strength with wavelength is very steep, such as the UV region of a solar spectrum or a very narrow absorption peak.</p>
 <p>The slit function of a spectrometer can be estimated by measuring laser beams at different wavelengths and fitting suitable functions to the observed data. Here we explain how to apply such a function. The slit function is the result of an optical effect, and consequently independent of integration time and other detector settings. Consequently, can be applied to either the merged <em>cps</em> values or after application of a calibration. <strong>Obviously, the stage at which the slit correction is applied needs to match the stage of processing of the data used for estimating the slit function.</strong></p>
 <p>The correction to apply to a given pixel depends on the readings of nearby pixels. Some authors recommend to apply this correction recursively, however, we follow the simple approach of applying it only once as an approximation.</p>
+<hr />
 </div>
+</div>
+<div id="code-examples" class="section level2">
+<h2>Code examples</h2>
+<p>All examples in vignettes use data and files included in the package. Data files in formats <em>foreign</em> to R, are stored in the <code>&quot;extdata&quot;</code> folder, as is the norm for R packages.</p>
+<p><em>To reproduce any of the examples which use files as data input, it is best to make a local copy of the whole <code>&quot;extdata&quot;</code> folder.</em> The files used in examples are organized into subfolders, but all example code assumes that its in being run with <code>&quot;extdata&quot;</code> or a copy of it as the current <em>working</em> folder.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">folderpath &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>,<span class="dt">package=</span><span class="st">&quot;ooacquire&quot;</span>)
+## file.copy(from = folderpath, to = &quot;.&quot;, recursive = TRUE)</code></pre></div>
+<hr />
 </div>
 <div id="measurement-of-spectral-irradiance" class="section level2">
 <h2>Measurement of spectral irradiance</h2>
@@ -402,7 +411,7 @@ In special cases we may need to set a locale matching the language used in the f
 <hr>
 <p>The first example is the one listed as “minimal” in the table above, we use a single spectrum, using for the dark correction pixels expected to receive no true excitation. For example, those in the UVC region of the spectrum when the light source is sunlight at ground level.</p>
 <p>We set a list of file names to be read, with members named according to their role in the measuring protocol.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">file_names &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">light =</span> <span class="st">&quot;light-short.txt&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">file_names &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">light =</span> <span class="st">&quot;irrad-files/light-short.txt&quot;</span>)</code></pre></div>
 <p>We subsequently compute the spectral irradiance.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">one_file.spct &lt;-<span class="st"> </span>
 <span class="st">  </span><span class="kw">s_irrad_corrected</span>(<span class="dt">x =</span> file_names,
@@ -418,7 +427,7 @@ In special cases we may need to set a locale matching the language used in the f
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">one_file.spct</code></pre></div>
 <pre><code>## Object: source_spct [1,421 x 2]
 ## Wavelength range 251.16 to 898.81 nm, step 0.43 to 0.48 nm 
-## Label: light: light-short.txt 
+## Label: light: irrad-files/light-short.txt 
 ## Measured on 2016-10-11 11:23:05 UTC 
 ## Time unit 1s
 ## 
@@ -442,7 +451,7 @@ In special cases we may need to set a locale matching the language used in the f
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">getWhenMeasured</span>(one_file.spct)</code></pre></div>
 <pre><code>## [1] &quot;2016-10-11 11:23:05 UTC&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cat</span>(<span class="kw">getWhatMeasured</span>(one_file.spct))</code></pre></div>
-<pre><code>## light: light-short.txt</code></pre>
+<pre><code>## light: irrad-files/light-short.txt</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">getWhereMeasured</span>(one_file.spct)</code></pre></div>
 <pre><code>##   lon lat
 ## 1  NA  NA</code></pre>
@@ -451,7 +460,7 @@ In special cases we may need to set a locale matching the language used in the f
 ## with 's_irrad_corrected()' from 'ooacquire' ver. 0.1.4.9003
 ## 
 ## from files:
-## light: light-short.txt</code></pre>
+## light: irrad-files/light-short.txt</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">getInstrDesc</span>(one_file.spct)</code></pre></div>
 <pre><code>## Data acquired with 'MayaPro2000' s.n. MAYP11278
 ## grating 'HC1', slit '010s'</code></pre>
@@ -461,11 +470,11 @@ In special cases we may need to set a locale matching the language used in the f
 ## counts @ peak (% of max): 76</code></pre>
 <p>At the other extreme, we can use bracketing, a dark measurement, plus a measurement with a UV-absorbing filter (polycarbonate). The UV absorbing filter allows us to estimate stray light in the UV region. This is the protocol listed as corrected and bracketed (cor. brkt.) in the table above.</p>
 <p>We go exactly through the same steps as before, the only difference is the list of file names passed as argument to parameter <code>x</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">file_names &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">light =</span> <span class="kw">c</span>(<span class="st">&quot;light-short.txt&quot;</span>,
-                             <span class="st">&quot;light-long.txt&quot;</span>),
-                   <span class="dt">filter =</span> <span class="st">&quot;flt-long.txt&quot;</span>,
-                   <span class="dt">dark =</span> <span class="kw">c</span>(<span class="st">&quot;dark-short.txt&quot;</span>,
-                            <span class="st">&quot;dark-long.txt&quot;</span>))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">file_names &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">light =</span> <span class="kw">c</span>(<span class="st">&quot;irrad-files/light-short.txt&quot;</span>,
+                             <span class="st">&quot;irrad-files/light-long.txt&quot;</span>),
+                   <span class="dt">filter =</span> <span class="st">&quot;irrad-files/flt-long.txt&quot;</span>,
+                   <span class="dt">dark =</span> <span class="kw">c</span>(<span class="st">&quot;irrad-files/dark-short.txt&quot;</span>,
+                            <span class="st">&quot;irrad-files/dark-long.txt&quot;</span>))</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">five_files.spct &lt;-<span class="st"> </span>
 <span class="st">  </span><span class="kw">s_irrad_corrected</span>(<span class="dt">x =</span> file_names,
                     <span class="dt">descriptor =</span> <span class="kw">which_descriptor</span>(<span class="st">&quot;2016-10-11&quot;</span>, 
@@ -481,9 +490,9 @@ five_files.spct &lt;-<span class="st"> </span><span class="kw">trim_wl</span>(fi
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">five_files.spct</code></pre></div>
 <pre><code>## Object: source_spct [1,421 x 2]
 ## Wavelength range 251.16 to 898.81 nm, step 0.43 to 0.48 nm 
-## Label: light: light-short.txt, light-long.txt
-## filter: flt-long.txt
-## dark: dark-short.txt, dark-long.txt 
+## Label: light: irrad-files/light-short.txt, irrad-files/light-long.txt
+## filter: irrad-files/flt-long.txt
+## dark: irrad-files/dark-short.txt, irrad-files/dark-long.txt 
 ## Measured on 2016-10-11 11:23:05 UTC 
 ## Time unit 1s
 ## 
@@ -507,7 +516,7 @@ five_files.spct &lt;-<span class="st"> </span><span class="kw">trim_wl</span>(fi
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">getWhenMeasured</span>(five_files.spct)</code></pre></div>
 <pre><code>## [1] &quot;2016-10-11 11:23:05 UTC&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">getWhatMeasured</span>(five_files.spct)</code></pre></div>
-<pre><code>## [1] &quot;light: light-short.txt, light-long.txt\nfilter: flt-long.txt\ndark: dark-short.txt, dark-long.txt&quot;</code></pre>
+<pre><code>## [1] &quot;light: irrad-files/light-short.txt, irrad-files/light-long.txt\nfilter: irrad-files/flt-long.txt\ndark: irrad-files/dark-short.txt, irrad-files/dark-long.txt&quot;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">getWhereMeasured</span>(five_files.spct)</code></pre></div>
 <pre><code>##   lon lat
 ## 1  NA  NA</code></pre>
@@ -516,9 +525,9 @@ five_files.spct &lt;-<span class="st"> </span><span class="kw">trim_wl</span>(fi
 ## with 's_irrad_corrected()' from 'ooacquire' ver. 0.1.4.9003
 ## 
 ## from files:
-## light: light-short.txt, light-long.txt
-## filter: flt-long.txt
-## dark: dark-short.txt, dark-long.txt</code></pre>
+## light: irrad-files/light-short.txt, irrad-files/light-long.txt
+## filter: irrad-files/flt-long.txt
+## dark: irrad-files/dark-short.txt, irrad-files/dark-long.txt</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">getInstrDesc</span>(five_files.spct)</code></pre></div>
 <pre><code>## Data acquired with 'MayaPro2000' s.n. MAYP11278
 ## grating 'HC1', slit '010s'</code></pre>
@@ -572,9 +581,9 @@ five_files.spct &lt;-<span class="st"> </span><span class="kw">trim_wl</span>(fi
 <div id="from-oceanview-files" class="section level4">
 <h4>From OceanView files</h4>
 <p>Files output by SpectraSuite and OceanView have different header format, but they can be recognized automatically. Consequently there is no difference in the function calls. The filter measurement is not used as it is not suitable for the source spectrum measured, and would be ignored with a warning.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">file_names &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">light =</span> <span class="st">&quot;light_MAYP112785.txt&quot;</span>,
-<span class="co">#                    filter = &quot;filter_MAYP112785.txt&quot;,</span>
-                    <span class="dt">dark =</span> <span class="st">&quot;dark_MAYP112785.txt&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">file_names &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">light =</span> <span class="st">&quot;irrad-files/light_MAYP112785.txt&quot;</span>,
+<span class="co">#                    filter = &quot;irrad-files/ilter_MAYP112785.txt&quot;,</span>
+                    <span class="dt">dark =</span> <span class="st">&quot;irrad-files/dark_MAYP112785.txt&quot;</span>)</code></pre></div>
 <p>In this case we use a different descriptor definition only because the files acquired with SpectraSuite and OceanView originated from different instruments.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ov_files.raw_mspct &lt;-<span class="st"> </span>
 <span class="st">  </span>ooacquire<span class="op">::</span><span class="kw">read_files2mspct</span>(file_names,
@@ -646,8 +655,8 @@ five_files.spct &lt;-<span class="st"> </span><span class="kw">trim_wl</span>(fi
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ov_files.spct</code></pre></div>
 <pre><code>## Object: source_spct [1,436 x 2]
 ## Wavelength range 251.116 to 898.589 nm, step 0.428 to 0.47 nm 
-## Label: light: light_MAYP112785.txt
-## dark: dark_MAYP112785.txt 
+## Label: light: irrad-files/light_MAYP112785.txt
+## dark: irrad-files/dark_MAYP112785.txt 
 ## Measured on 2017-01-05 14:22:55 UTC 
 ## Time unit 1s
 ## 

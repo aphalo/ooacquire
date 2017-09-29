@@ -114,7 +114,6 @@ As there are several settings needed for the acquisition of a spectrum, we will 
 Some settings need to be adjusted according to the current irradiance level so as to make full use of the dynamic range of the instrument. For this we use function `tune_acq_settings()`, which updates the settings stored in a list as created by `acq_settings()` or as returned by a previous call to `tune_acq_settings()`.
 
 Function `get_oo_settings()` can be used to query the instrument for the settings currently in use. 
-
 To acquire spectral data we can use one of two functions, `acq_raw_spct()` to acquire a single spectrum, or `acq_raw_mspct()` to acquire a collection of spectra according to a user supplied protocol. In cases when we use HDR (bracketing) or _overexpose_ some part of the spectrum the first data-processing step is to replace the data from the saturated pixels with `NA`'s using function `trim_counts()`---as the settings used in the acquisition and descriptor of the instrument are stored in the spectral object, this function needs only to be supplied a `raw_spct` object, unless the user wants to discard more pixels. As pixels neighbouring _overexposed_ pixels are disturbed by the charge _overflowing_ from the saturated wells, these pixels need also to be set as NAs by means of function `bleed_nas`. If the instrument array contains bad pixels, it is best to replace the data produced by them at this early stage. Function `skip_bad_pixs()` is useful here and it replaces the bad data with the average of the readings from the neighbouring pixels. The third step after data acquisition, unless the linearisation is done by the instrument, is to linearize the acquired _valid_ raw counts by means of method `linearize_counts()`. The non-linearity of the detector is related to how "full" are its electron wells, irrespective of whether the electrons originate from measured photons or any other source, consequently the linearisation function should be applied to raw detector counts at this point. 
 
 CCD arrays, especially if not cooled, have a significant dark signal. The best approach to remove this _background_ signal is to measure it---to take a spectral reading with the array not exposed to light. This _dark spectrum_ is them subtracted from the one measured in the light. An alternative, with advantages and disadvantages, is to use the signal from pixels corresponding to wavelengths **known** _a priori_ to be absent in the light source being measured. This calculation is done with the **linearized** raw counts by means of method `photobiology::fshift()` with a pair of suitable wavelength values for `range`. In the case of measuring transmittance (and absorbance) and reflectance we need to also measure a _clear_ and _white_ reference respectively.
@@ -137,8 +136,21 @@ The correction to apply to a given pixel depends on the readings of nearby pixel
  
 ```{r "setup", include=FALSE}
 require("knitr")
-opts_knit$set(root.dir = system.file("extdata/irradiance", package = "ooacquire"))
+opts_knit$set(root.dir = system.file("extdata", package = "ooacquire"))
 ```
+
+***
+## Code examples
+
+All examples in vignettes use data and files included in the package. Data files in formats _foreign_ to R, are stored in the `"extdata"` folder, as is the norm for R packages.
+
+_To reproduce any of the examples which use files as data input, it is best to make a local copy of the whole `"extdata"` folder._ The files used in examples are organized into subfolders, but all example code assumes that its in being run with `"extdata"` or a copy of it as the current _working_ folder.
+
+```{r, eval=-2}
+folderpath <- system.file("extdata",package="ooacquire")
+file.copy(from = folderpath, to = ".", recursive = TRUE)
+```
+***
 
 ## Measurement of spectral irradiance
 
@@ -178,7 +190,7 @@ We set a list of file names to be read, with members named according
 to their role in the measuring protocol.
 
 ```{r}
-file_names <- list(light = "light-short.txt")
+file_names <- list(light = "irrad-files/light-short.txt")
 ```
 
 We subsequently compute the spectral irradiance.
@@ -230,11 +242,11 @@ At the other extreme, we can use bracketing, a dark measurement, plus a measurem
 We go exactly through the same steps as before, the only difference is the list of file names passed as argument to parameter `x`. 
 
 ```{r}
-file_names <- list(light = c("light-short.txt",
-                             "light-long.txt"),
-                   filter = "flt-long.txt",
-                   dark = c("dark-short.txt",
-                            "dark-long.txt"))
+file_names <- list(light = c("irrad-files/light-short.txt",
+                             "irrad-files/light-long.txt"),
+                   filter = "irrad-files/flt-long.txt",
+                   dark = c("irrad-files/dark-short.txt",
+                            "irrad-files/dark-long.txt"))
 ```
 
 ```{r}
@@ -302,9 +314,9 @@ Files output by SpectraSuite and OceanView have different header format, but the
 The filter measurement is not used as it is not suitable for the source spectrum measured, and would be ignored with a warning.
 
 ```{r}
-file_names <- list(light = "light_MAYP112785.txt",
-#                    filter = "filter_MAYP112785.txt",
-                    dark = "dark_MAYP112785.txt")
+file_names <- list(light = "irrad-files/light_MAYP112785.txt",
+#                    filter = "irrad-files/ilter_MAYP112785.txt",
+                    dark = "irrad-files/dark_MAYP112785.txt")
 ```
 
 In this case we use a different descriptor definition only because the files acquired with SpectraSuite and OceanView originated from different instruments.

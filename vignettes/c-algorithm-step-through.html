@@ -76,6 +76,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <div id="TOC">
 <ul>
+<li><a href="#introdcution">Introdcution</a></li>
+<li><a href="#code-examples">Code examples</a></li>
 <li><a href="#irradiance">Irradiance</a></li>
 <li><a href="#interactive-acquisition-of-spectral-irradiance">Interactive acquisition of spectral irradiance</a><ul>
 <li><a href="#household-white-led-bulb">Household white LED bulb</a></li>
@@ -85,6 +87,19 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul>
 </div>
 
+<div id="introdcution" class="section level2">
+<h2>Introdcution</h2>
+<p>In this vignette we will walk through the different steps used in the conversion of raw counts into physical quantites. Different protocols can be used, and not all those implemented are exemplified. The facilities in the package also allow users to implement their own measurement and correction protocols. <em>It must be, however, always kept in mind that protocols and calibrations go hand in han:</em> <strong>For each different protocol new calibration data will be required</strong>. In many cases new calibration and validation measurements will be needed, but sometimes just recalculation of new calibration constants from existing raw-counts and calibration-lamp data may be enough.</p>
+<hr />
+</div>
+<div id="code-examples" class="section level2">
+<h2>Code examples</h2>
+<p>All examples in vignettes use data and files included in the package. Data files in formats <em>foreign</em> to R, are stored in the <code>&quot;extdata&quot;</code> folder, as is the norm for R packages.</p>
+<p><em>To reproduce any of the examples which use files as data input, it is best to make a local copy of the whole <code>&quot;extdata&quot;</code> folder.</em> The files used in examples are organized into subfolders, but all example code assumes that its in being run with <code>&quot;extdata&quot;</code> or a copy of it as the current <em>working</em> folder.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">folderpath &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>,<span class="dt">package=</span><span class="st">&quot;ooacquire&quot;</span>)
+## file.copy(from = folderpath, to = &quot;.&quot;, recursive = TRUE)</code></pre></div>
+<hr />
+</div>
 <div id="irradiance" class="section level2">
 <h2>Irradiance</h2>
 <p>We will step through the different steps of the algorithm used, plotting the spectra at each step along the way. We use raw counts data, included in the package, to make building this vignette easier. At the same time we show how raw data acquire outwith R can be also processed with the package.</p>
