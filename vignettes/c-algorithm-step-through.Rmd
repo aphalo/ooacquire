@@ -14,7 +14,7 @@ vignette: >
 
 ## Introdcution
 
-In this vignette we will walk through the different steps used in the conversion of raw counts into physical quantites. Different protocols can be used, and not all those implemented are exemplified. The facilities in the package also allow users to implement their own measurement and correction protocols. _It must be, however, always kept in mind that protocols and calibrations go hand in han:_ **For each different protocol new calibration data will be required**. In many cases new calibration and validation measurements will be needed, but sometimes just recalculation of new calibration constants from existing raw-counts and calibration-lamp data may be enough.
+In this vignette we will walk through the different steps used in the conversion of raw counts into physical quantities. Different protocols can be used, and not all those implemented are exemplified. The facilities in the package also allow users to implement their own measurement and correction protocols. _It must be, however, always kept in mind that protocols and calibrations go hand in han:_ **For each different protocol new calibration data will be required**. In many cases new calibration and validation measurements will be needed, but sometimes just recalculation of new calibration constants from existing raw-counts and calibration-lamp data may be enough.
 
 ***
 ## Code examples
@@ -72,7 +72,7 @@ We next print the collection of spectra containing raw counts data. The protocol
 ```{r}
 white_LED.raw_mspct
 ```
-Ploting the three bracketed spectra shows the raw data. The detector saturates at approximately 64000 counts.
+Plotting the three bracketed spectra shows the raw data. The detector saturates at approximately 64000 counts.
 
 ```{r, fig.width=8, fig.asp=0.5}
 plot(white_LED_2min.raw_mspct[["light"]])
@@ -112,7 +112,7 @@ for (m in names(white_LED_2min.raw_mspct)) {
 }
 ```
 
-Next we need to apply a linearization function, as detector response is not linear---saturation is gradual.
+Next we need to apply a linearisation function, as detector response is not linear---saturation is gradual.
 
 ```{r, fig.width=8, fig.asp=0.5}
 for (m in names(white_LED_2min.raw_mspct)) {
@@ -122,7 +122,7 @@ for (m in names(white_LED_2min.raw_mspct)) {
 }
 ```
 
-We may next remove an estimate of dark signal based on reference pixels not expected to be excited. This step may apear redundant, but _might_ help in cases when instrument temperature is not stable.
+We may next remove an estimate of dark signal based on reference pixels not expected to be excited. This step may appear redundant, but _might_ help in cases when instrument temperature is not stable.
 
 ```{r, fig.width=8, fig.asp=0.5}
 for (m in names(white_LED_2min.raw_mspct)) {
@@ -227,7 +227,7 @@ for (m in names(halogen.cps_mspct)) {
 }
 ```
 
-We substract the dark reading from both the light and filter measurements, and copy attributes, including instrument settings and calibration data.
+We subtract the dark reading from both the light and filter measurements, and copy attributes, including instrument settings and calibration data.
 
 ```{r}
 halogen01.cps_mspct <- cps_mspct()
@@ -293,6 +293,6 @@ q_ratio(halogen.source_spct, list(UVC(), UVB(), UVA()), PAR()) * 1e3
 
 ## Coming soon
 
-Step by step application of slit fucntion tail correction.
+Step by step application of slit function tail correction.
 
 

@@ -119,14 +119,14 @@ acq_irrad_interactive <-
     oldwd <- setwd(folder.name)
     message("Files will be saved to '", folder.name, "'", sep="")
 
-    protocol <- protocol_interactive(protocols)
+    protocol <- protocol_interactive(protocols = protocols)
 
     start.int.time <- 0.1 # seconds
 
     # data set measured with same protocol values but adjusted integration time
 
-    settings <- acq_settings(descriptor,
-                             start.int.time,
+    settings <- acq_settings(descriptor = descriptor,
+                             integ.time = start.int.time,
                              target.margin = target.margin,
                              tot.time.range = tot.time.range,
                              HDR.mult = HDR.mult)
@@ -150,16 +150,17 @@ acq_irrad_interactive <-
       settings <- tune_interactive(descriptor = descriptor, settings = settings)
       seq.settings <- set_seq_interactive(seq.settings)
 
-      raw.mspct <- acq_raw_mspct(descriptor,
-                                 settings,
-                                 protocol,
+      raw.mspct <- acq_raw_mspct(descriptor = descriptor,
+                                 acq.settings = settings,
+                                 seq.settings = seq.settings,
+                                 protocol = protocol,
                                  user.label = obj.name)
 
       if (length(raw.mspct) == 0) {
         next()
       }
 
-      irrad.spct <- s_irrad_corrected(raw.mspct, correction.method = correction.method)
+      irrad.spct <- s_irrad_corrected(x = raw.mspct, correction.method = correction.method)
 
       assign(raw.name, raw.mspct)
       assign(irrad.name, irrad.spct)
@@ -339,12 +340,12 @@ acq_fraction_interactive <-
     oldwd <- setwd(folder.name)
     message("Files will be saved to '", folder.name, "'", sep="")
 
-    protocol <- protocol_interactive(protocols)
+    protocol <- protocol_interactive(protocols = protocols)
 
     start.int.time <- 1 # seconds
 
-    settings <- acq_settings(descriptor,
-                             start.int.time,
+    settings <- acq_settings(descriptor = descriptor,
+                             integ.time = start.int.time,
                              target.margin = target.margin,
                              tot.time.range = tot.time.range,
                              HDR.mult = HDR.mult)
@@ -364,9 +365,9 @@ acq_fraction_interactive <-
 
       settings <- tune_interactive(descriptor = descriptor, settings = settings)
 
-      raw.mspct <- acq_raw_mspct(descriptor,
-                                 settings,
-                                 protocol,
+      raw.mspct <- acq_raw_mspct(descriptor = descriptor,
+                                 acq.settings = settings,
+                                 protocol = protocol,
                                  user.label = obj.name)
 
       if (length(raw.mspct) == 0) {
@@ -463,7 +464,7 @@ tune_interactive <- function(descriptor, settings) {
       answ <- ifelse(tuned, "s", "t")
     }
     if (answ == "t") {
-      settings <- tune_acq_settings(descriptor, settings)
+      settings <- tune_acq_settings(descriptor = descriptor, acq.settings = settings)
       tuned <- TRUE
     } else if (answ == "s") {
       break()
@@ -641,9 +642,12 @@ set_seq_interactive <- function(seq.settings) {
         print("Value not changed!")
       }
     } else if (answ == "n") {
-      cat(sprintf("Number of steps = %i, new: "))
-      num.steps <- scan(what = integer, nmax = 1)
-      if (num.steps < 1L || num.steps > 10000L) {
+      num.steps <- readline(sprintf("Number of steps = %i, new: ",
+                               seq.settings[["num.steps"]]))
+      num.steps <- try(as.integer(num.steps))
+      if (is.na(num.steps)) {
+        print("Number of steps must be a positive integer. Value not changed!")
+      } else if (num.steps < 1L || num.steps > 10000L) {
         warning("Number of steps must be in range 1..10000. Value not changed!")
       } else {
         seq.settings[[num.steps]] <- num.steps
@@ -726,7 +730,7 @@ acq_rfr_tfr_interactive <-
     oldwd <- setwd(folder.name)
     message("Files will be saved to '", folder.name, "'", sep="")
 
-    protocol <- protocol_interactive(protocols)
+    protocol <- protocol_interactive(protocols = protocols)
 
     start.int.time <- 0.5 # seconds
 
@@ -764,9 +768,9 @@ acq_rfr_tfr_interactive <-
       rfr.settings <- tune_interactive(descriptor = rfr.descriptor,
                                        settings = rfr.settings)
 
-      rfr.raw.mspct <- acq_raw_mspct(rfr.descriptor,
-                                     rfr.settings,
-                                     protocol,
+      rfr.raw.mspct <- acq_raw_mspct(descriptor = rfr.descriptor,
+                                     acq.settings = rfr.settings,
+                                     protocol = protocol,
                                      user.label = spct.name)
 
       if (length(rfr.raw.mspct) == 0) {
@@ -779,9 +783,9 @@ acq_rfr_tfr_interactive <-
       tfr.settings <- tune_interactive(descriptor = tfr.descriptor,
                                        settings = tfr.settings)
 
-      tfr.raw.mspct <- acq_raw_mspct(tfr.descriptor,
-                                     tfr.settings,
-                                     protocol,
+      tfr.raw.mspct <- acq_raw_mspct(descriptor = tfr.descriptor,
+                                     acq.settings = tfr.settings,
+                                     protocol = protocol,
                                      user.label = spct.name)
 
       if (length(tfr.raw.mspct) == 0) {
