@@ -2,6 +2,7 @@
 ^\.Rproj\.user$
 ^.Rdata$
 ^.Rhistory$
+^inst/example-gadgets$
 ^not-inst$
 ^data-raw$
 ^_pkgdown.yml$

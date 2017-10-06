@@ -81,8 +81,6 @@ load(file = "./data-raw/jaz-descriptor/JAZA3098.Rda")
 descriptor_ch1$w <- NULL
 descriptor_ch2$w <- NULL
 
-
-
 # we do not have calibration files for this spectrometer
 
 # create a new descriptor for each channel with 1 as calibration multipliers

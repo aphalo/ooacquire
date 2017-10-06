@@ -6,7 +6,7 @@ Add support for OO calibrations.
 ooacquire 0.1.5
 ===============
 
-* Fix serious bug that triggered a fatal error with current version of 'Rcpp'.
+* Fix serious design bug that triggered a fatal error with current version of 'Rcpp'.
 * Add functions choose_sr_interactive() and choose_ch_interactive() and edit
 acq_irrad_interactive() and acq_fraction_interactive() to make use of them.
 * Add fields to the instrument descriptor to store the numeric coefficients

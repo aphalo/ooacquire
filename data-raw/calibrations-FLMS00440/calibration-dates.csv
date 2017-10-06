@@ -1,0 +1,3 @@
+## Calibration dates
+inst.sn, name, calib.date, start.date, end.date, coeffs.file
+FLMS00440, cal_201606, 2016-06-03, 2016-06-03, 2017-12-17, cal-coeffs-2016-06.xlsx

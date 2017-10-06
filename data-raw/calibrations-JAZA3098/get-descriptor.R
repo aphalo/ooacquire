@@ -8,7 +8,7 @@ list_instruments(w)
 descriptor_ch1 <- get_oo_descriptor(w, 0L, 0L)
 descriptor_ch2 <- get_oo_descriptor(w, 0L, 1L)
 
-# these are teken from certificate (not same as in firmware)
+# these are taken from certificate (not same as in firmware)
 descriptor_ch1 <-
   set_descriptor_nl(descriptor_ch1,
                   nl.coeff = c(0.834187, 8.78431e-6, -3.065558e-11,
@@ -25,7 +25,7 @@ descriptor_ch2 <-
                                5.08055e-14, -2.31932e-18, 5.74352e-23,
                                -7.04268e-28, 3.29791e-33))
 descriptor_ch2 <-
-  set_descriptor_bad_pixs(descriptor_ch1,
+  set_descriptor_bad_pixs(descriptor_ch2,
                         bad.pixs = c(503, 1609, 2021))
 
 save(descriptor_ch1, descriptor_ch2, file = "data-raw/jaz-descriptor/JAZA3098.Rda")

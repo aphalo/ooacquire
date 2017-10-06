@@ -27,6 +27,7 @@ settings <- tune_acq_settings(descriptor, settings)
 # settings
 
 mspct_1 <- acq_raw_mspct(descriptor, settings, protocol = c("reference", "sample", "dark"))
+
 names(mspct_1)
 plot(mspct_1[[1]], range = c(200, 1100))
 plot(mspct_1[[2]], range = c(200, 1100))
@@ -53,13 +54,16 @@ plot(mspct_merged_01$reference)
 plot(mspct_merged_01$sample)
 plot(mspct_merged_01$dark)
 
-reflectance_01.spct <- cps2Rfr(mspct_merged_01$sample,
+trnasmittance_01.spct <- cps2Tfr(mspct_merged_01$sample,
                                mspct_merged_01$reference,
                                mspct_merged_01$dark)
 
 plot(reflectance_01.spct, annotations = "boundaries")
 
-plot(reflectance_01.spct, range = c(290, 850),
+plot(reflectance_01.spct, range = c(280, 850),
+     annotations = c("+", "boundaries"))
+
+plot(clean(reflectance_01.spct), range = c(280, 850),
      annotations = c("+", "boundaries"))
 
 # measure transmittance

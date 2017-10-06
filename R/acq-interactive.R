@@ -269,7 +269,7 @@ acq_fraction_interactive <-
 
     serial_no <- as.character(instruments[sr.index + 1L, 3])
 
-    message("Using channel ", ch.index,
+    message("Using channel ", ch.index + 1L,
             " from spectrometer with serial number: ", serial_no)
 
     if (anyNA(c(descriptors[[1]], correction.method[[1]]))) {
