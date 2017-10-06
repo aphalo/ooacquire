@@ -122,6 +122,17 @@ s_fraction_corrected.raw_mspct <- function(x,
 
   smp.names <- spct.names[c("sample", "dark")]
   names(smp.names) <- c("light", "dark")
+
+  if (is.character(correction.method[["worker.fun"]])) {
+    worker.fun <- get(correction.method[["worker.fun"]],
+                      mode = "function",
+                      envir = as.environment("package:ooacquire"))
+  } else {
+    worker.fun <- correction.method[["worker.fun"]]
+  }
+
+  stopifnot(is.function(worker.fun))
+
   corrected_smp.spct <-
     ooacquire::uvb_corrections(x = x[spct.names[c("sample", "dark")]],
                                spct.names = smp.names,
@@ -131,9 +142,7 @@ s_fraction_corrected.raw_mspct <- function(x,
                                flt.ref.wl = correction.method[["flt.ref.wl"]],
                                flt.Tfr = correction.method[["flt.Tfr"]],
                                inst.dark.pixs = correction.method[["inst.dark.pixs"]],
-                               worker.fun = get(correction.method[["worker.fun"]],
-                                                mode = "function",
-                                                envir = as.environment("package:ooacquire")),
+                               worker.fun = worker.fun,
                                trim = correction.method[["trim"]],
                                verbose = verbose)
 

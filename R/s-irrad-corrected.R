@@ -102,6 +102,16 @@ s_irrad_corrected.raw_mspct <-
       }
     }
 
+    if (is.character(correction.method[["worker.fun"]])) {
+      worker.fun <- get(correction.method[["worker.fun"]],
+                        mode = "function",
+                        envir = as.environment("package:ooacquire"))
+    } else {
+      worker.fun <- correction.method[["worker.fun"]]
+    }
+
+    stopifnot(is.function(worker.fun))
+
     corrected.spct <-
       ooacquire::uvb_corrections(x = x,
                                  spct.names = spct.names,
@@ -111,9 +121,7 @@ s_irrad_corrected.raw_mspct <-
                                  flt.ref.wl = correction.method[["flt.ref.wl"]],
                                  flt.Tfr = correction.method[["flt.Tfr"]],
                                  inst.dark.pixs = correction.method[["inst.dark.pixs"]],
-                                 worker.fun = get(correction.method[["worker.fun"]],
-                                                  mode = "function",
-                                                  envir = as.environment("package:ooacquire")),
+                                 worker.fun = worker.fun,
                                  trim = correction.method[["trim"]],
                                  verbose = verbose)
 
