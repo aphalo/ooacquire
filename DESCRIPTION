@@ -2,7 +2,7 @@ Package: ooacquire
 Type: Package
 Title: Acquire Data from OO Spectrometers
 Version: 0.1.4.9004
-Date: 2017-10-06
+Date: 2017-10-08
 Authors@R:
    c(
     person("Pedro J.", "Aphalo", email = "pedro.aphalo@helsinki.fi", role = c("aut", "trl", "cre")),
@@ -16,12 +16,17 @@ Description: Functions to acquire data directly from Ocean Optics spectrometers,
     instrument description, date-time of acquisition and optionally goecode are
     stored as attributes.
 License: GPL (>= 2)
+Remotes:
+    bitbucket:aphalo/photobiology,
+    bitbucket:aphalo/photobiologyWavebands,
+    bitbucket:aphalo/ggspectra
 Depends:
     R (>= 3.3.0),
 Imports:
     grDevices,
     graphics,
     utils,
+    devtools (>= 1.13.3),
     Rcpp (>= 0.12.12),
     ggplot2 (>= 2.2.1),
     photobiology (>= 0.9.17),
