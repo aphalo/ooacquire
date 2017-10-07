@@ -4,7 +4,7 @@
 \name{ooacquire-package}
 \alias{ooacquire}
 \alias{ooacquire-package}
-\title{ooacquire: Acquire Spectral Data from Ocean Optics Spectrometers}
+\title{ooacquire: Acquire Data from OO Spectrometers}
 \description{
 Functions to acquire data directly from Ocean Optics spectrometers,
 and functions to read similar data files. Functions to convert raw-counts
