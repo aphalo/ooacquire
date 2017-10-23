@@ -23,13 +23,13 @@
 #' @export
 #'
 read_oo_data <- function(file,
-                           time = NULL,
-                           geocode = NULL,
-                           label = NULL,
-                           descriptor = NULL,
-                           tz = NULL,
-                           locale = NULL,
-                           verbose = getOption("photobiology.verbose", default = FALSE)) {
+                         time = NULL,
+                         geocode = NULL,
+                         label = NULL,
+                         descriptor = NULL,
+                         tz = NULL,
+                         locale = NULL,
+                         verbose = getOption("photobiology.verbose", default = FALSE)) {
 
   line01 <- scan(file = file, nlines =  1, skip = 0,
                  what = "character", quiet = !verbose)
@@ -42,13 +42,13 @@ read_oo_data <- function(file,
     stop("File format of '", basename(file), "' not recognized!")
   }
   .read.fun(file = file,
-                 time = time,
-                 geocode = geocode,
-                 label = label,
-                 descriptor = descriptor,
-                 tz = tz,
-                 locale = locale,
-                 verbose = verbose)
+            time = time,
+            geocode = geocode,
+            label = label,
+            descriptor = descriptor,
+            tz = tz,
+            locale = locale,
+            verbose = verbose)
 }
 
 #' Read multiple files into raw_mspct object

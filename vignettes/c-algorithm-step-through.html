@@ -12,7 +12,7 @@
 
 <meta name="author" content="Pedro J. Aphalo" />
 
-<meta name="date" content="2017-10-08" />
+<meta name="date" content="2017-10-22" />
 
 <title>Algorithms</title>
 
@@ -71,12 +71,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h1 class="title toc-ignore">Algorithms</h1>
 <h3 class="subtitle"><em><code>ooacquire</code> 0.1.4.9004</em></h3>
 <h4 class="author"><em>Pedro J. Aphalo</em></h4>
-<h4 class="date"><em>2017-10-08</em></h4>
+<h4 class="date"><em>2017-10-22</em></h4>
 
 
 <div id="TOC">
 <ul>
-<li><a href="#introdcution">Introdcution</a></li>
+<li><a href="#introduction">Introduction</a></li>
 <li><a href="#code-examples">Code examples</a></li>
 <li><a href="#irradiance">Irradiance</a></li>
 <li><a href="#interactive-acquisition-of-spectral-irradiance">Interactive acquisition of spectral irradiance</a><ul>
@@ -87,8 +87,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul>
 </div>
 
-<div id="introdcution" class="section level2">
-<h2>Introdcution</h2>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
 <p>In this vignette we will walk through the different steps used in the conversion of raw counts into physical quantities. Different protocols can be used, and not all those implemented are exemplified. The facilities in the package also allow users to implement their own measurement and correction protocols. <em>It must be, however, always kept in mind that protocols and calibrations go hand in han:</em> <strong>For each different protocol new calibration data will be required</strong>. In many cases new calibration and validation measurements will be needed, but sometimes just recalculation of new calibration constants from existing raw-counts and calibration-lamp data may be enough.</p>
 <hr />
 </div>
@@ -102,7 +102,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </div>
 <div id="irradiance" class="section level2">
 <h2>Irradiance</h2>
-<p>We will step through the different steps of the algorithm used, plotting the spectra at each step along the way. We use raw counts data, included in the package, to make building this vignette easier. At the same time we show how raw data acquire outwith R can be also processed with the package.</p>
+<p>We will step through the different steps of the algorithm used, plotting the spectra at each step along the way. We use raw counts data, included in the package, to make building this vignette easier. At the same time we show how raw data acquired outside R can be also processed with the package.</p>
 </div>
 <div id="interactive-acquisition-of-spectral-irradiance" class="section level2">
 <h2>Interactive acquisition of spectral irradiance</h2>
@@ -136,7 +136,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## Wavelength range 187.82 to 1117.14 nm, step 0.41 to 0.48 nm 
 ## what label: light
 ## user.label label: osram06 
-## Measured on 2016-12-01 12:08:16 UTC 
+## Measured on 2016-12-01 10:08:16 UTC 
 ## Data acquired with 'MayaPro2000' s.n. MAYP11278
 ## grating 'HC1', slit '010s'
 ## integ. time (s): 0.32, 3.2

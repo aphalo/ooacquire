@@ -1,0 +1,33 @@
+---
+title: "Ocean Optics calibrations"
+subtitle: "`ooacquire` `r packageVersion('ooacquire')`"
+author: "Pedro J. Aphalo"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: yes
+vignette: >
+  %\VignetteIndexEntry{Algortihms}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Introduction
+
+Irradiance calibration data supplied by Ocean Optics is expressed in energy 
+units per detector count. In other words needs to be corrected for the wavelength
+step between detector pixels and for the area of the cosine diffuser used. The
+equation to use is
+$$E_\lambda = \frac{k_\lambda \cdot c_\lambda}{A \cdot t
+\cdot \Delta \lambda}$$
+where $k_\lambda$ is the calibration constant for a detector pixel, and $c_\lambda$ are the counts registered by the correspoding detector pixel, $A$ is the area of the diffuser, $t$ is the integration time and $\Delta \lambda$ is the wavelength step for the pixel.
+
+With $k_\lambda$ in $\mu J c^{-1}$, $A$ in $mm^2$, $t$ in seconds and $\Delta \lambda$ in $nm$, the result as spectral energy irradiance in $W m^{-2} nm{-1}$
+
+We can substitute $c_\lambda / t$ by "counts per second", which is what we use in the computations, and recalculate the remaining of the equation as a new set of caalibration constants.
+
+$$k_\lambda^\prime = \frac{k_\lambda}{A 
+\cdot \Delta \lambda}$$
+
+
+
