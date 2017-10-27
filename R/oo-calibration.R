@@ -24,10 +24,13 @@ oo_calib2irrad_mult <-
     if (is.null(area)) {
       area <-
         switch(toupper(diff.type),
-               "CC-3-DA" = pi * (7.14 / 2)^2,
-               "CC-3" = pi * (3.9 / 2)^2,
-               "CC-3-UV-S" = pi * (3.9 / 2)^2,
-               "CC-3-UV-T" = pi * (3.9 / 2)^2,
+               "CC-3-DA" = pi * (7.14 / 2)^2, # OO
+               "CC-3" = pi * (3.9 / 2)^2, # OO
+               "CC-3-UV-S" = pi * (3.9 / 2)^2, # OO
+               "CC-3-UV-T" = pi * (3.9 / 2)^2, # OO
+               "UV-J1002-SMA" = pi * (11 / 2)^2, # Schreder
+               "D7-SMA" = pi * (10 / 2)^2, # Bentham
+               "D7-H-SMA" = pi * (10 / 2)^2, # Bentham
                NA_real_)
     }
     wl.steps <- diff(x[["w.length"]])
@@ -74,20 +77,28 @@ read_oo_caldata <-
            locale = NULL,
            verbose = getOption("photobiology.verbose", default = FALSE)) {
 
-    label <- paste("File: ", basename(file), label, sep = "")
-
     line01 <- scan(file = file, nlines = 1, skip = 0,
                    what = "character", quiet = !verbose)
     if (line01[1] != "Date") {
       warning("Input file may not be a calibration file as expected: skipping")
       return(NA)
     }
-    file_header <- scan(file = file, nlines = 9,
+
+    line02 <- scan(file = file, nlines = 1, skip = 1,
+                   what = "character", quiet = !verbose)
+    spectrometer.sn <- line02[2]
+
+    what.measured <- list(file.name = basename(file),
+                          sn = spectrometer.sn,
+                          user.label = ifelse(is.null(label), "", label)
+                          )
+
+    data.rows <- c(9, Inf)
+    names(data.rows) <- c("skip", "npixels")
+
+    file_header <- scan(file = file, nlines = data.rows[["skip"]],
                         skip = 0, what = "character", sep = "\n",
                         quiet = !verbose)
-
-    data.rows <- c(10, Inf)
-    names(data.rows) <- c("skip", "npixels")
 
     if (length(locale) == 0) {
       locale <- readr::default_locale()
@@ -156,7 +167,7 @@ read_oo_caldata <-
 
     photobiology::setWhenMeasured(z, time)
     photobiology::setWhereMeasured(z, geocode)
-    photobiology::setWhatMeasured(z, label)
+    photobiology::setWhatMeasured(z, what.measured)
     set_oo_ssdata_descriptor(z,
                              descriptor = descriptor,
                              action = ifelse(is.null(descriptor), "overwrite", "merge"))

@@ -4,8 +4,8 @@ library(ggplot2)
 library(r4photobiology)
 library(ooacquire)
 
-read_oo_caldata("FLMS00673_12022015.IrradCal") %>%
-  oo_calib2irrad_mult(diff.type = "CC-3-DA") -> cal.spct
+read_oo_caldata("FLMS00416_20150728_VIS.IRRADCAL") %>%
+  oo_calib2irrad_mult(diff.type = "UV-J1002-SMA") -> cal.spct
 
 class_spct(cal.spct)
 names(cal.spct)
@@ -16,5 +16,3 @@ getWhatMeasured(cal.spct)
 plot(cal.spct, annotations = c("+", "boundaries"),
      range = c(280, 800)) +
   ggtitle(getWhatMeasured(cal.spct)$sn, getWhatMeasured(cal.spct)$file.name)
-
-FLMS00673_12022015.spct <- cal.spct
