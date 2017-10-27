@@ -1,4 +1,3 @@
-library(readxl)
 library(readr)
 library(ooacquire)
 
@@ -33,6 +32,11 @@ load(file = "./data-raw/flame-s-descriptor/FLMS00440.Rda")
 
 # we make sure not to depend on Java code
 descriptor$w <- NULL
+
+descriptor <- set_descriptor_nl(descriptor,
+                                nl.coeff = c(0.847773, 6.69476e-6, 2.72833e-11,
+                                             -9.19219e-15, 3.13902e-19, -5.59827e-24,
+                                             5.83296e-29, -2.88581e-34))
 
 # find calibration files
 files <- list.files("data-raw/calibrations-FLMS00440",
@@ -73,12 +77,16 @@ rm(tmp, f, name.f)
 stopifnot(names(descriptors) == FLMS00440_calib_dates.df[["name"]])
 stopifnot(basename(files) == FLMS00440_calib_dates.df[["coeffs.file"]])
 
+FLMS00440_cal.spct <- cal.spct
+
 FLMS00440_descriptors <- descriptors
+
 save(FLMS00440_ylianttila.mthd,
      FLMS00440_sun.mthd,
      FLMS00440_simple.mthd,
      FLMS00440_none.mthd,
      FLMS00440_descriptors,
      FLMS00440_calib_dates.df,
+     FLMS00440_cal.spct,
      file = "data/calibs-FLMS00440.rda")
 

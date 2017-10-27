@@ -5,7 +5,7 @@ library(ggplot2)
 library(r4photobiology)
 library(ooacquire)
 
-read_oo_caldata("FLMS00440_2016-06-03_UV.IRRADCAL") %>%
+read_oo_caldata("./data-raw/calibrations-FLMS00440/FLMS00440_2016-06-03_UV.IRRADCAL") %>%
   oo_calib2irrad_mult(diff.type = "UV-J1002-SMA") -> cal.spct
 
 # the two calibrations files have different values for the same wavelengths
@@ -24,4 +24,4 @@ plot(cal.spct,
      annotations = c("+", "boundaries", "title:what:when"),
      range = c(280, 800))
 
-save(cal.spct, file = "FLMS00440_2016-06-03_cal.rda")
+save(cal.spct, file = "./data-raw/calibrations-FLMS00440/FLMS00440_2016-06-03_cal.rda")

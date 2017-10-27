@@ -11,4 +11,4 @@ descriptor <- get_oo_descriptor(w)
 #   set_descriptor_bad_pixs(descriptor,
 #                           bad.pixs = c(123, 380, 388, 697, 1829, 1994))
 
-save(descriptor, file = "data-raw/maya-descriptor/FLMS00440.Rda")
+save(descriptor, file = "data-raw/flame-s-descriptor/FLMS00440.Rda")

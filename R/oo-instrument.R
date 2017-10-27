@@ -205,7 +205,7 @@ set_descriptor_nl <- function(descriptor,
   }
   stopifnot(is.function(nl.fun))
   descriptor[["inst.calib"]][["nl.coeff"]] <- nl.coeff
-  descriptor[["inst.calib"]][["nl.fun"]] <- nl.fun
+  descriptor[["inst.calib"]][["nl.fun"]] <- function(x) {x / nl.fun(x)}
   descriptor
 }
 

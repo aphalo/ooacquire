@@ -22,21 +22,21 @@ oo_calib2irrad_mult <-
     stopifnot(is.generic_spct(x))
     stopifnot(xor(is.null(area), is.null(diff.type)))
     if (is.null(area)) {
-      area <-
+      area <- # diameters in metres
         switch(toupper(diff.type),
-               "CC-3-DA" = pi * (7.14 / 2)^2, # OO
-               "CC-3" = pi * (3.9 / 2)^2, # OO
-               "CC-3-UV-S" = pi * (3.9 / 2)^2, # OO
-               "CC-3-UV-T" = pi * (3.9 / 2)^2, # OO
-               "UV-J1002-SMA" = pi * (11 / 2)^2, # Schreder
-               "D7-SMA" = pi * (10 / 2)^2, # Bentham
-               "D7-H-SMA" = pi * (10 / 2)^2, # Bentham
+               "CC-3-DA" = pi * (7.14e-3 / 2)^2, # OO
+               "CC-3" = pi * (3.9e-3 / 2)^2, # OO
+               "CC-3-UV-S" = pi * (3.9e-3 / 2)^2, # OO
+               "CC-3-UV-T" = pi * (3.9e-3 / 2)^2, # OO
+               "UV-J1002-SMA" = pi * (11e-3 / 2)^2, # Schreder
+               "D7-SMA" = pi * (10e-3 / 2)^2, # Bentham
+               "D7-H-SMA" = pi * (10e-3 / 2)^2, # Bentham
                NA_real_)
     }
     wl.steps <- diff(x[["w.length"]])
     wl.steps <- c(wl.steps[1], wl.steps)
     wl.steps <- caTools::runmean(wl.steps, k = 2)
-    x[["irrad.mult"]] <- x[["oo.cal"]] / (area * wl.steps)
+    x[["irrad.mult"]] <- x[["oo.cal"]] / (area * wl.steps) * 1e-6 # uW -> W
     if (!verbose) {
       x[["oo.cal"]] <- NULL
     }
