@@ -1,7 +1,8 @@
 TODO
 
-Add test cases. Complete writing of vignettes.
-Add support for OO calibrations.
+Add test cases.
+Finish writing algorithms vignette.
+Document support for OO calibrations and add example scripts.
 
 ooacquire 0.1.5
 ===============
@@ -12,6 +13,7 @@ acq_irrad_interactive() and acq_fraction_interactive() to make use of them.
 * Add fields to the instrument descriptor to store the numeric coefficients
 in addition to functions for non-linearity and wavelength calibrations.
 * Add pre-built calibrations and methods for our Jaz instrument.
+* Add support for irradiance calibrations done by Ocean Optics.
 
 ooacquire 0.1.4
 ===============
