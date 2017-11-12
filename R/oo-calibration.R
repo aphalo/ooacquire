@@ -31,7 +31,8 @@ oo_calib2irrad_mult <-
                "UV-J1002-SMA" = pi * (11e-3 / 2)^2, # Schreder
                "D7-SMA" = pi * (10e-3 / 2)^2, # Bentham
                "D7-H-SMA" = pi * (10e-3 / 2)^2, # Bentham
-               NA_real_)
+               {warning("diff.type argument '", diff.type, "' not recognized.")
+               NA_real_})
     }
     wl.steps <- diff(x[["w.length"]])
     wl.steps <- c(wl.steps[1], wl.steps)
