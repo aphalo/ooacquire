@@ -14,6 +14,7 @@ acq_irrad_interactive() and acq_fraction_interactive() to make use of them.
 in addition to functions for non-linearity and wavelength calibrations.
 * Add pre-built calibrations and methods for our Jaz instrument.
 * Add support for irradiance calibrations done by Ocean Optics.
+* Add pre-built calibrations and methods for two FLAME-S instruments.
 
 ooacquire 0.1.4
 ===============
