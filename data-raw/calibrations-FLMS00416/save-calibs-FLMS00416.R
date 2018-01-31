@@ -1,3 +1,6 @@
+# clear environment
+rm(list = ls(pattern = "*"))
+
 library(readr)
 library(ooacquire)
 
@@ -33,8 +36,6 @@ load(file = "./data-raw/flame-s-descriptor/FLMS00416.Rda")
 # we make sure not to depend on Java code
 descriptor$w <- NULL
 
-descriptor$spectrometer.sn <- "FLMS00416"
-
 descriptor <- set_descriptor_nl(descriptor,
                                 nl.coeff = c(0.864123, 6.5517e-6, -1.06531e-10,
                                              4.70652e-16, 5.4788e-20, -3.1291e-24,
@@ -65,7 +66,7 @@ for (f in files) {
   descriptor.tmp <-
     set_descriptor_irrad_mult(descriptor = descriptor.tmp,
                               irrad.mult = tmp[["irrad.mult"]],
-                              wl.range = c(349.59, 1021.16),
+                              wl.range = c(350, 899),
                               start.date = FLMS00416_calib_dates.df[["start.date"]][date.row],
                               end.date = FLMS00416_calib_dates.df[["end.date"]][date.row])
 

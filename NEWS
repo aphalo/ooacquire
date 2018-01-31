@@ -4,6 +4,11 @@ Add test cases.
 Finish writing algorithms vignette.
 Document support for OO calibrations and add example scripts.
 
+ooacquire 0.1.6
+===============
+
+* Add pre-built calibrations and methods for a third FLAME-S instrument.
+
 ooacquire 0.1.5
 ===============
 

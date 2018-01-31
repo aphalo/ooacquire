@@ -1,3 +1,6 @@
+# clear environment
+rm(list = ls(pattern = "*"))
+
 library(readr)
 library(ooacquire)
 

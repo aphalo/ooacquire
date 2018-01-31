@@ -20,6 +20,7 @@ reference:
     - acq_raw_spct
     - acq_raw_mspct
     - acq_irrad_interactive
+    - acq_fraction_interactive
   - title: Read raw-counts data from spectrometers
     desc: Functions for reading raw-counts and metadata from output files from **OceanView**, **SpectraSuite**, Raspberry Pi software and the inbuilt-firmware of the Jaz modular spectrometer.
     contents:
@@ -27,12 +28,12 @@ reference:
     - read_oo_ssdata
     - read_oo_ovdata
     - read_oo_pidata
+    - read_oo_caldata
     - read_files2mspct
     - map_oofile_header_rows
     - oofile_data_rows
     - set_oo_ssdata_settings
     - set_oo_ssdata_descriptor
-    - merge_raw_mspct
   - title: High level conversion functions and methods.
     desc: Functions related to conversion of raw detector counts into counts-per-second and physical quantities.
     contents:
@@ -50,13 +51,17 @@ reference:
     - linearize_counts
     - ref_correction
     - filter_correction
+    - slit_function_correction
     - no_filter_correction
     - uvb_corrections
     - raw2cps
+    - merge_cps
+    - new_correction_method
   - title: Computation of calibration coefficients
-    desc: (NOT YET WORKING!) Compute a calibration coefficients from raw counts and calibration lamps' emission spectra.
+    desc: Compute a calibration coefficients.
     contents:
     - compute_irrad_calibration
+    - oo_calib2irrad_mult
   - title: Raw spectral data examples
     desc: Collections of raw-counts spectra stored as R objects of class `raw_mspct` defined in package 'photobiology'.
     contents:
@@ -65,8 +70,6 @@ reference:
     - white_LED.raw_mspct
     - white_LED_2min.raw_mspct
     - halogen.raw_mspct
-    - merge_cps
-    - new_correction_method
   - title: Calibration data examples
     desc: Examples of individual instrument calibrations as used by the functions in this package, serving only as examples.
     contents:
@@ -83,3 +86,12 @@ reference:
     - JAZA3098_ch1_ylianttila.mthd
     - JAZA3098_ch2_descriptors
     - JAZA3098_ch2_ylianttila.mthd
+    - FLMS00416_calib_dates.df
+    - FLMS00416_descriptors
+    - FLMS00416_none.mthd
+    - FLMS00440_calib_dates.df
+    - FLMS00440_descriptors
+    - FLMS00440_none.mthd
+    - FLMS00673_calib_dates.df
+    - FLMS00673_descriptors
+    - FLMS00673_none.mthd
