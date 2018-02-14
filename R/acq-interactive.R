@@ -266,7 +266,10 @@ acq_irrad_interactive <-
         break()
       }
     }
-    save(file.names, file = paste("files4session-", session.name, ".Rda", sep = ""))
+    save(file.names,
+         file = paste("files4session-",
+                      make.names(session.name),
+                      ".Rda", sep = ""))
 
     print("Ending...")
     end_session(w)
@@ -380,7 +383,7 @@ acq_fraction_interactive <-
     # Before continuing we check that wavelength calibration is available
     stopifnot(length(descriptor[["wavelengths"]]) == descriptor[["num.pixs"]])
 
-    session.name <- make.names(readline("Session's name: "))
+    session.name <- readline("Session's name: ")
     if (session.name == "") {
       session.name <- trunc(stats::runif(max = 999))
     }
