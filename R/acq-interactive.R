@@ -43,7 +43,8 @@ acq_irrad_interactive <-
            correction.method = NA,
            descriptors = NA,
            stray.light.method = "none",
-           save.pdfs = TRUE) {
+           save.pdfs = TRUE,
+           object.out = "source_spct") {
 
     # define measurement protocols
     if (length(protocols) == 0) {
@@ -107,6 +108,9 @@ acq_irrad_interactive <-
     session.label <- paste("operator: ", readline("Operator's name: "),
                            ", instrument s.n.: ", descriptor[["spectrometer.sn"]])
 
+    user.attrs <- list(what.measured = "",
+                       comment.text = "")
+
     folder.name <- readline("Enter folder name (use forward slashes '/' instead of '\'): ")
     if (length(folder.name == 0)) {
       folder.name <- "."
@@ -134,18 +138,28 @@ acq_irrad_interactive <-
     seq.settings <- list(step = 0,
                          num.steps = 1L)
 
-    # save current value as starting value for next iteration
+    # initialize list to collect all names from session
+    irrad.names <- character()
+    raw.names <- character()
+    file.names <- character()
 
     repeat { # with same settings
       repeat{
         obj.name <- readline("Give a name to the spectrum: ")
-        if (length(obj.name) > 0 && obj.name != "") break()
+        if (length(obj.name) > 0 && obj.name != "" &&
+            !exists(obj.name)) break()
         print("A valid and unique name is required, please try again...")
       }
+
       raw.name <- paste(obj.name, "raw_mspct", sep = ".")
+      raw.names <- c(raw.names, raw.name)
       irrad.name <- paste(obj.name, "spct", sep = ".")
+      irrad.names <- c(irrad.names, irrad.name)
       file.name <- paste(irrad.name, "Rda", sep = ".")
+      file.names <- c(file.names, file.name)
       pdf.name <- paste(irrad.name, "pdf", sep = ".")
+
+      user.attrs <- set_attributes_interactive(user.attrs)
 
       settings <- tune_interactive(descriptor = descriptor, settings = settings)
       seq.settings <- set_seq_interactive(seq.settings)
@@ -161,6 +175,14 @@ acq_irrad_interactive <-
       }
 
       irrad.spct <- s_irrad_corrected(x = raw.mspct, correction.method = correction.method)
+
+      if (length(user.attrs$what.measured) > 0) {
+        setWhatMeasured(irrad.spct, user.attrs$what.measured)
+      }
+
+      if (length(user.attrs$comment.text) > 0) {
+        comment(irrad.spct) <- user.attrs$comment.text
+      }
 
       assign(raw.name, raw.mspct)
       assign(irrad.name, irrad.spct)
@@ -202,8 +224,27 @@ acq_irrad_interactive <-
         break()
       }
 
-      user.input <- readline("Next, change protocol, quit (-/p/q): ")
+      user.input <- readline("Next, c = make and save collection (-/c): ")
+      if (user.input[1] == "") {
+        next()
+      } else if (user.input[1] == "c") {
+        collection.name <- readline("Name of the collection?")
+        irrad.collection.name <- paste(collection.name, "irrad", "mspct", sep = ".")
+        raw.collection.name <- paste(collection.name, "raw", "lst", sep = ".")
+        collection.file.name <- paste(collection.name, "Rda", sep = ".")
 
+       assign(irrad.collection.name,
+              source_mspct(mget(irrad.names)))
+       assign(raw.collection.name,
+              mget(raw.names))
+       save(list = c(irrad.collection.name, raw.collection.name),
+            file = collection.file.name)
+       irrad.names <- character()
+       raw.names <- character()
+       file.names <- c(file.names, collection.file.name)
+     }
+
+      user.input <- readline("Next, p = change protocol, q = quit (-/p/q): ")
       if (user.input[1] == "") {
         next()
       } else if (user.input[1] == "p") {
@@ -212,6 +253,8 @@ acq_irrad_interactive <-
         break()
       }
     }
+    save(file.names, file = paste("files4job-", lubridate::now(), ".Rda", sep = ""))
+
     print("Ending...")
     end_session(w)
     setwd(oldwd)
@@ -658,6 +701,26 @@ set_seq_interactive <- function(seq.settings) {
     }
   }
   seq.settings
+}
+
+#' Interactively set user attributes
+#'
+#' Enter values for "user supplied" attribute values.
+#'
+#' @keywords internal
+#'
+set_attributes_interactive <- function(user.attrs) {
+  repeat{
+    user.input <- readline(prompt = "w = what.measured, c = comment (w/c/-): ")
+    if (user.input[1] == "w") {
+      user.attrs$what.measured <- readline("Set 'what.measured' = ")
+    } else if (user.input[1] == "c") {
+      user.attrs$comment.text <- readline("Set 'comment' = ")
+    } else {
+      break()
+    }
+  }
+  user.attrs
 }
 
 # simple fraction interactive ---------------------------------------------
