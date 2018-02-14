@@ -105,8 +105,17 @@ acq_irrad_interactive <-
     stopifnot(length(descriptor[["wavelengths"]]) == descriptor[["num.pixs"]])
     stopifnot(length(descriptor[["inst.calib"]][["irrad.mult"]]) == descriptor[["num.pixs"]])
 
-    session.label <- paste("operator: ", readline("Operator's name: "),
-                           ", instrument s.n.: ", descriptor[["spectrometer.sn"]])
+    # We get metadata from user
+
+    session.name <- make.names(readline("Session's name: "))
+    if (session.name == "") {
+      session.name <- trunc(stats::runif(max = 999))
+    }
+
+    session.label <- paste("Operator: ", readline("Operator's name: "),
+                           "\nSession: ", session.name,
+                           ", instrument s.n.: ", descriptor[["spectrometer.sn"]],
+                           sep = "")
 
     user.attrs <- list(what.measured = "",
                        comment.text = "")
@@ -181,7 +190,7 @@ acq_irrad_interactive <-
       }
 
       if (length(user.attrs$comment.text) > 0) {
-        comment(irrad.spct) <- user.attrs$comment.text
+        comment(irrad.spct) <- paste(comment(irrad.spct), user.attrs$comment.text, sep = "\n")
       }
 
       assign(raw.name, raw.mspct)
@@ -228,7 +237,7 @@ acq_irrad_interactive <-
       if (user.input[1] == "") {
         next()
       } else if (user.input[1] == "c") {
-        collection.name <- readline("Name of the collection?")
+        collection.name <- make.names(readline("Name of the collection?: "))
         irrad.collection.name <- paste(collection.name, "irrad", "mspct", sep = ".")
         raw.collection.name <- paste(collection.name, "raw", "lst", sep = ".")
         collection.file.name <- paste(collection.name, "Rda", sep = ".")
@@ -239,9 +248,13 @@ acq_irrad_interactive <-
               mget(raw.names))
        save(list = c(irrad.collection.name, raw.collection.name),
             file = collection.file.name)
+
+       file.names <- c(file.names, collection.file.name)
+
+       # clean up
+       rm(list = c(irrad.names, raw.names))
        irrad.names <- character()
        raw.names <- character()
-       file.names <- c(file.names, collection.file.name)
      }
 
       user.input <- readline("Next, p = change protocol, q = quit (-/p/q): ")
@@ -253,7 +266,7 @@ acq_irrad_interactive <-
         break()
       }
     }
-    save(file.names, file = paste("files4job-", lubridate::now(), ".Rda", sep = ""))
+    save(file.names, file = paste("files4session-", session.name, ".Rda", sep = ""))
 
     print("Ending...")
     end_session(w)
@@ -367,9 +380,16 @@ acq_fraction_interactive <-
     # Before continuing we check that wavelength calibration is available
     stopifnot(length(descriptor[["wavelengths"]]) == descriptor[["num.pixs"]])
 
-    session.label <- paste("operator: ", readline("Operator's name: "),
+    session.name <- make.names(readline("Session's name: "))
+    if (session.name == "") {
+      session.name <- trunc(stats::runif(max = 999))
+    }
+
+    session.label <- paste("Operator: ", readline("Operator's name: "),
+                           "\nSession: ", session.name,
                            ", instrument s.n.: ", descriptor[["spectrometer.sn"]],
                            sep = "")
+
 
     folder.name <- readline("Enter folder name (use forward slashes '/' instead of '\'): ")
     if (length(folder.name == 0)) {
@@ -397,7 +417,7 @@ acq_fraction_interactive <-
 
     repeat {
       repeat{
-        obj.name <- readline("Give a name to the spectrum: ")
+        obj.name <- make.names(readline("Give a name to the spectrum: "))
         if (length(obj.name) > 0 && !exists(obj.name)) break()
         print("A valid and unique name is required, please try again...")
       }
