@@ -120,15 +120,8 @@ acq_irrad_interactive <-
     user.attrs <- list(what.measured = "",
                        comment.text = "")
 
-    folder.name <- readline("Enter folder name (use forward slashes '/' instead of '\'): ")
-    if (length(folder.name == 0)) {
-      folder.name <- "."
-    }
-    # need to add folder.name sanitation
-    if (!file.exists(folder.name)) {
-      message("Folder does not exist, creating it...")
-      dir.create(folder.name)
-    }
+    folder.name <- set_folder_interactive()
+
     oldwd <- setwd(folder.name)
     message("Files will be saved to '", folder.name, "'", sep="")
 
@@ -154,7 +147,14 @@ acq_irrad_interactive <-
 
     repeat { # with same settings
       repeat{
-        obj.name <- readline("Give a name to the spectrum: ")
+        user.obj.name <- readline("Give a name to the spectrum: ")
+        obj.name <- make.names(user.obj.name)
+        if (obj.name != user.obj.name) {
+          answ <- readline(paste("Use sanitised name:", obj.name, " (-/n) :"))
+          if (answ == "n") {
+            obj.name <- ""
+          }
+        }
         if (length(obj.name) > 0 && obj.name != "" &&
             !exists(obj.name)) break()
         print("A valid and unique name is required, please try again...")
@@ -170,7 +170,10 @@ acq_irrad_interactive <-
 
       user.attrs <- set_attributes_interactive(user.attrs)
 
-      settings <- tune_interactive(descriptor = descriptor, settings = settings)
+      settings <- tune_interactive(descriptor = descriptor,
+                                   settings = settings,
+                                   start.int.time = start.int.time)
+
       seq.settings <- set_seq_interactive(seq.settings)
 
       raw.mspct <- acq_raw_mspct(descriptor = descriptor,
@@ -234,9 +237,7 @@ acq_irrad_interactive <-
       }
 
       user.input <- readline("Next, c = make and save collection (-/c): ")
-      if (user.input[1] == "") {
-        next()
-      } else if (user.input[1] == "c") {
+      if (user.input[1] == "c") {
         collection.name <- make.names(readline("Name of the collection?: "))
         irrad.collection.name <- paste(collection.name, "irrad", "mspct", sep = ".")
         raw.collection.name <- paste(collection.name, "raw", "lst", sep = ".")
@@ -257,7 +258,7 @@ acq_irrad_interactive <-
        raw.names <- character()
      }
 
-      user.input <- readline("Next, p = change protocol, q = quit (-/p/q): ")
+     user.input <- readline("Next, p = change protocol, q = quit (-/p/q): ")
       if (user.input[1] == "") {
         next()
       } else if (user.input[1] == "p") {
@@ -387,6 +388,7 @@ acq_fraction_interactive <-
     if (session.name == "") {
       session.name <- trunc(stats::runif(max = 999))
     }
+    message("Session ", session.name)
 
     session.label <- paste("Operator: ", readline("Operator's name: "),
                            "\nSession: ", session.name,
@@ -394,15 +396,8 @@ acq_fraction_interactive <-
                            sep = "")
 
 
-    folder.name <- readline("Enter folder name (use forward slashes '/' instead of '\'): ")
-    if (length(folder.name == 0)) {
-      folder.name <- "."
-    }
-    # need to add folder.name sanitation
-    if (!file.exists(folder.name)) {
-      message("Folder does not exist, creating it...")
-      dir.create(folder.name)
-    }
+    folder.name <- set_folder_interactive()
+
     oldwd <- setwd(folder.name)
     message("Files will be saved to '", folder.name, "'", sep="")
 
@@ -469,11 +464,11 @@ acq_fraction_interactive <-
             ggplot2::theme_bw()
           print(fig)
           answer <- readline("Change wavebands/discard/save and continue (/w/d/-): ")
-          switch(answer,
+          switch(substr(answer, 1, 1),
                  # p = {options(photobiology.radiation.unit = "photon"); next()},
                  # e = {options(photobiology.radiation.unit = "energy"); next()},
                  w = {answer1 <- readline("Waveband set to use, UV+PAR, plants, visible, total, default (u/p/v/t/-)")
-                 switch(answer1,
+                 switch(substr(answer1, 1, 1),
                         u = options(photobiology.plot.bands =
                                       list(photobiologyWavebands::UVC(),
                                            photobiologyWavebands::UVB(),
@@ -498,11 +493,11 @@ acq_fraction_interactive <-
 
       user.input <- readline("Next, change protocol, quit (-/p/q): ")
 
-      if (user.input[1] == "") {
+      if (user.input == "") {
         next()
-      } else if (user.input[1] == "p") {
+      } else if (substr(user.input, 1, 1) == "p") {
         protocol <- protocol_interactive(protocols)
-      } else if (user.input[1] == "q") {
+      } else if (substr(user.input, 1, 1) == "q") {
         break()
       }
     }
@@ -520,21 +515,25 @@ acq_fraction_interactive <-
 #'
 #' @keywords internal
 #'
-tune_interactive <- function(descriptor, settings) {
+tune_interactive <- function(descriptor, settings, start.int.time) {
   old.settings <- settings
   tuned <- FALSE
   repeat{
     cat("Ready to adjust integration time?\n")
-    answ <- readline("t = tune, s = skip, m = margin, r = range, h = HDR mult., u = undo (t/s/m/r/h/u/-): ")
+    answ <- readline("t = retune, T = tune, s = skip, m = margin, r = range, h = HDR mult., u = undo (t/s/m/r/h/u/-): ")
     if (answ == "") {
       answ <- ifelse(tuned, "s", "t")
     }
-    if (answ == "t") {
+    if (substr(answ, 1, 1) == "t") {
       settings <- tune_acq_settings(descriptor = descriptor, acq.settings = settings)
       tuned <- TRUE
-    } else if (answ == "s") {
+    } else if (substr(answ, 1, 1) == "T") {
+      settings[["integ.time"]] <- start.int.time * 1e6
+      settings <- tune_acq_settings(descriptor = descriptor, acq.settings = settings)
+      tuned <- TRUE
+    } else if (substr(answ, 1, 1) == "s") {
       break()
-    } else if (answ == "m") {
+    } else if (substr(answ, 1, 1) == "m") {
       margin <- readline(sprintf("Saturation margin = %.2g, new: ",
                                  settings[["target.margin"]]))
       margin <- try(as.numeric(margin))
@@ -544,7 +543,7 @@ tune_interactive <- function(descriptor, settings) {
       } else {
         print("Value not changed!")
       }
-    } else if (answ == "r") {
+    } else if (substr(answ, 1, 1) == "r") {
       cat("Total time range (seconds), 2 numbers: ")
       tot.time.range <- range(scan(nmax = 2)) * 1e6
       if (tot.time.range[1] >= 0) {
@@ -553,7 +552,7 @@ tune_interactive <- function(descriptor, settings) {
       } else {
         cat("Value not changed!")
       }
-    }  else if (answ == "h") {
+    }  else if (substr(answ, 1, 1) == "h") {
       cat("HDR multipliers, 1 to 4 numbers: ")
       HDR.mult <- sort(scan(nmax = 4))
       if (HDR.mult[1] >= 0  && HDR.mult[length(HDR.mult)] < 1000) {
@@ -562,7 +561,7 @@ tune_interactive <- function(descriptor, settings) {
       } else {
         cat("Value not changed!")
       }
-    } else if (answ == "u") {
+    } else if (substr(answ, 1, 1) == "u") {
       cat("Restoring previous settings!")
       settings <- old.settings
     }
@@ -583,10 +582,10 @@ protocol_interactive <- function(protocols) {
                   ": ")
   repeat{
     user.input <- readline(prompt = prompt)
-    if (user.input[1] == "") {
+    if (user.input == "") {
       user.input <- names(protocols)[[1]]
     }
-    if (user.input[1] %in% names(protocols)) {
+    if (user.input %in% names(protocols)) {
       protocol <- protocols[[user.input[1]]]
       if (readline(paste("Will use protocol ",
                          paste(protocol, collapse = " -> "),
@@ -698,7 +697,7 @@ set_seq_interactive <- function(seq.settings) {
     if (answ == "") {
       break()
     }
-    if (answ == "s") {
+    if (substr(answ, 1, 1) == "s") {
       step <- readline(sprintf("Step = %.g2 seconds, new: ",
                                  seq.settings[["step"]]))
       step <- try(as.numeric(step))
@@ -707,7 +706,7 @@ set_seq_interactive <- function(seq.settings) {
       } else {
         print("Value not changed!")
       }
-    } else if (answ == "n") {
+    } else if (substr(answ, 1, 1) == "n") {
       num.steps <- readline(sprintf("Number of steps = %i, new: ",
                                seq.settings[["num.steps"]]))
       num.steps <- try(as.integer(num.steps))
@@ -718,7 +717,7 @@ set_seq_interactive <- function(seq.settings) {
       } else {
         seq.settings[[num.steps]] <- num.steps
       }
-    } else if (answ == "u") {
+    } else if (substr(answ, 1, 1) == "u") {
       cat("Restoring previous settings!")
       seq.settings <- old.seq.settings
     }
@@ -735,15 +734,39 @@ set_seq_interactive <- function(seq.settings) {
 set_attributes_interactive <- function(user.attrs) {
   repeat{
     user.input <- readline(prompt = "w = what.measured, c = comment (w/c/-): ")
-    if (user.input[1] == "w") {
+    if (substr(user.input, 1, 1) == "w") {
       user.attrs$what.measured <- readline("Set 'what.measured' = ")
-    } else if (user.input[1] == "c") {
+    } else if (substr(user.input, 1, 1) == "c") {
       user.attrs$comment.text <- readline("Set 'comment' = ")
     } else {
       break()
     }
   }
   user.attrs
+}
+
+#' Interactively get folder to use
+#'
+#' Enter values for "user supplied" folder.
+#'
+#' @keywords internal
+#'
+set_folder_interactive <- function(folder.name = ".") {
+  old.folder.name <- folder.name
+  folder.name <- readline("Enter folder name (use forward slashes '/' instead of '\'): ")
+  message("Folder: ", folder.name)
+  # needs to be replaced by a proper vailidity check
+  if (folder.name == "") {
+    folder.name <- old.folder.name
+    message("Folder: ", folder.name)
+  }
+  if (!file.exists(folder.name)) {
+    message("Folder does not exist, creating it...")
+    dir.create(folder.name)
+  } else {
+    message("Using existing folder: '", folder.name, "'.")
+  }
+  folder.name
 }
 
 # simple fraction interactive ---------------------------------------------

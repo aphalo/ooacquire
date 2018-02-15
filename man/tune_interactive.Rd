@@ -4,7 +4,7 @@
 \alias{tune_interactive}
 \title{Interactively adjust the integration time settings}
 \usage{
-tune_interactive(descriptor, settings)
+tune_interactive(descriptor, settings, start.int.time)
 }
 \description{
 Adjust integration time settings, allowing the user to repeat the tunning,
