@@ -119,7 +119,7 @@ uvb_corrections <- function(x,
 
   if (flt.flag && stray.light.method != "simple" &&
       average_spct(clip_wl(y[[spct.names["light"]]], range = flt.ref.wl)) < 0.001 *
-      max(y[[spct.names["light"]]][["cps"]])) {
+      max(y[[spct.names["light"]]][["cps"]], na.rm = TRUE)) {
     warning("Too low cps in filter reference region, setting method to 'simple'.")
     stray.light.method <- "simple"
   }
