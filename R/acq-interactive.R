@@ -43,8 +43,7 @@ acq_irrad_interactive <-
            correction.method = NA,
            descriptors = NA,
            stray.light.method = "none",
-           save.pdfs = TRUE,
-           object.out = "source_spct") {
+           save.pdfs = TRUE) {
 
     # define measurement protocols
     if (length(protocols) == 0) {
@@ -107,9 +106,13 @@ acq_irrad_interactive <-
 
     # We get metadata from user
 
-    session.name <- make.names(readline("Session's name: "))
-    if (session.name == "") {
+    user.session.name <- readline("Session's name: ")
+    session.name <- make.names(user.session.name)
+    if (user.session.name == "") {
       session.name <- trunc(stats::runif(max = 999))
+    }
+    if (session.name != user.session.name) {
+      message("Using sanitised/generated name: '", session.name, "'.", sep = "")
     }
 
     session.label <- paste("Operator: ", readline("Operator's name: "),
@@ -243,22 +246,22 @@ acq_irrad_interactive <-
         raw.collection.name <- paste(collection.name, "raw", "lst", sep = ".")
         collection.file.name <- paste(collection.name, "Rda", sep = ".")
 
-       assign(irrad.collection.name,
-              source_mspct(mget(irrad.names)))
-       assign(raw.collection.name,
-              mget(raw.names))
-       save(list = c(irrad.collection.name, raw.collection.name),
-            file = collection.file.name)
+        assign(irrad.collection.name,
+               source_mspct(mget(irrad.names)))
+        assign(raw.collection.name,
+               mget(raw.names))
+        save(list = c(irrad.collection.name, raw.collection.name),
+             file = collection.file.name)
 
-       file.names <- c(file.names, collection.file.name)
+        file.names <- c(file.names, collection.file.name)
 
-       # clean up
-       rm(list = c(irrad.names, raw.names))
-       irrad.names <- character()
-       raw.names <- character()
-     }
+        # clean up
+        rm(list = c(irrad.names, raw.names))
+        irrad.names <- character()
+        raw.names <- character()
+      }
 
-     user.input <- readline("Next, p = change protocol, q = quit (-/p/q): ")
+      user.input <- readline("Next, p = change protocol, q = quit (-/p/q): ")
       if (user.input[1] == "") {
         next()
       } else if (user.input[1] == "p") {
@@ -384,17 +387,24 @@ acq_fraction_interactive <-
     # Before continuing we check that wavelength calibration is available
     stopifnot(length(descriptor[["wavelengths"]]) == descriptor[["num.pixs"]])
 
-    session.name <- readline("Session's name: ")
-    if (session.name == "") {
+    # We get metadata from user
+
+    user.session.name <- readline("Session's name: ")
+    session.name <- make.names(user.session.name)
+    if (user.session.name == "") {
       session.name <- trunc(stats::runif(max = 999))
     }
-    message("Session ", session.name)
+    if (session.name != user.session.name) {
+      message("Using sanitised/generated name: '", session.name, "'.", sep = "")
+    }
 
     session.label <- paste("Operator: ", readline("Operator's name: "),
                            "\nSession: ", session.name,
                            ", instrument s.n.: ", descriptor[["spectrometer.sn"]],
                            sep = "")
 
+    user.attrs <- list(what.measured = "",
+                       comment.text = "")
 
     folder.name <- set_folder_interactive()
 
@@ -515,7 +525,7 @@ acq_fraction_interactive <-
 #'
 #' @keywords internal
 #'
-tune_interactive <- function(descriptor, settings, start.int.time) {
+tune_interactive <- function(descriptor, settings, start.int.time = 0.1) {
   old.settings <- settings
   tuned <- FALSE
   repeat{
@@ -699,7 +709,7 @@ set_seq_interactive <- function(seq.settings) {
     }
     if (substr(answ, 1, 1) == "s") {
       step <- readline(sprintf("Step = %.g2 seconds, new: ",
-                                 seq.settings[["step"]]))
+                               seq.settings[["step"]]))
       step <- try(as.numeric(step))
       if (!is.na(step)) {
         seq.settings[["step"]] <- step
@@ -708,7 +718,7 @@ set_seq_interactive <- function(seq.settings) {
       }
     } else if (substr(answ, 1, 1) == "n") {
       num.steps <- readline(sprintf("Number of steps = %i, new: ",
-                               seq.settings[["num.steps"]]))
+                                    seq.settings[["num.steps"]]))
       num.steps <- try(as.integer(num.steps))
       if (is.na(num.steps)) {
         print("Number of steps must be a positive integer. Value not changed!")

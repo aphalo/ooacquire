@@ -73,7 +73,7 @@ get_oo_descriptor <- function(w, sr.index = 0L, ch.index = 0L) {
   )
 }
 
-#' Add bad pixel informatoin to an instrument description
+#' Add bad pixel information to an instrument description
 #'
 #' A integer vector of indexes to bad pixels in the instrument array. Data from
 #' these array pixels will be discarded.

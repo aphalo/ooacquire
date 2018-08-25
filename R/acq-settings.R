@@ -54,6 +54,7 @@ acq_settings <- function(descriptor,
                          corr.elect.dark = 0L,
                          corr.sensor.nl = 0L,
                          boxcar.width = 0L,
+                         force.valid = FALSE,
                          verbose = TRUE) {
   # Check length consistency
   stopifnot(length(integ.time) == length(num.scans))
@@ -95,6 +96,8 @@ acq_settings <- function(descriptor,
     corr.elect.dark = corr.elect.dark,
     corr.sensor.nl = corr.sensor.nl,
     boxcar.width = boxcar.width,
+    # accept invalid spectra as good (we may be willing to accept clipping)
+    force.valid = force.valid,
     # processing flag
     linearized = as.logical(corr.sensor.nl),
     # diagnosis

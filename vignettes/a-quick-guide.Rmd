@@ -26,7 +26,7 @@ All examples in vignettes use data and files included in the package. Data files
 _To reproduce any of the examples which use files as data input, it is best to make a local copy of the whole `"extdata"` folder._ The files used in examples are organized into subfolders, but all example code assumes that its in being run with `"extdata"` or a copy of it as the current _working_ folder.
 
 ```{r, eval=-2}
-folderpath <- system.file("extdata",package="ooacquire")
+folderpath <- system.file("extdata", package="ooacquire")
 file.copy(from = folderpath, to = ".", recursive = TRUE)
 ```
 ***
@@ -35,7 +35,7 @@ file.copy(from = folderpath, to = ".", recursive = TRUE)
 
 ```{r "setup", include=FALSE}
 require("knitr")
-opts_knit$set(autodep = TRUE, root.dir = system.file("extdata", package = "ooacquire"))
+opts_knit$set(cache = FALSE, root.dir = system.file("extdata", package = "ooacquire"))
 ```
 
 We first load the R packages to be used.

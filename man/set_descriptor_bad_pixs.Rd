@@ -2,7 +2,7 @@
 % Please edit documentation in R/oo-instrument.R
 \name{set_descriptor_bad_pixs}
 \alias{set_descriptor_bad_pixs}
-\title{Add bad pixel informatoin to an instrument description}
+\title{Add bad pixel information to an instrument description}
 \usage{
 set_descriptor_bad_pixs(descriptor, bad.pixs)
 }

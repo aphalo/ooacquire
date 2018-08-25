@@ -1,10 +1,10 @@
 ## ---- eval=-2------------------------------------------------------------
-folderpath <- system.file("extdata",package="ooacquire")
+folderpath <- system.file("extdata", package="ooacquire")
 file.copy(from = folderpath, to = ".", recursive = TRUE)
 
 ## ----"setup", include=FALSE----------------------------------------------
 require("knitr")
-opts_knit$set(autodep = TRUE, root.dir = system.file("extdata", package = "ooacquire"))
+opts_knit$set(cache = FALSE, root.dir = system.file("extdata", package = "ooacquire"))
 
 ## ------------------------------------------------------------------------
 library(photobiology)

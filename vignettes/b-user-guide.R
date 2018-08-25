@@ -1,6 +1,7 @@
-## ----"setup", include=FALSE----------------------------------------------
+## ----"setup", include=FALSE, cache=FALSE---------------------------------
 require("knitr")
-opts_knit$set(root.dir = system.file("extdata", package = "ooacquire"))
+opts_knit$set(cache = FALSE, root.dir = system.file("extdata", package = "ooacquire"))
+sr.online <- FALSE
 
 ## ---- eval=-2------------------------------------------------------------
 folderpath <- system.file("extdata",package="ooacquire")

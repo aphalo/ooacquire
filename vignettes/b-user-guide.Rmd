@@ -134,9 +134,10 @@ The slit function of a spectrometer can be estimated by measuring laser beams at
 
 The correction to apply to a given pixel depends on the readings of nearby pixels. Some authors recommend to apply this correction recursively, however, we follow the simple approach of applying it only once as an approximation.
  
-```{r "setup", include=FALSE}
+```{r "setup", include=FALSE, cache=FALSE}
 require("knitr")
-opts_knit$set(root.dir = system.file("extdata", package = "ooacquire"))
+opts_knit$set(cache = FALSE, root.dir = system.file("extdata", package = "ooacquire"))
+sr.online <- FALSE
 ```
 
 ***

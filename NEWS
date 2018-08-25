@@ -8,6 +8,9 @@ ooacquire 0.1.6
 ===============
 
 * Add pre-built calibrations and methods for a third FLAME-S instrument.
+* Update acq_irrad_interactive() adding possibility to set attributes.
+* Update acq_irrad_interactive() adding possibility of constructing
+collections of spectra.
 
 ooacquire 0.1.5
 ===============
