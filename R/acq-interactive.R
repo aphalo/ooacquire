@@ -17,8 +17,9 @@
 #' @param stray.light.method character Used only when the correction method is
 #'   created on-the-fly.
 #' @param save.pdfs logical Whether to save PDFs to files or not.
-#' @param interface.mode character One of "auto", "simple", "manual",
-#'   "series", "auto-attr", "simple-attr", "manual-attr", "series-attr".
+#' @param interface.mode character One of "auto", "simple", "manual", "flash",
+#'   "series", "auto-attr", "simple-attr", "manual-attr", "flash-attr", and
+#'   "series-attr".
 #'
 #' @export
 #'
@@ -29,6 +30,9 @@
 #'   protocols are passed, each character vector must contain strings "light",
 #'   "filter" and "dark", or "sample", "reference", and "dark", depending on
 #'   the function.
+#'
+#' @details The different interface modes are suitable for different types of
+#'   measurements.
 #'
 #' @examples
 #'
@@ -50,7 +54,8 @@ acq_irrad_interactive <-
 
     # validate interface mode
     interface.mode <- tolower(interface.mode)
-    if (!gsub("-attr$", "", interface.mode) %in% c("auto", "simple", "series")) {
+    if (!gsub("-attr$", "", interface.mode) %in%
+        c("auto", "simple", "flash", "series")) {
       stop("Invalid argument for 'interface.mode', aborting.")
     }
     # define measurement protocols
@@ -538,23 +543,26 @@ acq_fraction_interactive <-
 #' @keywords internal
 #'
 tune_interactive <- function(descriptor, settings, start.int.time = 0.1, interface.mode = "auto") {
-  if (!interface.mode %in% c("simple", "auto", "manual")) {
+  if (!interface.mode %in% c("simple", "auto", "flash", "manual")) {
     interface.mode <- "auto"
   }
   # configure interface for active mode
   prompt.text <- switch(interface.mode,
-                   simple = "t = retune, r = range, h = HDR mult., u = undo (t/r/h/u/-): ",
-                   auto = "t = retune, T = tune, s = skip, m = margin, r = range, h = HDR mult., u = undo (t/s/m/r/h/u/-): ",
-                   manual = "f = fixed, s = skip, m = margin, r = range, h = HDR mult., u = undo (f/m/r/h/u/-): "
+                        simple = "t = retune, r = range, h = HDR mult., u = undo (t/r/h/u/-): ",
+                        auto = "t = retune, T = tune, s = skip, m = margin, r = range, h = HDR mult., u = undo (t/s/m/r/h/u/-): ",
+                        manual = "f = fixed, s = skip, r = range, h = HDR mult., u = undo (f/r/h/u/-): ",
+                        flash = "f = fixed, n = number of flashes, s = skip, h = HDR mult., u = undo (f/n/h/u/-): "
   )
   valid.input <- switch(interface.mode,
-                         simple = c("t", "r", "h", "u", ""),
-                         auto = c("t", "T", "s", "m", "r", "h", "u", ""),
-                         manual = c("f", "s", "m", "r", "h", "u", "")
+                        simple = c("t", "r", "h", "u", ""),
+                        auto = c("t", "T", "s", "m", "r", "h", "u", ""),
+                        manual = c("f", "s", "r", "h", "u", ""),
+                        flash = c("f", "n", "s", "h", "u", "")
   )
   default.input <- switch(interface.mode,
                           simple = c("t", "s"),
                           auto = c("t", "s"),
+                          flash =  c("f", "s"),
                           manual = c("f", "s")
   )
   # common code to all modes
@@ -582,10 +590,25 @@ tune_interactive <- function(descriptor, settings, start.int.time = 0.1, interfa
     } else if (substr(answ, 1, 1) == "f") {
       cat("Integration time (seconds): ")
       user.integ.time <- scan(nmax = 4L) * 1e6
-      settings <- set_integ_time(acq.settings = settings, integ.time = user.integ.time)
+      if (interface.mode == "flash") {
+        settings <- set_integ_time(acq.settings = settings,
+                                   integ.time = user.integ.time,
+                                   max.num.scans = 1)
+      } else {
+        settings <- set_integ_time(acq.settings = settings,
+                                   integ.time = user.integ.time)
+      }
       tuned <- TRUE
-    } else if (substr(answ, 1, 1) == "s") {
-      break()
+    } else if (substr(answ, 1, 1) == "n") {
+      cat("Number of flashes for each of", length(settings[["integ.time"]]), "scans.")
+      repeat {
+        num.flashes <- trunc(scan(nmax = 4L))
+        if (length(num.flashes) == length(settings[["integ.time"]])) {
+          break()
+        }
+        cat("Wrong length, please, try again...")
+      }
+      settings[["num.flashes"]] <- num.flashes
     } else if (substr(answ, 1, 1) == "m") {
       margin <- readline(sprintf("Saturation margin = %.2g, new: ",
                                  settings[["target.margin"]]))

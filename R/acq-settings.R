@@ -57,6 +57,7 @@ acq_settings <- function(descriptor,
                          corr.sensor.nl = 0L,
                          boxcar.width = 0L,
                          force.valid = FALSE,
+                         num.flashes = NA_integer_,
                          verbose = TRUE) {
   # Check length consistency
   stopifnot(length(integ.time) == length(num.scans))
@@ -98,6 +99,8 @@ acq_settings <- function(descriptor,
     corr.elect.dark = corr.elect.dark,
     corr.sensor.nl = corr.sensor.nl,
     boxcar.width = boxcar.width,
+    # flash settings
+    num.flashes = num.flashes,
     # accept invalid spectra as good (we may be willing to accept clipping)
     force.valid = force.valid,
     # processing flag
@@ -137,22 +140,27 @@ set_linearized <- function(acq.settings) {
 #'
 set_integ_time <- function(acq.settings,
                            integ.time,
+                           single.scan = FALSE,
                            verbose = TRUE) {
   if (length(integ.time) == 1) {
-    settings$integ.time <- integ.time * settings$HDR.mult
-  } else if (length(integ.time) != length(settings$HDR.mult)) {
+    integ.time <- integ.time * acq.settings$HDR.mult
+  } else if (length(integ.time) != length(acq.settings$HDR.mult)) {
     warning("Length missmatch in integration time, using only first value")
-    integ.time  <- integ.time[1] * settings$HDR.mult
+    integ.time  <- integ.time[1] * acq.settings$HDR.mult
   }
   integ.time <- ifelse(integ.time > acq.settings$max.integ.time, acq.settings$max.integ.time, integ.time)
   integ.time <- ifelse(integ.time < acq.settings$min.integ.time, acq.settings$min.integ.time, integ.time)
-  num.scans <- ifelse(integ.time < acq.settings$tot.time.range[1],
-                      trunc(acq.settings$tot.time.range[1] / integ.time) + 1,
-                      1)
-  if (acq.settings$tot.time.range[2] - acq.settings$tot.time.range[1] < acq.settings$min.integ.time) {
-    integ.time <- acq.settings$tot.time.range[1] / num.scans
-  } else if (integ.time[1] > acq.settings$tot.time.range[2]) {
-    integ.time <- acq.settings$tot.time.range[2]
+  if (single.scan) {
+    num.scans <- rep(1, times = length(integ.time))
+  } else {
+    num.scans <- ifelse(integ.time < acq.settings$tot.time.range[1],
+                        trunc(acq.settings$tot.time.range[1] / integ.time) + 1,
+                        1)
+    if (acq.settings$tot.time.range[2] - acq.settings$tot.time.range[1] < acq.settings$min.integ.time) {
+      integ.time <- acq.settings$tot.time.range[1] / num.scans
+    } else if (integ.time[1] > acq.settings$tot.time.range[2]) {
+      integ.time <- acq.settings$tot.time.range[2]
+    }
   }
   acq.settings$integ.time <- integ.time
   acq.settings$num.scans <- num.scans
