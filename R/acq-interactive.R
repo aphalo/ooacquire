@@ -17,6 +17,8 @@
 #' @param stray.light.method character Used only when the correction method is
 #'   created on-the-fly.
 #' @param save.pdfs logical Whether to save PDFs to files or not.
+#' @param interface.mode character One of "auto", "simple", "manual",
+#'   "series", "auto-attr", "simple-attr", "manual-attr", "series-attr".
 #'
 #' @export
 #'
@@ -43,8 +45,14 @@ acq_irrad_interactive <-
            correction.method = NA,
            descriptors = NA,
            stray.light.method = "none",
-           save.pdfs = TRUE) {
+           save.pdfs = TRUE,
+           interface.mode = "auto") {
 
+    # validate interface mode
+    interface.mode <- tolower(interface.mode)
+    if (!gsub("-attr$", "", interface.mode) %in% c("auto", "simple", "series")) {
+      stop("Invalid argument for 'interface.mode', aborting.")
+    }
     # define measurement protocols
     if (length(protocols) == 0) {
       protocols <- list(l = "light",
@@ -109,7 +117,7 @@ acq_irrad_interactive <-
     user.session.name <- readline("Session's name: ")
     session.name <- make.names(user.session.name)
     if (user.session.name == "") {
-      session.name <- trunc(stats::runif(max = 999))
+      session.name <- paste("session", trunc(stats::runif(n = 1L, max = 1) * 100000), sep = "")
     }
     if (session.name != user.session.name) {
       message("Using sanitised/generated name: '", session.name, "'.", sep = "")
@@ -171,13 +179,17 @@ acq_irrad_interactive <-
       file.names <- c(file.names, file.name)
       pdf.name <- paste(irrad.name, "pdf", sep = ".")
 
-      user.attrs <- set_attributes_interactive(user.attrs)
+      if (grepl("-attr", interface.mode)) {
+        user.attrs <- set_attributes_interactive(user.attrs)
+      }
 
       settings <- tune_interactive(descriptor = descriptor,
                                    settings = settings,
                                    start.int.time = start.int.time)
 
-      seq.settings <- set_seq_interactive(seq.settings)
+      if (grepl("series", interface.mode)) {
+        seq.settings <- set_seq_interactive(seq.settings)
+      }
 
       raw.mspct <- acq_raw_mspct(descriptor = descriptor,
                                  acq.settings = settings,
@@ -525,14 +537,40 @@ acq_fraction_interactive <-
 #'
 #' @keywords internal
 #'
-tune_interactive <- function(descriptor, settings, start.int.time = 0.1) {
+tune_interactive <- function(descriptor, settings, start.int.time = 0.1, interface.mode = "auto") {
+  if (!interface.mode %in% c("simple", "auto", "manual")) {
+    interface.mode <- "auto"
+  }
+  # configure interface for active mode
+  prompt.text <- switch(interface.mode,
+                   simple = "t = retune, r = range, h = HDR mult., u = undo (t/r/h/u/-): ",
+                   auto = "t = retune, T = tune, s = skip, m = margin, r = range, h = HDR mult., u = undo (t/s/m/r/h/u/-): ",
+                   manual = "f = fixed, s = skip, m = margin, r = range, h = HDR mult., u = undo (f/m/r/h/u/-): "
+  )
+  valid.input <- switch(interface.mode,
+                         simple = c("t", "r", "h", "u", ""),
+                         auto = c("t", "T", "s", "m", "r", "h", "u", ""),
+                         manual = c("f", "s", "m", "r", "h", "u", "")
+  )
+  default.input <- switch(interface.mode,
+                          simple = c("t", "s"),
+                          auto = c("t", "s"),
+                          manual = c("f", "s")
+  )
+  # common code to all modes
   old.settings <- settings # allow starting over
   tuned <- FALSE
   repeat{
     cat("Ready to adjust integration time?\n")
-    answ <- readline("t = retune, T = tune, f = fixed, s = skip, m = margin, r = range, h = HDR mult., u = undo (t/s/m/r/h/u/-): ")
+    repeat {
+      answ <- readline(prompt.text)
+      if (answ[1] %in% valid.input) {
+        break()
+      }
+      cat("Unrecognized letter: ", answ[1], ". Please, try again.")
+    }
     if (answ == "") {
-      answ <- ifelse(tuned, "s", "t")
+      answ <- ifelse(!tuned, default.input[1], default.input[2])
     }
     if (substr(answ, 1, 1) == "t") {
       settings <- tune_acq_settings(descriptor = descriptor, acq.settings = settings)
@@ -542,27 +580,10 @@ tune_interactive <- function(descriptor, settings, start.int.time = 0.1) {
       settings <- tune_acq_settings(descriptor = descriptor, acq.settings = settings)
       tuned <- TRUE
     } else if (substr(answ, 1, 1) == "f") {
-      repeat{
-        cat("Integration time (seconds): ")
-        user.integ.time <- scan(nmax = 4L) * 1e6
-        if (length(user.integ.time) == 1) {
-          settings[["integ.time"]] <- user.integ.time * settings[["HDR.mult"]]
-        } else if (length(user.integ.time) == length(settings[["HDR.mult"]])) {
-          settings[["integ.time"]] <- user.integ.time
-        } else {
-          settings[["integ.time"]]  <- user.integ.time[1]
-        }
-        if (settings[["integ.time"]] >= descriptor$min.integ.time &&
-            settings[["integ.time"]] <= descriptor$max.integ.time) {
-          tuned <- TRUE
-          break()
-        } else {
-          cat("Off-range value:",
-              settings[["integ.time"]] * 1e-6, ", allowed integration time (s)",
-              descriptor$min.integ.time * 1e-6, "to",
-              descriptor$max.integ.time * 1e-6)
-        }
-      }
+      cat("Integration time (seconds): ")
+      user.integ.time <- scan(nmax = 4L) * 1e6
+      settings <- set_integ_time(acq.settings = settings, integ.time = user.integ.time)
+      tuned <- TRUE
     } else if (substr(answ, 1, 1) == "s") {
       break()
     } else if (substr(answ, 1, 1) == "m") {

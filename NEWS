@@ -11,6 +11,7 @@ ooacquire 0.1.6
 * Update acq_irrad_interactive() adding possibility to set attributes.
 * Update acq_irrad_interactive() adding possibility of constructing
 collections of spectra.
+* Fix various minor bugs.
 
 ooacquire 0.1.5
 ===============

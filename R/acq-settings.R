@@ -124,6 +124,56 @@ set_linearized <- function(acq.settings) {
   acq.settings
 }
 
+#' Set integration time
+#'
+#' Tag the settings as linearized
+#'
+#' @param acq.settings list as returned by function \code{acq_settings()}
+#'
+#' @return a copy of the argument passed for \code{acq.settings} with the
+#' \code{integ.time} field of the settings data replaced by \code{integ.time}.
+#'
+#' @keywords internal
+#'
+set_integ_time <- function(acq.settings,
+                           integ.time,
+                           verbose = TRUE) {
+  if (length(integ.time) == 1) {
+    settings$integ.time <- integ.time * settings$HDR.mult
+  } else if (length(integ.time) != length(settings$HDR.mult)) {
+    warning("Length missmatch in integration time, using only first value")
+    integ.time  <- integ.time[1] * settings$HDR.mult
+  }
+  integ.time <- ifelse(integ.time > acq.settings$max.integ.time, acq.settings$max.integ.time, integ.time)
+  integ.time <- ifelse(integ.time < acq.settings$min.integ.time, acq.settings$min.integ.time, integ.time)
+  num.scans <- ifelse(integ.time < acq.settings$tot.time.range[1],
+                      trunc(acq.settings$tot.time.range[1] / integ.time) + 1,
+                      1)
+  if (acq.settings$tot.time.range[2] - acq.settings$tot.time.range[1] < acq.settings$min.integ.time) {
+    integ.time <- acq.settings$tot.time.range[1] / num.scans
+  } else if (integ.time[1] > acq.settings$tot.time.range[2]) {
+    integ.time <- acq.settings$tot.time.range[2]
+  }
+  acq.settings$integ.time <- integ.time
+  acq.settings$num.scans <- num.scans
+  #diagnosis
+  acq.settings$tot.time <- integ.time * num.scans
+  acq.settings$rel.signal = NA_real_
+
+  if (verbose) {
+    message("Relative saturation: ",
+            format(acq.settings$rel.signal, width = 10, digits = 3), " ")
+    message("Integration times (ms): ",
+            format(acq.settings$integ.time * 1e-3, nsmall = 0, width = 10, digits = 3), " ")
+    message("Numbers of scans:       ",
+            format(acq.settings$num.scans, width = 10, digits = 3), " ")
+    message("Total time (s):         ",
+            format(acq.settings$tot.time * 1e-6,
+                   digits = 3, width = 10), " ")
+  }
+  acq.settings
+}
+
 #' Tune settings for measurement
 #'
 #' Find optimal settings for spectral measurements under a given measurement

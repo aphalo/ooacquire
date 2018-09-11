@@ -9,7 +9,8 @@
 acq_irrad_interactive(tot.time.range = c(5, 15), target.margin = 0.1,
   HDR.mult = c(short = 1, long = 10), protocols = NULL,
   correction.method = NA, descriptors = NA,
-  stray.light.method = "none", save.pdfs = TRUE)
+  stray.light.method = "none", save.pdfs = TRUE,
+  interface.mode = "auto")
 
 acq_fraction_interactive(tot.time.range = c(5, 15),
   target.margin = 0.2, HDR.mult = c(short = 1, long = 10),
@@ -42,6 +43,9 @@ calibration data.}
 created on-the-fly.}
 
 \item{save.pdfs}{logical Whether to save PDFs to files or not.}
+
+\item{interface.mode}{character One of "auto", "simple", "manual",
+"series", "auto-attr", "simple-attr", "manual-attr", "series-attr".}
 
 \item{ref.value}{numeric or filter_spct/reflector_spct object.}
 
