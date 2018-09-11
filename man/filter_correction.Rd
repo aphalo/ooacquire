@@ -11,8 +11,9 @@ filter_correction(x, flt, stray.light.method = "original",
   verbose = getOption("photobiology.verbose", default = FALSE))
 
 no_filter_correction(x, stray.light.wl = c(218.5, 228.5),
-  flt.dark.wl = c(193, 209.5), flt.ref.wl = NULL, flt.Tfr = 1, trim = 0,
-  verbose = getOption("photobiology.verbose", default = FALSE))
+  flt.dark.wl = c(193, 209.5), flt.ref.wl = NULL, flt.Tfr = 1,
+  trim = 0, verbose = getOption("photobiology.verbose", default =
+  FALSE))
 }
 \arguments{
 \item{x, flt}{cps_spct objects, containig spectral data from which to subtract

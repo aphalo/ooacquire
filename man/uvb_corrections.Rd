@@ -5,10 +5,11 @@
 \alias{slit_function_correction}
 \title{Apply filter-based stray-light correction}
 \usage{
-uvb_corrections(x, spct.names = c(light = "light", filter = "filter", dark =
-  "dark"), stray.light.method = "original", stray.light.wl = c(218.5,
-  228.5), flt.dark.wl = c(193, 209.5), flt.ref.wl = c(360, 379.5),
-  flt.Tfr = 0.9, inst.dark.pixs = 1:4, worker.fun = NULL, trim = 0.05,
+uvb_corrections(x, spct.names = c(light = "light", filter = "filter",
+  dark = "dark"), stray.light.method = "original",
+  stray.light.wl = c(218.5, 228.5), flt.dark.wl = c(193, 209.5),
+  flt.ref.wl = c(360, 379.5), flt.Tfr = 0.9, inst.dark.pixs = 1:4,
+  worker.fun = NULL, trim = 0.05,
   verbose = getOption("photobiology.verbose", default = FALSE), ...)
 
 slit_function_correction(x, worker.fun = NULL,

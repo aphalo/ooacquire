@@ -6,8 +6,8 @@
 \title{Settings for spectral measurement}
 \usage{
 acq_settings(descriptor, integ.time = 0.01, num.scans = 10L,
-  min.integ.time = -Inf, max.integ.time = Inf, tot.time.range = c(0, Inf),
-  HDR.mult = c(short = 1, long = 10), target.margin = 0.1,
+  min.integ.time = -Inf, max.integ.time = Inf, tot.time.range = c(0,
+  Inf), HDR.mult = c(short = 1, long = 10), target.margin = 0.1,
   pix.selector = TRUE, corr.elect.dark = 0L, corr.sensor.nl = 0L,
   boxcar.width = 0L, force.valid = FALSE, verbose = TRUE)
 
@@ -36,7 +36,10 @@ pixels}
 
 \item{corr.elect.dark, corr.sensor.nl}{integer 0L (FALSE) or 1L (TRUE)}
 
-\item{boxcar.width}{integer number of pixels to average}
+\item{boxcar.width}{integer Number of pixels to average}
+
+\item{force.valid}{logical Accept all spectra as valid, for example do not
+treat clipping as an error condition.}
 
 \item{verbose}{a logical to enable or disable warnings}
 

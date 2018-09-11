@@ -58,7 +58,7 @@ acq_irrad_interactive <-
 
     instruments <- list_instruments(w)
 
-    sr.index <- choose_sr_interactive(instruments)
+    sr.index <- choose_sr_interactive(instruments, w)
     ch.index <- choose_ch_interactive(instruments, sr.index)
 
     serial_no <- as.character(instruments[sr.index + 1L, 3])
@@ -526,11 +526,11 @@ acq_fraction_interactive <-
 #' @keywords internal
 #'
 tune_interactive <- function(descriptor, settings, start.int.time = 0.1) {
-  old.settings <- settings
+  old.settings <- settings # allow starting over
   tuned <- FALSE
   repeat{
     cat("Ready to adjust integration time?\n")
-    answ <- readline("t = retune, T = tune, s = skip, m = margin, r = range, h = HDR mult., u = undo (t/s/m/r/h/u/-): ")
+    answ <- readline("t = retune, T = tune, f = fixed, s = skip, m = margin, r = range, h = HDR mult., u = undo (t/s/m/r/h/u/-): ")
     if (answ == "") {
       answ <- ifelse(tuned, "s", "t")
     }
@@ -541,6 +541,28 @@ tune_interactive <- function(descriptor, settings, start.int.time = 0.1) {
       settings[["integ.time"]] <- start.int.time * 1e6
       settings <- tune_acq_settings(descriptor = descriptor, acq.settings = settings)
       tuned <- TRUE
+    } else if (substr(answ, 1, 1) == "f") {
+      repeat{
+        cat("Integration time (seconds): ")
+        user.integ.time <- scan(nmax = 4L) * 1e6
+        if (length(user.integ.time) == 1) {
+          settings[["integ.time"]] <- user.integ.time * settings[["HDR.mult"]]
+        } else if (length(user.integ.time) == length(settings[["HDR.mult"]])) {
+          settings[["integ.time"]] <- user.integ.time
+        } else {
+          settings[["integ.time"]]  <- user.integ.time[1]
+        }
+        if (settings[["integ.time"]] >= descriptor$min.integ.time &&
+            settings[["integ.time"]] <= descriptor$max.integ.time) {
+          tuned <- TRUE
+          break()
+        } else {
+          cat("Off-range value:",
+              settings[["integ.time"]] * 1e-6, ", allowed integration time (s)",
+              descriptor$min.integ.time * 1e-6, "to",
+              descriptor$max.integ.time * 1e-6)
+        }
+      }
     } else if (substr(answ, 1, 1) == "s") {
       break()
     } else if (substr(answ, 1, 1) == "m") {
@@ -613,23 +635,31 @@ protocol_interactive <- function(protocols) {
 #' user to correct the selection if needed.
 #'
 #' @param instruments the returm value of \code{list_instruments(w)}.
+#' @param w handle to Omni Driver, used to retry if an spectrometer is connected.
 #'
 #' @keywords internal
 #'
-choose_sr_interactive <- function(instruments) {
+choose_sr_interactive <- function(instruments, w = NULL) {
   # if instruments has names these would not be needed
   sn.idx <- 3
 
-  print("Connected spectrometers")
-  num.inst <- nrow(instruments)
-  if (num.inst < 1) {
-    print("No spectrometer found. Please connect one, or abort.")
-    if (readline("abort, retry (-/a)") != "a") {
-      next()
+  # make sure at least one instrument is connected
+  repeat{
+    num.inst <- nrow(instruments)
+    if (num.inst >= 1) {
+      print("Connected spectrometers")
+      break()
+    } else if (!is.null(w)) {
+      cat("No spectrometer found. Abort, or connect one and then retry.")
+      if (readline("abort, retry (-/a)") == "a") {
+        stop("Aborting as requested! Bye.")
+      }
+      instruments <- list_instruments(w)
     } else {
-      stop("Aborting as requested! Bye.")
+      cat("No spectrometer found. Aborting.")
     }
   }
+
   # select instrument
   if (num.inst > 1) {
     prompt <- paste(1:nrow(instruments), ": ", instruments[[sn.idx]],

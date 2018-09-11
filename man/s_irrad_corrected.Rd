@@ -17,11 +17,13 @@ s_irrad_corrected(x, ...)
   verbose = getOption("photobiology.verbose", default = FALSE), ...)
 
 \method{s_irrad_corrected}{raw_mspct}(x, spct.names = c(light = "light",
-  filter = "filter", dark = "dark"), correction.method, return.cps = FALSE,
-  verbose = getOption("photobiology.verbose", default = FALSE), ...)
+  filter = "filter", dark = "dark"), correction.method,
+  return.cps = FALSE, verbose = getOption("photobiology.verbose",
+  default = FALSE), ...)
 
-\method{s_irrad_corrected}{raw_spct}(x, correction.method, return.cps = FALSE,
-  verbose = getOption("photobiology.verbose", default = FALSE), ...)
+\method{s_irrad_corrected}{raw_spct}(x, correction.method,
+  return.cps = FALSE, verbose = getOption("photobiology.verbose",
+  default = FALSE), ...)
 }
 \arguments{
 \item{x}{A named list of one to three vectors of file names, with names

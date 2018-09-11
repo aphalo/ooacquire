@@ -4,7 +4,8 @@
 \alias{map_oofile_header_rows}
 \title{Set the instrument description.}
 \usage{
-map_oofile_header_rows(lines, header.end = NULL, grammar = oo.minimum.gr)
+map_oofile_header_rows(lines, header.end = NULL,
+  grammar = oo.minimum.gr)
 }
 \arguments{
 \item{lines}{character The data file read line by line.}

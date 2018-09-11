@@ -16,7 +16,9 @@
 #' @param pix.selector a logical or numeric vector used as subscript to select
 #'   pixels
 #' @param corr.elect.dark,corr.sensor.nl  integer 0L (FALSE) or 1L (TRUE)
-#' @param boxcar.width integer number of pixels to average
+#' @param boxcar.width integer Number of pixels to average
+#' @param force.valid logical Accept all spectra as valid, for example do not
+#'   treat clipping as an error condition.
 #' @param verbose a logical to enable or disable warnings
 #'
 #' @note \code{pixel.selector} can be used for two different purposes: to
