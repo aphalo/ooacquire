@@ -44,7 +44,9 @@
 acq_irrad_interactive <-
   function(tot.time.range = c(5, 15),
            target.margin = 0.1,
-           HDR.mult = c(short = 1, long = 10),
+           HDR.mult = ifelse(interface.mode %in% c("flash", "flash-attr"),
+                             c(short = 1, long = 1),
+                             c(short = 1, long = 10)),
            protocols = NULL,
            correction.method = NA,
            descriptors = NA,
@@ -593,7 +595,7 @@ tune_interactive <- function(descriptor, settings, start.int.time = 0.1, interfa
       if (interface.mode == "flash") {
         settings <- set_integ_time(acq.settings = settings,
                                    integ.time = user.integ.time,
-                                   max.num.scans = 1)
+                                   single.scan = TRUE)
       } else {
         settings <- set_integ_time(acq.settings = settings,
                                    integ.time = user.integ.time)

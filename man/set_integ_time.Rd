@@ -4,7 +4,8 @@
 \alias{set_integ_time}
 \title{Set integration time}
 \usage{
-set_integ_time(acq.settings, integ.time, verbose = TRUE)
+set_integ_time(acq.settings, integ.time, single.scan = FALSE,
+  verbose = TRUE)
 }
 \arguments{
 \item{acq.settings}{list as returned by function \code{acq_settings()}}

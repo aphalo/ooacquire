@@ -4,13 +4,16 @@ Add test cases.
 Finish writing algorithms vignette.
 Document support for OO calibrations and add example scripts.
 
-ooacquire 0.1.6
+ooacquire 0.2.0
 ===============
 
-* Add pre-built calibrations and methods for a third FLAME-S instrument.
+* Implement support for measuring output from xenon flashes, including use of
+such flashes as light source for measurement of spectral transmittance.
+* Update acq_irrad_interactive() adding alterative user-interface modes.
 * Update acq_irrad_interactive() adding possibility to set attributes.
 * Update acq_irrad_interactive() adding possibility of constructing
 collections of spectra.
+* Add pre-built calibrations and methods for a third FLAME-S instrument.
 * Fix various minor bugs.
 
 ooacquire 0.1.5

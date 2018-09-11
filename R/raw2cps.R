@@ -35,6 +35,11 @@ raw2cps.raw_spct <- function(x,
     x <- linearize_counts(x)
   }
   acq_settings <- getInstrSettings(x)
+  if (exists("num.flashes", acq_settings)) {
+    num.flashes <- acq_settings[["num.flashes"]]
+  } else {
+    num.flashes <- NA_integer_
+  }
   integ.time <- acq_settings[["integ.time"]]
   counts.cols <- names(x)[grep("^counts", names(x))]
   cps.cols <- gsub("^counts", "cps", counts.cols)
@@ -44,9 +49,16 @@ raw2cps.raw_spct <- function(x,
   max.counts <- numeric(length(counts.cols))
   for (i in seq_along(counts.cols)) {
     max.counts[i] <- max(x[[counts.cols[i]]], na.rm = TRUE)
-    z[[cps.cols[i]]] <- x[[counts.cols[i]]] / integ.time[i] * 1e6
+    if (!is.na(num.flashes)) {
+      # counts per flash
+      z[[cps.cols[i]]] <- x[[counts.cols[i]]] / num.flashes
+      setCpsSpct(z) # tag as counts per flash!!
+    } else {
+      # counts per second
+      z[[cps.cols[i]]] <- x[[counts.cols[i]]] / integ.time[i] * 1e6
+      setCpsSpct(z)
+    }
   }
-  setCpsSpct(z)
   descriptor <- getInstrDesc(x)
   setInstrDesc(z, descriptor)
   if (is.na(acq_settings[["rel.signal"]])) {

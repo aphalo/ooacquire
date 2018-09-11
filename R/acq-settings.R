@@ -19,6 +19,7 @@
 #' @param boxcar.width integer Number of pixels to average
 #' @param force.valid logical Accept all spectra as valid, for example do not
 #'   treat clipping as an error condition.
+#' @param num.flashes integer Number of flashes triggered per scan.
 #' @param verbose a logical to enable or disable warnings
 #'
 #' @note \code{pixel.selector} can be used for two different purposes: to

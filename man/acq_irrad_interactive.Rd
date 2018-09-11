@@ -7,7 +7,8 @@
 \title{Acquire spectra interactively}
 \usage{
 acq_irrad_interactive(tot.time.range = c(5, 15), target.margin = 0.1,
-  HDR.mult = c(short = 1, long = 10), protocols = NULL,
+  HDR.mult = ifelse(interface.mode \%in\% c("flash", "flash-attr"),
+  c(short = 1, long = 1), c(short = 1, long = 10)), protocols = NULL,
   correction.method = NA, descriptors = NA,
   stray.light.method = "none", save.pdfs = TRUE,
   interface.mode = "auto")
@@ -44,8 +45,9 @@ created on-the-fly.}
 
 \item{save.pdfs}{logical Whether to save PDFs to files or not.}
 
-\item{interface.mode}{character One of "auto", "simple", "manual",
-"series", "auto-attr", "simple-attr", "manual-attr", "series-attr".}
+\item{interface.mode}{character One of "auto", "simple", "manual", "flash",
+"series", "auto-attr", "simple-attr", "manual-attr", "flash-attr", and
+"series-attr".}
 
 \item{ref.value}{numeric or filter_spct/reflector_spct object.}
 
@@ -58,6 +60,10 @@ or "raw" (raw counts).}
 Functions providing a simple interactive front-end to the functions in the
 package. Mostly as example code that can be modified for diferent
 uses.
+}
+\details{
+The different interface modes are suitable for different types of
+  measurements.
 }
 \note{
 The integration time is set automatically so that the peak number of
