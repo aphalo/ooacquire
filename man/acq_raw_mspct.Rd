@@ -4,8 +4,9 @@
 \alias{acq_raw_mspct}
 \title{Take one set of spectral readings}
 \usage{
-acq_raw_mspct(descriptor, acq.settings, seq.settings = NULL,
-  protocol = c("light", "filter", "dark"), user.label = "",
+acq_raw_mspct(descriptor, acq.settings, seq.settings = list(step = 0,
+  num.steps = 1L), protocol = c("light", "filter", "dark"),
+  f.trigger.pulse = NULL, user.label = "",
   where.measured = data.frame(lon = NA_real_, lat = NA_real_),
   pause.fun = NULL, verbose = TRUE, ...)
 }
@@ -19,6 +20,8 @@ or \code{retune_acq_settings()} or \code{acq_settings()}}
 "num.steps" integer.}
 
 \item{protocol}{vector of character strings}
+
+\item{f.trigger.pulse}{function Function to be called to trigger light pulse.}
 
 \item{user.label}{character string to set as label}
 

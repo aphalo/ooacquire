@@ -19,7 +19,7 @@
 #' @param boxcar.width integer Number of pixels to average
 #' @param force.valid logical Accept all spectra as valid, for example do not
 #'   treat clipping as an error condition.
-#' @param num.flashes integer Number of flashes triggered per scan.
+#' @param num.exposures integer Number of flashes triggered per scan.
 #' @param verbose a logical to enable or disable warnings
 #'
 #' @note \code{pixel.selector} can be used for two different purposes: to
@@ -58,7 +58,7 @@ acq_settings <- function(descriptor,
                          corr.sensor.nl = 0L,
                          boxcar.width = 0L,
                          force.valid = FALSE,
-                         num.flashes = NA_integer_,
+                         num.exposures = NA_integer_,
                          verbose = TRUE) {
   # Check length consistency
   stopifnot(length(integ.time) == length(num.scans))
@@ -101,7 +101,7 @@ acq_settings <- function(descriptor,
     corr.sensor.nl = corr.sensor.nl,
     boxcar.width = boxcar.width,
     # flash settings
-    num.flashes = num.flashes,
+    num.exposures = num.exposures,
     # accept invalid spectra as good (we may be willing to accept clipping)
     force.valid = force.valid,
     # processing flag
@@ -130,7 +130,7 @@ set_linearized <- function(acq.settings) {
 
 #' Set integration time
 #'
-#' Tag the settings as linearized
+#' Set the integration time in the instrument settings data structure.
 #'
 #' @param acq.settings list as returned by function \code{acq_settings()}
 #'
@@ -178,6 +178,54 @@ set_integ_time <- function(acq.settings,
             format(acq.settings$num.scans, width = 10, digits = 3), " ")
     message("Total time (s):         ",
             format(acq.settings$tot.time * 1e-6,
+                   digits = 3, width = 10), " ")
+  }
+  acq.settings
+}
+
+#' Set number of exposures
+#'
+#' Set the number of exposures in the instrument settings data structure. This
+#' value is by default missing, indicating a protocol in which one assumes
+#' contant illumination during an integration. If the light exposure is shorter
+#' than the integration time, we need to express the results per exposure, and
+#' consequently calculations done based on the number of exposure during each
+#' integration. This is the case, for example, when measuring the spectral
+#' emission of a xenon flash.
+#'
+#' @param acq.settings list as returned by function \code{acq_settings()}
+#'
+#' @return a copy of the argument passed for \code{acq.settings} with the
+#' \code{integ.time} field of the settings data replaced by \code{integ.time}.
+#'
+#' @keywords internal
+#'
+set_num_exposures <- function(acq.settings,
+                              num.exposures = NA_integer_,
+                              single.scan = FALSE,
+                              verbose = TRUE) {
+  num.exposures <- as.integer(num.exposures)
+  stopifnot(all(is.na(num.exposures) | num.exposures >= 1L))
+  if (length(num.exposures) == 1) {
+    num.exposures <- rep(num.exposures, times = length(acq.settings$HDR.mult))
+  } else if (length(num.exposures) != length(acq.settings$HDR.mult)) {
+    warning("Length missmatch in 'num.exposures', using only first value")
+    num.exposures  <- rep(num.exposures[1], times = length(acq.settings$HDR.mult))
+  }
+
+  if (single.scan || any(!is.na(num.exposures))) {
+    num.scans <- rep(1, times = length(num.exposures))
+    acq.settings$num.scans <- num.scans
+  }
+  acq.settings$num.exposures <- num.exposures
+
+  if (verbose) {
+    message("Exposures (n / scan): ",
+            format(acq.settings$num.exposures, width = 10, digits = 3), " ")
+    message("Numbers of scans:       ",
+            format(acq.settings$num.scans, width = 10, digits = 3), " ")
+    message("Total exposures (n):         ",
+            format(sum(acq.settings$num.scans),
                    digits = 3, width = 10), " ")
   }
   acq.settings

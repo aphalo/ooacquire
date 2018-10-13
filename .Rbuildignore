@@ -5,6 +5,5 @@
 ^inst/example-gadgets$
 ^not-inst$
 ^data-raw$
-^_pkgdown.yml$
 ^docs$
 ^_pkgdown\.yml$

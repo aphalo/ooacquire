@@ -6,9 +6,10 @@
 #'
 #' @param descriptor list as returned by function \code{get_oo_descriptor}
 #' @param acq.settings list as returned by functions \code{tune_acq_settings}
+#' @param f.trigger.pulse function Function to be called to trigger light pulse.
 #' @param what.measured value used to set attribute
-#' @param where.measured data.frame with at least columns "lon" and "lat" compatible
-#' with value returned by \code{ggmap::geocode()}
+#' @param where.measured data.frame with at least columns "lon" and "lat"
+#'   compatible with value returned by \code{ggmap::geocode()}
 #' @param set.all logical resend or not all instrument settings
 #' @param verbose logical to enable or disable warnings
 #'
@@ -19,6 +20,7 @@
 #'
 acq_raw_spct <- function(descriptor,
                          acq.settings,
+                         f.trigger.pulse = NULL,
                          what.measured = NA,
                          where.measured = data.frame(lon = NA_real_, lat = NA_real_),
                          set.all = TRUE,
@@ -68,6 +70,9 @@ acq_raw_spct <- function(descriptor,
     x$integ.time[i] <- actual.integ.time
     rOmniDriver::set_scans_to_avg(y$w, x$num.scans[i], y$sr.index, y$ch.index)
     if (verbose) message(paste("Measurement ", i, "..."))
+    if (!is.null(f.trigger.pullse)) {
+      f.trigger.pulse()
+    }
     counts <- rOmniDriver::get_spectrum(y$w, y$sr.index, y$ch.index)
     if (rOmniDriver::is_spectrum_valid(y$w, y$sr.index, y$ch.index) || x$force.valid)
     {
@@ -99,6 +104,7 @@ acq_raw_spct <- function(descriptor,
 #' @param seq.settings list with members "step" numeric value in seconds,
 #'   "num.steps" integer.
 #' @param protocol vector of character strings
+#' @param f.trigger.pulse function Function to be called to trigger light pulse.
 #' @param user.label character string to set as label
 #' @param where.measured data.frame with at least columns "lon" and "lat"
 #'   compatible with value returned by \code{ggmap::geocode()}
@@ -115,17 +121,14 @@ acq_raw_spct <- function(descriptor,
 #'
 acq_raw_mspct <- function(descriptor,
                           acq.settings,
-                          seq.settings = NULL,
+                          seq.settings = list(step = 0, num.steps = 1L),
                           protocol = c("light", "filter", "dark"),
+                          f.trigger.pulse = NULL,
                           user.label = "",
                           where.measured = data.frame(lon = NA_real_, lat = NA_real_),
                           pause.fun = NULL,
                           verbose = TRUE,
                           ...) {
-
-  if (is.null(seq.settings)) {
-    seq.settings <- list(step = 0, num.steps = 1L)
-  }
 
   default_pause_fun <- function(acq.what, ...) {
     answ <- readline(paste("Ready to acquire", acq.what,
@@ -148,9 +151,15 @@ acq_raw_mspct <- function(descriptor,
         return(raw_mspct())
       }
     }
+    if (p != "dark" && !is.null(f.trigger.pulse)) {
+      f.current <- f.trigger.pulse
+    } else {
+      f.current <- NULL
+    }
     idx <- idx + 1
     z[[idx]] <- acq_raw_spct(descriptor = descriptor,
                              acq.settings = acq.settings,
+                             f.trigger.pulse = f.current,
                              what.measured = user.label,
                              where.measured = where.measured)
     photobiology::setWhenMeasured(z[[idx]], start.time)
@@ -163,5 +172,4 @@ acq_raw_mspct <- function(descriptor,
   names(z) <- protocol
   z
 }
-
 

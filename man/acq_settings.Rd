@@ -9,8 +9,8 @@ acq_settings(descriptor, integ.time = 0.01, num.scans = 10L,
   min.integ.time = -Inf, max.integ.time = Inf, tot.time.range = c(0,
   Inf), HDR.mult = c(short = 1, long = 10), target.margin = 0.1,
   pix.selector = TRUE, corr.elect.dark = 0L, corr.sensor.nl = 0L,
-  boxcar.width = 0L, force.valid = FALSE, num.flashes = NA_integer_,
-  verbose = TRUE)
+  boxcar.width = 0L, force.valid = FALSE,
+  num.exposures = NA_integer_, verbose = TRUE)
 
 tune_acq_settings(descriptor, acq.settings, verbose = TRUE)
 }
@@ -42,7 +42,7 @@ pixels}
 \item{force.valid}{logical Accept all spectra as valid, for example do not
 treat clipping as an error condition.}
 
-\item{num.flashes}{integer Number of flashes triggered per scan.}
+\item{num.exposures}{integer Number of flashes triggered per scan.}
 
 \item{verbose}{a logical to enable or disable warnings}
 

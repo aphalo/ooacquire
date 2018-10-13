@@ -15,6 +15,6 @@ a copy of the argument passed for \code{acq.settings} with the
 \code{integ.time} field of the settings data replaced by \code{integ.time}.
 }
 \description{
-Tag the settings as linearized
+Set the integration time in the instrument settings data structure.
 }
 \keyword{internal}

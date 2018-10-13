@@ -53,7 +53,7 @@ test_that("SpectraSuite comma", {
   expect_equal(getWhereMeasured(ss.spct),
                data.frame(lon = NA_real_, lat = NA_real_))
   expect_equal(getWhatMeasured(ss.spct), "File: pheno1normal.txt")
-  expect_equal(getTimeUnit(ss.spct), NA)
+  expect_equal(getTimeUnit(ss.spct), "unknown")
   expect_gt(length(comment(ss.spct)), 0)
 })
 
@@ -90,6 +90,6 @@ test_that("SpectraSuite comma multiple", {
   expect_equal(getWhereMeasured(ss.mspct[["light"]]),
                data.frame(lon = NA_real_, lat = NA_real_))
   expect_equal(getWhatMeasured(ss.mspct[["light"]]), "File: pheno1normal.txt")
-  expect_equal(getTimeUnit(ss.mspct[["light"]]), NA)
+  expect_equal(getTimeUnit(ss.mspct[["light"]]),  "unknown")
   expect_gt(length(comment(ss.mspct[["light"]])), 0)
 })

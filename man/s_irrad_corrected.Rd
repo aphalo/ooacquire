@@ -6,24 +6,24 @@
 \alias{s_irrad_corrected.list}
 \alias{s_irrad_corrected.raw_mspct}
 \alias{s_irrad_corrected.raw_spct}
-\title{Convert raw counts data into spectral irradiance}
+\title{Convert raw counts data into spectral irradiance or fluence}
 \usage{
 s_irrad_corrected(x, ...)
 
 \method{s_irrad_corrected}{default}(x, ...)
 
-\method{s_irrad_corrected}{list}(x, time = NULL, correction.method,
-  return.cps = FALSE, descriptor, locale = NULL,
+\method{s_irrad_corrected}{list}(x, num.pulses = 0L, time = NULL,
+  correction.method, return.cps = FALSE, descriptor, locale = NULL,
   verbose = getOption("photobiology.verbose", default = FALSE), ...)
 
-\method{s_irrad_corrected}{raw_mspct}(x, spct.names = c(light = "light",
-  filter = "filter", dark = "dark"), correction.method,
-  return.cps = FALSE, verbose = getOption("photobiology.verbose",
-  default = FALSE), ...)
+\method{s_irrad_corrected}{raw_mspct}(x, num.pulses = 0L,
+  spct.names = c(light = "light", filter = "filter", dark = "dark"),
+  correction.method, return.cps = FALSE,
+  verbose = getOption("photobiology.verbose", default = FALSE), ...)
 
-\method{s_irrad_corrected}{raw_spct}(x, correction.method,
-  return.cps = FALSE, verbose = getOption("photobiology.verbose",
-  default = FALSE), ...)
+\method{s_irrad_corrected}{raw_spct}(x, num.pulses = 0L,
+  correction.method, return.cps = FALSE,
+  verbose = getOption("photobiology.verbose", default = FALSE), ...)
 }
 \arguments{
 \item{x}{A named list of one to three vectors of file names, with names
@@ -56,7 +56,7 @@ names.}
 \code{x} to those expected.}
 }
 \description{
-Convert raw counts data into spectral irradiance
+Convert raw counts data into spectral irradiance or fluence
 }
 \section{Methods (by class)}{
 \itemize{

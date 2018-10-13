@@ -4,6 +4,19 @@
 #' package. Mostly as example code that can be modified for diferent
 #' uses.
 #'
+#' @details These functions can be useful for commonly done measurements but
+#'   they also play the role of examples that users can modify according to
+#'   their needs. They are all composed in a modular way from functions that can
+#'   be reshuffled and combined with other functions to define new variations
+#'   better suited to users' needs and tastes. The examples we provide cover the
+#'   measurement of spectral irradiance of continuous light sources, and
+#'   transmittance, reflectance and absorbance using continuous light sources.
+#'
+#'   The default behaviour of the functions can be changed by passing different
+#'   arguments through parameters, but for special use cases it could be best
+#'   for users to define case specific data acquisition functions from the
+#'   same building blocks.
+#'
 #' @param tot.time.range numeric vector Range of total times for a measurement
 #'   in seconds.
 #' @param target.margin numeric (0..1) when tuning integration time, how big a
@@ -17,8 +30,8 @@
 #' @param stray.light.method character Used only when the correction method is
 #'   created on-the-fly.
 #' @param save.pdfs logical Whether to save PDFs to files or not.
-#' @param interface.mode character One of "auto", "simple", "manual", "flash",
-#'   "series", "auto-attr", "simple-attr", "manual-attr", "flash-attr", and
+#' @param interface.mode character One of "auto", "simple", "manual",
+#'   "series", "auto-attr", "simple-attr", "manual-attr", and
 #'   "series-attr".
 #'
 #' @export
@@ -44,9 +57,7 @@
 acq_irrad_interactive <-
   function(tot.time.range = c(5, 15),
            target.margin = 0.1,
-           HDR.mult = ifelse(interface.mode %in% c("flash", "flash-attr"),
-                             c(short = 1, long = 1),
-                             c(short = 1, long = 10)),
+           HDR.mult = c(short = 1, long = 10),
            protocols = NULL,
            correction.method = NA,
            descriptors = NA,
@@ -57,7 +68,7 @@ acq_irrad_interactive <-
     # validate interface mode
     interface.mode <- tolower(interface.mode)
     if (!gsub("-attr$", "", interface.mode) %in%
-        c("auto", "simple", "flash", "series")) {
+        c("auto", "simple", "series")) {
       stop("Invalid argument for 'interface.mode', aborting.")
     }
     # define measurement protocols
@@ -192,7 +203,8 @@ acq_irrad_interactive <-
 
       settings <- tune_interactive(descriptor = descriptor,
                                    settings = settings,
-                                   start.int.time = start.int.time)
+                                   start.int.time = start.int.time,
+                                   interface.mode = interface.mode)
 
       if (grepl("series", interface.mode)) {
         seq.settings <- set_seq_interactive(seq.settings)
@@ -315,8 +327,12 @@ acq_irrad_interactive <-
 #'   one may want to use a grey reference. We provide an argument that allows
 #'   the user to supply a constant or a spectrum describing the properties of
 #'   the reference. It is also important to distinguish between total and
-#'   internal transmittance, and which of these is measured depends on the
-#'   measuring protocol.
+#'   internal transmittance, and between total and specular reflectance.
+#'   In both cases which of these is measured depends on the measuring protocol
+#'   (condition used as reference, use of an integrating sphere versus use of a
+#'   probe with a narrow angle of aperture, etc.) and consequently the correct
+#'   value should be entered to ensure that data are correctly tagged and
+#'   later computations valid.
 #'
 #' @export
 #'
@@ -537,6 +553,7 @@ acq_fraction_interactive <-
     message("Bye!")
   }
 
+
 #' Interactively adjust the integration time settings
 #'
 #' Adjust integration time settings, allowing the user to repeat the tunning,
@@ -545,26 +562,23 @@ acq_fraction_interactive <-
 #' @keywords internal
 #'
 tune_interactive <- function(descriptor, settings, start.int.time = 0.1, interface.mode = "auto") {
-  if (!interface.mode %in% c("simple", "auto", "flash", "manual")) {
+  if (!interface.mode %in% c("simple", "auto", "manual")) {
     interface.mode <- "auto"
   }
   # configure interface for active mode
   prompt.text <- switch(interface.mode,
                         simple = "t = retune, r = range, h = HDR mult., u = undo (t/r/h/u/-): ",
                         auto = "t = retune, T = tune, s = skip, m = margin, r = range, h = HDR mult., u = undo (t/s/m/r/h/u/-): ",
-                        manual = "f = fixed, s = skip, r = range, h = HDR mult., u = undo (f/r/h/u/-): ",
-                        flash = "f = fixed, n = number of flashes, s = skip, h = HDR mult., u = undo (f/n/h/u/-): "
+                        manual = "f = fixed, s = skip, r = range, h = HDR mult., u = undo (f/r/h/u/-): "
   )
   valid.input <- switch(interface.mode,
                         simple = c("t", "r", "h", "u", ""),
                         auto = c("t", "T", "s", "m", "r", "h", "u", ""),
-                        manual = c("f", "s", "r", "h", "u", ""),
-                        flash = c("f", "n", "s", "h", "u", "")
+                        manual = c("f", "s", "r", "h", "u", "")
   )
   default.input <- switch(interface.mode,
                           simple = c("t", "s"),
                           auto = c("t", "s"),
-                          flash =  c("f", "s"),
                           manual = c("f", "s")
   )
   # common code to all modes
@@ -582,6 +596,10 @@ tune_interactive <- function(descriptor, settings, start.int.time = 0.1, interfa
     if (answ == "") {
       answ <- ifelse(!tuned, default.input[1], default.input[2])
     }
+    if (answ %in% c("s", "g")) {
+      break()                       ## <- exit point for loop
+    }
+
     if (substr(answ, 1, 1) == "t") {
       settings <- tune_acq_settings(descriptor = descriptor, acq.settings = settings)
       tuned <- TRUE
@@ -592,25 +610,9 @@ tune_interactive <- function(descriptor, settings, start.int.time = 0.1, interfa
     } else if (substr(answ, 1, 1) == "f") {
       cat("Integration time (seconds): ")
       user.integ.time <- scan(nmax = 4L) * 1e6
-      if (interface.mode == "flash") {
-        settings <- set_integ_time(acq.settings = settings,
-                                   integ.time = user.integ.time,
-                                   single.scan = TRUE)
-      } else {
-        settings <- set_integ_time(acq.settings = settings,
-                                   integ.time = user.integ.time)
-      }
+      settings <- set_integ_time(acq.settings = settings,
+                                 integ.time = user.integ.time)
       tuned <- TRUE
-    } else if (substr(answ, 1, 1) == "n") {
-      cat("Number of flashes for each of", length(settings[["integ.time"]]), "scans.")
-      repeat {
-        num.flashes <- trunc(scan(nmax = 4L))
-        if (length(num.flashes) == length(settings[["integ.time"]])) {
-          break()
-        }
-        cat("Wrong length, please, try again...")
-      }
-      settings[["num.flashes"]] <- num.flashes
     } else if (substr(answ, 1, 1) == "m") {
       margin <- readline(sprintf("Saturation margin = %.2g, new: ",
                                  settings[["target.margin"]]))
