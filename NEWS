@@ -13,7 +13,11 @@ such flashes as light source for measurement of spectral transmittance.
 * Update acq_irrad_interactive() adding possibility to set attributes.
 * Update acq_irrad_interactive() adding possibility of constructing
 collections of spectra.
-* Add pre-built calibrations and methods for a third FLAME-S instrument.
+* Add acq_fluence_interactive() for measuring spectral fluence of pulsed light
+sources.
+* Add acq_fraction_pulsed_interactive() for measuring transmitance and
+reflectance using a pulsed light source.
+* Add pre-built calibrations and methods for a fourth FLAME-S instrument.
 * Fix various minor bugs.
 
 ooacquire 0.1.5
