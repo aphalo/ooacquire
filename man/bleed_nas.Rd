@@ -20,13 +20,13 @@ Replace "good" data from pixels adyacent to NAs with NAs as data from pixels
 not saturated but located in the neighbourhood of saturated pixels can return
 unreliable data. This correction is needed by a phenomenon similar to
 "blooming" in camera sensors whereby when a sensor well gets saturated some
-of charge migrates to adjacent wells in the detector increasing their
+of the charge migrates to adjacent wells in the detector increasing their
 readings.
 }
 \note{
-Avoid using large n values as n pixels at each end of the array are
-  skipped. The value of n needed for each detector type/instrument
-  needs to be found through testing. As rule of thumb use 5 < n < 10 for
-  Sony's ILxxx and 8 < n < 14 for Hamamatsu xxxx. At the moment we use
-  a symetric window although "blooming" could be asymetric.
+Avoid using very large n values as n pixels at each end of the array
+  are assumed not to be ever saturated. The value of n needed for each
+  detector type/instrument needs to be found through testing. As rule of
+  thumb use 5 < n < 10 for Sony's ILxxx and 8 < n < 14 for Hamamatsu xxxx. At
+  the moment we use a symetric window although "blooming" could be asymetric.
 }

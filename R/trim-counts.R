@@ -84,7 +84,12 @@ merge_cps <- function(x) {
   instr.desc <- getInstrDesc(x)
   instr.settings <- getInstrSettings(x)
   integ.times <- instr.settings[["integ.time"]]
-  cols <- counts.cols[order(integ.times, decreasing = TRUE)]
+  num.exposures <- instr.settings[["num.exposures"]]
+  if (all(num.exposures < 0L)) {
+    cols <- counts.cols[order(integ.times, decreasing = TRUE)]
+  } else {
+    cols <- counts.cols[order(num.exposures, decreasing = TRUE)]
+  }
   x[["cps"]] <- x[[cols[1]]]
   for (i in 2:length(cols)) {
     x[["cps"]] <- ifelse(is.na(x[["cps"]]),
@@ -104,7 +109,7 @@ merge_cps <- function(x) {
 #' not saturated but located in the neighbourhood of saturated pixels can return
 #' unreliable data. This correction is needed by a phenomenon similar to
 #' "blooming" in camera sensors whereby when a sensor well gets saturated some
-#' of charge migrates to adjacent wells in the detector increasing their
+#' of the charge migrates to adjacent wells in the detector increasing their
 #' readings.
 #'
 #' @param x raw_spct object
@@ -115,21 +120,21 @@ merge_cps <- function(x) {
 #' @return  a copy of x with values replaced by NAs as needed in all counts
 #'   columns present.
 #'
-#' @note Avoid using large n values as n pixels at each end of the array are
-#'   skipped. The value of n needed for each detector type/instrument
-#'   needs to be found through testing. As rule of thumb use 5 < n < 10 for
-#'   Sony's ILxxx and 8 < n < 14 for Hamamatsu xxxx. At the moment we use
-#'   a symetric window although "blooming" could be asymetric.
+#' @note Avoid using very large n values as n pixels at each end of the array
+#'   are assumed not to be ever saturated. The value of n needed for each
+#'   detector type/instrument needs to be found through testing. As rule of
+#'   thumb use 5 < n < 10 for Sony's ILxxx and 8 < n < 14 for Hamamatsu xxxx. At
+#'   the moment we use a symetric window although "blooming" could be asymetric.
 #'
 bleed_nas <- function(x, n = 10) {
   stopifnot(is.raw_spct(x))
   instr.desc <- getInstrDesc(x)
   instr.settings <- getInstrSettings(x)
   counts.cols <- grep("^counts", names(x), value = TRUE)
-  # this is a "quick and dirty" algorithm that assumes that we can ignore the
-  # first n and last n pixels of the detector array, which in practice are
-  # almost never used for anything but dark reference and so very unlikely
-  # to be exposed to an irradiance saturating their response.
+  # this is a "quick and dirty" algorithm that assumes that we do not need to
+  # check for NAs the first n and last n pixels of the detector array, which in
+  # practice are almost never used for anything but dark reference and so very
+  # unlikely to be exposed to an irradiance saturating their response.
   z <- x
   for (i in counts.cols) {
     for (j in n:(nrow(x) - n)) {

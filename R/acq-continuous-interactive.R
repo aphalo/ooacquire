@@ -202,7 +202,7 @@ acq_irrad_interactive <-
       }
 
       settings <- tune_interactive(descriptor = descriptor,
-                                   settings = settings,
+                                   acq.settings = settings,
                                    start.int.time = start.int.time,
                                    interface.mode = interface.mode)
 
@@ -469,7 +469,7 @@ acq_fraction_interactive <-
       file.name <- paste(filter.name, "Rda", sep = ".")
       pdf.name <- paste(filter.name, "pdf", sep = ".")
 
-      settings <- tune_interactive(descriptor = descriptor, settings = settings)
+      settings <- tune_interactive(descriptor = descriptor, acq.settings = settings)
 
       raw.mspct <- acq_raw_mspct(descriptor = descriptor,
                                  acq.settings = settings,
@@ -553,309 +553,6 @@ acq_fraction_interactive <-
     message("Bye!")
   }
 
-
-#' Interactively adjust the integration time settings
-#'
-#' Adjust integration time settings, allowing the user to repeat the tunning,
-#' and to change some of the parameters used for tunning.
-#'
-#' @keywords internal
-#'
-tune_interactive <- function(descriptor, settings, start.int.time = 0.1, interface.mode = "auto") {
-  if (!interface.mode %in% c("simple", "auto", "manual")) {
-    interface.mode <- "auto"
-  }
-  # configure interface for active mode
-  prompt.text <- switch(interface.mode,
-                        simple = "t = retune, r = range, h = HDR mult., u = undo (t/r/h/u/-): ",
-                        auto = "t = retune, T = tune, s = skip, m = margin, r = range, h = HDR mult., u = undo (t/s/m/r/h/u/-): ",
-                        manual = "f = fixed, s = skip, r = range, h = HDR mult., u = undo (f/r/h/u/-): "
-  )
-  valid.input <- switch(interface.mode,
-                        simple = c("t", "r", "h", "u", ""),
-                        auto = c("t", "T", "s", "m", "r", "h", "u", ""),
-                        manual = c("f", "s", "r", "h", "u", "")
-  )
-  default.input <- switch(interface.mode,
-                          simple = c("t", "s"),
-                          auto = c("t", "s"),
-                          manual = c("f", "s")
-  )
-  # common code to all modes
-  old.settings <- settings # allow starting over
-  tuned <- FALSE
-  repeat{
-    cat("Ready to adjust integration time?\n")
-    repeat {
-      answ <- readline(prompt.text)
-      if (answ[1] %in% valid.input) {
-        break()
-      }
-      cat("Unrecognized letter: ", answ[1], ". Please, try again.")
-    }
-    if (answ == "") {
-      answ <- ifelse(!tuned, default.input[1], default.input[2])
-    }
-    if (answ %in% c("s", "g")) {
-      break()                       ## <- exit point for loop
-    }
-
-    if (substr(answ, 1, 1) == "t") {
-      settings <- tune_acq_settings(descriptor = descriptor, acq.settings = settings)
-      tuned <- TRUE
-    } else if (substr(answ, 1, 1) == "T") {
-      settings[["integ.time"]] <- start.int.time * 1e6
-      settings <- tune_acq_settings(descriptor = descriptor, acq.settings = settings)
-      tuned <- TRUE
-    } else if (substr(answ, 1, 1) == "f") {
-      cat("Integration time (seconds): ")
-      user.integ.time <- scan(nmax = 4L) * 1e6
-      settings <- set_integ_time(acq.settings = settings,
-                                 integ.time = user.integ.time)
-      tuned <- TRUE
-    } else if (substr(answ, 1, 1) == "m") {
-      margin <- readline(sprintf("Saturation margin = %.2g, new: ",
-                                 settings[["target.margin"]]))
-      margin <- try(as.numeric(margin))
-      if (!is.na(margin)) {
-        settings[["target.margin"]] <- margin
-        tuned <- FALSE
-      } else {
-        print("Value not changed!")
-      }
-    } else if (substr(answ, 1, 1) == "r") {
-      cat("Total time range (seconds), 2 numbers: ")
-      tot.time.range <- range(scan(nmax = 2)) * 1e6
-      if (tot.time.range[1] >= 0) {
-        settings[["tot.time.range"]] <- tot.time.range
-        tuned <- FALSE
-      } else {
-        cat("Value not changed!")
-      }
-    }  else if (substr(answ, 1, 1) == "h") {
-      cat("HDR multipliers, 1 to 4 numbers: ")
-      HDR.mult <- sort(scan(nmax = 4))
-      if (HDR.mult[1] >= 0  && HDR.mult[length(HDR.mult)] < 1000) {
-        settings[["HDR.mult"]] <- HDR.mult
-        tuned <- FALSE
-      } else {
-        cat("Value not changed!")
-      }
-    } else if (substr(answ, 1, 1) == "u") {
-      cat("Restoring previous settings!")
-      settings <- old.settings
-    }
-  }
-  settings
-}
-
-#' Interactively select a measurement protocol
-#'
-#' Choose a protocol by name from a list of protocols, allowing the user to
-#' correct the selection if needed.
-#'
-#' @keywords internal
-#'
-protocol_interactive <- function(protocols) {
-  prompt <- paste("Protocols: ",
-                  paste(names(protocols), collapse = ", "),
-                  ": ")
-  repeat{
-    user.input <- readline(prompt = prompt)
-    if (user.input == "") {
-      user.input <- names(protocols)[[1]]
-    }
-    if (user.input %in% names(protocols)) {
-      protocol <- protocols[[user.input[1]]]
-      if (readline(paste("Will use protocol ",
-                         paste(protocol, collapse = " -> "),
-                         " o.k.? (-/n): ", sep = "")) != "n") {
-        break()
-      }
-    }
-  }
-  protocol
-}
-
-#' Interactively select an instrument
-#'
-#' Choice of spectrometer by name from a list of serial numbers, allowing the
-#' user to correct the selection if needed.
-#'
-#' @param instruments the returm value of \code{list_instruments(w)}.
-#' @param w handle to Omni Driver, used to retry if an spectrometer is connected.
-#'
-#' @keywords internal
-#'
-choose_sr_interactive <- function(instruments, w = NULL) {
-  # if instruments has names these would not be needed
-  sn.idx <- 3
-
-  # make sure at least one instrument is connected
-  repeat{
-    num.inst <- nrow(instruments)
-    if (num.inst >= 1) {
-      print("Connected spectrometers")
-      break()
-    } else if (!is.null(w)) {
-      cat("No spectrometer found. Abort, or connect one and then retry.")
-      if (readline("abort, retry (-/a)") == "a") {
-        stop("Aborting as requested! Bye.")
-      }
-      instruments <- list_instruments(w)
-    } else {
-      cat("No spectrometer found. Aborting.")
-    }
-  }
-
-  # select instrument
-  if (num.inst > 1) {
-    prompt <- paste(1:nrow(instruments), ": ", instruments[[sn.idx]],
-                    " (choose by index): ", sep = "")
-    repeat{
-      sr.idx <- as.integer(readline(prompt = prompt))
-      if (sr.idx[1] == "") {
-        sr.idx <- 1L
-      }
-      if (sr.idx[1] %in% 1L:nrow(instruments)) {
-        sr.index <- sr.idx - 1L
-        break()
-      } else {
-        print("A number between 1 and ", num.inst, " is required.")
-      }
-    }
-  } else { # num.inst == 1
-    sr.idx <- 1L
-    sr.index <- sr.idx - 1L
-  }
-  print(instruments[sr.idx, ])
-  sr.index
-}
-
-
-#' Interactively select a channel
-#'
-#' Choice of channel to be used if spectrometer has more than one channel.
-#'
-#' @param instruments the returm value of \code{list_instruments(w)}
-#' @param sr.index integer The index to the spectrometer, starting from zero,
-#'   following C conventions instead of R indexing conventions.
-#' @param prompt.text character string to use as prompt.
-#'
-#' @keywords internal
-#'
-choose_ch_interactive <- function(instruments,
-                                  sr.index = 0L,
-                                  prompt.text = "Channels available: ") {
-  stopifnot(nrow(instruments) > 0)
-
-  num.ch.idx <- 4
-
-  num.channels <- instruments[sr.index + 1L, num.ch.idx]
-  if (num.channels > 1) {
-    repeat {
-      prompt <- paste(prompt.text, paste(format(1:num.channels, digits = 0L), collapse = ", "),
-                      " (choose by index): ", sep = "")
-      ch.idx <- as.integer(readline(prompt = prompt))
-      if (ch.idx %in% 1:num.channels) {
-        ch.index <- ch.idx - 1L
-        break()
-      } else {
-        print(paste("A number between 1 and ", num.channels, " is required.", sep = ""))
-      }
-    }
-  } else {
-    ch.index <- 0L
-  }
-  ch.index
-}
-
-#' Interactively set sequential measurements
-#'
-#' Adjust integration time settings, allowing the user to repeat the tunning,
-#' and to change some of the parameters used for tunning.
-#'
-#' @keywords internal
-#'
-set_seq_interactive <- function(seq.settings) {
-  old.seq.settings <- seq.settings
-  repeat{
-    cat("Ready to set sequence parameters?\n")
-    answ <- readline("s = step size, n = step number, u = undo (s/n/u/-): ")
-    if (answ == "") {
-      break()
-    }
-    if (substr(answ, 1, 1) == "s") {
-      step <- readline(sprintf("Step = %.g2 seconds, new: ",
-                               seq.settings[["step"]]))
-      step <- try(as.numeric(step))
-      if (!is.na(step)) {
-        seq.settings[["step"]] <- step
-      } else {
-        print("Value not changed!")
-      }
-    } else if (substr(answ, 1, 1) == "n") {
-      num.steps <- readline(sprintf("Number of steps = %i, new: ",
-                                    seq.settings[["num.steps"]]))
-      num.steps <- try(as.integer(num.steps))
-      if (is.na(num.steps)) {
-        print("Number of steps must be a positive integer. Value not changed!")
-      } else if (num.steps < 1L || num.steps > 10000L) {
-        warning("Number of steps must be in range 1..10000. Value not changed!")
-      } else {
-        seq.settings[[num.steps]] <- num.steps
-      }
-    } else if (substr(answ, 1, 1) == "u") {
-      cat("Restoring previous settings!")
-      seq.settings <- old.seq.settings
-    }
-  }
-  seq.settings
-}
-
-#' Interactively set user attributes
-#'
-#' Enter values for "user supplied" attribute values.
-#'
-#' @keywords internal
-#'
-set_attributes_interactive <- function(user.attrs) {
-  repeat{
-    user.input <- readline(prompt = "w = what.measured, c = comment (w/c/-): ")
-    if (substr(user.input, 1, 1) == "w") {
-      user.attrs$what.measured <- readline("Set 'what.measured' = ")
-    } else if (substr(user.input, 1, 1) == "c") {
-      user.attrs$comment.text <- readline("Set 'comment' = ")
-    } else {
-      break()
-    }
-  }
-  user.attrs
-}
-
-#' Interactively get folder to use
-#'
-#' Enter values for "user supplied" folder.
-#'
-#' @keywords internal
-#'
-set_folder_interactive <- function(folder.name = ".") {
-  old.folder.name <- folder.name
-  folder.name <- readline("Enter folder name (use forward slashes '/' instead of '\'): ")
-  message("Folder: ", folder.name)
-  # needs to be replaced by a proper vailidity check
-  if (folder.name == "") {
-    folder.name <- old.folder.name
-    message("Folder: ", folder.name)
-  }
-  if (!file.exists(folder.name)) {
-    message("Folder does not exist, creating it...")
-    dir.create(folder.name)
-  } else {
-    message("Using existing folder: '", folder.name, "'.")
-  }
-  folder.name
-}
 
 # simple fraction interactive ---------------------------------------------
 
@@ -963,7 +660,7 @@ acq_rfr_tfr_interactive <-
 
       cat("REFLECTANCE:\n")
       rfr.settings <- tune_interactive(descriptor = rfr.descriptor,
-                                       settings = rfr.settings)
+                                       acq.settings = rfr.settings)
 
       rfr.raw.mspct <- acq_raw_mspct(descriptor = rfr.descriptor,
                                      acq.settings = rfr.settings,
@@ -978,7 +675,7 @@ acq_rfr_tfr_interactive <-
 
       cat("TRANSMITANCE:\n")
       tfr.settings <- tune_interactive(descriptor = tfr.descriptor,
-                                       settings = tfr.settings)
+                                       acq.settings = tfr.settings)
 
       tfr.raw.mspct <- acq_raw_mspct(descriptor = tfr.descriptor,
                                      acq.settings = tfr.settings,

@@ -38,7 +38,7 @@ raw2cps.raw_spct <- function(x,
   if (exists("num.exposures", acq_settings)) {
     num.exposures <- acq_settings[["num.exposures"]]
   } else {
-    num.exposures <- NA_integer_
+    num.exposures <- -1L
   }
   integ.time <- acq_settings[["integ.time"]]
   counts.cols <- names(x)[grep("^counts", names(x))]
@@ -49,11 +49,12 @@ raw2cps.raw_spct <- function(x,
   max.counts <- numeric(length(counts.cols))
   for (i in seq_along(counts.cols)) {
     max.counts[i] <- max(x[[counts.cols[i]]], na.rm = TRUE)
-    if (!is.na(num.exposures)) {
+    if (any(num.exposures >= 1L)) {
       # counts per flash
       z[[cps.cols[i]]] <- x[[counts.cols[i]]] / num.exposures[i]
-      setCpsSpct(z, time.unit = "exposure") # tag as counts per flash!!
-    } else {
+      setCpsSpct(z, time.unit = "exposure") # tag as counts per exposure!!
+    } else if (any(num.exposures < 0L)) {
+      stopifnot(all(num.exposures < 0L)) # mix not allowed
       # counts per second
       z[[cps.cols[i]]] <- x[[counts.cols[i]]] / integ.time[i] * 1e6
       setCpsSpct(z, time.unit = "second")

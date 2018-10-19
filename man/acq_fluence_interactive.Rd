@@ -2,17 +2,17 @@
 % Please edit documentation in R/acq-pulsed-interactive.R
 \name{acq_fluence_interactive}
 \alias{acq_fluence_interactive}
-\alias{acq_fraction_flash_interactive}
+\alias{acq_fraction_pulsed_interactive}
 \title{Acquire flash spectra interactively}
 \usage{
-acq_fluence_interactive(integ.time = 2, num.scans = 3,
-  num.pulses = 1, f.trigger.pulse = f.trigger.message,
+acq_fluence_interactive(integ.time = 2, num.scans = 1L,
+  num.exposures = 1L, f.trigger.pulses = f.trigger.message,
   protocols = NULL, correction.method = NA, descriptors = NA,
   stray.light.method = "none", save.pdfs = TRUE,
   interface.mode = "manual")
 
-acq_fraction_flash_interactive(integ.time = 2, num.scans = 3,
-  num.pulses = 1, f.trigger.pulse = f.trigger.message,
+acq_fraction_pulsed_interactive(integ.time = 2, num.scans = 1L,
+  num.exposures = 1L, f.trigger.pulses = f.trigger.message,
   protocols = NULL, correction.method = NA, descriptors = NA,
   ref.value = 1, ref.absolute = TRUE, ref.persistence = 1,
   qty.out = "Tfr", type = "total", stray.light.method = "simple",
@@ -24,9 +24,12 @@ in seconds.}
 
 \item{num.scans}{integer Number of scans to average.}
 
-\item{num.pulses}{integer Number or light pulses (flashes) per scan.}
+\item{num.exposures}{integer Number or light pulses (flashes) per scan. Set
+to \code{-1L} to indicate that the light source is continuous.}
 
-\item{f.trigger.pulse}{function Function to be called to trigger light pulse.}
+\item{f.trigger.pulses}{function Function to be called to trigger light
+pulse(s). Should accept as its only argument the number of pulses, and
+return \code{TRUE} on sucess and \code{FALSE} on failure.}
 
 \item{protocols}{list of character vectors.}
 

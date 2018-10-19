@@ -4,16 +4,22 @@
 \alias{acq_raw_spct}
 \title{Measure one raw spectrum}
 \usage{
-acq_raw_spct(descriptor, acq.settings, f.trigger.pulse = NULL,
-  what.measured = NA, where.measured = data.frame(lon = NA_real_, lat =
-  NA_real_), set.all = TRUE, verbose = TRUE)
+acq_raw_spct(descriptor, acq.settings, num.exposures = -1L,
+  f.trigger.pulses = f.trigger.message, what.measured = NA,
+  where.measured = data.frame(lon = NA_real_, lat = NA_real_),
+  set.all = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{descriptor}{list as returned by function \code{get_oo_descriptor}}
 
 \item{acq.settings}{list as returned by functions \code{tune_acq_settings}}
 
-\item{f.trigger.pulse}{function Function to be called to trigger light pulse.}
+\item{num.exposures}{integer Number or light pulses (flashes) per scan. Set
+to \code{-1L} to indicate that the light source is continuous.}
+
+\item{f.trigger.pulses}{function Function to be called to trigger light
+pulse(s). Should accept as its only argument the number of pulses, and
+return \code{TRUE} on sucess and \code{FALSE} on failure.}
 
 \item{what.measured}{value used to set attribute}
 

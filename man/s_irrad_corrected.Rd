@@ -12,16 +12,16 @@ s_irrad_corrected(x, ...)
 
 \method{s_irrad_corrected}{default}(x, ...)
 
-\method{s_irrad_corrected}{list}(x, num.pulses = 0L, time = NULL,
-  correction.method, return.cps = FALSE, descriptor, locale = NULL,
+\method{s_irrad_corrected}{list}(x, time = NULL, correction.method,
+  return.cps = FALSE, descriptor, locale = NULL,
   verbose = getOption("photobiology.verbose", default = FALSE), ...)
 
-\method{s_irrad_corrected}{raw_mspct}(x, num.pulses = 0L,
-  spct.names = c(light = "light", filter = "filter", dark = "dark"),
-  correction.method, return.cps = FALSE,
-  verbose = getOption("photobiology.verbose", default = FALSE), ...)
+\method{s_irrad_corrected}{raw_mspct}(x, spct.names = c(light = "light",
+  filter = "filter", dark = "dark"), correction.method,
+  return.cps = FALSE, verbose = getOption("photobiology.verbose",
+  default = FALSE), ...)
 
-\method{s_irrad_corrected}{raw_spct}(x, num.pulses = 0L,
+\method{s_irrad_corrected}{raw_spct}(x, num.exposures = 0L,
   correction.method, return.cps = FALSE,
   verbose = getOption("photobiology.verbose", default = FALSE), ...)
 }
@@ -54,6 +54,9 @@ names.}
 
 \item{spct.names}{named character vector of length three, to map names in
 \code{x} to those expected.}
+
+\item{num.exposures}{integer Number of pulses per scan, if 0L, continuous source is
+assumed.}
 }
 \description{
 Convert raw counts data into spectral irradiance or fluence

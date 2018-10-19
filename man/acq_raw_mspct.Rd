@@ -4,11 +4,11 @@
 \alias{acq_raw_mspct}
 \title{Take one set of spectral readings}
 \usage{
-acq_raw_mspct(descriptor, acq.settings, seq.settings = list(step = 0,
+acq_raw_mspct(descriptor, acq.settings, num.exposures = -1L,
+  f.trigger.pulses = f.trigger.message, seq.settings = list(step = 0,
   num.steps = 1L), protocol = c("light", "filter", "dark"),
-  f.trigger.pulse = NULL, user.label = "",
-  where.measured = data.frame(lon = NA_real_, lat = NA_real_),
-  pause.fun = NULL, verbose = TRUE, ...)
+  user.label = "", where.measured = data.frame(lon = NA_real_, lat =
+  NA_real_), pause.fun = NULL, verbose = TRUE, ...)
 }
 \arguments{
 \item{descriptor}{list as returned by function \code{get_oo_descriptor()}}
@@ -16,12 +16,17 @@ acq_raw_mspct(descriptor, acq.settings, seq.settings = list(step = 0,
 \item{acq.settings}{list as returned by functions \code{tune_acq_settings()}
 or \code{retune_acq_settings()} or \code{acq_settings()}}
 
+\item{num.exposures}{integer Number or light pulses (flashes) per scan. Set
+to \code{-1L} to indicate that the light source is continuous.}
+
+\item{f.trigger.pulses}{function Function to be called to trigger light
+pulse(s). Should accept as its only argument the number of pulses, and
+return \code{TRUE} on sucess and \code{FALSE} on failure.}
+
 \item{seq.settings}{list with members "step" numeric value in seconds,
 "num.steps" integer.}
 
 \item{protocol}{vector of character strings}
-
-\item{f.trigger.pulse}{function Function to be called to trigger light pulse.}
 
 \item{user.label}{character string to set as label}
 

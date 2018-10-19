@@ -58,7 +58,7 @@ acq_settings <- function(descriptor,
                          corr.sensor.nl = 0L,
                          boxcar.width = 0L,
                          force.valid = FALSE,
-                         num.exposures = NA_integer_,
+                         num.exposures = -1L,
                          verbose = TRUE) {
   # Check length consistency
   stopifnot(length(integ.time) == length(num.scans))
@@ -201,11 +201,11 @@ set_integ_time <- function(acq.settings,
 #' @keywords internal
 #'
 set_num_exposures <- function(acq.settings,
-                              num.exposures = NA_integer_,
+                              num.exposures = -1L,
                               single.scan = FALSE,
                               verbose = TRUE) {
   num.exposures <- as.integer(num.exposures)
-  stopifnot(all(is.na(num.exposures) | num.exposures >= 1L))
+  stopifnot(all(is.na(num.exposures) | num.exposures >= -1L))
   if (length(num.exposures) == 1) {
     num.exposures <- rep(num.exposures, times = length(acq.settings$HDR.mult))
   } else if (length(num.exposures) != length(acq.settings$HDR.mult)) {
@@ -219,14 +219,9 @@ set_num_exposures <- function(acq.settings,
   }
   acq.settings$num.exposures <- num.exposures
 
-  if (verbose) {
+  if (verbose && any(acq.settings$num.exposures >= 0L)) {
     message("Exposures (n / scan): ",
             format(acq.settings$num.exposures, width = 10, digits = 3), " ")
-    message("Numbers of scans:       ",
-            format(acq.settings$num.scans, width = 10, digits = 3), " ")
-    message("Total exposures (n):         ",
-            format(sum(acq.settings$num.scans),
-                   digits = 3, width = 10), " ")
   }
   acq.settings
 }
@@ -247,7 +242,17 @@ set_num_exposures <- function(acq.settings,
 tune_acq_settings <- function(descriptor,
                               acq.settings,
                               verbose = TRUE) {
+  # old objects are missing this field, so we set it to retain old behaviour
+  if (!exists("num.exposures", acq.settings)) {
+    acq.settings$num.exposures <- -1L
+  }
+
   x <- acq.settings
+
+  if (!all(x$num.exposures < 0L)) {
+    warning("Multiple exposures set.\nIntegration time not adjusted!")
+    return(x)
+  }
 
   # correction for electrical dark (in instrument using ocluded pixels in array)
   rOmniDriver::set_correct_for_electrical_dark(descriptor$w, x$corr.elect.dark,
@@ -274,7 +279,8 @@ tune_acq_settings <- function(descriptor,
   integ.time <- x$integ.time[1]
   target.margin <- x$target.margin
   target.min.counts <- nl.fun((1 - target.margin) * descriptor$max.counts)
-  target.counts <- nl.fun((1 - target.margin / 2) * descriptor$max.counts)
+  target.max.counts <- nl.fun((1 - target.margin / 2) * descriptor$max.counts)
+  target.counts <- nl.fun((1 - target.margin / 3 * 2) * descriptor$max.counts)
 
   i <- 0L
   repeat {
@@ -290,9 +296,10 @@ tune_acq_settings <- function(descriptor,
                                             descriptor$ch.index)
     dark.counts <- nl.fun(min(raw.counts[x$pix.selector]))
     max.counts <- nl.fun(max(raw.counts[x$pix.selector]))
-    while (max.counts > target.counts)
+    while (max.counts > target.max.counts)
     {
-      integ.time <- integ.time / 3
+      # increased divisor to 5 to make the "blind" decrease in integration time faster
+      integ.time <- integ.time / 5
       if (integ.time < x$min.integ.time) {
         break()
       }
@@ -311,10 +318,11 @@ tune_acq_settings <- function(descriptor,
     }
     if (verbose) message(paste("max.counts[", i, "]: ", format(max.counts)))
     if (max.counts < target.min.counts && integ.time < x$max.integ.time) {
-      if (verbose) message("max count <", round(target.min.counts))
-      integ.time <- round(integ.time *
+      if (verbose) message("max count <", trunc(target.min.counts))
+      # replaced round with trunc as the algorithm was sometimes overshooting
+      integ.time <- trunc(integ.time *
                             (target.counts - dark.counts) /
-                            (max.counts - dark.counts), 0)
+                            (max.counts - dark.counts))
     }
 
     if (integ.time >= x$max.integ.time) {
@@ -341,6 +349,7 @@ tune_acq_settings <- function(descriptor,
       i <- i + 1
     }
   }
+
   integ.time <- x$HDR.mult * integ.time # vectorized!
   integ.time <- ifelse(integ.time > x$max.integ.time, x$max.integ.time, integ.time)
   integ.time <- ifelse(integ.time < x$min.integ.time, x$min.integ.time, integ.time)
@@ -371,3 +380,4 @@ tune_acq_settings <- function(descriptor,
   }
   acq.settings
 }
+

@@ -4,7 +4,7 @@
 \alias{set_num_exposures}
 \title{Set number of exposures}
 \usage{
-set_num_exposures(acq.settings, num.exposures = NA_integer_,
+set_num_exposures(acq.settings, num.exposures = -1L,
   single.scan = FALSE, verbose = TRUE)
 }
 \arguments{

@@ -6,7 +6,11 @@
 #'
 #' @param descriptor list as returned by function \code{get_oo_descriptor}
 #' @param acq.settings list as returned by functions \code{tune_acq_settings}
-#' @param f.trigger.pulse function Function to be called to trigger light pulse.
+#' @param num.exposures integer Number or light pulses (flashes) per scan. Set
+#'   to \code{-1L} to indicate that the light source is continuous.
+#' @param f.trigger.pulses function Function to be called to trigger light
+#'   pulse(s). Should accept as its only argument the number of pulses, and
+#'   return \code{TRUE} on sucess and \code{FALSE} on failure.
 #' @param what.measured value used to set attribute
 #' @param where.measured data.frame with at least columns "lon" and "lat"
 #'   compatible with value returned by \code{ggmap::geocode()}
@@ -20,7 +24,8 @@
 #'
 acq_raw_spct <- function(descriptor,
                          acq.settings,
-                         f.trigger.pulse = NULL,
+                         num.exposures = -1L,
+                         f.trigger.pulses = f.trigger.message,
                          what.measured = NA,
                          where.measured = data.frame(lon = NA_real_, lat = NA_real_),
                          set.all = TRUE,
@@ -28,8 +33,19 @@ acq_raw_spct <- function(descriptor,
   x <- acq.settings
   x$integ.time <- as.integer(x$integ.time) # integer microseconds
 
-  y <- descriptor
   num.readings <- length(x$integ.time)
+
+  num.exposures <- as.integer(num.exposures)
+  if (length(num.exposures) == 1L) {
+    if (num.readings > 1L) {
+      num.exposures <- rep(num.exposures, num.readings)
+    }
+  }
+  stopifnot(length(num.exposures) == num.readings)
+  x <- set_num_exposures(x, num.exposures)
+
+  y <- descriptor
+
   z <- dplyr::data_frame(w.length = y$wavelengths)
   start.time <- lubridate::now()
 
@@ -70,8 +86,8 @@ acq_raw_spct <- function(descriptor,
     x$integ.time[i] <- actual.integ.time
     rOmniDriver::set_scans_to_avg(y$w, x$num.scans[i], y$sr.index, y$ch.index)
     if (verbose) message(paste("Measurement ", i, "..."))
-    if (!is.null(f.trigger.pullse)) {
-      f.trigger.pulse()
+    if (num.exposures[i] > 0L  && !is.null(f.trigger.pulses)) {
+      f.trigger.pulses(num.exposures[i])
     }
     counts <- rOmniDriver::get_spectrum(y$w, y$sr.index, y$ch.index)
     if (rOmniDriver::is_spectrum_valid(y$w, y$sr.index, y$ch.index) || x$force.valid)
@@ -101,10 +117,14 @@ acq_raw_spct <- function(descriptor,
 #' @param descriptor list as returned by function \code{get_oo_descriptor()}
 #' @param acq.settings list as returned by functions \code{tune_acq_settings()}
 #'   or \code{retune_acq_settings()} or \code{acq_settings()}
+#' @param num.exposures integer Number or light pulses (flashes) per scan. Set
+#'   to \code{-1L} to indicate that the light source is continuous.
+#' @param f.trigger.pulses function Function to be called to trigger light
+#'   pulse(s). Should accept as its only argument the number of pulses, and
+#'   return \code{TRUE} on sucess and \code{FALSE} on failure.
 #' @param seq.settings list with members "step" numeric value in seconds,
 #'   "num.steps" integer.
 #' @param protocol vector of character strings
-#' @param f.trigger.pulse function Function to be called to trigger light pulse.
 #' @param user.label character string to set as label
 #' @param where.measured data.frame with at least columns "lon" and "lat"
 #'   compatible with value returned by \code{ggmap::geocode()}
@@ -121,9 +141,10 @@ acq_raw_spct <- function(descriptor,
 #'
 acq_raw_mspct <- function(descriptor,
                           acq.settings,
+                          num.exposures = -1L,
+                          f.trigger.pulses = f.trigger.message,
                           seq.settings = list(step = 0, num.steps = 1L),
                           protocol = c("light", "filter", "dark"),
-                          f.trigger.pulse = NULL,
                           user.label = "",
                           where.measured = data.frame(lon = NA_real_, lat = NA_real_),
                           pause.fun = NULL,
@@ -151,15 +172,16 @@ acq_raw_mspct <- function(descriptor,
         return(raw_mspct())
       }
     }
-    if (p != "dark" && !is.null(f.trigger.pulse)) {
-      f.current <- f.trigger.pulse
+    if (p != "dark" && !is.null(f.trigger.pulses)) {
+      f.current <- f.trigger.pulses
     } else {
       f.current <- NULL
     }
     idx <- idx + 1
     z[[idx]] <- acq_raw_spct(descriptor = descriptor,
                              acq.settings = acq.settings,
-                             f.trigger.pulse = f.current,
+                             num.exposures = num.exposures,
+                             f.trigger.pulses = f.current,
                              what.measured = user.label,
                              where.measured = where.measured)
     photobiology::setWhenMeasured(z[[idx]], start.time)

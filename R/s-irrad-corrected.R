@@ -2,7 +2,7 @@
 #'
 #' @param x A named list of one to three vectors of file names, with names
 #'   "light", "filter", and "dark". Or a raw_mspt object, or a raw_spct object.
-#' @num.pulses integer Number of pulses per scan, if 0L, continuous source is
+#' @param num.exposures integer Number of pulses per scan, if 0L, continuous source is
 #'   assumed.
 #' @param spct.names named character vector of length three, to map names in
 #'   \code{x} to those expected.
@@ -45,7 +45,6 @@ s_irrad_corrected.default <- function(x, ...) {
 #'   file is used, and if \code{NA} no date variable is added
 #' @export
 s_irrad_corrected.list <- function(x,
-                                   num.pulses = 0L,
                                    time = NULL,
                                    correction.method,
                                    return.cps = FALSE,
@@ -66,7 +65,6 @@ s_irrad_corrected.list <- function(x,
 
   corrected.spct <-
     s_irrad_corrected(x = raw.mspct,
-                      num.pulses = num.pulses,
                       spct.names = c(light = "light",
                                      filter = "filter",
                                      dark = "dark"),
@@ -88,7 +86,6 @@ s_irrad_corrected.list <- function(x,
 #' @export
 s_irrad_corrected.raw_mspct <-
   function(x,
-           num.pulses = 0L,
            spct.names = c(light = "light",
                           filter = "filter",
                           dark = "dark"),
@@ -130,11 +127,6 @@ s_irrad_corrected.raw_mspct <-
                                  trim = correction.method[["trim"]],
                                  verbose = verbose)
 
-    if (num.pulses > 0) {
-      corrected.spct <- corrected.spct / num.pulses
-      photobiology::setTimeUnit(corrected.spct, "exposure")
-    }
-
     if (return.cps) {
       corrected.spct
     } else {
@@ -145,14 +137,14 @@ s_irrad_corrected.raw_mspct <-
 #' @describeIn s_irrad_corrected Default for generic function.
 #' @export
 s_irrad_corrected.raw_spct <- function(x,
-                                       num.pulses = 0L,
+                                       num.exposures = 0L,
                                        correction.method,
                                        return.cps = FALSE,
                                        verbose = getOption("photobiology.verbose", default = FALSE),
                                        ...) {
   raw.mspct <- raw_mspct(list(light = x))
   s_irrad_corrected(x = raw.mspct,
-                    num.pulses = num.pulses,
+                    num.exposures = num.exposures,
                     correction.method = correction.method,
                     return.cps = return.cps,
                     verbose = verbose,

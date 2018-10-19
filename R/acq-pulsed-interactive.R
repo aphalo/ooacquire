@@ -21,8 +21,11 @@
 #' @param integ.time numeric Integration time for a measurement event
 #'   in seconds.
 #' @param num.scans integer Number of scans to average.
-#' @param num.pulses integer Number or light pulses (flashes) per scan.
-#' @param f.trigger.pulse function Function to be called to trigger light pulse.
+#' @param num.exposures integer Number or light pulses (flashes) per scan. Set
+#'   to \code{-1L} to indicate that the light source is continuous.
+#' @param f.trigger.pulses function Function to be called to trigger light
+#'   pulse(s). Should accept as its only argument the number of pulses, and
+#'   return \code{TRUE} on sucess and \code{FALSE} on failure.
 #' @param protocols list of character vectors.
 #' @param correction.method list The method to use when applying the calibration
 #' @param descriptors list A list of instrument descriptors containing
@@ -52,9 +55,9 @@
 #'
 acq_fluence_interactive <-
   function(integ.time = 2,
-           num.scans = 3,
-           num.pulses = 1,
-           f.trigger.pulse = f.trigger.message,
+           num.scans = 1L,
+           num.exposures = 1L,
+           f.trigger.pulses = f.trigger.message,
            protocols = NULL,
            correction.method = NA,
            descriptors = NA,
@@ -200,7 +203,7 @@ acq_fluence_interactive <-
                                  acq.settings = settings,
                                  seq.settings = seq.settings,
                                  protocol = protocol,
-                                 f.trigger.pulse = f.trigger.pulse,
+                                 f.trigger.pulses = f.trigger.pulses,
                                  user.label = obj.name)
 
       if (length(raw.mspct) == 0) {
@@ -209,7 +212,7 @@ acq_fluence_interactive <-
 
       fluence.spct <- s_irrad_corrected(x = raw.mspct,
                                         correction.method = correction.method,
-                                        num.pulses = num.pulses)
+                                        num.exposures = num.exposures)
 
       if (length(user.attrs$what.measured) > 0) {
         setWhatMeasured(fluence.spct, user.attrs$what.measured)
@@ -329,11 +332,11 @@ acq_fluence_interactive <-
 #'
 #' @export
 #'
-acq_fraction_flash_interactive <-
+acq_fraction_pulsed_interactive <-
   function(integ.time = 2,
-           num.scans = 3,
-           num.pulses = 1,
-           f.trigger.pulse = f.trigger.message,
+           num.scans = 1L,
+           num.exposures = 1L,
+           f.trigger.pulses = f.trigger.message,
            protocols = NULL,
            correction.method = NA,
            descriptors = NA,
@@ -481,9 +484,10 @@ acq_fraction_flash_interactive <-
 
       raw.mspct <- acq_raw_mspct(descriptor = descriptor,
                                  acq.settings = settings,
+                                 num.exposures = num.exposures,
                                  seq.settings = seq.settings,
                                  protocol = protocol,
-                                 f.trigger.pulse = f.trigger.pulse,
+                                 f.trigger.pulses = f.trigger.pulses,
                                  user.label = obj.name)
 
       if (length(raw.mspct) == 0) {
@@ -563,14 +567,3 @@ acq_fraction_flash_interactive <-
     message("Folder reset to: ", getwd())
     message("Bye!")
   }
-
-#' Manual trigger request
-#'
-#' This function is used by default. It prints a message asking the operator
-#' to manually trigger the flash.
-#'
-#' @export
-#'
-f.trigger.message <- function() {
-  cat("Trigger the flash!!")
-}
