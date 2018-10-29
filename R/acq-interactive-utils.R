@@ -1,4 +1,3 @@
-
 #' Interactively adjust the integration time settings
 #'
 #' Adjust integration time settings, allowing the user to repeat the tunning,
@@ -70,7 +69,7 @@ tune_interactive <- function(descriptor,
       tuned <- TRUE
     } else if (substr(answ, 1, 1) == "m") {
       margin <- readline(sprintf("Saturation margin = %.2g, new: ",
-                                 settings[["target.margin"]]))
+                                 acq.settings[["target.margin"]]))
       margin <- try(as.numeric(margin))
       if (!is.na(margin)) {
         acq.settings[["target.margin"]] <- margin

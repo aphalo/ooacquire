@@ -21,9 +21,9 @@ s_irrad_corrected(x, ...)
   return.cps = FALSE, verbose = getOption("photobiology.verbose",
   default = FALSE), ...)
 
-\method{s_irrad_corrected}{raw_spct}(x, num.exposures = 0L,
-  correction.method, return.cps = FALSE,
-  verbose = getOption("photobiology.verbose", default = FALSE), ...)
+\method{s_irrad_corrected}{raw_spct}(x, time = NULL, correction.method,
+  return.cps = FALSE, verbose = getOption("photobiology.verbose",
+  default = FALSE), ...)
 }
 \arguments{
 \item{x}{A named list of one to three vectors of file names, with names
@@ -54,9 +54,6 @@ names.}
 
 \item{spct.names}{named character vector of length three, to map names in
 \code{x} to those expected.}
-
-\item{num.exposures}{integer Number of pulses per scan, if 0L, continuous source is
-assumed.}
 }
 \description{
 Convert raw counts data into spectral irradiance or fluence

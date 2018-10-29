@@ -12,7 +12,7 @@
 
 <meta name="author" content="Pedro J. Aphalo" />
 
-<meta name="date" content="2018-03-01" />
+<meta name="date" content="2018-10-20" />
 
 <title>Quick Start Guide</title>
 
@@ -20,46 +20,254 @@
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
 
-<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#header {
+text-align: center;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
 
 </head>
 
@@ -69,9 +277,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 
 <h1 class="title toc-ignore">Quick Start Guide</h1>
-<h3 class="subtitle"><em><code>ooacquire</code> 0.1.5.9001</em></h3>
+<h3 class="subtitle"><em><code>ooacquire</code> 0.1.5.9005</em></h3>
 <h4 class="author"><em>Pedro J. Aphalo</em></h4>
-<h4 class="date"><em>2018-03-01</em></h4>
+<h4 class="date"><em>2018-10-20</em></h4>
 
 
 <div id="TOC">
@@ -79,8 +287,13 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#code-examples">Code examples</a></li>
 <li><a href="#interactive-acquisition-of-spectral-irradiance">Interactive acquisition of spectral irradiance</a></li>
-<li><a href="#interactive-acquisition-of-transmittance-absorptance-and-reflectance">Interactive acquisition of transmittance, absorptance and reflectance</a></li>
+<li><a href="#interactive-acquisition-of-spectral-fluence">Interactive acquisition of spectral fluence</a></li>
+<li><a href="#interactive-acquisition-of-transmittance-absorptance-and-reflectance">Interactive acquisition of transmittance, absorptance and reflectance</a><ul>
+<li><a href="#using-light-sources-with-continuous-emission">Using light sources with continuous emission</a></li>
+<li><a href="#using-light-sources-with-pulsed-emission">Using light sources with pulsed emission</a></li>
+</ul></li>
 <li><a href="#reading-raw-counts-from-files">Reading raw counts from files</a></li>
+<li><a href="#reading-calibration-data-from-files">Reading calibration data from files</a></li>
 <li><a href="#rolling-your-own">Rolling your own</a></li>
 <li><a href="#using-scripts">Using scripts</a></li>
 </ul>
@@ -96,102 +309,138 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h2>Code examples</h2>
 <p>All examples in vignettes use data and files included in the package. Data files in formats <em>foreign</em> to R, are stored in the <code>&quot;extdata&quot;</code> folder, as is the norm for R packages.</p>
 <p><em>To reproduce any of the examples which use files as data input, it is best to make a local copy of the whole <code>&quot;extdata&quot;</code> folder.</em> The files used in examples are organized into subfolders, but all example code assumes that its in being run with <code>&quot;extdata&quot;</code> or a copy of it as the current <em>working</em> folder.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">folderpath &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="dt">package=</span><span class="st">&quot;ooacquire&quot;</span>)
-## file.copy(from = folderpath, to = &quot;.&quot;, recursive = TRUE)</code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">folderpath &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="dt">package=</span><span class="st">&quot;ooacquire&quot;</span>)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="co">## file.copy(from = folderpath, to = &quot;.&quot;, recursive = TRUE)</span></a></code></pre></div>
 <hr />
+<p>In addition to measuring light sources with continuous emission, it is also possible to measure light sources which emit light as pulses. In the case of continuous light sources the quantity measured is either spectral energy irradiance or spectral photon irradiance (flux of energy or photons per unit area, unit wavelength interval and unit time). In the case of light pulses, such as those emitted by xenon-tube flashes, the quantity measured is either spectral energy fluence or spectral photon fluence (flux of energy or photons per unit area, unit wavelength interval and per exposure event).</p>
+<p>In the case of light sources with continuous emission the integration time setting in the spectrometer controls the number of photons reaching the detector. When measuring individually triggered pulses of light, the integration time gives the time window within which the photons from one or multiple pulses will reach the detector. Obviously, when measuring pulses, no background continuous illumination should contribute to the measurements.</p>
+<p>The first two examples below are for light sources with continuous emission.</p>
+<p>Before examples, we discuss here the function of the most frequently used parameters. With the functions described below, integration time is adjusted automatically, within the range allowed by the attached instrument. The numbers scans is also automatically set based on the requested total measurement time. Keeping total measurement time constant or within a narrow range of values helps smooth out random variation (detector noise) or fast oscillations or random noise of the light sources measured. The parameter <code>tot.time.range</code> allows the user to set this value, either as an allowed range or a specific value. For short values of total time it is good to use a range for <code>tot.time.range</code> as the number of scans my be small. The values are in seconds, with default <code>c(5, 15)</code>. Setting this parameter to <code>c(0, Inf)</code> ensures that only one scan will be always used. Setting the high value in the range to less than the instrument’s maximum integration time, will limit the range of integration times available.</p>
+<p>A procedure that allows to enhance the realized dynamic range is to measure a <em>stable</em> light source multiple times using different integration times. The longer-than-optimal integrations provide improved measurement of the low spectral irradiance regions. These multiple measurements can be spliced together into a final “high dynamic range” (HDR) spectrum. This is equivalent to the procedure used in digital photography to obtain HDR photographs by merging photographs taking using exposure bracketing. The parameter <code>HDR.mult</code> determines the multiplier(s) applied to the optimal integration time. Setting <code>HDR.mult = 1</code> disables HDR. The default <code>HDR.mult = c(1, 10)</code> uses the optimal integration time for the first of the measurements to be merged and 10 times the optimal integration time for the second measurement. In practice there is rarely a need to use more than two multipliers, but the implementation allows their use (e.g. <code>c(1, 5, 25)</code> is valid input).</p>
+<p>This package implements several different methods for processing raw spectra into the final spectral quantities. Most of these methods need to be matched by a given protocol during the acquisition of spectral data, and specific calibration data and/or correction factors need to be available for the instrument in use. Only some of these methods can be used with spectrometers calibrated in the “manufacturer-recommended” way, and, consequently usable with manufacturer provided calibration data.</p>
+<p>Please, see the documentation for the individual functions, and below, for details on the use of other parameters, and other vignettes for descriptions of the different algorithms implemented.</p>
 </div>
 <div id="interactive-acquisition-of-spectral-irradiance" class="section level2">
 <h2>Interactive acquisition of spectral irradiance</h2>
 <p>We first load the R packages to be used.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(photobiology)</code></pre></div>
-<pre><code>## For news about 'photobiology', please, see http://www.r4photobiology.info/</code></pre>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">library</span>(photobiology)</a></code></pre></div>
+<pre><code>## For news about &#39;photobiology&#39;, please, see http://www.r4photobiology.info/</code></pre>
 <pre><code>## For on-line documentation see http://docs.r4photobiology.info/photobiology/</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(photobiologyWavebands)</code></pre></div>
-<pre><code>## For news about 'photobiologyWavebands', please, see http://www.r4photobiology.info/</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">library</span>(photobiologyWavebands)</a></code></pre></div>
+<pre><code>## For news about &#39;photobiologyWavebands&#39;, please, see http://www.r4photobiology.info/</code></pre>
 <pre><code>## For on-line documentation see http://docs.r4photobiology.info/photobiologyWavebands/</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ggspectra)</code></pre></div>
-<pre><code>## For news about 'ggspectra', please, see http://www.r4photobiology.info/</code></pre>
-<pre><code>## For on-line documentation see http://docs.r4photobiology.info/ggspectra/</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ooacquire)
-
-<span class="co"># print warnings at the time they are triggered</span>
-<span class="kw">options</span>(<span class="dt">warn =</span> <span class="dv">1</span>)
-
-<span class="co"># change this to TRUE to run acquisition examples</span>
-sr.online &lt;-<span class="st"> </span><span class="ot">FALSE</span></code></pre></div>
-<p>First plug in an Ocean Optics spectrometer to the USB port. Then loading the packages as above and executing the statement b elow above is all what is needed to start an interactive spectral-data acquisition session using default starting values for all settings.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">acq_irrad_interactive</span>(<span class="dt">correction.method =</span> ooacquire<span class="op">::</span>MAYP11278_ylianttila.mthd,
-                      <span class="dt">descriptors =</span> ooacquire<span class="op">::</span>MAYP11278_descriptors)</code></pre></div>
-<p>These code is run at the R console. I normally use the RStudio IDE, but this is not required as longs as graphical display is enabled. Alternatively, the statements can saved into an R script (as plain-text file) and then the file <code>source</code>d from the R console. As scripts can be also run from the operating system shell or command prompt, it is possible, if desired to partly hide R from users’ view.</p>
-<p>Within functions <code>acq_irrad_interactive()</code> and its companion <code>acq_fraction_interactive()</code> the user can modify settings through simple menus. These functions, however, have parameters which can be used to set initial settings to different values than their “built-in” defaults. In all cases when values supplied by the user fall outside those accepted by the connected instrument, these values will be adjusted to the nearest valid value.</p>
-<p>Although we here discuss these settings in relation to parameter arguments, the same settings can be set interactively by the user. It should also be remembered that the functions described will in normal use set a suitable integration time automatically.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw">library</span>(ggspectra)</a></code></pre></div>
+<pre><code>## For news about &#39;ggspectra&#39;, please, see https://www.r4photobiology.info/</code></pre>
+<pre><code>## For on-line documentation see https://docs.r4photobiology.info/ggspectra/</code></pre>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw">library</span>(ooacquire)</a>
+<a class="sourceLine" id="cb11-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb11-3" data-line-number="3"><span class="co"># print warnings at the time they are triggered</span></a>
+<a class="sourceLine" id="cb11-4" data-line-number="4"><span class="kw">options</span>(<span class="dt">warn =</span> <span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb11-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb11-6" data-line-number="6"><span class="co"># change this to TRUE to run acquisition examples</span></a>
+<a class="sourceLine" id="cb11-7" data-line-number="7">sr.online &lt;-<span class="st"> </span><span class="ot">FALSE</span></a></code></pre></div>
+<p>For spectral data acquisition the first step is to connect an Ocean Optics spectrometer to a USB port. After loading the packages as shown above executing the statement below starts an interactive spectral-data acquisition session using default starting values for all settings.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="kw">acq_irrad_interactive</span>(<span class="dt">correction.method =</span> ooacquire<span class="op">::</span>MAYP11278_ylianttila.mthd,</a>
+<a class="sourceLine" id="cb12-2" data-line-number="2">                      <span class="dt">descriptors =</span> ooacquire<span class="op">::</span>MAYP11278_descriptors)</a></code></pre></div>
+<p>This code is run at the R console. I normally use the RStudio IDE, but this is not required as longs as graphical display is enabled. Alternatively, the statements can be saved into an R script (as plain-text file) and then the file <code>source</code>d from the R console. As scripts can be also run from the operating system shell or command prompt, it is possible, if desired to partly hide R from users’ view.</p>
+<p>Within functions <code>acq_irrad_interactive()</code> and its companion <code>acq_fraction_interactive()</code> the user can modify settings through simple menus as discussed above. These functions, however, have parameters which can be used to set initial settings to different values than their “built-in” defaults. In all cases when values supplied by the user fall outside those accepted by the connected instrument, these values will be adjusted to the nearest valid value.</p>
+<p>The user interface for these functions supports different modes. The difference between these modes is in which of the different possible settings can be modified by the user at run time. The simplified interfaces make measurements simpler and faster in specific situations. The default <code>interface.mode = &quot;auto&quot;</code> retains the behaviour of earlier versions, but in many cases <code>interface.mode = &quot;simple&quot;</code> will still allow all the parameters needed for measurements at hand to be altered at runtime.</p>
+<p>Although we here discuss settings in relation to parameter arguments, the same settings can be set interactively by the user. It should also be remembered that, as discussed above, the functions described here will in normal use set a suitable integration time automatically.</p>
 <p>Simplest settings. Using no integration time bracketing as a single numeric value for <code>HDR.mult</code> corresponds to acquisition using a single integration time. Maximum and minimum total integration time as short or as long as allowed by the instrument with no scan averaging.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">acq_irrad_interactive</span>(<span class="dt">HDR.mult =</span> <span class="dv">1</span>,
-                      <span class="dt">tot.time.range =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="ot">Inf</span>),
-                      <span class="dt">correction.method =</span> ooacquire<span class="op">::</span>MAYP11278_ylianttila.mthd,
-                      <span class="dt">descriptors =</span> ooacquire<span class="op">::</span>MAYP11278_descriptors)</code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw">acq_irrad_interactive</span>(<span class="dt">HDR.mult =</span> <span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb13-2" data-line-number="2">                      <span class="dt">tot.time.range =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="ot">Inf</span>),</a>
+<a class="sourceLine" id="cb13-3" data-line-number="3">                      <span class="dt">correction.method =</span> ooacquire<span class="op">::</span>MAYP11278_ylianttila.mthd,</a>
+<a class="sourceLine" id="cb13-4" data-line-number="4">                      <span class="dt">descriptors =</span> ooacquire<span class="op">::</span>MAYP11278_descriptors)</a></code></pre></div>
 <p>It is possible to use in the example above a value larger than one for <code>HDR.mult</code> even if a single integration time is used. This is unusual, but if we indeed would like to force clipping of part of the spectrum, this would be the way to achieve it.</p>
 <p>For bracketing, one acquires spectral data with more than one integration time, and the resulting spectra are merged using the <em>most suitable</em> integration time for each wavelength region. Although usually two values are a good compromise, there is no built-in limitation in the package code. Using three or more values, combined with a very long total acquisition time of the order of minutes, can yield very good control of noise for light sources with stable output. Consequently, although the default setting <code>HDR.mult = c(1, 10)</code> tends to work well, settings like <code>HDR.mult = c(1, 5, 25)</code> may be useful in special circumstances.</p>
-<p>In the next example, we set bracketing, with two values for integration time, with the <em>long integration</em> 10 times longer than the normal or <em>short</em> one (the same as the default, in this case). We set total acquisition time to a fixed length of 10 seconds. Once this setting is active, each time the integration time is automatically set, both the integration time and number of scans are adjusted so that total acquisition time is exactly 10 seconds, for both short and long integration times. This is useful when irradiance varies “randomly” with time and one desires to keep its effect on the acquired data stable.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">acq_irrad_interactive</span>(<span class="dt">HDR.mult =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">10</span>), 
-                      <span class="dt">tot.time.range =</span> <span class="dv">10</span>,
-                      <span class="dt">correction.method =</span> ooacquire<span class="op">::</span>MAYP11278_ylianttila.mthd,
-                      <span class="dt">descriptors =</span> ooacquire<span class="op">::</span>MAYP11278_descriptors)</code></pre></div>
+<p>In the next example, we set bracketing, with two values for integration time, with the <em>long integration</em> 10 times longer than the normal or <em>short</em> one (the same as the default, in this case). We set total acquisition time to a fixed length of 10 seconds. Once this setting is active, each time the integration time is automatically set, both the integration time and number of scans are adjusted so that total acquisition time is exactly 10 seconds, for both short and long integration times. This is useful when irradiance varies “randomly” with time and one desires to keep the influence of “noise” on the acquired data stable irrespective of the integration time used.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="kw">acq_irrad_interactive</span>(<span class="dt">HDR.mult =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">10</span>), </a>
+<a class="sourceLine" id="cb14-2" data-line-number="2">                      <span class="dt">tot.time.range =</span> <span class="dv">10</span>,</a>
+<a class="sourceLine" id="cb14-3" data-line-number="3">                      <span class="dt">correction.method =</span> ooacquire<span class="op">::</span>MAYP11278_ylianttila.mthd,</a>
+<a class="sourceLine" id="cb14-4" data-line-number="4">                      <span class="dt">descriptors =</span> ooacquire<span class="op">::</span>MAYP11278_descriptors)</a></code></pre></div>
 <p>If long integration times are needed, the setting above may result in the use of suboptimal integration times, as the desired integration time may have be to be shortened until it becomes an exact fraction of the total acquisition time. To avoid this, we can supply instead of a single fixed value for the total acquisition time, a range of values.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">acq_irrad_interactive</span>(<span class="dt">HDR.mult =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">10</span>), 
-                      <span class="dt">tot.time.range =</span> <span class="kw">c</span>(<span class="dv">10</span>, <span class="dv">20</span>),
-                      <span class="dt">correction.method =</span> ooacquire<span class="op">::</span>MAYP11278_ylianttila.mthd,
-                      <span class="dt">descriptors =</span> ooacquire<span class="op">::</span>MAYP11278_descriptors)</code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="kw">acq_irrad_interactive</span>(<span class="dt">HDR.mult =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">10</span>), </a>
+<a class="sourceLine" id="cb15-2" data-line-number="2">                      <span class="dt">tot.time.range =</span> <span class="kw">c</span>(<span class="dv">10</span>, <span class="dv">20</span>),</a>
+<a class="sourceLine" id="cb15-3" data-line-number="3">                      <span class="dt">correction.method =</span> ooacquire<span class="op">::</span>MAYP11278_ylianttila.mthd,</a>
+<a class="sourceLine" id="cb15-4" data-line-number="4">                      <span class="dt">descriptors =</span> ooacquire<span class="op">::</span>MAYP11278_descriptors)</a></code></pre></div>
 <p>Sometimes we may want to avoid long integration times even at the cost of not using the whole dynamic range of the detector. For example, when following some fast kinetics, we would usually need the integration time not to exceed a certain time, say 50 milliseconds, we would simply use smaller values, such as <code>tot.time.range = c(0.03, 0.05)</code>.</p>
-<p>One problem with automatic setting of integration time is that depending on the stability of the light source we will need to set a different value for the target relative to the longest integration time that would result in no clipping during tuning. Parameter <code>target.margin</code> allows the user to set a <em>safety marging</em> different from the default of 0.1 (or 10%). The example below could help prevent clipping in cases when irradiance changes so fast that it could be up to 25% higher during actual measurement than during the preceding tuning of the integration time.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">acq_irrad_interactive</span>(<span class="dt">target.margin =</span> <span class="fl">0.25</span>,
-                      <span class="dt">correction.method =</span> ooacquire<span class="op">::</span>MAYP11278_ylianttila.mthd,
-                      <span class="dt">descriptors =</span> ooacquire<span class="op">::</span>MAYP11278_descriptors)</code></pre></div>
+<p>One problem with automatic setting of integration time is that depending on the stability of the light source we will need to set a different value for the target relative to the longest integration time that would result in no clipping during tuning. Parameter <code>target.margin</code> allows the user to set a <em>safety margin</em> different from the default of 0.1 (or 10%). The example below could help prevent clipping in cases when irradiance changes so fast that it could be up to 25% higher during actual measurement than during the preceding tuning of the integration time.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="kw">acq_irrad_interactive</span>(<span class="dt">target.margin =</span> <span class="fl">0.25</span>,</a>
+<a class="sourceLine" id="cb16-2" data-line-number="2">                      <span class="dt">correction.method =</span> ooacquire<span class="op">::</span>MAYP11278_ylianttila.mthd,</a>
+<a class="sourceLine" id="cb16-3" data-line-number="3">                      <span class="dt">descriptors =</span> ooacquire<span class="op">::</span>MAYP11278_descriptors)</a></code></pre></div>
+</div>
+<div id="interactive-acquisition-of-spectral-fluence" class="section level2">
+<h2>Interactive acquisition of spectral fluence</h2>
+<p>Fluence, also called radiant exposure, is defined per exposure event rather than per unit time. When measuring pulsed light sources, the length of exposure is determined by the duration of the pulse, which is usually not known with precision. In the discussion below we assume that the quantity of interest is fluence per pulse. For these type of measurements the integration time setting in the spectrometer only affects the window within which pulses will be measured, consequently, it is always set manually, and in the current implementation kept constant for the whole session. The way of controlling the number of photons reaching the detector during an integration is through the number of pulses per integration and/or the fluence provided by each pulse (e.g. by altering the distance between source and instrument light entrance).</p>
+<p>We start the session as described above for irradiance, but using a different function. Using defaults.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="kw">acq_fluence_interactive</span>(<span class="dt">correction.method =</span> ooacquire<span class="op">::</span>MAYP11278_ylianttila.mthd,</a>
+<a class="sourceLine" id="cb17-2" data-line-number="2">                      <span class="dt">descriptors =</span> ooacquire<span class="op">::</span>MAYP11278_descriptors)</a></code></pre></div>
+<p>The integration time can be set when calling the function to start a session.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1"><span class="kw">acq_fluence_interactive</span>(<span class="dt">integ.time =</span> <span class="dv">4</span>, <span class="co"># seconds</span></a>
+<a class="sourceLine" id="cb18-2" data-line-number="2">                        <span class="dt">correction.method =</span> ooacquire<span class="op">::</span>MAYP11278_ylianttila.mthd,</a>
+<a class="sourceLine" id="cb18-3" data-line-number="3">                        <span class="dt">descriptors =</span> ooacquire<span class="op">::</span>MAYP11278_descriptors)</a></code></pre></div>
+<p>Another important parameter is the number of exposure events. This determines how the resulting data are expressed. If we consider that each individual pulse is an exposure event, and for example, we trigger five flashes per spectrometer integration (or “scan”), we would set <code>num.exposures = 5</code>.</p>
+<p>By default the user is prompted to trigger a pulse. However, it the triggering can be automated, a function accepting as only argument the number of pulses can be passed as argument to parameter <code>f.trigger.pulses</code>.</p>
 </div>
 <div id="interactive-acquisition-of-transmittance-absorptance-and-reflectance" class="section level2">
 <h2>Interactive acquisition of transmittance, absorptance and reflectance</h2>
-<p>Here we group the acquisition of data where the quantities of interest are expressed relative to a reference. This is the case for transmittance, reflectance and absorptance. A single function allows the acquisition of transmittance and reflectance spectra. The same parameters as discussed for <code>acq_irrad_interactive()</code> in the section on irradiance are available in function <code>acq_fraction_interactive()</code>. We will here describe three additional parameters only present in this function. The first one is <code>ref.value</code> which needs to be supplied if the reference target is imperfect, such as a white reference patch which reflects less than 100%. The default is <code>ref.value = 1</code>, but this parameter not only aspects numeric values as argument but also transmittance or reflectance spectra for the target used as reference.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">acq_fraction_interactive</span>(<span class="dt">ref.value =</span> <span class="fl">0.97</span>,
-                         <span class="dt">correction.method =</span> ooacquire<span class="op">::</span>MAYP11278_ylianttila.mthd,
-                         <span class="dt">descriptors =</span> ooacquire<span class="op">::</span>MAYP11278_descriptors)</code></pre></div>
+<div id="using-light-sources-with-continuous-emission" class="section level3">
+<h3>Using light sources with continuous emission</h3>
+<p>A single function can be used for the acquisition of data where the quantities of interest are expressed relative to a reference. This is the case for transmittance, reflectance and absorptance. The same parameters as discussed for <code>acq_irrad_interactive()</code> in the section above are available in function <code>acq_fraction_interactive()</code>. We will here describe three additional parameters only present in this function. The first one is <code>ref.value</code> which needs to be supplied if the reference target is imperfect, such as a white reference patch which reflects less than 100%. The default is <code>ref.value = 1</code>, but this parameter not only accepts numeric values as argument but also transmittance or reflectance spectra for the target used as reference. Consequently if the reflectance of an “imperfect” reference is know, such reference can be used. (e.g. In the case of measuring the reflectance of very dark objects, it might be convenient to use a grey reference instead of a white reference). For a reference with 97% reflectance across the whole range of wavelengths of interest one would use.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1"><span class="kw">acq_fraction_interactive</span>(<span class="dt">ref.value =</span> <span class="fl">0.97</span>,</a>
+<a class="sourceLine" id="cb19-2" data-line-number="2">                         <span class="dt">correction.method =</span> ooacquire<span class="op">::</span>MAYP11278_ylianttila.mthd,</a>
+<a class="sourceLine" id="cb19-3" data-line-number="3">                         <span class="dt">descriptors =</span> ooacquire<span class="op">::</span>MAYP11278_descriptors)</a></code></pre></div>
 <p>Parameters <code>qty.out</code> and <code>type</code> determine the class of object and the quantity stored in the returned objects. If the optical set-up used is for measuring specular spectral reflectance, we use the following code. This information will also be used when plotting the data.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">acq_fraction_interactive</span>(<span class="dt">qty.out =</span> <span class="st">&quot;Rfr&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;specular&quot;</span>,
-                         <span class="dt">correction.method =</span> ooacquire<span class="op">::</span>MAYP11278_ylianttila.mthd,
-                         <span class="dt">descriptors =</span> ooacquire<span class="op">::</span>MAYP11278_descriptors)</code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="kw">acq_fraction_interactive</span>(<span class="dt">qty.out =</span> <span class="st">&quot;Rfr&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;specular&quot;</span>,</a>
+<a class="sourceLine" id="cb20-2" data-line-number="2">                         <span class="dt">correction.method =</span> ooacquire<span class="op">::</span>MAYP11278_ylianttila.mthd,</a>
+<a class="sourceLine" id="cb20-3" data-line-number="3">                         <span class="dt">descriptors =</span> ooacquire<span class="op">::</span>MAYP11278_descriptors)</a></code></pre></div>
+</div>
+<div id="using-light-sources-with-pulsed-emission" class="section level3">
+<h3>Using light sources with pulsed emission</h3>
+<p>In this case we start a session by calling function <code>acq_fraction_pulsed_interactive()</code> and we set manually the integration time as when measuring spectral fluence. In other respects the procedure is similar to that for continuous light sources except for the need to either manually or automatically triggering the light pulses.</p>
+</div>
 </div>
 <div id="reading-raw-counts-from-files" class="section level2">
 <h2>Reading raw counts from files</h2>
-<p>The examples in the previous section can be run only when a spectrometer is connected. Here we add one examples using files.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">file_names &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">light =</span> <span class="kw">c</span>(<span class="st">&quot;irrad-files/light-short.txt&quot;</span>,
-                             <span class="st">&quot;irrad-files/light-long.txt&quot;</span>),
-                   <span class="dt">filter =</span> <span class="st">&quot;irrad-files/flt-long.txt&quot;</span>,
-                   <span class="dt">dark =</span> <span class="kw">c</span>(<span class="st">&quot;irrad-files/dark-short.txt&quot;</span>,
-                            <span class="st">&quot;irrad-files/dark-long.txt&quot;</span>))</code></pre></div>
-<p>In this case, a call to a hight level function both reads five files with raw data, and converts these to a single spectral irradiance spectrum.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">irrad.spct &lt;-<span class="st"> </span>
-<span class="st">  </span><span class="kw">s_irrad_corrected</span>(<span class="dt">x =</span> file_names,
-                    <span class="dt">descriptor =</span> <span class="kw">which_descriptor</span>(<span class="st">&quot;2016-10-11&quot;</span>, 
-                                                  MAYP11278_descriptors),
-                    <span class="dt">correction.method =</span> MAYP11278_ylianttila.mthd)</code></pre></div>
+<p>The examples in the previous section can be run only when a spectrometer is connected. Here we add examples using files containing spectral data as RAW sensor counts. The files output by most instruments and software from Ocean Optics include a header with metadata describing the instrument settings using for acquisition.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1">file_names &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">light =</span> <span class="kw">c</span>(<span class="st">&quot;irrad-files/light-short.txt&quot;</span>,</a>
+<a class="sourceLine" id="cb21-2" data-line-number="2">                             <span class="st">&quot;irrad-files/light-long.txt&quot;</span>),</a>
+<a class="sourceLine" id="cb21-3" data-line-number="3">                   <span class="dt">filter =</span> <span class="st">&quot;irrad-files/flt-long.txt&quot;</span>,</a>
+<a class="sourceLine" id="cb21-4" data-line-number="4">                   <span class="dt">dark =</span> <span class="kw">c</span>(<span class="st">&quot;irrad-files/dark-short.txt&quot;</span>,</a>
+<a class="sourceLine" id="cb21-5" data-line-number="5">                            <span class="st">&quot;irrad-files/dark-long.txt&quot;</span>))</a></code></pre></div>
+<p>In this case, a call to a hight level function both reads five files with raw data, and converts these to a single spectral irradiance spectrum. For this to work, a valid calibration specific to the spectrometer used to acquire the RAW data must be available and already imported into R.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1">irrad.spct &lt;-<span class="st"> </span></a>
+<a class="sourceLine" id="cb22-2" data-line-number="2"><span class="st">  </span><span class="kw">s_irrad_corrected</span>(<span class="dt">x =</span> file_names,</a>
+<a class="sourceLine" id="cb22-3" data-line-number="3">                    <span class="dt">descriptor =</span> <span class="kw">which_descriptor</span>(<span class="st">&quot;2016-10-11&quot;</span>, </a>
+<a class="sourceLine" id="cb22-4" data-line-number="4">                                                  MAYP11278_descriptors),</a>
+<a class="sourceLine" id="cb22-5" data-line-number="5">                    <span class="dt">correction.method =</span> MAYP11278_ylianttila.mthd)</a></code></pre></div>
 <pre><code>## Descriptor cal_2016a selected for 2016-10-11</code></pre>
 <p>The example above uses a protocol with integration-time bracketing plus subtraction of measured stray light. We can plot the result.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(irrad.spct)</code></pre></div>
-<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1"><span class="kw">plot</span>(irrad.spct)</a></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="reading-calibration-data-from-files" class="section level2">
+<h2>Reading calibration data from files</h2>
+<p>Although supporting only some of the methods and protocols implemented in this package, it is possible to read calibration data as supplied by Ocean Optics. The problem is that the format used has not been always consistent, and the import may sometimes fail.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1">cal.spct &lt;-<span class="st"> </span><span class="kw">read_oo_caldata</span>(<span class="st">&quot;oo-calibration/xxxx&quot;</span>)</a></code></pre></div>
+<p>Because of the way calibration data is provided by Ocean Optics, one additional piece of information is needed for the calculation of multipliers usable with the functions in this package. This is the area of the cosine diffuser in square millimetres or the name of one of the “known” diffusor types.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1">cal.multipliers &lt;-<span class="st"> </span><span class="kw">oo_calib2irrad_mult</span>(cal.spct,</a>
+<a class="sourceLine" id="cb26-2" data-line-number="2">                                       <span class="dt">diff.type =</span> <span class="st">&quot;CC-3&quot;</span>)</a></code></pre></div>
 </div>
 <div id="rolling-your-own" class="section level2">
 <h2>Rolling your own</h2>
-<p>The two functions described above, although useful for general spectral data acquisition, they are meant mainly as examples. In cases of routine measurements one could simplify menus by removing entries that are not needed, or even converting the functions to non-interactive, and possibly adding support for scheduled sequences of spectral data acquisitions. This should be fairly simple, not requiring advanced knowledge of the R language.</p>
+<p>The functions for interactive acquisition of spectral data described above, although useful in many cases, are meant also as examples. In cases of routine measurements one could simplify menus by removing entries that are not needed, or even converting the functions to non-interactive, and possibly adding support for scheduled sequences of spectral data acquisitions. This should be fairly simple, not requiring advanced knowledge of the R language as we export the lower level functions that can be used as building blocks for new variations.</p>
 </div>
 <div id="using-scripts" class="section level2">
 <h2>Using scripts</h2>
 <p>It is also possibly to combine lower level functions using R scripts instead of through writing higher level R functions from them. Several example scripts are included with the package. I recommend that you open them, and save them to your own working directory before sourcing them and or editing them.</p>
 <p>You will need first to locate where in your computer’s file system the ‘ooacquire’ package is installed, and where the file you are interested is, and make a copy of it in your own workspace. Here we copy the script called <code>&quot;irrad-acq-interac.R&quot;</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">filepath &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;example-scripts&quot;</span>, <span class="st">&quot;irrad-acq-interac.R&quot;</span>, <span class="dt">package=</span><span class="st">&quot;ooacquire&quot;</span>)
-<span class="kw">file.copy</span>(<span class="dt">from =</span> filepath, <span class="dt">to =</span> <span class="st">&quot;.&quot;</span>)</code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1">filepath &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;example-scripts&quot;</span>, <span class="st">&quot;irrad-acq-interac.R&quot;</span>, <span class="dt">package=</span><span class="st">&quot;ooacquire&quot;</span>)</a>
+<a class="sourceLine" id="cb27-2" data-line-number="2"><span class="kw">file.copy</span>(<span class="dt">from =</span> filepath, <span class="dt">to =</span> <span class="st">&quot;.&quot;</span>)</a></code></pre></div>
 <p>Here we copy all the example scripts.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">folderpath &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;example-scripts&quot;</span>, <span class="dt">package=</span><span class="st">&quot;ooacquire&quot;</span>)
-<span class="kw">list.files</span>(<span class="dt">path =</span> folderpath, <span class="dt">pattern =</span> <span class="st">&quot;.*[.]R&quot;</span>)
-<span class="kw">file.copy</span>(<span class="dt">from =</span> <span class="kw">list.files</span>(<span class="dt">path =</span> folderpath, <span class="dt">pattern =</span> <span class="st">&quot;.*[.]R&quot;</span>, <span class="dt">full.names =</span> <span class="ot">TRUE</span>), <span class="dt">to =</span> <span class="st">&quot;.&quot;</span>)</code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" data-line-number="1">folderpath &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;example-scripts&quot;</span>, <span class="dt">package=</span><span class="st">&quot;ooacquire&quot;</span>)</a>
+<a class="sourceLine" id="cb28-2" data-line-number="2"><span class="kw">list.files</span>(<span class="dt">path =</span> folderpath, <span class="dt">pattern =</span> <span class="st">&quot;.*[.]R&quot;</span>)</a>
+<a class="sourceLine" id="cb28-3" data-line-number="3"><span class="kw">file.copy</span>(<span class="dt">from =</span> <span class="kw">list.files</span>(<span class="dt">path =</span> folderpath, <span class="dt">pattern =</span> <span class="st">&quot;.*[.]R&quot;</span>, <span class="dt">full.names =</span> <span class="ot">TRUE</span>), <span class="dt">to =</span> <span class="st">&quot;.&quot;</span>)</a></code></pre></div>
 </div>
 
 

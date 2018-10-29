@@ -7,18 +7,27 @@ Document support for OO calibrations and add example scripts.
 ooacquire 0.2.0 (2018-10-xx)
 ============================
 
-* Implement support for measuring output from xenon flashes, including use of
-such flashes as light source for measurement of spectral transmittance.
-* Update acq_irrad_interactive() adding alterative user-interface modes.
-* Update acq_irrad_interactive() adding possibility to set attributes.
-* Update acq_irrad_interactive() adding possibility of constructing
-collections of spectra.
-* Add acq_fluence_interactive() for measuring spectral fluence of pulsed light
-sources.
-* Add acq_fraction_pulsed_interactive() for measuring transmitance and
+Implement support for measuring output from xenon flashes, including use of
+such flashes as light sources for measurement of spectral transmittance and
+reflectance. Use of multiple exposures per integration is also supported and
+the number of exposures stored as metadata is used during later processing.
+In the case of pulsed light sources the first conversion of RAW spectra is into
+counts per exposure, and instead of spectral irradiance spectral fluence per
+exposure is computed. All changes are backwards compatible with raw data
+acquired with earlier versions of 'ooacquire' and the user interface remains
+unaltered for the measurement of continuous light sources.
+
+* Add function acq_fluence_interactive() for measuring spectral fluence of
+pulsed light sources.
+* Add acq_fraction_pulsed_interactive() for measuring transmittance and
 reflectance using a pulsed light source.
-* Add pre-built calibrations and methods for a fourth FLAME-S instrument.
+* Update acq_irrad_interactive() adding alternative user-interface modes,
+allowing users to set comment and what.measured attributes, and to constructing
+collections of spectra.
+* Add pre-built calibrations and methods for two additional FLAME-S instruments.
+* Improve algorithm for automatic tuning of integration time.
 * Fix various minor bugs.
+* Update vignettes.
 
 ooacquire 0.1.5 (2017-11-13)
 ============================
@@ -56,7 +65,7 @@ support for remapping names of raw_mspct members' to "light", "filter" and
 of raw_mspct members' to "sample", "reference" and "dark". In the process
 fixed bug that was causing overcorrection for stray light in the UVA region.
 Added additional data to the descriptor. Changed test for too low signal for
-original filter correction to be more permisive, and instead of skipping the
+original filter correction to be more permissive, and instead of skipping the
 filter correction we use newly added method "simple".
 Rename parameter "method" to "correction.method" for clarity.
 Add warning for cases when users supply spectra with negative values for

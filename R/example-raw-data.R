@@ -5,7 +5,7 @@
 #'
 #' @docType data
 #' @keywords datasets
-#' @format A raw_mscpt
+#' @format A raw_mspct
 #'
 "blue_filter.raw_mspct"
 
@@ -17,7 +17,7 @@
 #'
 #' @docType data
 #' @keywords datasets
-#' @format A raw_mscpt
+#' @format A raw_mspct
 #'
 "red_filter.raw_mspct"
 
@@ -28,7 +28,7 @@
 #'
 #' @docType data
 #' @keywords datasets
-#' @format A raw_mscpt
+#' @format A raw_mspct
 #'
 "white_LED.raw_mspct"
 
@@ -41,7 +41,7 @@
 #'
 #' @docType data
 #' @keywords datasets
-#' @format A raw_mscpt
+#' @format A raw_mspct
 #'
 "white_LED_2min.raw_mspct"
 
@@ -52,7 +52,18 @@
 #'
 #' @docType data
 #' @keywords datasets
-#' @format A raw_mscpt
+#' @format A raw_mspct
 #'
 "halogen.raw_mspct"
+
+#' Raw counts data for a lamp measurement.
+#'
+#' A photography flash Godox AD200 with a bare lamp in a head with a reflector
+#' fitted. The spectrometer used was an Ocean Optics Maya2000 Pro.
+#'
+#' @docType data
+#' @keywords datasets
+#' @format A raw_mspct
+#'
+"xenon_flash.raw_mspct"
 

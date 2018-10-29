@@ -19,13 +19,13 @@ and the 'r4photobiology' suite as bases. These functions conform a sort of
 "grammar for spectral data acquisition". We provide a separate function for each
 conceptual step in the process leading from raw counts to final spectral
 data---e.g. spectral irradiance. Some higher level functions are included as
-well, mainly as examples of how to implement some protocols.
+well, serving also as examples of how to implement specific protocols.
 
 The package includes functions for direct data acquisition and near real-time
 processing of spectra, plus functions that read raw-detector-counts and 
-instrument settings from text files output by the SpectraSuite program from
+instrument settings from text files output by programs and instruments from
 Ocean Optics. After acquisition or file reading the processing of the raw 
-spectral data is identical in both cases.
+spectral data is the same.
 
 For data acquisition, the initial steps are opening a connection to an instrument and retrieving a descriptor including model type, optical configuration and possibly calibration data from its non-volatile memory. These first steps in most cases are needed only at the start the R session where data will be acquired. The drivers
 from Ocean Optics support multichannel instruments and simultaneous connection
@@ -33,9 +33,9 @@ to multiple spectrometers. This is also supported by this package.
 
 The steps for the acquisition of one raw spectrum are to 1) define the settings to be used, 2) optionally adjust or tune some of these settings automatically, 3) acquire the spectrum, 4) convert the raw counts into linearised counts per second.
 
-In most cases we need acquire more than one raw spectrum, frequently following a certain protocol. There are two possibilities: a) they are conceptually a single observation, such as multiple scans to be averaged to reduce noise or acquired with different integration times (bracketing) and to be merged to increase the dynamic range, and b) sets of spectra in which each spectrum represents a different observation, such as a 'measurement' spectrum and a 'dark' spectrum to be used to correct it.  The distinction may be not that easy to grasp, but in case a) we are measuring a single thing, what we are measuring remains unchanged for all spectra acquired in a set---e.e. we are measuring repeatedly, possibly changing the instrument settings. In case b), although the different spectra may contribute to a single processed spectrum, they are based on measuring a different thing, say a light source and a corresponding dark reading.
+In most cases we need acquire more than one raw spectrum, frequently following a certain protocol. There are two possibilities: a) they are conceptually a single observation, such as multiple scans to be averaged to reduce noise or acquired with different integration times (bracketing) and to be merged to increase the dynamic range, and b) sets of spectra in which each spectrum represents a different observation, such as a 'measurement' spectrum and a 'dark' spectrum to be used to correct it.  The distinction may be not that easy to grasp, but in case a) we are measuring a single thing, what we are measuring remains unchanged for all spectra acquired in a set---e.e. we are measuring repeatedly, possibly changing the instrument settings. In case b), although the different spectra may contribute to a single processed spectrum, they are based on measuring a different thing, say a light source and a paired dark reading.
 
-In case a) all the acquired raw spectra are stored as columns in the same `raw_spct` object, while in case b) the different conceptual spectra are each stored in a separate `raw_spct` object, member of a `raw_mspct` collection of spectra object. As a) and b) are usually combined, this approach allows and easy distinction of the two situations, and greatly simplifies the coding of later data processing steps.
+In case a) all the acquired raw spectra are stored as columns in the same `raw_spct` object, while in case b) the different conceptual spectra are each stored in a separate `raw_spct` object, member of a `raw_mspct` collection of spectral objects. As a) and b) are usually combined, this approach allows and easy distinction of the two situations, and greatly simplifies the coding of later data processing steps.
 
 When spectral data are acquired with other software and read from files into R, this
 same approach is used for raw data storage. The role of the different files is determined by the structure of a named list used as argument. Files do not contain
@@ -50,7 +50,7 @@ irradiance, a calibration needs to be applied to the counts-per-second spectral 
 calibration data is also stored in the non-volatile memory of the spectrometer, but
 in some cases it is convenient to apply special algorithms or calibration data 
 that cannot be retrieved from the instrument itself. Functions for both the normal and special 
-cases are also included in the package. Here it is important to remember that a calibration will be valid only if the raw spectral data processing steps are exactly the same for the spectral data used for calibration and the measured data. **This in practice means that calibrations supplied by instrument manufacturers will almost never be usable if you process the measured data with this pacakge. You will need the reference lamp spectrum and the raw detector-counts data for the calibration event, to be able to calculate valid calibration coefficients for the best data-processing protocol you adopt for your actual measurements.** On the other hand, this also means that the functions in the present package, as each of them fulfils a simple and well defined step of data processing, are ideal for _in silico_ testing of alternative data processing approaches and measuring protocols. 
+cases are also included in the package. Here it is important to remember that a calibration will be valid only if the raw spectral data processing steps are exactly the same for the spectral data used for calibration and the measured data. **This in practice means that calibrations supplied by instrument manufacturers will almost never be usable with all the methods implemented in this pacakge. However, methods are provided also for this case.** When doing a calibration "manually" by simply measuring a standard lamp you will need the reference lamp spectrum and the raw detector-counts data from the calibration event. Doing the calibration manually allows the use of any of the different measuring protocols and correction algorithms implemented. This permits the obtention of valid calibration coefficients for the data-acquisition protocol you adopt for measurements.** On the other hand, this also means that the functions in the present package, as each of them fulfils a simple and well defined step of data processing, are ideal for _in silico_ testing of alternative data processing approaches and measuring protocols. 
 
 ## Functions
 
@@ -72,7 +72,9 @@ cases are also included in the package. Here it is important to remember that a 
 | `acq_raw_spct` | take one measurement (data point) |
 | `acq_raw_mspct` | take a sequence of spectral measurements (several data points) |
 | `acq_irrad_interactive` | interactively acquire spectral irradiance and save data and plots to disk |
-| `acq_trans_interactive` | interactively acquire spectral transmittance and save data and plots to disk |
+| `acq_fluence_interactive` | interactively acquire spectral fluence and save data and plots to disk |
+| `acq_fraction_interactive` | interactively acquire spectral transmittance or reflectance and save data and plots to disk |
+| `acq_fraction_pulsed_interactive` | as above but using a pulsed light source |
 | **data procesing** | |
 | `trim_counts` | replace values from saturated array pixels with NAs |
 | `bleed_nas` | replace values from pixels neighbouring NAs with NAs |
@@ -92,16 +94,20 @@ cases are also included in the package. Here it is important to remember that a 
 | `photobiology::cps2Rfr` | methods to convert counts per second into reflectance |
 | **calibration** | |
 | `compute_irrad_calibration` | compute irradiance calibration multipliers from raw counts data and polynomial coeffcicientes from standard lamp certificates using any of the different measuring protocols and data processing methods implemented in the package |
+| `oo_calib2irrad_mult` | compute irradiance calibration multipliers from Ocean Optics provided calibration |
 | **file reading**  | |
 | `read_oo_ssdata` | read data from a 'SpectraSuite' output file with raw-counts data |
+| `read_oo_ovdata` | read data from a 'OceanView' output file with raw-counts data |
 | `read_oo_pidata` | read data from a 'XXXXXXXXX' output file with raw-counts data from a Raspberry Pi board |
 | `read_files2mspct` | read multiple data files and assemble from them into a `raw_maspct` object compatible to that obtained through direct data acquisition |
+| `read_oo_caldata` | read irradiance calibration data from an Ocean Optics supplied calibration file |
 | `set_oo_ssdata_settings` | set the instrument settings attributes by decoding the header of text files saved from SpectraSuite |
-| `set_oo_ssdata_descriptor` | set the instrument descriptor attribute by decoding the header of text files saved from SpectraSuite and optionally merging these data incomplete with a _descriptor_ supplied as argument |
+| `set_oo_ssdata_descriptor` | set the instrument descriptor attribute by decoding the header of text files saved from SpectraSuite and optionally merging these incomplete data with that in a _descriptor_ supplied as argument |
 | `merge_raw_mspct` | Merge `raw_spct` objects members of a single `raw_mspct` object into a `raw_spct` object with multiple columns |
 | **high level method** | |
 | `raw2corr_cps`| higher level function that returns **corrected** counts per second useful for calculating spectral reflectance and spectral transmittamce.|
 | `s_irrad_corrected` | high-level method with specializations for files and `raw_mspct` objects returning spectral irradiance in a `source_spct` object. |
+| `s_fraction_corrected` | high-level method with specializations for files and `raw_mspct` objects returning spectral transmittance in a `filter_spct` object or spectral reflectance in a `reflector_spct` object. |
 
 ## Workflow
 
@@ -130,7 +136,7 @@ After the preceding steps, if the _cps_ or merged _cps_ values are from an irrad
 
 The slit function describes how monochromatic light "reaches" adjacent pixels which should have been in total darkness had the monochromator been perfect. This is a subtle correction, which will affect only regions of a spectrum where the change in signal strength with wavelength is very steep, such as the UV region of a solar spectrum or a very narrow absorption peak.
 
-The slit function of a spectrometer can be estimated by measuring laser beams at different wavelengths and fitting suitable functions to the observed data. Here we explain how to apply such a function. The slit function is the result of an optical effect, and consequently independent of integration time and other detector settings. Consequently, can be applied to either the merged _cps_ values or after application of a calibration. **Obviously, the stage at which the slit correction is applied needs to match the stage of processing of the data used for estimating the slit function.**
+The slit function of a spectrometer can be estimated by measuring laser beams at different wavelengths and fitting suitable functions to the observed data. Here we explain how to apply such a function. The slit function is the result of an optical effect, and consequently independent of integration time and other detector settings. Consequently, can be applied to either the merged _cps_ values or after application of a calibration. **Obviously, the stage at which the slit correction is applied needs to match the stage of processing of the calibration data used for estimating the slit function.**
 
 The correction to apply to a given pixel depends on the readings of nearby pixels. Some authors recommend to apply this correction recursively, however, we follow the simple approach of applying it only once as an approximation.
  

@@ -51,6 +51,15 @@ sr.online <- FALSE
 #                        descriptors = ooacquire::MAYP11278_descriptors)
 
 ## ---- eval=sr.online-----------------------------------------------------
+#  acq_fluence_interactive(correction.method = ooacquire::MAYP11278_ylianttila.mthd,
+#                        descriptors = ooacquire::MAYP11278_descriptors)
+
+## ---- eval=sr.online-----------------------------------------------------
+#  acq_fluence_interactive(integ.time = 4, # seconds
+#                          correction.method = ooacquire::MAYP11278_ylianttila.mthd,
+#                          descriptors = ooacquire::MAYP11278_descriptors)
+
+## ---- eval=sr.online-----------------------------------------------------
 #  acq_fraction_interactive(ref.value = 0.97,
 #                           correction.method = ooacquire::MAYP11278_ylianttila.mthd,
 #                           descriptors = ooacquire::MAYP11278_descriptors)
@@ -76,6 +85,13 @@ irrad.spct <-
 
 ## ---- fig.height=5, fig.width=7------------------------------------------
 plot(irrad.spct)
+
+## ---- eval=FALSE---------------------------------------------------------
+#  cal.spct <- read_oo_caldata("oo-calibration/xxxx")
+
+## ---- eval=FALSE---------------------------------------------------------
+#  cal.multipliers <- oo_calib2irrad_mult(cal.spct,
+#                                         diff.type = "CC-3")
 
 ## ---- eval=FALSE---------------------------------------------------------
 #  filepath <- system.file("example-scripts", "irrad-acq-interac.R", package="ooacquire")

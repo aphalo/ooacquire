@@ -30,34 +30,41 @@ raw2cps.default <- function(x, ...) {
 #'
 raw2cps.raw_spct <- function(x,
                              ...) {
+  acq_settings <- getInstrSettings(x)
+
   # guard against attempts to reapply linearization
-  if (!getInstrSettings(x)[["linearized"]]) {
+  if (!acq_settings[["linearized"]]) {
     x <- linearize_counts(x)
   }
-  acq_settings <- getInstrSettings(x)
+  integ.time <- acq_settings[["integ.time"]]
+  counts.cols <- names(x)[grep("^counts", names(x))]
+  stopifnot(length(counts.cols) == length(integ.time))
+  cps.cols <- gsub("^counts", "cps", counts.cols)
   if (exists("num.exposures", acq_settings)) {
     num.exposures <- acq_settings[["num.exposures"]]
   } else {
     num.exposures <- -1L
   }
-  integ.time <- acq_settings[["integ.time"]]
-  counts.cols <- names(x)[grep("^counts", names(x))]
-  cps.cols <- gsub("^counts", "cps", counts.cols)
-  stopifnot(length(counts.cols) == length(integ.time))
+  if (length(num.exposures) == 1L) {
+    num.exposures <- rep(num.exposures, length(integ.time))
+  } else {
+    stopifnot(length(num.exposures) == length(integ.time))
+    # consistently spectral irradiance (-1L) or spectral fluence (>= 0L)
+    stopifnot(all(num.exposures < 0L) || all(num.exposures >= 0L))
+  }
   other.cols <- setdiff(names(x), counts.cols)
   z <- as.generic_spct(x)[other.cols]
   max.counts <- numeric(length(counts.cols))
   for (i in seq_along(counts.cols)) {
     max.counts[i] <- max(x[[counts.cols[i]]], na.rm = TRUE)
-    if (any(num.exposures >= 1L)) {
+    if (num.exposures[i] >= 1L) {
       # counts per flash
       z[[cps.cols[i]]] <- x[[counts.cols[i]]] / num.exposures[i]
-      setCpsSpct(z, time.unit = "exposure") # tag as counts per exposure!!
-    } else if (any(num.exposures < 0L)) {
-      stopifnot(all(num.exposures < 0L)) # mix not allowed
+      z <- setCpsSpct(z, time.unit = "exposure") # tag as counts per exposure!!
+    } else if (num.exposures[i] < 0L) {
       # counts per second
       z[[cps.cols[i]]] <- x[[counts.cols[i]]] / integ.time[i] * 1e6
-      setCpsSpct(z, time.unit = "second")
+      z <- setCpsSpct(z, time.unit = "second")
     }
   }
   descriptor <- getInstrDesc(x)

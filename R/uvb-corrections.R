@@ -61,22 +61,24 @@ uvb_corrections <- function(x,
                      mode = "function")
   }
 
-  raw2merged_cps <- function(x, spct.names = spct.names) {
-    spct.names <- intersect(spct.names, names(x))
-    z <- cps_mspct()
+  raw2merged_cps <- function(xx,
+                             spct.names,
+                             inst.dark.pixs) {
+    spct.names <- intersect(spct.names, names(xx))
+    zz <- cps_mspct()
     for (n in spct.names) {
+      temp.spct <- xx[[n]]
       inst.dark.wl <-
-        range(x[[n]][["w.length"]][inst.dark.pixs])
-      x[[n]] %>%
-        skip_bad_pixs() %>%
-        trim_counts() %>%
-        bleed_nas() %>%
-        linearize_counts() %>%
-        fshift(range = inst.dark.wl) %>%
-        raw2cps() %>%
-        merge_cps() -> z[[n]]
+        range(temp.spct[["w.length"]][inst.dark.pixs])
+      temp.spct <- skip_bad_pixs(temp.spct)
+      temp.spct <- trim_counts(temp.spct)
+      temp.spct <- bleed_nas(temp.spct)
+      temp.spct <- linearize_counts(temp.spct)
+      temp.spct <- fshift(temp.spct, range = inst.dark.wl)
+      temp.spct <- raw2cps(temp.spct)
+      zz[[n]] <- merge_cps(temp.spct)
     }
-    z
+    zz
   }
 
   spct.nms <- spct.names[c("light", "filter", "dark")]
@@ -85,24 +87,27 @@ uvb_corrections <- function(x,
   names(spct.names) <- c("light", "filter", "dark")[spct.present]
 
   if (length(setdiff(c("light", "filter", "dark"), names(spct.names))) == 0) {
-    x %>%
-      raw2merged_cps(spct.names = spct.names) %>%
-      ref_correction(ref_name = spct.names["dark"]) -> y
+    y <- raw2merged_cps(xx = x,
+                        spct.names = spct.names,
+                        inst.dark.pixs = inst.dark.pixs)
+    y <- ref_correction(y, ref_name = spct.names["dark"])
   } else if (length(setdiff(c("light", "dark"), names(spct.names))) == 0) {
     if (verbose) {
       warning("No filter spectra available: continuing without filter correction")
     }
     flt.flag <- FALSE
-    x %>%
-      raw2merged_cps(spct.names = spct.names) %>%
-      ref_correction(ref_name = spct.names["dark"]) -> y
+    y <- raw2merged_cps(xx = x,
+                        spct.names = spct.names,
+                        inst.dark.pixs = inst.dark.pixs)
+    y <- ref_correction(y, ref_name = spct.names["dark"])
   } else if (length(setdiff("light", names(spct.names))) == 0){
     if (verbose) {
       warning("No 'dark' measurement available: using internal reference")
     }
     flt.flag <- FALSE
-    x %>%
-      raw2merged_cps(spct.names = spct.names) -> y
+    y <- raw2merged_cps(xx = x,
+                        spct.names = spct.names,
+                        inst.dark.pixs = inst.dark.pixs)
     # may need to add
   } else {
     if (verbose) {
@@ -155,11 +160,11 @@ uvb_corrections <- function(x,
     z <- slit_function_correction(z, worker.fun = worker.fun, ...)
   }
 
-  z <- setInstrDesc(z, descriptor)
-  z <- setInstrSettings(z, inst.settings)
-  z <- setWhenMeasured(z, when.measured)
-  z <- setWhereMeasured(z, where.measured)
-  z <- setWhatMeasured(z, what.measured)
+  setInstrDesc(z, descriptor)
+  setInstrSettings(z, inst.settings)
+  setWhenMeasured(z, when.measured)
+  setWhereMeasured(z, where.measured)
+  setWhatMeasured(z, what.measured)
   z
 }
 

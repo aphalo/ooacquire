@@ -4,7 +4,7 @@
 \name{white_LED_2min.raw_mspct}
 \alias{white_LED_2min.raw_mspct}
 \title{Raw counts data for a lamp measurement.}
-\format{A raw_mscpt}
+\format{A raw_mspct}
 \usage{
 white_LED_2min.raw_mspct
 }

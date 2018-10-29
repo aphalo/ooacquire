@@ -33,6 +33,22 @@ halogen.raw_mspct <-
 
 rm(Halogen.raw_spct, Halogen.spct)
 
+load(file = "data-raw/raw-mspct-examples/flash-AD200.Rda")
+
+xenon_flash.raw_mspct <- obj.reference.1.8.raw_mspct
+
+settings <- getInstrSettings(xenon_flash.raw_mspct[["light"]])
+settings <- ooacquire:::set_num_exposures(settings, 1L)
+
+xenon_flash.raw_mspct[["light"]] <- setInstrSettings(xenon_flash.raw_mspct[["light"]], settings)
+xenon_flash.raw_mspct[["dark"]] <- setInstrSettings(xenon_flash.raw_mspct[["dark"]], settings)
+
+xenon_flash.raw_mspct[["light"]] <- setWhatMeasured(xenon_flash.raw_mspct[["light"]], "Bare bulb xenon flash")
+xenon_flash.raw_mspct[["dark"]] <- setWhatMeasured(xenon_flash.raw_mspct[["dark"]], "Bare bulb xenon flash")
+
+rm(obj.reference.1.8.raw_mspct, obj.reference.1.8.spct)
+
+
 load(file = "data-raw/raw-mspct-examples/Heliopan695.Rda")
 
 red_filter.raw_mspct <- msmsply(Heliopan695.raw_spct, trimInstrDesc, fields = c("-", "w", "sr.index"))
@@ -45,7 +61,7 @@ blue_filter.raw_mspct <- msmsply(UQG_Blue.raw_spct, trimInstrDesc, fields = c("-
 
 rm(UQG_Blue.raw_spct)
 
-save(white_LED.raw_mspct, white_LED_2min.raw_mspct, halogen.raw_mspct,
+save(white_LED.raw_mspct, white_LED_2min.raw_mspct, halogen.raw_mspct, xenon_flash.raw_mspct,
      red_filter.raw_mspct, blue_filter.raw_mspct,
      file = "data/raw-counts.rda",
      compress = "xz")

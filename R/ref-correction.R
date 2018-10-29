@@ -55,6 +55,8 @@ ref_correction.raw_spct <- function(x,
   # check that measurement conditions were the same
   stopifnot(all(getInstrSettings(x)[["integ.time"]] ==
                   getInstrSettings(y)[["integ.time"]]))
+  # check that number of exposures is consitent
+  # TO DO!!
   # check that the two spectra have equivalent spectral data
   counts.cols_x <- names(x)[grep("^counts", names(x))]
   counts.cols_y <- names(x)[grep("^counts", names(y))]
@@ -95,8 +97,8 @@ ref_correction.cps_spct <- function(x,
               getInstrDesc(y)[["spectrometer.sn"]])
   # guard against differences in linearization
   stopifnot(attr(x, "linearized") == attr(y, "linearized"))
-  # no need to check that integration times were the same
-  # We keep those from x only
+  # guard against spectra with different time units
+  stopifnot(getTimeUnit(x) == getTimeUnit(y))
   # check that the two spectra have equivalent spectral data
   cps.cols_x <- names(x)[grep("^cps", names(x))]
   cps.cols_y <- names(x)[grep("^cps", names(y))]
@@ -111,7 +113,7 @@ ref_correction.cps_spct <- function(x,
   for (i in seq_along(cps.cols)) {
     z[[cps.cols[i]]] <- .oper(x[[cps.cols[i]]],  y[[cps.cols[i]]], ...)
   }
-  setCpsSpct(z)
+  setCpsSpct(z, time.unit = getTimeUnit(x))
   # add metadata to result
   setInstrDesc(z, getInstrDesc(x))
   setInstrSettings(z, getInstrSettings(x))

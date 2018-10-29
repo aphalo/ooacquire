@@ -4,7 +4,7 @@
 \name{red_filter.raw_mspct}
 \alias{red_filter.raw_mspct}
 \title{Raw counts data for a filter measurement}
-\format{A raw_mscpt}
+\format{A raw_mspct}
 \usage{
 red_filter.raw_mspct
 }

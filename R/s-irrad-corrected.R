@@ -2,8 +2,6 @@
 #'
 #' @param x A named list of one to three vectors of file names, with names
 #'   "light", "filter", and "dark". Or a raw_mspt object, or a raw_spct object.
-#' @param num.exposures integer Number of pulses per scan, if 0L, continuous source is
-#'   assumed.
 #' @param spct.names named character vector of length three, to map names in
 #'   \code{x} to those expected.
 #' @param correction.method A named list of constants and functions defining the
@@ -137,14 +135,14 @@ s_irrad_corrected.raw_mspct <-
 #' @describeIn s_irrad_corrected Default for generic function.
 #' @export
 s_irrad_corrected.raw_spct <- function(x,
-                                       num.exposures = 0L,
+                                       time = NULL,
                                        correction.method,
                                        return.cps = FALSE,
                                        verbose = getOption("photobiology.verbose", default = FALSE),
                                        ...) {
   raw.mspct <- raw_mspct(list(light = x))
   s_irrad_corrected(x = raw.mspct,
-                    num.exposures = num.exposures,
+                    time = time,
                     correction.method = correction.method,
                     return.cps = return.cps,
                     verbose = verbose,
