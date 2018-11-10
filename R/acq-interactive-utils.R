@@ -134,37 +134,48 @@ protocol_interactive <- function(protocols) {
   protocol
 }
 
+#' Get list of conencted instruments
+#'
+#' Get list of spectrometers requesting user to connect one or abort if none
+#' fould.
+#'
+#' @param w handle to Omni Driver, used to test if an spectrometer is still
+#'   connected.
+#'
+#' @export
+#'
+list_srs_interactive <- function(w) {
+  while (rOmniDriver::number_srs(w) < 1L) {
+    answ <- readline("Please, connect a spectrometer to an USB port. <enter> = try again, z = abort.")
+    if (answ[1] %in% c("z", "Z")) {
+      break()
+    }
+  }
+  list_instruments(w)
+}
+
 #' Interactively select an instrument
 #'
 #' Choice of spectrometer by name from a list of serial numbers, allowing the
 #' user to correct the selection if needed.
 #'
 #' @param instruments the returm value of \code{list_instruments(w)}.
-#' @param w handle to Omni Driver, used to test if an spectrometer is still
-#'   connected.
 #'
 #' @export
 #'
-choose_sr_interactive <- function(instruments,
-                                  w = NULL) {
-  # if instruments has names these would not be needed
+choose_sr_interactive <- function(instruments) {
+  # if instruments had names this would not be needed
   sn.idx <- 3
 
   # make sure at least one instrument is connected
-  repeat{
-    num.inst <- nrow(instruments)
-    if (num.inst >= 1) {
-      print("Connected spectrometers")
-      break()
-    } else if (!is.null(w)) {
-      cat("No spectrometer found. Abort, or connect one and then retry.")
-      if (readline("abort, retry (-/a)") == "a") {
-        stop("Aborting as requested! Bye.")
-      }
-      instruments <- list_instruments(w)
-    } else {
-      cat("No spectrometer found. Aborting.")
-    }
+  stopifnot(nrow(instruments) > 0L)
+
+  num.inst <- nrow(instruments)
+  if (num.inst >= 1) {
+    print("Connected spectrometers")
+  } else {
+    cat("No spectrometers found.")
+    return(-1L)
   }
 
   # select instrument
@@ -172,12 +183,12 @@ choose_sr_interactive <- function(instruments,
     prompt <- paste(1:nrow(instruments), ": ", instruments[[sn.idx]],
                     " (choose by index): ", sep = "")
     repeat{
-      sr.idx <- as.integer(readline(prompt = prompt))
-      if (sr.idx[1] == "") {
+      answ <- as.integer(readline(prompt = prompt))
+      if (is.na(answ[1])) {
         sr.idx <- 1L
       }
       if (sr.idx[1] %in% 1L:nrow(instruments)) {
-        sr.index <- sr.idx - 1L
+        sr.idx <- sr.idx[1]
         break()
       } else {
         print("A number between 1 and ", num.inst, " is required.")
@@ -185,12 +196,10 @@ choose_sr_interactive <- function(instruments,
     }
   } else { # num.inst == 1
     sr.idx <- 1L
-    sr.index <- sr.idx - 1L
   }
   print(instruments[sr.idx, ])
-  sr.index
+  sr.idx - 1L # use Omni Driver convention for indexes
 }
-
 
 #' Interactively select a channel
 #'
@@ -198,7 +207,7 @@ choose_sr_interactive <- function(instruments,
 #'
 #' @param instruments the returm value of \code{list_instruments(w)}
 #' @param sr.index integer The index to the spectrometer, starting from zero,
-#'   following C conventions instead of R indexing conventions.
+#'   following Omni Driver indexing conventions.
 #' @param prompt.text character string to use as prompt.
 #'
 #' @export
@@ -217,16 +226,16 @@ choose_ch_interactive <- function(instruments,
                       " (choose by index): ", sep = "")
       ch.idx <- as.integer(readline(prompt = prompt))
       if (ch.idx %in% 1:num.channels) {
-        ch.index <- ch.idx - 1L
+        ch.index <- ch.idx
         break()
       } else {
         print(paste("A number between 1 and ", num.channels, " is required.", sep = ""))
       }
     }
   } else {
-    ch.index <- 0L
+    ch.index <- 1L
   }
-  ch.index
+  ch.index - 1L # use Omni Driver convention for indexes
 }
 
 #' Interactively set sequential measurements

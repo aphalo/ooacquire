@@ -82,10 +82,15 @@ acq_fluence_interactive <-
 
     w <- start_session()
 
-    instruments <- list_instruments(w)
-
-    sr.index <- choose_sr_interactive(instruments, w)
-    ch.index <- choose_ch_interactive(instruments, sr.index)
+    instruments <- list_srs_interactive(w = w)
+    sr.index <- choose_sr_interactive(instruments = instruments)
+    if (sr.index < 0L) {
+      print("Aborting...")
+      end_session(w = w)
+      message("Bye!")
+    }
+    ch.index <- choose_ch_interactive(instruments = instruments,
+                                      sr.index = sr.index)
 
     serial_no <- as.character(instruments[sr.index + 1L, 3])
 
@@ -135,7 +140,7 @@ acq_fluence_interactive <-
     user.session.name <- readline("Session's name: ")
     session.name <- make.names(user.session.name)
     if (user.session.name == "") {
-      session.name <- paste("session", trunc(stats::runif(n = 1L, max = 1) * 100000), sep = "")
+      session.name <- make.names(lubridate::now())
     }
     if (session.name != user.session.name) {
       message("Using sanitised/generated name: '", session.name, "'.", sep = "")
@@ -367,11 +372,15 @@ acq_fraction_pulsed_interactive <-
 
     w <- start_session()
 
-    instruments <- list_instruments(w)
-    print(instruments)
-
-    sr.index <- choose_sr_interactive(instruments)
-    ch.index <- choose_ch_interactive(instruments, sr.index)
+    instruments <- list_srs_interactive(w = w)
+    sr.index <- choose_sr_interactive(instruments = instruments)
+    if (sr.index < 0L) {
+      print("Aborting...")
+      end_session(w = w)
+      message("Bye!")
+    }
+    ch.index <- choose_ch_interactive(instruments = instruments,
+                                      sr.index = sr.index)
 
     serial_no <- as.character(instruments[sr.index + 1L, 3])
 
@@ -435,7 +444,7 @@ acq_fraction_pulsed_interactive <-
     user.session.name <- readline("Session's name: ")
     session.name <- make.names(user.session.name)
     if (user.session.name == "") {
-      session.name <- paste("session", trunc(stats::runif(n = 1L, max = 1) * 100000), sep = "")
+      session.name <- make.names(lubridate::now())
     }
     if (session.name != user.session.name) {
       message("Using sanitised/generated name: '", session.name, "'.", sep = "")

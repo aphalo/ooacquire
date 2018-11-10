@@ -4,13 +4,10 @@
 \alias{choose_sr_interactive}
 \title{Interactively select an instrument}
 \usage{
-choose_sr_interactive(instruments, w = NULL)
+choose_sr_interactive(instruments)
 }
 \arguments{
 \item{instruments}{the returm value of \code{list_instruments(w)}.}
-
-\item{w}{handle to Omni Driver, used to test if an spectrometer is still
-connected.}
 }
 \description{
 Choice of spectrometer by name from a list of serial numbers, allowing the
