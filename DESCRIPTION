@@ -28,7 +28,7 @@ Imports:
     ggplot2 (>= 2.2.1),
     photobiology (>= 0.9.24),
     photobiologyWavebands (>= 0.4.2-1),
-    ggspectra (> 0.3.1),
+    ggspectra (>= 0.3.1),
     rOmniDriver (>= 0.1.12),
     lubridate (>= 1.7.4),
     anytime (>= 0.3.2),

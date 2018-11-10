@@ -16,6 +16,8 @@
 #'
 start_session <- function(error.action = stop) {
   w <- rOmniDriver::init_srs()
+  message("Omni Driver version: ", rOmniDriver::get_api_version(w))
+  message("rOmniDriver package version: ", utils::packageVersion("rOmniDriver"))
   num.srs <- rOmniDriver::number_srs(w)
 
   # num.srs <- 1
@@ -23,7 +25,7 @@ start_session <- function(error.action = stop) {
     message_text <-
     error.action("Error starting session: ", message_text)
   } else if (num.srs == 0) {
-    error.action("No SR found")
+    warning("No SR found")
   }
   w
 }
@@ -40,7 +42,7 @@ start_session <- function(error.action = stop) {
 #' @export
 list_instruments <- function(w) {
   number.srs <- rOmniDriver::number_srs(w)
-  srs.idxs <- (1:number.srs) - 1L
+  srs.idxs <- seq(from = 0, length.out = number.srs)
   z <- data.frame(idx = numeric(),
                   model = character(),
                   serial.no = character(),
@@ -65,5 +67,6 @@ list_instruments <- function(w) {
 #' @export
 #'
 end_session <- function(w) {
+  message("Clossing connection to ", rOmniDriver::number_srs(w), " spectrometer(s)")
   rOmniDriver::srs_close(w)
 }
