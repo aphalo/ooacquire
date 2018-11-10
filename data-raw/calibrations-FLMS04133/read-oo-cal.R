@@ -1,12 +1,11 @@
 # read calibration
-library(readr)
 library(magrittr)
 library(ggplot2)
 library(r4photobiology)
 library(ooacquire)
 
-read_oo_caldata("./data-raw/calibrations-FLMS00440/FLMS00440_2016-06-03_VIS-patched.IRRADCAL") %>%
-  oo_calib2irrad_mult(diff.type = "UV-J1002-SMA") -> cal.spct
+read_oo_caldata("./data-raw/calibrations-FLMS04133/FLMS04133_20180320_CC.IrradCal") %>%
+  oo_calib2irrad_mult(diff.type = "CC-3-DA") -> cal.spct
 
 class_spct(cal.spct)
 names(cal.spct)
@@ -19,6 +18,6 @@ plot(cal.spct,
 
 plot(cal.spct,
      annotations = c("+", "boundaries", "title:what:when"),
-     range = c(352, 920), norm = 520)
+     range = c(230, 850), norm = 500)
 
-save(cal.spct, file = "./data-raw/calibrations-FLMS00440/FLMS00440_2016-06-03_cal.rda")
+save(cal.spct, file = "./data-raw/calibrations-FLMS04133/FLMS04133_2018-03-20_cal.rda")

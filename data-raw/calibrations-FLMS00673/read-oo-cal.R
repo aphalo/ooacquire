@@ -14,7 +14,10 @@ getWhenMeasured(cal.spct)
 getWhatMeasured(cal.spct)
 
 plot(cal.spct,
+     annotations = c("+", "boundaries", "title:what:when"))
+
+plot(cal.spct,
      annotations = c("+", "boundaries", "title:what:when"),
-     range = c(280, 800))
+     range = c(205, 925), norm = 500)
 
 save(cal.spct, file = "./data-raw/calibrations-FLMS00673/FLMS00673_2015-12-02_cal.rda")

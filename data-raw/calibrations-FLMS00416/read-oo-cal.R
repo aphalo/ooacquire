@@ -13,8 +13,11 @@ cat(comment(cal.spct))
 getWhenMeasured(cal.spct)
 getWhatMeasured(cal.spct)
 
-plot(cal.spct, annotations = c("+", "boundaries"),
-     range = c(355, 800)) +
-  ggtitle(getWhatMeasured(cal.spct)$sn, getWhatMeasured(cal.spct)$file.name)
+plot(cal.spct,
+     annotations = c("+", "boundaries", "title:what:when"))
+
+plot(cal.spct,
+     annotations = c("+", "boundaries", "title:what:when"),
+     range = c(352, 920), norm = 520)
 
 save(cal.spct, file = "./data-raw/calibrations-FLMS00416/FLMS00416_2015-07-28_cal.rda")

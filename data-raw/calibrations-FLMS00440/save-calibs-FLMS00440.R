@@ -66,7 +66,7 @@ for (f in files) {
   descriptor.tmp <-
     set_descriptor_irrad_mult(descriptor = descriptor.tmp,
                               irrad.mult = tmp[["irrad.mult"]],
-                              wl.range = c(350, 899),
+                              wl.range = c(352, 920),
                               start.date = FLMS00440_calib_dates.df[["start.date"]][date.row],
                               end.date = FLMS00440_calib_dates.df[["end.date"]][date.row])
 

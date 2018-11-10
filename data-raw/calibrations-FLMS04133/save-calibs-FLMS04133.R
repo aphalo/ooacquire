@@ -3,21 +3,21 @@ library(ooacquire)
 
 # create an object with the parameters for Lasse Ylianttila's original method
 # for Maya, not vavailable.
-FLMS00673_ylianttila.mthd <- list()
+FLMS04133_ylianttila.mthd <- list()
 
 # create an object with the parameters for a method good only for sunlight,
 # not vavailable.
-FLMS00673_sun.mthd <- list()
+FLMS04133_sun.mthd <- list()
 
 # create an object with the parameters for simple method for Jaz
 # suitable for any light source, but not as good for irradiance.
-FLMS00673_simple.mthd <- list()
+FLMS04133_simple.mthd <- list()
 
 # create an object with the parameters for simple method for Jaz
 # suitable for any light source, but not as good for irradiance.
-FLMS00673_none.mthd <- list(
+FLMS04133_none.mthd <- list(
   stray.light.method = "none",
-  stray.light.wl = c(188.41, 195.42),
+  stray.light.wl = c(189.91, 195.59),
   flt.dark.wl = c(NA_real_, NA_real_),
   flt.ref.wl = c(NA_real_, NA_real_),
   flt.Tfr = 1,
@@ -33,13 +33,13 @@ load(file = "./data-raw/flame-s-descriptor/FLMS00440.Rda")
 # we make sure not to depend on Java code
 descriptor$w <- NULL
 
-descriptor[["spectrometer.name"]] <- "Flame-S-XR1-ES"
-descriptor[["spectrometer.sn"]] <- "FLMS00673"
-descriptor[["bench.grating"]] <- "XR1"
+descriptor[["spectrometer.name"]] <- "Flame-S-RAD"
+descriptor[["spectrometer.sn"]] <- "FLMS04133"
+descriptor[["bench.grating"]] <- "02"
 descriptor[["bench.filter"]] <- "000"
-descriptor[["bench.slit"]] <- "025"
-descriptor[["bench-lens"]] <- "L2"
-descriptor[["detector"]] <- "DET2B-200-1100"
+descriptor[["bench.slit"]] <- "050"
+descriptor[["bench-lens"]] <- "L2-C"
+descriptor[["detector"]] <- "DET2B-200-850"
 descriptor[["num.pixs"]] <- 2048
 descriptor[["num.dark.pixs"]] <- 16
 descriptor[["min.integ.time"]] <- 1000
@@ -48,24 +48,24 @@ descriptor[["max.counts"]] <- 65535
 
 descriptor[["time"]] <- NA
 descriptor <- set_descriptor_nl(descriptor,
-                                nl.coeff = c(0.878133, 8.83404e-6, -5.07091e-10,
-                                             3.80507e-14, -1.84551e-18, 4.64183e-23,
-                                             -5.62435e-28, 2.56084e-33))
+                                nl.coeff = c(0.893344, 7.20663e-6, -1.33919e-10,
+                                            -2.26498e-15, -8.91163e-20, 4.24693e-25,
+                                             -2.89509e-29, 1.55269e-34))
 
 # find calibration files
-files <- list.files("data-raw/calibrations-FLMS00673",
+files <- list.files("data-raw/calibrations-FLMS04133",
                     pattern = "*cal.rda$",
                     full.names = TRUE)
 
-FLMS00673_calib_dates.df <-
-  read_csv("data-raw/calibrations-FLMS00673/calibration-dates.csv", skip = 1)
+FLMS04133_calib_dates.df <-
+  read_csv("data-raw/calibrations-FLMS04133/calibration-dates.csv", skip = 1)
 
 # create a new descriptor for each calibration file
 descriptors <- list()
 for (f in files) {
   print(f)
-  date.row <- which(FLMS00673_calib_dates.df[["coeffs.file"]] == basename(f))
-  name.f <- FLMS00673_calib_dates.df[["name"]][date.row]
+  date.row <- which(FLMS04133_calib_dates.df[["coeffs.file"]] == basename(f))
+  name.f <- FLMS04133_calib_dates.df[["name"]][date.row]
   load(f)
   tmp <- cal.spct
 #  names(tmp) <- c("w.length", "irrad.mult")
@@ -77,9 +77,9 @@ for (f in files) {
   descriptor.tmp <-
     set_descriptor_irrad_mult(descriptor = descriptor.tmp,
                               irrad.mult = tmp[["irrad.mult"]],
-                              wl.range = c(205, 925),
-                              start.date = FLMS00673_calib_dates.df[["start.date"]][date.row],
-                              end.date = FLMS00673_calib_dates.df[["end.date"]][date.row])
+                              wl.range = c(230, 850),
+                              start.date = FLMS04133_calib_dates.df[["start.date"]][date.row],
+                              end.date = FLMS04133_calib_dates.df[["end.date"]][date.row])
 
   descriptor.tmp <- descriptors[[name.f]] <- descriptor.tmp
 }
@@ -88,19 +88,19 @@ print(names(descriptors))
 
 rm(tmp, f, name.f)
 
-stopifnot(names(descriptors) == FLMS00673_calib_dates.df[["name"]])
-stopifnot(basename(files) == FLMS00673_calib_dates.df[["coeffs.file"]])
+stopifnot(names(descriptors) == FLMS04133_calib_dates.df[["name"]])
+stopifnot(basename(files) == FLMS04133_calib_dates.df[["coeffs.file"]])
 
-FLMS00673_cal.spct <- cal.spct
+FLMS04133_cal.spct <- cal.spct
 
-FLMS00673_descriptors <- descriptors
+FLMS04133_descriptors <- descriptors
 
-save(FLMS00673_ylianttila.mthd,
-     FLMS00673_sun.mthd,
-     FLMS00673_simple.mthd,
-     FLMS00673_none.mthd,
-     FLMS00673_descriptors,
-     FLMS00673_calib_dates.df,
-     FLMS00673_cal.spct,
-     file = "data/calibs-FLMS00673.rda")
+save(FLMS04133_ylianttila.mthd,
+     FLMS04133_sun.mthd,
+     FLMS04133_simple.mthd,
+     FLMS04133_none.mthd,
+     FLMS04133_descriptors,
+     FLMS04133_calib_dates.df,
+     FLMS04133_cal.spct,
+     file = "data/calibs-FLMS04133.rda")
 
