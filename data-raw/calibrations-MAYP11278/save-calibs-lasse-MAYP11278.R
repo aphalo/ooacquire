@@ -47,6 +47,9 @@ MAYP11278_simple.mthd <- list(
 # load an instrument descriptor
 load(file = "./data-raw/maya-descriptor/MAYP11278.Rda")
 
+descriptor$num.pixs <- 2068
+descriptor$num.dark.pixs <- 20
+
 descriptor$w <- NULL
 
 # find calibration files

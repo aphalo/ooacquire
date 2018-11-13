@@ -46,6 +46,8 @@ MAYP112785_simple.mthd <- list(
 
 # load an instrument descriptor
 load(file = "./data-raw/maya-descriptor/MAYP112785.Rda")
+descriptor$num.pixs <- 2068
+descriptor$num.dark.pixs <- 20
 
 descriptor$w <- NULL
 descriptor$sr.index <- 0L

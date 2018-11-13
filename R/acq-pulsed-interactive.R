@@ -32,6 +32,8 @@
 #'   calibration data.
 #' @param stray.light.method character Used only when the correction method is
 #'   created on-the-fly.
+#' @param qty.out character One of "Tfr" (spectral transmittance as a fraction of one),
+#'   "fluence" (spectral irardiance), "cps" (counts per second), or "raw" (raw sensor counts).
 #' @param save.pdfs logical Whether to save PDFs to files or not.
 #' @param interface.mode character One of "manual", and "manual-attr".
 #'
@@ -62,6 +64,7 @@ acq_fluence_interactive <-
            correction.method = NA,
            descriptors = NA,
            stray.light.method = "none",
+           qty.out = "fluence",
            save.pdfs = TRUE,
            interface.mode = "manual") {
 
@@ -71,6 +74,11 @@ acq_fluence_interactive <-
         c("manual")) {
       stop("Invalid argument for 'interface.mode', aborting.")
     }
+
+    # validate qty.out
+    qty.out <- tolower(qty.out)
+    stopifnot(qty.out %in% c("fluence", "cps", "raw"))
+
     # define measurement protocols
     if (length(protocols) == 0) {
       protocols <- list(l = "light",
@@ -194,11 +202,16 @@ acq_fluence_interactive <-
 
       raw.name <- paste(obj.name, "raw_mspct", sep = ".")
       raw.names <- c(raw.names, raw.name)
-      fluence.name <- paste(obj.name, "spct", sep = ".")
-      fluence.names <- c(fluence.names, fluence.name)
-      file.name <- paste(fluence.name, "Rda", sep = ".")
+
+      if (qty.out != "raw") {
+        fluence.name <- paste(obj.name, "spct", sep = ".")
+        fluence.names <- c(fluence.names, fluence.name)
+      }
+
+      file.name <- paste(obj.name, "spct.Rda", sep = ".")
       file.names <- c(file.names, file.name)
-      pdf.name <- paste(fluence.name, "pdf", sep = ".")
+
+      pdf.name <- paste(obj.name, "spct.pdf", sep = ".")
 
       if (grepl("-attr", interface.mode)) {
         user.attrs <- set_attributes_interactive(user.attrs)
@@ -206,6 +219,7 @@ acq_fluence_interactive <-
 
       raw.mspct <- acq_raw_mspct(descriptor = descriptor,
                                  acq.settings = settings,
+                                 num.exposures = num.exposures,
                                  seq.settings = seq.settings,
                                  protocol = protocol,
                                  f.trigger.pulses = f.trigger.pulses,
@@ -215,76 +229,104 @@ acq_fluence_interactive <-
         next()
       }
 
-      fluence.spct <- s_irrad_corrected(x = raw.mspct,
-                                        correction.method = correction.method,
-                                        num.exposures = num.exposures)
+      if (qty.out != "raw") {
+        fluence.spct <- s_irrad_corrected(x = raw.mspct,
+                                          correction.method = correction.method,
+                                          return.cps = qty.out == "cps")
 
-      if (length(user.attrs$what.measured) > 0) {
-        setWhatMeasured(fluence.spct, user.attrs$what.measured)
-      }
+        if (length(user.attrs$what.measured) > 0) {
+          setWhatMeasured(fluence.spct, user.attrs$what.measured)
+        } else {
+          setWhatMeasured(fluence.spct, obj.name)
+        }
 
-      if (length(user.attrs$comment.text) > 0) {
-        comment(fluence.spct) <- paste(comment(fluence.spct), user.attrs$comment.text, sep = "\n")
-      }
+        if (length(user.attrs$comment.text) > 0) {
+          comment(fluence.spct) <- paste(comment(fluence.spct), user.attrs$comment.text, sep = "\n")
+        }
 
-      assign(raw.name, raw.mspct)
-      assign(fluence.name, fluence.spct)
+        assign(raw.name, raw.mspct)
+        assign(fluence.name, fluence.spct)
 
-      save(list = c(raw.name, fluence.name), file = file.name)
+        save(list = c(raw.name, fluence.name), file = file.name)
 
-      repeat {
-        fig <- graphics::plot(fluence.spct) +
+        repeat {
+          fig <- graphics::plot(fluence.spct) +
+            ggplot2::labs(title = obj.name,
+                          subtitle = paste(photobiology::getWhenMeasured(fluence.spct), " UTC, ",
+                                           session.label, sep = ""),
+                          caption = paste("ooacquire", utils::packageVersion("ooacquire"))) +
+            ggplot2::theme_bw()
+          print(fig)
+          answer <- readline("Plot as photons/energy/wavebands/discard/save and continue (p/e/w/d/-): ")
+          switch(answer,
+                 p = {options(photobiology.radiation.unit = "photon"); next()},
+                 e = {options(photobiology.radiation.unit = "energy"); next()},
+                 w = {answer1 <- readline("Waveband set to use, UV+PAR, plants, visible, total, default (u/p/v/t/-): ")
+                 switch(answer1,
+                        u = options(photobiology.plot.bands =
+                                      list(photobiologyWavebands::UVC(),
+                                           photobiologyWavebands::UVB(),
+                                           photobiologyWavebands::UVA(),
+                                           photobiologyWavebands::PAR())),
+                        p = options(photobiology.plot.bands = photobiologyWavebands::Plant_bands()),
+                        v = options(photobiology.plot.bands = photobiologyWavebands::VIS_bands()),
+                        t = options(photobiology.plot.bands =
+                                      list(new_waveband(min(fluence.spct), max(fluence.spct), wb.name = "Total"))),
+                        options(photobiology.plot.bands = NULL))
+                 next()},
+                 d = break()
+          )
+          break()
+        }
+      } else {
+        assign(raw.name, raw.mspct)
+        save(list = c(raw.name), file = file.name)
+        fig <- graphics::plot(raw.mspct[["light"]]) +
           ggplot2::labs(title = obj.name,
-                        subtitle = paste(photobiology::getWhenMeasured(fluence.spct), " UTC, ",
+                        subtitle = paste(photobiology::getWhenMeasured(raw.mspct[["light"]]), " UTC, ",
                                          session.label, sep = ""),
                         caption = paste("ooacquire", utils::packageVersion("ooacquire"))) +
           ggplot2::theme_bw()
         print(fig)
-        answer <- readline("Plot as photons/energy/wavebands/discard/save and continue (p/e/w/d/-): ")
-        switch(answer,
-               p = {options(photobiology.radiation.unit = "photon"); next()},
-               e = {options(photobiology.radiation.unit = "energy"); next()},
-               w = {answer1 <- readline("Waveband set to use, UV+PAR, plants, visible, total, default (u/p/v/t/-): ")
-               switch(answer1,
-                      u = options(photobiology.plot.bands =
-                                    list(photobiologyWavebands::UVC(),
-                                         photobiologyWavebands::UVB(),
-                                         photobiologyWavebands::UVA(),
-                                         photobiologyWavebands::PAR())),
-                      p = options(photobiology.plot.bands = photobiologyWavebands::Plant_bands()),
-                      v = options(photobiology.plot.bands = photobiologyWavebands::VIS_bands()),
-                      t = options(photobiology.plot.bands =
-                                    list(new_waveband(min(fluence.spct), max(fluence.spct), wb.name = "Total"))),
-                      options(photobiology.plot.bands = NULL))
-               next()},
-               d = break()
-        )
-        if (save.pdfs) {
-          grDevices::pdf(file = pdf.name, width = 8, height = 6)
-          print(fig)
-          grDevices::dev.off()
-        }
-        break()
+      }
+      if (save.pdfs) {
+        grDevices::pdf(file = pdf.name, width = 8, height = 6)
+        print(fig)
+        grDevices::dev.off()
       }
 
       user.input <- readline("Next, c = make and save collection (-/c): ")
       if (user.input[1] == "c") {
+        message("Source spectra to collect: ",
+                paste(irrad.names, collapse = ", "))
+        message("Raw objects to collect: ",
+                paste(raw.names, collapse = ", "), sep = " ")
         collection.name <- make.names(readline("Name of the collection?: "))
         fluence.collection.name <- paste(collection.name, "fluence", "mspct", sep = ".")
         raw.collection.name <- paste(collection.name, "raw", "lst", sep = ".")
         collection.file.name <- paste(collection.name, "Rda", sep = ".")
 
-        assign(fluence.collection.name,
-               source_mspct(mget(fluence.names)))
-        assign(raw.collection.name,
-               mget(raw.names))
-        save(list = c(fluence.collection.name, raw.collection.name),
-             file = collection.file.name)
+        if (qty.out != "raw") {
+          collection.mspct <- switch(qty.out,
+                                     fluence = source_mspct(mget(fluence.names)),
+                                     cps =     cps_mspct(mget(fluence.names)))
+
+          assign(fluence.collection.name, collection.mspct)
+          assign(raw.collection.name, mget(raw.names))
+
+          save(list = c(fluence.collection.name, raw.collection.name),
+               file = collection.file.name)
+          rm(list = c(fluence.names, raw.names))
+        } else {
+          assign(raw.collection.name, mget(raw.names))
+
+          save(list = raw.collection.name, file = collection.file.name)
+          rm(list = c(raw.names))
+        }
 
         file.names <- c(file.names, collection.file.name)
 
         # clean up
-        rm(list = c(fluence.names, raw.names))
         fluence.names <- character()
         raw.names <- character()
       }
@@ -302,6 +344,9 @@ acq_fluence_interactive <-
          file = paste("files4session-",
                       make.names(session.name),
                       ".Rda", sep = ""))
+
+    message("Data files created during session:\n",
+            paste(file.names, collapse = ",\n"), ".", sep = "")
 
     print("Ending...")
     end_session(w)
@@ -521,6 +566,17 @@ acq_fraction_pulsed_interactive <-
                                             qty.out = qty.out,
                                             ref.value = ref.value,
                                             ref.absolute = ref.absolute)
+
+        if (length(user.attrs$what.measured) > 0) {
+          setWhatMeasured(filter.spct, user.attrs$what.measured)
+        } else {
+          setWhatMeasured(filter.spct, obj.name)
+        }
+
+        if (length(user.attrs$comment.text) > 0) {
+          comment(filter.spct) <- paste(comment(filter.spct), user.attrs$comment.text, sep = "\n")
+        }
+
         assign(filter.name, filter.spct)
         save(list = c(raw.name, filter.name), file = file.name)
 

@@ -8,7 +8,7 @@
 acq_fluence_interactive(integ.time = 2, num.scans = 1L,
   num.exposures = 1L, f.trigger.pulses = f.trigger.message,
   protocols = NULL, correction.method = NA, descriptors = NA,
-  stray.light.method = "none", save.pdfs = TRUE,
+  stray.light.method = "none", qty.out = "fluence", save.pdfs = TRUE,
   interface.mode = "manual")
 
 acq_fraction_pulsed_interactive(integ.time = 2, num.scans = 1L,
@@ -41,6 +41,9 @@ calibration data.}
 \item{stray.light.method}{character Used only when the correction method is
 created on-the-fly.}
 
+\item{qty.out}{character One of "Tfr" (spectral transmittance as a fraction of one),
+"fluence" (spectral irardiance), "cps" (counts per second), or "raw" (raw sensor counts).}
+
 \item{save.pdfs}{logical Whether to save PDFs to files or not.}
 
 \item{interface.mode}{character One of "manual", and "manual-attr".}
@@ -53,10 +56,10 @@ absolute or relative. In the last case, cps spectra are normalised.}
 \item{ref.persistence}{integer Number of measurements using the same
 reference reading.}
 
+\item{type}{character Type of transmittance or reflectance measured.}
+
 \item{qty.out}{character One of "Tfr" (transmittance as a fraction of one)
 or "raw" (raw counts).}
-
-\item{type}{character Type of transmittance or reflectance measured.}
 }
 \description{
 Functions providing a simple interactive front-end to the functions in the

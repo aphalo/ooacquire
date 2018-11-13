@@ -9,7 +9,7 @@
 acq_irrad_interactive(tot.time.range = c(5, 15), target.margin = 0.1,
   HDR.mult = c(short = 1, long = 10), protocols = NULL,
   correction.method = NA, descriptors = NA,
-  stray.light.method = "none", save.pdfs = TRUE,
+  stray.light.method = "none", qty.out = "irrad", save.pdfs = TRUE,
   interface.mode = "auto")
 
 acq_fraction_interactive(tot.time.range = c(5, 15),
@@ -42,6 +42,9 @@ calibration data.}
 \item{stray.light.method}{character Used only when the correction method is
 created on-the-fly.}
 
+\item{qty.out}{character One of "Tfr" (spectral transmittance as a fraction of one),
+"irrad" (spectral irardiance), "cps" (counts per second), or "raw" (raw sensor counts).}
+
 \item{save.pdfs}{logical Whether to save PDFs to files or not.}
 
 \item{interface.mode}{character One of "auto", "simple", "manual",
@@ -49,9 +52,6 @@ created on-the-fly.}
 "series-attr".}
 
 \item{ref.value}{numeric or filter_spct/reflector_spct object.}
-
-\item{qty.out}{character One of "Tfr" (transmittance as a fraction of one)
-or "raw" (raw counts).}
 
 \item{type}{character Type of transmittance or reflectance measured.}
 }

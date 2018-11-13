@@ -1,5 +1,4 @@
-
-# FLM00416 ----------------------------------------------------------------
+# FLMS00416 ----------------------------------------------------------------
 
 #' Instrument descriptors for a Flame S spectrometer
 #'
@@ -266,3 +265,92 @@
 #' @format A list.
 #'
 "FLMS00673_none.mthd"
+
+# FLMS04133 ----------------------------------------------------------------
+
+#' Instrument descriptors for a Flame S spectrometer
+#'
+#' This a list of instrument descriptors, each one containing the calibration
+#' data needed to read raw data acquired on different dates.
+#'
+#' @docType data
+#' @keywords datasets
+#' @format A list.
+#'
+"FLMS04133_descriptors"
+
+#' Instrument calibration for a Flame S spectrometer
+#'
+#' This a list of instrument descriptors, each one containing the calibration
+#' data needed to read raw data acquired on different dates.
+#'
+#' @docType data
+#' @keywords datasets
+#' @format A \code{calibration_spct} object.
+#'
+"FLMS04133_cal.spct"
+
+#' Dates for which the different descriptors conatin valid calibrations.
+#'
+#' This a data frame with data needed to process raw data acquired on different
+#' dates.
+#'
+#' @docType data
+#' @keywords datasets
+#' @format A list.
+#'
+"FLMS04133_calib_dates.df"
+
+#' Correction method definition
+#'
+#' This a list with data needed to process raw data in the example files. It
+#' contains constants and functions defining the method developed by Lasse
+#' Ylianttila.
+#'
+#' @note NOT IMPLEMENTED.
+#'
+#' @docType data
+#' @keywords datasets
+#' @format A list.
+#'
+"FLMS04133_ylianttila.mthd"
+
+#' Correction method definition
+#'
+#' This a list with data needed to process raw data in the example files. It
+#' contains constants and functions defining the method developed by Lasse
+#' Ylianttila.
+#'
+#' @note NOT IMPLEMENTED.
+#'
+#' @docType data
+#' @keywords datasets
+#' @format A list.
+#'
+"FLMS04133_sun.mthd"
+
+#' Correction method definition
+#'
+#' This a list with data needed to process raw data in the example files. It
+#' contains constants and functions defining the method developed by Lasse
+#' Ylianttila.
+#'
+#' @note NOT IMPLEMENTED.
+#'
+#' @docType data
+#' @keywords datasets
+#' @format A list.
+#'
+"FLMS04133_simple.mthd"
+
+#' Correction method definition
+#'
+#' This a list with data needed to process raw data in the example files. It
+#' contains constants and functions defining a default method with no special
+#' corrections or data processing.
+#'
+#' @docType data
+#' @keywords datasets
+#' @format A list.
+#'
+"FLMS04133_none.mthd"
