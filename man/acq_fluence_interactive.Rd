@@ -72,7 +72,7 @@ These functions can be useful as is for commonly done measurements
   to their needs. They are all composed in a modular way from functions
   that can be reshuffled and combined with other functions to define
   new variations better suited to users needs and tastes. The examples we
-  provide here cover the measurement of spectral irradiance of pulsed light
+  provide here cover the measurement of spectral fluence of pulsed light
   sources: spectral fluence from flashes, and transmittance, reflectance
   and absorbance using a flash as light sources.
 

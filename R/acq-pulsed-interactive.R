@@ -9,7 +9,7 @@
 #'   to their needs. They are all composed in a modular way from functions
 #'   that can be reshuffled and combined with other functions to define
 #'   new variations better suited to users needs and tastes. The examples we
-#'   provide here cover the measurement of spectral irradiance of pulsed light
+#'   provide here cover the measurement of spectral fluence of pulsed light
 #'   sources: spectral fluence from flashes, and transmittance, reflectance
 #'   and absorbance using a flash as light sources.
 #'
@@ -298,7 +298,7 @@ acq_fluence_interactive <-
       user.input <- readline("Next, c = make and save collection (-/c): ")
       if (user.input[1] == "c") {
         message("Source spectra to collect: ",
-                paste(irrad.names, collapse = ", "))
+                paste(fluence.names, collapse = ", "))
         message("Raw objects to collect: ",
                 paste(raw.names, collapse = ", "), sep = " ")
         collection.name <- make.names(readline("Name of the collection?: "))
