@@ -4,8 +4,24 @@ Add more test cases.
 Finish writing algorithms vignette.
 Document support for OO calibrations and add example scripts.
 
-ooacquire 0.2.0 (2018-11-xx)
+ooacquire 0.2.0 (2018-11-30)
 ============================
+
+* Update acq_irrad_interactive() adding alternative user-interface modes,
+allowing users to set comment and what.measured attributes, and to constructing
+collections of spectra.
+* Add pre-built calibrations and methods for two additional FLAME-S instruments.
+* Improve algorithm for automatic tuning of integration time.
+* Fix various minor bugs.
+* Update vignettes.
+
+** Test against OmniDriver 1.2.56
+** Update for readr >= 1.2.0 which is now required
+
+*** Measurement of pulsed light sources (under development)
+
+The new features described below are under development, subject to change and
+not well tested!! (double-check any results and please repost any bugs!)
 
 Implement support for measuring output from xenon flashes, including use of
 such flashes as light sources for measurement of spectral transmittance and
@@ -21,15 +37,6 @@ unaltered for the measurement of continuous light sources.
 pulsed light sources.
 * Add acq_fraction_pulsed_interactive() for measuring transmittance and
 reflectance using a pulsed light source.
-* Update acq_irrad_interactive() adding alternative user-interface modes,
-allowing users to set comment and what.measured attributes, and to constructing
-collections of spectra.
-* Add pre-built calibrations and methods for two additional FLAME-S instruments.
-* Improve algorithm for automatic tuning of integration time.
-* Fix various minor bugs.
-* Update vignettes.
-
-** Tested against OmniDriver 1.2.56
 
 ooacquire 0.1.5 (2017-11-13)
 ============================

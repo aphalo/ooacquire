@@ -57,9 +57,6 @@ absolute or relative. In the last case, cps spectra are normalised.}
 reference reading.}
 
 \item{type}{character Type of transmittance or reflectance measured.}
-
-\item{qty.out}{character One of "Tfr" (transmittance as a fraction of one)
-or "raw" (raw counts).}
 }
 \description{
 Functions providing a simple interactive front-end to the functions in the

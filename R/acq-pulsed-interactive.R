@@ -362,8 +362,6 @@ acq_fluence_interactive <-
 #'   reference reading.
 #' @param ref.absolute logical Flag indicating whether the reference is
 #'   absolute or relative. In the last case, cps spectra are normalised.
-#' @param qty.out character One of "Tfr" (transmittance as a fraction of one)
-#'   or "raw" (raw counts).
 #' @param type character Type of transmittance or reflectance measured.
 #'
 #' @note The calculations for reflectance and transmittance are very similar,
@@ -519,7 +517,10 @@ acq_fraction_pulsed_interactive <-
     seq.settings <- list(step = 0,
                          num.steps = 1L)
 
-    # save current value as starting value for next iteration
+    # initialize list to collect all names from session
+    obj.names <- character()
+    raw.names <- character()
+    file.names <- character()
 
     repeat {
       repeat{
@@ -529,8 +530,12 @@ acq_fraction_pulsed_interactive <-
       }
       raw.name <- paste(obj.name, "raw_spct", sep = ".")
       filter.name <- paste(obj.name, "spct", sep = ".")
-      file.name <- paste(filter.name, "Rda", sep = ".")
-      pdf.name <- paste(filter.name, "pdf", sep = ".")
+      file.name <- paste(obj.name, "spct.Rda", sep = ".")
+      pdf.name <- paste(obj.name, "spct.pdf", sep = ".")
+
+      obj.names <- c(obj.names, obj.name)
+      raw.names <- c(raw.names, raw.name)
+      file.names <- c(file.names, file.name)
 
       if (grepl("-attr", interface.mode)) {
         user.attrs <- set_attributes_interactive(user.attrs)
@@ -616,6 +621,43 @@ acq_fraction_pulsed_interactive <-
         grDevices::dev.off()
       }
 
+      user.input <- readline("Next, c = make and save collection (-/c): ")
+      if (user.input[1] == "c") {
+        message("Filter spectra to collect: ",
+                paste(obj.names, collapse = ", "))
+        message("Raw objects to collect: ",
+                paste(raw.names, collapse = ", "), sep = " ")
+        collection.name <- make.names(readline("Name of the collection?: "))
+        obj.collection.name <- paste(collection.name, "mspct", sep = ".")
+        raw.collection.name <- paste(collection.name, "raw", "lst", sep = ".")
+        collection.file.name <- paste(collection.name, "Rda", sep = ".")
+
+        if (qty.out != "raw") {
+          collection.mspct <- switch(qty.out,
+                                     Tfr = filter_mspct(mget(obj.names)),
+                                     Rfr = reflector_mspct(mget(obj.names)),
+                                     cps = cps_mspct(mget(obj.names)))
+
+          assign(obj.collection.name, collection.mspct)
+          assign(raw.collection.name, mget(raw.names))
+
+          save(list = c(obj.collection.name, raw.collection.name),
+               file = collection.file.name)
+          rm(list = c(obj.names, raw.names))
+        } else {
+          assign(raw.collection.name, mget(raw.names))
+
+          save(list = raw.collection.name, file = collection.file.name)
+          rm(list = c(raw.names))
+        }
+
+        file.names <- c(file.names, collection.file.name)
+
+        # clean up
+        obj.names <- character()
+        raw.names <- character()
+      }
+
       user.input <- readline("Next, change protocol, quit (-/p/q): ")
 
       if (user.input == "") {
@@ -626,6 +668,16 @@ acq_fraction_pulsed_interactive <-
         break()
       }
     }
+
+
+    save(file.names,
+         file = paste("files4session-",
+                      make.names(session.name),
+                      ".Rda", sep = ""))
+
+    message("Data files created during session:\n",
+            paste(file.names, collapse = ",\n"), ".", sep = "")
+
     print("Ending...")
     end_session(w)
     setwd(oldwd)

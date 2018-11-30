@@ -2,8 +2,26 @@ reference:
   - title: Package overview
     contents:
     - '`ooacquire-package`'
-  - title: Acquire raw-counts data from spectrometers
-    desc: Functions related to direct acquisition of spectral data from array spectrometers from within R.
+  - title: Interactive data acquisition functions
+    desc: Functions for direct acquisition of spectral data from array spectrometers.
+    contents:
+    - acq_irrad_interactive
+    - acq_fraction_interactive
+    - acq_fluence_interactive
+  - title: Interactive data acquisition utility functions
+    desc: Functions useful for development of user defined interactive functions. Used for the implementation of the functions in the previous section.
+    contents:
+    - choose_ch_interactive
+    - list_srs_interactive
+    - choose_sr_interactive
+    - protocol_interactive
+    - set_attributes_interactive
+    - set_folder_interactive
+    - set_seq_interactive
+    - tune_interactive
+    - f.trigger.message
+  - title: Utility functions for data acquisition from spectrometers
+    desc: Low level functions useful for development of both of user defined scripts and interactive functions.
     contents:
     - start_session
     - end_session
@@ -19,9 +37,7 @@ reference:
     - tune_acq_settings
     - acq_raw_spct
     - acq_raw_mspct
-    - acq_irrad_interactive
-    - acq_fraction_interactive
-  - title: Read raw-counts data from spectrometers
+  - title: Read raw-counts data from files
     desc: Functions for reading raw-counts and metadata from output files from **OceanView**, **SpectraSuite**, Raspberry Pi software and the inbuilt-firmware of the Jaz modular spectrometer.
     contents:
     - read_oo_data
@@ -30,6 +46,9 @@ reference:
     - read_oo_pidata
     - read_oo_caldata
     - read_files2mspct
+  - title: Utility functions for reading data from files
+    desc: Utility functions for reading raw-counts and metadata from output files from **OceanView**, **SpectraSuite**, Raspberry Pi software and the inbuilt-firmware of the Jaz modular spectrometer.
+    contents:
     - map_oofile_header_rows
     - oofile_data_rows
     - set_oo_ssdata_settings
@@ -57,6 +76,7 @@ reference:
     - raw2cps
     - merge_cps
     - new_correction_method
+    - skip_bad_pixs
   - title: Computation of calibration coefficients
     desc: Compute a calibration coefficients.
     contents:
@@ -70,28 +90,58 @@ reference:
     - white_LED.raw_mspct
     - white_LED_2min.raw_mspct
     - halogen.raw_mspct
+    - xenon_flash.raw_mspct
   - title: Calibration data examples
-    desc: Examples of individual instrument calibrations as used by the functions in this package, serving only as examples.
+    desc: Examples of individual instrument calibrations as used by the functions in this package, serving only as examples. Not all listed methods are currently implemented.
     contents:
     - MAYP11278_calib_dates.df
     - MAYP11278_descriptors
     - MAYP11278_ylianttila.mthd
     - MAYP11278_tail_correction
+    - MAYP11278_simple.mthd
+    - MAYP11278_sun.mthd
     - MAYP112785_calib_dates.df
     - MAYP112785_descriptors
     - MAYP112785_ylianttila.mthd
     - MAYP112785_tail_correction
+    - MAYP112785_simple.mthd
+    - MAYP112785_sun.mthd
     - JAZA3098_calib_dates.df
     - JAZA3098_ch1_descriptors
     - JAZA3098_ch1_ylianttila.mthd
+    - JAZA3098_ch1_none.mthd
+    - JAZA3098_ch1_simple.mthd
+    - JAZA3098_ch1_sun.mthd
     - JAZA3098_ch2_descriptors
     - JAZA3098_ch2_ylianttila.mthd
+    - JAZA3098_ch2_none.mthd
+    - JAZA3098_ch2_simple.mthd
+    - JAZA3098_ch2_sun.mthd
     - FLMS00416_calib_dates.df
     - FLMS00416_descriptors
     - FLMS00416_none.mthd
+    - FLMS00416_cal.spct
+    - FLMS00416_simple.mthd
+    - FLMS00416_sun.mthd
+    - FLMS00416_ylianttila.mthd
     - FLMS00440_calib_dates.df
     - FLMS00440_descriptors
     - FLMS00440_none.mthd
+    - FLMS00440_cal.spct
+    - FLMS00440_simple.mthd
+    - FLMS00440_sun.mthd
+    - FLMS00440_ylianttila.mthd
     - FLMS00673_calib_dates.df
     - FLMS00673_descriptors
     - FLMS00673_none.mthd
+    - FLMS00673_cal.spct
+    - FLMS00673_simple.mthd
+    - FLMS00673_sun.mthd
+    - FLMS00673_ylianttila.mthd
+    - FLMS04133_cal.spct
+    - FLMS04133_calib_dates.df
+    - FLMS04133_descriptors
+    - FLMS04133_none.mthd
+    - FLMS04133_simple.mthd
+    - FLMS04133_sun.mthd
+    - FLMS04133_ylianttila.mthd

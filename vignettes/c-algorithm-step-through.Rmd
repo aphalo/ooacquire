@@ -14,7 +14,7 @@ vignette: >
 
 ## Introduction
 
-In this vignette we will walk through the different steps used in the conversion of raw counts into physical quantities. Different protocols can be used, and not all those implemented are exemplified. The facilities in the package also allow users to implement their own measurement and correction protocols. _It must be, however, always kept in mind that protocols and calibrations go hand in hand:_ **For each different measuring protocol or new raw conversion algorithm new calibration multipliers will be required**. In the case of new measurement protocols new calibration data and validation measurements will be needed. However, for new raw data conversion protocols recalculation of new calibration multipliers from existing raw-counts and calibration-lamp data may be enough. In this last case existing validation measurements against other instruments can be resued if available.
+In this vignette we will walk through the different steps used in the conversion of raw counts into physical quantities. Different protocols can be used, and not all those implemented are exemplified. The facilities in the package also allow users to implement their own measurement and correction protocols. _It must be, however, always kept in mind that protocols and calibrations go hand in hand:_ **For each different measuring protocol or new raw conversion algorithm new calibration multipliers will be required**. In the case of new measurement protocols new calibration data and validation measurements will be needed. However, for new raw data conversion protocols recalculation of new calibration multipliers from existing raw-counts and calibration-lamp data may be enough. In this last case existing validation measurements against other instruments can be reused if available.
 
 ***
 ## Code examples
@@ -47,7 +47,7 @@ library(magrittr)
 
 ### Household white LED bulb
 
-We read RAW-detector-counts data from the measurement of irradiance under a white LED light source---_Osram LED Star classic A 60 E27_. Spectral data were acquired with an Ocean Optics Maya 2000 Pro spectrometer, using function `acquire_irrad_interactive()` from this package. This function implements several measurement protocols from which the user can chose. However, RAW counts data returned as a collection of RAW spectra, contains also metada including a descriptor of the instrument and a descriptor of the instrument settings used.
+We read RAW-detector-counts data from the measurement of irradiance under a white LED light source---_Osram LED Star classic A 60 E27_. Spectral data were acquired with an Ocean Optics Maya 2000 Pro spectrometer, using function `acquire_irrad_interactive()` from this package. This function implements several measurement protocols from which the user can chose. However, RAW counts data returned as a collection of RAW spectra, contains also metadata including a descriptor of the instrument and a descriptor of the instrument settings used.
 
 The data contains a measurement of the _light_ source and a reference _dark_ measurement.
 
@@ -89,7 +89,7 @@ LED_lamp_recalc.spct <-
                     correction.method= ooacquire::MAYP11278_ylianttila.mthd)
 ```
 
-The R object returned by `s_irrad_corrected()` belongs to class `"source_spct"` (defined in package 'photobiology') for which summary and plotting methods are available. We first have a quick look at this object. In the output bellow we will notice that the six RAW measurements, three in the light and three in the dark have been used to calcualte a single estimate of spectral irradiance. We can also see that the range of wavelengths is narrower as only wavelengths for which calibrattion data exists have been retained.
+The R object returned by `s_irrad_corrected()` belongs to class `"source_spct"` (defined in package 'photobiology') for which summary and plotting methods are available. We first have a quick look at this object. In the output bellow we will notice that the six RAW measurements, three in the light and three in the dark have been used to calculate a single estimate of spectral irradiance. We can also see that the range of wavelengths is narrower as only wavelengths for which calibration data exists have been retained.
 
 ```{r}
 summary(LED_lamp_recalc.spct)
@@ -104,15 +104,15 @@ plot(LED_lamp_recalc.spct)
 What we show bellow are the individual computation steps that the RAW spectral data have gone through to obtain the spectral irradiance spectrum shown in the figure above.
 We next print the collection of spectra containing raw counts data. The protocol used consisted in one light measurement and one dark measurement, each with bracketing of the integration time.
 
-We have described above the structure of the object containing the RAW counts data. As we saw above, measurements consisted in three measurements using three different intergration times. In addition to different integration times, the number of "scans" was adjusted so that the three spectra consist in the average of scans covering the same total length of time.
+We have described above the structure of the object containing the RAW counts data. As we saw above, measurements consisted in three measurements using three different integration times. In addition to different integration times, the number of "scans" was adjusted so that the three spectra consist in the average of scans covering the same total length of time.
 
-Plotting the three bracketed spectra shows the effect of using the optimal integration time plus two longer intergration times. To understand the figure one needs to be aware that the spectrometer detector saturates at approximately 64000 counts. In other words if more photons imping the detector cell/pixel than needed for 64000 counts, the reading remains at 64000 counts. This is usually called "signal clipping".
+Plotting the three bracketed spectra shows the effect of using the optimal integration time plus two longer integration times. To understand the figure one needs to be aware that the spectrometer detector saturates at approximately 64000 counts. In other words if more photons imping the detector cell/pixel than needed for 64000 counts, the reading remains at 64000 counts. This is usually called "signal clipping".
 
 ```{r, fig.width=8, fig.asp=0.5}
 plot(white_LED_2min.raw_mspct[["light"]])
 ```
 
-In the figure above, we can see that in addition to clipping, increasing the integration time, at least in some spectrometers signifcantly increases the "noise floor" or dark readings. This is even clearly seen in the measurements done in darkness. In this spectra, we can easily see some hot pixels in the detector (bad pixels).
+In the figure above, we can see that in addition to clipping, increasing the integration time, at least in some spectrometers significantly increases the "noise floor" or dark readings. This is even clearly seen in the measurements done in darkness. In this spectra, we can easily see some hot pixels in the detector (bad pixels).
 
 ```{r, fig.width=8, fig.asp=0.5}
 plot(white_LED_2min.raw_mspct[["dark"]])
@@ -138,7 +138,7 @@ for (m in names(white_LED_2min.raw_mspct)) {
 }
 ```
 
-An important cosideration is that when a pixel _well_ fills some of the excesive charge migrates to nearby pixels. How many nearby pixels are affected depends on the detector type, but it is at most a few tens of pixels. So in this **third step**, pixels neighbouring those set to `NA` in the second step are also set to `NA`.
+An important consideration is that when a pixel _well_ fills some of the excessive charge migrates to nearby pixels. How many nearby pixels are affected depends on the detector type, but it is at most a few tens of pixels. So in this **third step**, pixels neighbouring those set to `NA` in the second step are also set to `NA`.
 
 ```{r, fig.width=8, fig.asp=0.5}
 for (m in names(white_LED_2min.raw_mspct)) {
@@ -148,7 +148,7 @@ for (m in names(white_LED_2min.raw_mspct)) {
 }
 ```
 
-The response of array detectors is not linear in response to the number of photons received. Most precisely when the number of counts gets near the maximum value, the sensitivity to additional photons slightly decreases. This is a results of how "full" the sensor wells are, irrespective of the source of the charge. Consequently this correction should be applied before substraction of the dark reading.
+The response of array detectors is not linear in response to the number of photons received. Most precisely when the number of counts gets near the maximum value, the sensitivity to additional photons slightly decreases. This is a results of how "full" the sensor wells are, irrespective of the source of the charge. Consequently this correction should be applied before subtraction of the dark reading.
 The **fourth step** is to apply a linearisation function, in most cases supplied with the instrument and possibly stored in the instrument firmware. This function is part of the calibration data for the instrument that is stored as part of the metadata during acquisition of the spectra.
 
 ```{r, fig.width=8, fig.asp=0.5}
@@ -159,7 +159,7 @@ for (m in names(white_LED_2min.raw_mspct)) {
 }
 ```
 
-The first few pixels in the detector of most array spectrometers are covered and never exposed to light photons. These can be used as a dark reference to correct for thermal noise. This step may appear redundant, but _might_ help in cases when instrument temperature is not the same during the _light_ and _dark_ measurements. An alternative is to use pixels known to be not exposed to radiation from the light source, but within the useful measurement range of the instrument. A white LED lamp is not expected to emit UV-C, so wavelengths between 250 nm and 290 nm can used. Consequently, as the **fifth step** we remove an estimate of dark signal based on these "non-excited pixels". As seen in the plots, this step effectively removes the overall dark signal from both _light_ and _dark_ measurements. We can, however, also see that there is residual dark noise remaining at pixel level, not all pixels have the same noise floor. Part of this variation is systematic, and some may be randam. As we used a total measurement time of 120 s much of the random noise must have canceleld out.
+The first few pixels in the detector of most array spectrometers are covered and never exposed to light photons. These can be used as a dark reference to correct for thermal noise. This step may appear redundant, but _might_ help in cases when instrument temperature is not the same during the _light_ and _dark_ measurements. An alternative is to use pixels known to be not exposed to radiation from the light source, but within the useful measurement range of the instrument. A white LED lamp is not expected to emit UV-C, so wavelengths between 250 nm and 290 nm can used. Consequently, as the **fifth step** we remove an estimate of dark signal based on these "non-excited pixels". As seen in the plots, this step effectively removes the overall dark signal from both _light_ and _dark_ measurements. We can, however, also see that there is residual dark noise remaining at pixel level, not all pixels have the same noise floor. Part of this variation is systematic, and some may be random. As we used a total measurement time of 120 s much of the random noise must have cancelled out.
 
 ```{r, fig.width=8, fig.asp=0.5}
 for (m in names(white_LED_2min.raw_mspct)) {
@@ -169,7 +169,7 @@ for (m in names(white_LED_2min.raw_mspct)) {
 }
 ```
 
-At this point we have "clean" RAW counts data. The **sixth step** is to convert these raw counts into counts per second. As the integration time for each spectrum is stored together with the RAW count data, the function call is simple. After this step, the data acquired using different integratin times are expressed in the same units. We take advantage of this to plot using different colours the data from the three different "bracketed" integration times. Blue corresponds to the shortest and optimal integration time, and green to the longest one used. Here we overplot the three separate spectra.
+At this point we have "clean" RAW counts data. The **sixth step** is to convert these raw counts into counts per second. As the integration time for each spectrum is stored together with the RAW count data, the function call is simple. After this step, the data acquired using different integration times are expressed in the same units. We take advantage of this to plot using different colours the data from the three different "bracketed" integration times. Blue corresponds to the shortest and optimal integration time, and green to the longest one used. Here we over-plot the three separate spectra.
 
 ```{r, fig.width=8, fig.asp=0.5}
 white_LED_2min.cps_mspct <- cps_mspct()
@@ -254,7 +254,7 @@ halogen.spct <-
 plot(halogen.spct)
 ```
 
-In the example above we called the functions used for each of the steps in the computaion individually, saving the intermediate results so as to be able to show the partly processed data at each step. The functions, however, support the use of pipes as they all have as their first parameter the one accepting the R object returned by the previous stage.
+In the example above we called the functions used for each of the steps in the computation individually, saving the intermediate results so as to be able to show the partly processed data at each step. The functions, however, support the use of pipes as they all have as their first parameter the one accepting the R object returned by the previous stage.
 
 We first use a "pipe" to apply the same initial processing steps as for the LED bulb data in the previous section. The main difference is that we use as internal instrument dark reference those pixels that never are exposed to radiation. For our instrument they correspond to wavelengths 187.82 nm to 189.26 nm. We obtain this time three spectra containing counts-per-second data.
 
@@ -343,7 +343,7 @@ We can compute some photon ratios, expressed as $mmol\, mol^{-1}$ to diagnose wh
 q_ratio(halogen.source_spct, list(UVC(), UVB(), UVA()), PAR()) * 1e3
 ```
 
-Smoothing can sometimes help, but it can also introduce bias. It should be used with care and always checking the output. The arguments and method chosen remove random noise and a small "bump" at 320 nm, setting strength to `1` instead of `3` smoothes the random noise but not this small peak (not shown). In the infrared most of the wavy pattern is also removed. So, smoothing can be useful, but it can also remove real features, and one needs to decide if these features are of interest or not, based on other sources of information.
+Smoothing can sometimes help, but it can also introduce bias. It should be used with care and always checking the output. The arguments and method chosen remove random noise and a small "bump" at 320 nm, setting strength to `1` instead of `3` smooths the random noise but not this small peak (not shown). In the infra-red most of the wavy pattern is also removed. So, smoothing can be useful, but it can also remove real features, and one needs to decide if these features are of interest or not, based on other sources of information.
 
 ```{r}
 halogen_sm.source_spct <- smooth_spct(halogen.source_spct, method = "supsmu", strength = 3)
@@ -362,9 +362,9 @@ q_ratio(halogen.source_spct, list(UVC(), UVB(), UVA()), PAR()) * 1e3
 
 ## Slit function correction
 
-When measuring spectra containing narrow peaks or steep slopes the shape of the slit function will affect the apparent width of peaks or the apparent steepness of the slope. The slit through which light enters the instrument has a finite width and angle of acceptance for radiation. Consequently, even when measuring true monochromatic radiation from a laser photons will imping on multiple array pixels/wells. The pixel corresponding to the wavelenth of the radiation receives the most photons, but the neighbouring pixels receive a decreasing number of photons as the distance from the "correct" target pixel increases. The wider the slit used, the broader the "false" peak observed for monochramatic light. The shape and width of this _slit function_ depends not only on the width of the slit but also on other features of the optical bench of the instrument. In array spectrometers the slit function also depends on wavelength as the length of the path from the grating to the detector is not constant.
+When measuring spectra containing narrow peaks or steep slopes the shape of the slit function will affect the apparent width of peaks or the apparent steepness of the slope. The slit through which light enters the instrument has a finite width and angle of acceptance for radiation. Consequently, even when measuring true monochromatic radiation from a laser photons will imping on multiple array pixels/wells. The pixel corresponding to the wavelength of the radiation receives the most photons, but the neighbouring pixels receive a decreasing number of photons as the distance from the "correct" target pixel increases. The wider the slit used, the broader the "false" peak observed for monochromatic light. The shape and width of this _slit function_ depends not only on the width of the slit but also on other features of the optical bench of the instrument. In array spectrometers the slit function also depends on wavelength as the length of the path from the grating to the detector is not constant.
 
-However, if the slit function is known, it can be used to remove its influence from a measured spectrum, in simpelr words it can be used to partly reconstruct the structure of original light source spectrum. In the case of the two examples above, applying this correction would make little difference. In the case of the solar spectrum and discharge lamps this further step improves the estimates for spectral irradiance.
+However, if the slit function is known, it can be used to remove its influence from a measured spectrum, in simpler words it can be used to partly reconstruct the structure of original light source spectrum. In the case of the two examples above, applying this correction would make little difference. In the case of the solar spectrum and discharge lamps this further step improves the estimates for spectral irradiance.
 
 Too see the effect of this correction we need to look at individual peaks in a spectrum. We use data for a mercury lamp.
 
