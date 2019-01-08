@@ -24,16 +24,34 @@ library(httr)
 
 options(warn = 1) # no delay when issuing warnings
 
+# By default, the function used simply prompts the operator to manually trigger
+# the flash. We here define a simple function to use a USB relay module to
+# automatically trigger a flash. This facilitates measurements, especially
+# when using multiple flashes per spectrometer integration.
+#
+# The relay module is programmed beforehand to function as a momentary switch
+# with a pulse duration of 0.01 seconds. The flash is set to manual mode and
+# the XPro flash trigger set to SYNC = IN.
+
 yocto.flash.trigger <- function(n = 1L, delay = 0.2) {
   stopifnot(delay >= 0)
   stopifnot(n >= 0L)
   for (i in seq_len(length.out = n)) {
     Sys.sleep(delay)
     page <- GET("http://localhost:4444/bySerial/RELAYLO1-B263A/api?scr=&ctx=relay1&state=0")
-    # TO DO: parse html page to detect failure returning FALSE in such case
+    # If connection is refused a curl error is triggered and execution stopped.
+    # If the module is not on-line an error is returned, that we can test for and handle.
+    if (http_error(page)) {
+      break()
+    }
   }
-  message("Triggered ", n, ifelse(n == 1, " flash", " flashes"), ", with a delay of ", delay, " seconds.")
-  return(TRUE)
+  if (http_error(page)) {
+    warning("Failed to trigger the flash: '", http_status(page)$message, "'", call. = FALSE)
+    return(FALSE)
+  } else {
+    message("Triggered ", n, ifelse(n == 1, " flash", " flashes"), ", with a delay of ", delay, " seconds.")
+    return(TRUE)
+  }
 }
 
 # test that flash is triggered correctly

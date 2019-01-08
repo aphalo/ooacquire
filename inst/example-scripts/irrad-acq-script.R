@@ -1,8 +1,7 @@
 # Using an spectrometer with a single channel
 # Tested with a Maya 2000 Pro spectrometer
 
-library(photobiology)
-library(ggspectra)
+library(r4photobiology)
 library(ooacquire)
 
 w <- start_session()

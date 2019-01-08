@@ -1,7 +1,6 @@
 # Using an spectrometer with two channels
 # Tested with a Jaz spectrometer
 
-library(ggplot2)
 library(r4photobiology)
 library(ooacquire)
 
