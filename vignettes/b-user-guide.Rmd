@@ -329,8 +329,8 @@ In this case we use a different descriptor definition only because the files acq
 ```{r}
 ov_files.raw_mspct <- 
   ooacquire::read_files2mspct(file_names,
-                              descriptor = which_descriptor("2017-01-05", 
-                                                            MAYP112785_descriptors))
+                              descriptor = 
+                                which_descriptor("2017-01-05", MAYP112785_descriptors))
 summary(ov_files.raw_mspct[[1]])
 summary(ov_files.raw_mspct[[2]])
 ```

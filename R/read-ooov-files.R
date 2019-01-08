@@ -95,7 +95,7 @@ read_oo_ovdata <- function(file,
   z <- readr::read_tsv(
     file = file,
     col_names = c("w.length", "counts"),
-    skip =  data.rows[["skip"]] - 1L, # one blank line
+    skip =  data.rows[["skip"]],
     n_max = data.rows[["npixels"]],
     locale = locale
   )
