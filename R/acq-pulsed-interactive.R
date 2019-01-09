@@ -226,7 +226,14 @@ acq_fluence_interactive <-
                                  user.label = obj.name)
 
       if (length(raw.mspct) == 0) {
+        message("No data acquired!!")
         next()
+      } else if (!setequal(names(raw.mspct),  protocol)) {
+        warning("Spectra: ", paste(names(raw.mspct), collapse = ", "),
+                "obtained for protocol: ", paste(names(protocol), collapse = ", "))
+        if (! "light" %in% names(raw.mspct)) {
+          next()
+        }
       }
 
       if (qty.out != "raw") {
@@ -251,7 +258,7 @@ acq_fluence_interactive <-
 
         repeat {
           fig <- graphics::plot(fluence.spct) +
-            ggplot2::labs(title = obj.name,
+            ggplot2::labs(title = paste(raw.name, "sample", sep = "$"),
                           subtitle = paste(photobiology::getWhenMeasured(fluence.spct), " UTC, ",
                                            session.label, sep = ""),
                           caption = paste("ooacquire", utils::packageVersion("ooacquire"))) +
@@ -525,7 +532,7 @@ acq_fraction_pulsed_interactive <-
     repeat {
       repeat{
         obj.name <- make.names(readline("Give a name to the spectrum: "))
-        if (length(obj.name) > 0 && !exists(obj.name)) break()
+        if (length(obj.name) > 0L && !exists(obj.name)) break()
         print("A valid and unique name is required, please try again...")
       }
       raw.name <- paste(obj.name, "raw_spct", sep = ".")
@@ -550,14 +557,21 @@ acq_fraction_pulsed_interactive <-
                                  user.label = obj.name)
 
       if (length(raw.mspct) == 0) {
+        message("No data acquired!!")
         next()
+      } else if (!setequal(names(raw.mspct),  protocol)) {
+        warning("Spectra: ", paste(names(raw.mspct), collapse = ", "),
+                "obtained for protocol: ", paste(names(protocol), collapse = ", "))
+        if (! "sample" %in% names(raw.mspct)) {
+          next()
+        }
       }
 
       assign(raw.name, raw.mspct)
 
       if (qty.out == "raw") {
         fig <- graphics::plot(raw.mspct[["sample"]]) +
-          ggplot2::labs(title = raw.name,
+          ggplot2::labs(title = paste(raw.name, "sample", sep = "$"),
                         subtitle = paste(photobiology::getWhenMeasured(raw.mspct[["sample"]]), " UTC, ",
                                          session.label, sep = ""),
                         caption = paste("ooacquire", utils::packageVersion("ooacquire"))) +

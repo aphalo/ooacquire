@@ -106,6 +106,7 @@ acq_raw_spct <- function(descriptor,
   photobiology::setWhenMeasured(z, start.time)
   photobiology::setWhereMeasured(z, where.measured)
   photobiology::setWhatMeasured(z, what.measured)
+  stopifnot(is.raw_spct(z))
   z
 }
 
@@ -182,8 +183,9 @@ acq_raw_mspct <- function(descriptor,
                              acq.settings = acq.settings,
                              num.exposures = num.exposures,
                              f.trigger.pulses = f.current,
-                             what.measured = user.label,
+                             what.measured = paste(p, ": ", user.label, sep = ""),
                              where.measured = where.measured)
+    # next 3 statements shouldn't be needed. CHECK!
     photobiology::setWhenMeasured(z[[idx]], start.time)
     photobiology::setWhereMeasured(z[[idx]], where.measured)
     photobiology::setWhatMeasured(z[[idx]], paste(p, ":", user.label))
@@ -191,6 +193,11 @@ acq_raw_mspct <- function(descriptor,
     trimInstrDesc(z[[idx]], c("-", "w"))
   }
   z <- photobiology::as.raw_mspct(z)
+
+  # assertions to catch errors early on
+  stopifnot(is.raw_mspct(z))
+  stopifnot(length(z) == length(protocol))
+
   names(z) <- protocol
   z
 }

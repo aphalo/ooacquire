@@ -54,12 +54,6 @@ uvb_corrections <- function(x,
                             trim = 0.05,
                             verbose = getOption("photobiology.verbose", default = FALSE),
                             ...) {
-  flt.flag <- !is.na(stray.light.method) && stray.light.method != "none"
-
-  if (is.character(worker.fun)) {
-    worker.fun = get(worker.fun,
-                     mode = "function")
-  }
 
   raw2merged_cps <- function(xx,
                              spct.names,
@@ -81,8 +75,19 @@ uvb_corrections <- function(x,
     zz
   }
 
+  stopifnot(length(spct.names) > 0L)
+  stopifnot(length(setdiff(names(spct.names), c("light", "filter", "dark"))) == 0L)
+
+  flt.flag <- !is.na(stray.light.method) && stray.light.method != "none"
+
+  if (is.character(worker.fun)) {
+    worker.fun = get(worker.fun,
+                     mode = "function")
+  }
+
   spct.nms <- spct.names[c("light", "filter", "dark")]
   spct.present <- which(spct.nms %in% names(x))
+
   spct.names <- spct.nms[spct.present]
   names(spct.names) <- c("light", "filter", "dark")[spct.present]
 
@@ -93,22 +98,30 @@ uvb_corrections <- function(x,
     y <- ref_correction(y, ref_name = spct.names["dark"])
   } else if (length(setdiff(c("light", "dark"), names(spct.names))) == 0) {
     if (verbose) {
-      warning("No filter spectra available: continuing without filter correction")
+      warning("No 'filter' measurement available: continuing without filter correction")
     }
     flt.flag <- FALSE
     y <- raw2merged_cps(xx = x,
-                        spct.names = spct.names,
+                        spct.names = spct.names[c("light", "dark")],
                         inst.dark.pixs = inst.dark.pixs)
     y <- ref_correction(y, ref_name = spct.names["dark"])
-  } else if (length(setdiff("light", names(spct.names))) == 0){
+  } else if (length(setdiff(c("light", "filter"), names(spct.names))) == 0) {
+    # added 2019-01-09
     if (verbose) {
       warning("No 'dark' measurement available: using internal reference")
     }
+    flt.flag <- TRUE
+    y <- raw2merged_cps(xx = x,
+                        spct.names = spct.names,
+                        inst.dark.pixs = inst.dark.pixs)
+  } else if (length(setdiff("light", names(spct.names))) == 0) {
+    if (verbose) {
+      warning("No 'dark' or 'filter' measurements available: using internal reference")
+    }
     flt.flag <- FALSE
     y <- raw2merged_cps(xx = x,
                         spct.names = spct.names,
                         inst.dark.pixs = inst.dark.pixs)
-    # may need to add
   } else {
     if (verbose) {
       warning("No 'light' measurement available: aborting")

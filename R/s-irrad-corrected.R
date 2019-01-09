@@ -76,8 +76,8 @@ s_irrad_corrected.list <- function(x,
                                    "\nwith 's_irrad_corrected()' from 'ooacquire' ver. ",
                                    utils::packageVersion("ooacquire"),
                                    "\n\nfrom files:\n", comment.txt, sep = "")
-  corrected.spct
 
+  corrected.spct
 }
 
 #' @describeIn s_irrad_corrected Default for generic function.
@@ -91,6 +91,11 @@ s_irrad_corrected.raw_mspct <-
            return.cps = FALSE,
            verbose = getOption("photobiology.verbose", default = FALSE),
            ...) {
+
+    if (length(setdiff(names(x), spct.names)) > 0L) {
+      stop("Bad member names in 'spct.names': ", names(spct.names))
+    }
+
     if (length(x[[ spct.names["light"] ]]) == 0) {
       if (verbose) {
         warning("'raw_spct' object for 'light' scans missing")
