@@ -1,16 +1,17 @@
-context("convert raw ooacquire")
+context("convert raw pulsed source")
 
 library(photobiology)
+library(ggspectra)
 
-test_that("ooacquire irrad", {
+test_that("ooacquire fluence", {
 
   rm(list = ls(pattern = "*"))
 
-  files <- list.files("test-irrad-mspct-data", pattern = "*.Rda")
+  files <- list.files("test-fluence-mspct-data", pattern = "*.Rda")
 
   for (f in files) {
     print(f)
-    load(paste("test-irrad-mspct-data", f, sep = "/"))
+    load(paste("test-fluence-mspct-data", f, sep = "/"))
     old.spct <- get(sub(".Rda", "", f))
     serial.no <- getInstrDesc(old.spct)$spectrometer.sn
     correction.method <-
@@ -24,19 +25,20 @@ test_that("ooacquire irrad", {
     print(getInstrSettings(old.spct))
     old.raw.mspct <- get(sub("spct.Rda", "raw_mspct", f))
     new.spct <- s_irrad_corrected(old.raw.mspct, correction.method = correction.method)
+    expect_equal(length(old.spct), length(new.spct))
     expect_equivalent(old.spct, new.spct)
   }
 })
 
 
-test_that("ooacquire filter", {
+test_that("ooacuire filter pulsed source", {
 
   rm(list = ls(pattern = "*"))
 
-  files <- list.files("test-filter-mspct-data", pattern = "*.Rda")
+  files <- list.files("test-filter-pulsed-mspct-data", pattern = "*.Rda")
 
   for (f in files) {
-    load(paste("test-filter-mspct-data", f, sep = "/"))
+    load(paste("test-filter-pulsed-mspct-data", f, sep = "/"))
     old.spct <- get(sub(".Rda", "", f))
     ch.index <-
     serial.no <- getInstrDesc(old.spct)$spectrometer.sn
