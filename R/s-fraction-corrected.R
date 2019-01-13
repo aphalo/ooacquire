@@ -107,21 +107,37 @@ s_fraction_corrected.raw_mspct <- function(x,
                                            verbose = getOption("photobiology.verbose", default = FALSE),
                                            ...) {
 
-  if (length(x[[ spct.names["sample"]]]) == 0 || length(x[[ spct.names["reference"]]]) == 0) {
+  # if (length(setdiff(names(x), spct.names)) > 0L) {
+  #   stop("Bad member names in 'spct.names': ", names(spct.names))
+  # }
+
+  if (length(x[[spct.names["sample"]]]) == 0 || length(x[[spct.names["reference"]]]) == 0) {
     if (verbose) {
       warning("Raw spectra for 'sample' and/or 'reference' missing")
     }
     if (qty.out == "Rfr") {
-      z <- reflector_spct()
-      return(z)
+      return(reflector_spct())
     } else {
-      z <- filter_spct()
-      return(z)
+      return(filter_spct())
     }
   }
 
-  smp.names <- spct.names[c("sample", "dark")]
-  names(smp.names) <- c("light", "dark")
+  # build selectors
+
+  if ("dark" %in% names(spct.names) && spct.names["dark"] %in% names(x)) {
+    smp.names <- spct.names[c("sample", "dark")]
+    names(smp.names) <- c("light", "dark")
+
+    ref.names <- spct.names[c("reference", "dark")]
+    names(ref.names) <- c("light", "dark")
+  } else {
+    # no dark reading available
+    smp.names <- spct.names["sample"]
+    names(smp.names) <- "light"
+
+    ref.names <- spct.names["reference"]
+    names(ref.names) <- "light"
+  }
 
   if (is.character(correction.method[["worker.fun"]])) {
     worker.fun <- get(correction.method[["worker.fun"]],
@@ -134,7 +150,7 @@ s_fraction_corrected.raw_mspct <- function(x,
   stopifnot(is.function(worker.fun))
 
   corrected_smp.spct <-
-    ooacquire::uvb_corrections(x = x[spct.names[c("sample", "dark")]],
+    ooacquire::uvb_corrections(x = x[smp.names],
                                spct.names = smp.names,
                                stray.light.method = correction.method[["stray.light.method"]],
                                stray.light.wl = correction.method[["stray.light.wl"]],
@@ -146,10 +162,8 @@ s_fraction_corrected.raw_mspct <- function(x,
                                trim = correction.method[["trim"]],
                                verbose = verbose)
 
-  ref.names <- spct.names[c("reference", "dark")]
-  names(ref.names) <- c("light", "dark")
   corrected_ref.spct <-
-    ooacquire::uvb_corrections(x = x[spct.names[c("reference", "dark")]],
+    ooacquire::uvb_corrections(x = x[ref.names],
                                spct.names = ref.names,
                                stray.light.method = correction.method[["stray.light.method"]],
                                stray.light.wl = correction.method[["stray.light.wl"]],

@@ -75,6 +75,7 @@ uvb_corrections <- function(x,
     zz
   }
 
+  stopifnot(length(x) > 0L)
   stopifnot(length(spct.names) > 0L)
   stopifnot(length(setdiff(names(spct.names), c("light", "filter", "dark"))) == 0L)
 

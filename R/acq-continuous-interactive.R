@@ -550,6 +550,7 @@ acq_fraction_interactive <-
                                             type = type,
                                             correction.method = correction.method,
                                             qty.out = qty.out,
+                                            dyn.range = NULL,
                                             ref.value = ref.value)
 
         if (length(user.attrs$what.measured) > 0) {
