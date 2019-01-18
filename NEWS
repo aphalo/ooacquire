@@ -4,12 +4,13 @@ Add more test cases.
 Finish writing algorithms vignette.
 Document support for OO calibrations and add example scripts.
 
-ooacquire 0.2.0 (2019-01-08)
+ooacquire 0.2.0 (2019-01-19)
 ============================
 
 * Update acq_irrad_interactive() adding alternative user-interface modes,
 allowing users to set comment and what.measured attributes, and to constructing
 collections of spectra.
+* Add utility functions collect_spct_files() and plot_spct_file().
 * Add pre-built calibrations and methods for two additional FLAME-S instruments.
 * Improve algorithm for automatic tuning of integration time.
 * Fix various minor bugs.

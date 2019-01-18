@@ -8,6 +8,8 @@ reference:
     - acq_irrad_interactive
     - acq_fraction_interactive
     - acq_fluence_interactive
+    - plot_spct_file
+    - collect_spct_files
   - title: Interactive data acquisition utility functions
     desc: Functions useful for development of user defined interactive functions. Used for the implementation of the functions in the previous section.
     contents:
@@ -37,7 +39,7 @@ reference:
     - tune_acq_settings
     - acq_raw_spct
     - acq_raw_mspct
-  - title: Read raw-counts data from files
+  - title: Read raw-counts data from text files
     desc: Functions for reading raw-counts and metadata from output files from **OceanView**, **SpectraSuite**, Raspberry Pi software and the inbuilt-firmware of the Jaz modular spectrometer.
     contents:
     - read_oo_data
@@ -46,7 +48,7 @@ reference:
     - read_oo_pidata
     - read_oo_caldata
     - read_files2mspct
-  - title: Utility functions for reading data from files
+  - title: Utility functions for reading data from text files
     desc: Utility functions for reading raw-counts and metadata from output files from **OceanView**, **SpectraSuite**, Raspberry Pi software and the inbuilt-firmware of the Jaz modular spectrometer.
     contents:
     - map_oofile_header_rows
