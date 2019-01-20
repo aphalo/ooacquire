@@ -25,13 +25,14 @@ test_that("ooacquire fluence", {
     print(getInstrSettings(old.spct))
     old.raw.mspct <- get(sub("spct.Rda", "raw_mspct", f))
     new.spct <- s_irrad_corrected(old.raw.mspct, correction.method = correction.method)
+    setWhatMeasured(new.spct, getWhatMeasured(old.spct))
     expect_equal(length(old.spct), length(new.spct))
     expect_equivalent(old.spct, new.spct)
   }
 })
 
 
-test_that("ooacuire filter pulsed source", {
+test_that("ooacquire filter pulsed source", {
 
   rm(list = ls(pattern = "*"))
 
@@ -63,9 +64,12 @@ test_that("ooacuire filter pulsed source", {
                                      correction.method = correction.method,
                                      type = "total",
                                      qty.out = "Tfr")
-    # old.spct <- trim_wl(old.spct, range = c(400:1100))
-    # new.spct <- trim_wl(new.spct, range = c(400:1100))
-#    expect_equivalent(old.spct, new.spct)
+    setWhatMeasured(new.spct, getWhatMeasured(old.spct))
+    expect_equal(length(old.spct), length(new.spct))
+    old.spct <- trim_wl(old.spct, range = c(400:1100))
+    new.spct <- trim_wl(new.spct, range = c(400:1100))
+    expect_equal(length(old.spct), length(new.spct))
+    expect_equivalent(old.spct, new.spct)
   }
 })
 
