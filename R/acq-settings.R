@@ -213,7 +213,7 @@ set_num_exposures <- function(acq.settings,
     num.exposures  <- rep(num.exposures[1], times = length(acq.settings$HDR.mult))
   }
 
-  if (single.scan || any(!is.na(num.exposures))) {
+  if (single.scan || any(num.exposures > 0L)) {
     num.scans <- rep(1, times = length(num.exposures))
     acq.settings$num.scans <- num.scans
   }

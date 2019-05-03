@@ -34,11 +34,15 @@ options(warn = 1) # no delay when issuing warnings
 # with a pulse duration of 0.01 seconds. The flash is set to manual mode and
 # the XPro flash trigger set to SYNC = IN.
 
+### We need to use here the delayed pulse command so that GET returns before
+## the flash is triggered and we can so start the integration in the
+## spectrtometer before the USB relay module triggers the flashes.
+
 yocto.flash.trigger <- function(n = 1L, delay = 0.2) {
   stopifnot(delay >= 0)
   stopifnot(n >= 0L)
   for (i in seq_len(length.out = n)) {
-    Sys.sleep(delay)
+#    Sys.sleep(delay)
     page <- GET("http://localhost:4444/bySerial/RELAYLO1-B263A/api?scr=&ctx=relay1&state=0")
     # If connection is refused a curl error is triggered and execution stopped.
     # If the module is not on-line an error is returned, that we can test for and handle.
@@ -62,3 +66,4 @@ yocto.flash.trigger(n = 10)
 yocto.flash.trigger(n = 2, delay = 0.5)
 
 acq_fraction_pulsed_interactive(f.trigger.pulses = yocto.flash.trigger)
+acq_fraction_pulsed_interactive()

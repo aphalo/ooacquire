@@ -25,7 +25,7 @@ All examples in vignettes use data and files included in the package. Data files
 
 _To reproduce any of the examples which use files as data input, it is best to make a local copy of the whole `"extdata"` folder._ The files used in examples are organized into subfolders, but all example code assumes that its in being run with `"extdata"` or a copy of it as the current _working_ folder.
 
-```{r, eval= c(-2, -3)}
+```{r, eval = FALSE}
 folderpath <- system.file("extdata", package="ooacquire")
 file.copy(from = folderpath, to = ".", recursive = TRUE)
 oldwd <- setwd("./extdata")

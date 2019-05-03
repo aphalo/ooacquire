@@ -20,8 +20,8 @@ FLMS00416_simple.mthd <- list()
 # suitable for any light source, but not as good for irradiance.
 FLMS00416_none.mthd <- list(
   stray.light.method = "none",
-  stray.light.wl = c(340.45, 346.16),
-  flt.dark.wl = c(NA_real_, NA_real_),
+  stray.light.wl = c(NA_real_, NA_real_),
+  flt.dark.wl = c(340.45, 346.16),
   flt.ref.wl = c(NA_real_, NA_real_),
   flt.Tfr = 1,
   inst.dark.pixs = 1:16,

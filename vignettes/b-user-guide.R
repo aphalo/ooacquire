@@ -3,9 +3,9 @@ require("knitr")
 opts_knit$set(cache = FALSE, root.dir = system.file("extdata", package = "ooacquire"))
 sr.online <- FALSE
 
-## ---- eval=-2------------------------------------------------------------
-folderpath <- system.file("extdata",package="ooacquire")
-file.copy(from = folderpath, to = ".", recursive = TRUE)
+## ---- eval=FALSE---------------------------------------------------------
+#  folderpath <- system.file("extdata", package="ooacquire")
+#  oldwd <- setwd(folderpath)
 
 ## ------------------------------------------------------------------------
 library(photobiology)
@@ -98,14 +98,14 @@ kable(
 
 ## ------------------------------------------------------------------------
 file_names <- list(light = "irrad-files/light_MAYP112785.txt",
-#                    filter = "irrad-files/ilter_MAYP112785.txt",
+#                    filter = "irrad-files/filter_MAYP112785.txt",
                     dark = "irrad-files/dark_MAYP112785.txt")
 
 ## ------------------------------------------------------------------------
 ov_files.raw_mspct <- 
   ooacquire::read_files2mspct(file_names,
-                              descriptor = which_descriptor("2017-01-05", 
-                                                            MAYP112785_descriptors))
+                              descriptor = 
+                                which_descriptor("2017-01-05", MAYP112785_descriptors))
 summary(ov_files.raw_mspct[[1]])
 summary(ov_files.raw_mspct[[2]])
 
@@ -127,9 +127,8 @@ ov_files.spct
 ## ---- fig.height=5, fig.width=7------------------------------------------
 plot(ov_files.spct, unit.out = "photon")
 
-## ---- fig.height=5, fig.width=7, eval=FALSE------------------------------
-#  ## error!
-#  plot(smooth_spct(ov_files.spct, strength = 5), unit.out = "photon")
+## ---- fig.height=5, fig.width=7------------------------------------------
+plot(smooth_spct(ov_files.spct, strength = 5), unit.out = "photon")
 
 ## ------------------------------------------------------------------------
 descriptor <- 

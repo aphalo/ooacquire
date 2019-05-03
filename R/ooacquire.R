@@ -19,6 +19,7 @@
 #'   many possible configurations.
 #'
 #' @import photobiology
+#' @import ggspectra
 #' @importFrom Rcpp evalCpp
 #' @import magrittr
 #' @useDynLib ooacquire

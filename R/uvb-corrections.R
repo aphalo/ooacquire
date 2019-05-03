@@ -433,8 +433,10 @@ no_filter_correction <- function(x,
                            trim = trim, na.rm = TRUE)
 
   # We test whether any stray light has been detected
-  if (verbose && (mean_x_cps_medium - mean_x_cps_short) < 0.0) {
-    warning("No stray light detected, skipping correction.")
+  if (mean_x_cps_medium - mean_x_cps_short < 0.0) {
+    if (verbose) {
+      warning("No stray light detected, skipping correction.")
+    }
   } else {
     x <- x - mean_x_cps_medium
   }

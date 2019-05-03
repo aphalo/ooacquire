@@ -17,14 +17,14 @@ FLMS00673_simple.mthd <- list()
 # suitable for any light source, but not as good for irradiance.
 FLMS00673_none.mthd <- list(
   stray.light.method = "none",
-  stray.light.wl = c(188.41, 195.42),
-  flt.dark.wl = c(NA_real_, NA_real_),
-  flt.ref.wl = c(NA_real_, NA_real_),
+  stray.light.wl = c(203.34, 222.85),
+  flt.dark.wl = c(202.88, 195.42),
+  flt.ref.wl = c(359.99, 379.64),
   flt.Tfr = 1,
   inst.dark.pixs = 1:16,
   tail.coeffs = c(NA_real_, NA_real_),
   worker.fun = NULL,
-  trim = 0.05
+  trim = 1/16
 )
 
 # load an instrument descriptor

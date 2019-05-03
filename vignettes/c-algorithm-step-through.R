@@ -36,7 +36,7 @@ LED_lamp_recalc.spct <-
 ## ------------------------------------------------------------------------
 summary(LED_lamp_recalc.spct)
 
-## ------------------------------------------------------------------------
+## ---- fig.width=8, fig.asp=0.5-------------------------------------------
 plot(LED_lamp_recalc.spct)
 
 ## ---- fig.width=8, fig.asp=0.5-------------------------------------------
@@ -177,6 +177,7 @@ halogen_corrected.cps_spct <-
                     stray.light.method = "original",
                     flt.Tfr = 0.9)
 names(halogen_corrected.cps_spct)
+getTimeUnit(halogen_corrected.cps_spct)
 
 ## ---- fig.width=8, fig.asp=0.5-------------------------------------------
 plot(halogen_corrected.cps_spct)
@@ -219,11 +220,17 @@ getInstrSettings(xenon_flash.raw_mspct[["light"]])$num.exposures
 
 ## ---- fig.width=8, fig.asp=0.5-------------------------------------------
 xenon_flash.spct <-
-  s_irrad_corrected(xenon_flash.raw_mspct, correction.method= MAYP11278_ylianttila.mthd)
+  s_irrad_corrected(xenon_flash.raw_mspct, correction.method = MAYP11278_ylianttila.mthd)
+getTimeUnit(xenon_flash.spct)
+
+## ---- fig.width=8, fig.asp=0.5-------------------------------------------
 plot(xenon_flash.spct, range = c(315, NA))
 
 ## ---- fig.width=8, fig.asp=0.5-------------------------------------------
 xenon_flash.cps_spct <-
   s_irrad_corrected(xenon_flash.raw_mspct, correction.method= MAYP11278_ylianttila.mthd, return.cps = TRUE)
+getTimeUnit(xenon_flash.cps_spct)
+
+## ---- fig.width=8, fig.asp=0.5-------------------------------------------
 plot(xenon_flash.cps_spct, range = c(315, NA))
 

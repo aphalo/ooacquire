@@ -1,6 +1,7 @@
-## ---- eval=-2------------------------------------------------------------
-folderpath <- system.file("extdata", package="ooacquire")
-file.copy(from = folderpath, to = ".", recursive = TRUE)
+## ---- eval = FALSE-------------------------------------------------------
+#  folderpath <- system.file("extdata", package="ooacquire")
+#  file.copy(from = folderpath, to = ".", recursive = TRUE)
+#  oldwd <- setwd("./extdata")
 
 ## ----"setup", include=FALSE----------------------------------------------
 require("knitr")
@@ -82,6 +83,17 @@ irrad.spct <-
                     descriptor = which_descriptor("2016-10-11", 
                                                   MAYP11278_descriptors),
                     correction.method = MAYP11278_ylianttila.mthd)
+
+## ---- fig.height=5, fig.width=7------------------------------------------
+plot(irrad.spct)
+
+## ------------------------------------------------------------------------
+irrad.spct <- 
+  s_irrad_corrected(x = file_names,
+                    descriptor = which_descriptor("2016-10-11", 
+                                                  MAYP11278_descriptors),
+                    correction.method = MAYP11278_ylianttila.mthd,
+                    return.cps = TRUE)
 
 ## ---- fig.height=5, fig.width=7------------------------------------------
 plot(irrad.spct)

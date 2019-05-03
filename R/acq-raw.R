@@ -56,11 +56,24 @@ acq_raw_spct <- function(descriptor,
                                                  x$corr.elect.dark,
                                                  descriptor$sr.index,
                                                  descriptor$ch.index)
+
     # correction for sensor non-linearuty (in instrument)
     rOmniDriver::set_correct_for_detector_nonlinearity(descriptor$w,
                                                        x$corr.sensor.nl,
                                                        descriptor$sr.index,
                                                        descriptor$ch.index)
+    actual.corr.sensor.nl <-
+      rOmniDriver::get_correct_for_detector_nonlineary(descriptor$w,
+                                                     descriptor$sr.index,
+                                                     descriptor$ch.index)
+    # We need to
+    if (x$corr.sensor.nl != actual.corr.sensor.nl) {
+      # We guard against failure to set requested setting
+      # It should never happen
+      warning("The spectrometer has overridden linearity correction setting!")
+      x$corr.sensor.nl <- actual.corr.sensor.nl
+    }
+
     # moving window smoothing
     rOmniDriver::set_boxcar_width(descriptor$w,
                                   x$boxcar.width,
@@ -74,6 +87,7 @@ acq_raw_spct <- function(descriptor,
     } else {
       counts.name <- "counts"
     }
+
     rOmniDriver::set_integration_time(y$w, x$integ.time[i], y$sr.index, y$ch.index)
     actual.integ.time <- rOmniDriver::get_integration_time(y$w, y$sr.index, y$ch.index)
     # We need to
@@ -84,11 +98,22 @@ acq_raw_spct <- function(descriptor,
     }
     # could improve precision in case of rounding errors
     x$integ.time[i] <- actual.integ.time
+
     rOmniDriver::set_scans_to_avg(y$w, x$num.scans[i], y$sr.index, y$ch.index)
+    actual.num.scans <- rOmniDriver::get_scans_to_avg(y$w, y$sr.index, y$ch.index)
+    # We need to
+    if (x$num.scans[i] != actual.num.scans) {
+      # We guard against failure to set integration time
+      # It should never happen as we check validity value requested
+      warning("The spectrometer has overridden the number of scans!")
+      x$num.scans[i] <- actual.num.scans
+    }
+
     if (verbose) message(paste("Measurement ", i, "..."))
     if (num.exposures[i] > 0L  && !is.null(f.trigger.pulses)) {
       f.trigger.pulses(num.exposures[i])
     }
+
     counts <- rOmniDriver::get_spectrum(y$w, y$sr.index, y$ch.index)
     if (rOmniDriver::is_spectrum_valid(y$w, y$sr.index, y$ch.index) || x$force.valid)
     {
@@ -96,9 +121,13 @@ acq_raw_spct <- function(descriptor,
     } else {
       z[[counts.name]] <- rep(NA_real_, length(z$w.length))
     }
+
   }
+
   z <- as.raw_spct(z)
-  attr(z, "linearized") <- FALSE
+
+  attr(z, "linearized") <- x$corr.sensor.nl
+
   photobiology::setInstrDesc(z, y)
   # we remove the Java wrapper so that RJava is not required to read the data
   photobiology::trimInstrDesc(z, c("-", "w"))

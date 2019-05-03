@@ -110,15 +110,26 @@ acq_irrad_interactive <-
         switch(serial_no,
                MAYP11278 = which_descriptor(descriptors = ooacquire::MAYP11278_descriptors),
                MAYP112785 = which_descriptor(descriptors = ooacquire::MAYP112785_descriptors),
-               get_oo_descriptor(w, sr.index = sr.index, ch.index = ch.index)
+               FLMS04133 = which_descriptor(descriptors = ooacquire::FLMS04133_descriptors),
+               FLMS00673 = which_descriptor(descriptors = ooacquire::FLMS00673_descriptors),
+               {
+                 warning("No instrument descriptor found, retrieving from the spectrometer")
+                 get_oo_descriptor(w, sr.index = sr.index, ch.index = ch.index)
+               }
+
         )
 
       correction.method <-
         switch(serial_no,
                MAYP11278 = ooacquire::MAYP11278_ylianttila.mthd,
                MAYP112785 = ooacquire::MAYP112785_ylianttila.mthd,
-               new_correction_method(descriptor,
-                                     stray.light.method = stray.light.method)
+               FLMS04133 = ooacquire::FLMS04133_none.mthd,
+               FLMS00673 = ooacquire::FLMS00673_none.mthd,
+               {
+                 warning("No spectrometer-specific method found, using a generic one")
+                 new_correction_method(descriptor,
+                                       stray.light.method = stray.light.method)
+               }
         )
 
     } else {
@@ -131,17 +142,24 @@ acq_irrad_interactive <-
     descriptor[["sr.index"]] <- sr.index
     descriptor[["ch.index"]] <- ch.index
 
-    if (anyNA(c(descriptor[[1]], correction.method[[1]]))) {
-      stop("No callibration data found")
+    if (length(descriptor) < 10 || length(correction.method) < 5) {
+      stop("No spectrometer data found")
     }
 
     # We still check serial numbers, really needed only for user supplied descriptors
     descriptor.inst <- get_oo_descriptor(w)
     stopifnot(descriptor[["spectrometer.sn"]] == descriptor.inst[["spectrometer.sn"]])
 
-    # Before continuing we check that calibrations are available
+    # We check that wavelength calibration is available
     stopifnot(length(descriptor[["wavelengths"]]) == descriptor[["num.pixs"]])
-    stopifnot(length(descriptor[["inst.calib"]][["irrad.mult"]]) == descriptor[["num.pixs"]])
+    # We check for valid calibration multipliers
+    if (length(descriptor[["inst.calib"]][["irrad.mult"]]) != descriptor[["num.pixs"]] ||
+      anyNA(descriptor[["inst.calib"]][["irrad.mult"]])) {
+      if (qty.out == "irrad") {
+        warning("Bad calibration data, returning counts-per-second.")
+        qty.out = "cps"
+      }
+    }
 
     # We get metadata from user
 
@@ -169,7 +187,7 @@ acq_irrad_interactive <-
 
     protocol <- protocol_interactive(protocols = protocols)
 
-    start.int.time <- 0.1 # seconds
+    start.int.time <- 0.01 # seconds
 
     # data set measured with same protocol values but adjusted integration time
 

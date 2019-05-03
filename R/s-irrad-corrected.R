@@ -115,7 +115,7 @@ s_irrad_corrected.raw_mspct <-
       worker.fun <- correction.method[["worker.fun"]]
     }
 
-    stopifnot(is.function(worker.fun))
+    stopifnot(is.null(worker.fun) || is.function(worker.fun))
 
     corrected.spct <-
       ooacquire::uvb_corrections(x = x,
