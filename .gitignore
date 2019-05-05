@@ -1,7 +1,9 @@
 .Rproj.user
 .Rhistory
 .RData
-vignettes/user-guide_files
+vignettes/a-quick-guide_files
+vignettes/b-user-guide_files
+vignettes/c-algorithm-step-through_files
 not-inst
 src-i386
 src-x64
