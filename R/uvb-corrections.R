@@ -57,7 +57,7 @@ uvb_corrections <- function(x,
 
   raw2merged_cps <- function(xx,
                              spct.names,
-                             inst.dark.pixs) {
+                             inst.dark.pixs = NA_real_) {
     spct.names <- intersect(spct.names, names(xx))
     zz <- cps_mspct()
     for (n in spct.names) {
@@ -68,7 +68,9 @@ uvb_corrections <- function(x,
       temp.spct <- trim_counts(temp.spct)
       temp.spct <- bleed_nas(temp.spct)
       temp.spct <- linearize_counts(temp.spct)
-      temp.spct <- fshift(temp.spct, range = inst.dark.wl)
+      if (all(!is.na(inst.dark.wl))) {
+        temp.spct <- fshift(temp.spct, range = inst.dark.wl)
+      }
       temp.spct <- raw2cps(temp.spct)
       zz[[n]] <- merge_cps(temp.spct)
     }
@@ -86,7 +88,12 @@ uvb_corrections <- function(x,
                      mode = "function")
   }
 
-  spct.nms <- spct.names[c("light", "filter", "dark")]
+  if (stray.light.method %in% c("none")) {
+    # if method does not support a filter measurement, we discard these data if present
+    spct.nms <- spct.names[c("light", "dark")]
+  } else {
+    spct.nms <- spct.names[c("light", "filter", "dark")]
+  }
   spct.present <- which(spct.nms %in% names(x))
 
   spct.names <- spct.nms[spct.present]
@@ -98,10 +105,10 @@ uvb_corrections <- function(x,
                         inst.dark.pixs = inst.dark.pixs)
     y <- ref_correction(y, ref_name = spct.names["dark"])
   } else if (length(setdiff(c("light", "dark"), names(spct.names))) == 0) {
-    if (verbose) {
+    if (verbose && !stray.light.method %in% c("none")) {
       warning("No 'filter' measurement available: continuing without filter correction")
     }
-    flt.flag <- FALSE
+    flt.flag <- FALSE   # overrides flt.flag <- TRUE set above based on method
     y <- raw2merged_cps(xx = x,
                         spct.names = spct.names[c("light", "dark")],
                         inst.dark.pixs = inst.dark.pixs)
@@ -111,7 +118,6 @@ uvb_corrections <- function(x,
     if (verbose) {
       warning("No 'dark' measurement available: using internal reference")
     }
-    flt.flag <- TRUE
     y <- raw2merged_cps(xx = x,
                         spct.names = spct.names,
                         inst.dark.pixs = inst.dark.pixs)
@@ -119,7 +125,7 @@ uvb_corrections <- function(x,
     if (verbose) {
       warning("No 'dark' or 'filter' measurements available: using internal reference")
     }
-    flt.flag <- FALSE
+    flt.flag <- FALSE  # overrides flt.flag  <- TRUE set above based on method
     y <- raw2merged_cps(xx = x,
                         spct.names = spct.names,
                         inst.dark.pixs = inst.dark.pixs)
@@ -129,12 +135,6 @@ uvb_corrections <- function(x,
     }
     return(cps_spct())
   }
-
-  when.measured <- getWhenMeasured(y[[spct.names["light"]]])
-  where.measured <- getWhereMeasured(y[[spct.names["light"]]])
-  what.measured <- getWhatMeasured(y[[spct.names["light"]]])
-  descriptor <- getInstrDesc(y[[spct.names["light"]]])
-  inst.settings <- getInstrSettings(y[[spct.names["light"]]])
 
   if (flt.flag && stray.light.method != "simple" &&
       average_spct(clip_wl(y[[spct.names["light"]]], range = flt.ref.wl)) < 0.001 *
@@ -153,7 +153,7 @@ uvb_corrections <- function(x,
                            flt.Tfr = flt.Tfr,
                            trim = trim,
                            verbose = verbose)
-  } else {
+  } else if (stray.light.method != "none") {
     if (verbose) {
       warning("Assuming pure stray light in ",
               stray.light.wl[1], " to ", stray.light.wl[2], " nm")
@@ -164,21 +164,25 @@ uvb_corrections <- function(x,
                               flt.Tfr = flt.Tfr,
                               trim = trim,
                               verbose = verbose)
+  } else {
+    # no corrections, just subtract dark spectrum
+    z <- clean(y[["light"]] - y[["dark"]])
+    setInstrDesc(z, getInstrDesc(y[[spct.names["light"]]]))
+    setInstrSettings(z, getInstrSettings(y[[spct.names["light"]]]))
+    setWhenMeasured(z, getWhenMeasured(y[[spct.names["light"]]]))
+    setWhereMeasured(z, getWhereMeasured(y[[spct.names["light"]]]))
+    setWhatMeasured(z, getWhatMeasured(y[[spct.names["light"]]]))
+    attr(x, "straylight.corrected") <- FALSE
   }
 
-  if (is.null(worker.fun)) {
+  if (is.null(worker.fun) && stray.light.method != "none") {
     if (verbose) {
-      warning("Skipping slit fucntion tail correction: no function available.")
+      warning("Skipping slit function tail correction: no function available.")
     }
   } else {
     z <- slit_function_correction(z, worker.fun = worker.fun, ...)
   }
 
-  setInstrDesc(z, descriptor)
-  setInstrSettings(z, inst.settings)
-  setWhenMeasured(z, when.measured)
-  setWhereMeasured(z, where.measured)
-  setWhatMeasured(z, what.measured)
   z
 }
 
