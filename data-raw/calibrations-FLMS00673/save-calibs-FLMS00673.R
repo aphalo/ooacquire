@@ -1,6 +1,31 @@
 library(readr)
 library(ooacquire)
 
+# load an instrument descriptor
+load(file = "./data-raw/flame-s-descriptor/FLMS00440.Rda")
+
+# we make sure not to depend on Java code
+descriptor$w <- NULL
+
+descriptor[["spectrometer.name"]] <- "Flame-S-XR1-ES"
+descriptor[["spectrometer.sn"]] <- "FLMS00673"
+descriptor[["bench.grating"]] <- "XR1"
+descriptor[["bench.filter"]] <- "000"
+descriptor[["bench.slit"]] <- "025"
+descriptor[["bench-lens"]] <- "L2"
+descriptor[["detector"]] <- "DET2B-200-1100"
+descriptor[["num.pixs"]] <- 2048
+descriptor[["num.dark.pixs"]] <- 16
+descriptor[["min.integ.time"]] <- 1000
+descriptor[["max.integ.time"]] <- 65535000
+descriptor[["max.counts"]] <- 65535
+
+descriptor[["time"]] <- NA
+descriptor <- set_descriptor_nl(descriptor,
+                                nl.coeff = c(0.878133, 8.83404e-6, -5.07091e-10,
+                                             3.80507e-14, -1.84551e-18, 4.64183e-23,
+                                             -5.62435e-28, 2.56084e-33))
+
 # create an object with the parameters for Lasse Ylianttila's original method
 # for Maya, not vavailable.
 FLMS00673_ylianttila.mthd <- list()
@@ -16,6 +41,7 @@ FLMS00673_simple.mthd <- list()
 # create an object with the parameters for simple method for Jaz
 # suitable for any light source, but not as good for irradiance.
 FLMS00673_none.mthd <- list(
+  spectrometer.sn = descriptor$spectrometer.sn,
   stray.light.method = "none",
   stray.light.wl = c(203.34, 222.85),
   flt.dark.wl = c(202.88, 195.42),

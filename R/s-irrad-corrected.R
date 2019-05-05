@@ -92,6 +92,8 @@ s_irrad_corrected.raw_mspct <-
            verbose = getOption("photobiology.verbose", default = FALSE),
            ...) {
 
+    check_sn_match(x, correction.method, missmatch.action = stop)
+
     if (length(setdiff(names(x), spct.names)) > 0L) {
       stop("Bad member names in 'spct.names': ", names(spct.names))
     }
@@ -133,6 +135,12 @@ s_irrad_corrected.raw_mspct <-
     if (return.cps) {
       corrected.spct
     } else {
+      descriptor <- getInstrDesc(corrected.spct)
+      if (any(is.na(descriptor$inst.calib$irrad.mult)) ||
+          length(descriptor$inst.calib$irrad.mult) !=
+          length(descriptor$wavelengths)) {
+        stop("The 'instrument descriptor' lacks valid irradiance calibration data!")
+      }
       photobiology::cps2irrad(corrected.spct, ...)
     }
   }

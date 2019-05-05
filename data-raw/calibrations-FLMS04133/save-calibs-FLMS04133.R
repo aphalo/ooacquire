@@ -1,32 +1,6 @@
 library(readr)
 library(ooacquire)
 
-# create an object with the parameters for Lasse Ylianttila's original method
-# for Maya, not vavailable.
-FLMS04133_ylianttila.mthd <- list()
-
-# create an object with the parameters for a method good only for sunlight,
-# not vavailable.
-FLMS04133_sun.mthd <- list()
-
-# create an object with the parameters for simple method for Jaz
-# suitable for any light source, but not as good for irradiance.
-FLMS04133_simple.mthd <- list()
-
-# create an object with the parameters for simple method for Jaz
-# suitable for any light source, but not as good for irradiance.
-FLMS04133_none.mthd <- list(
-  stray.light.method = "none",
-  stray.light.wl = c(202.9037, 222.0784),
-  flt.dark.wl = c(189.8081, 194.8206),
-  flt.ref.wl = c(360.0815, 379.8590),
-  flt.Tfr = 1,
-  inst.dark.pixs = 1:16,
-  tail.coeffs = c(NA_real_, NA_real_),
-  worker.fun = NULL,
-  trim = 1/16
-)
-
 # load an instrument descriptor
 load(file = "./data-raw/flame-descriptor/FLMS04133.Rda")
 
@@ -37,6 +11,44 @@ descriptor[["bench-lens"]] <- "L2-C"
 descriptor[["detector"]] <- "DET2B-200-850"
 
 descriptor[["time"]] <- NA
+
+# create an object with the parameters for Lasse Ylianttila's original method
+# for Maya, not vavailable.
+FLMS04133_ylianttila.mthd <- list()
+
+# create an object with the parameters for a method good only for sunlight,
+# not vavailable.
+FLMS04133_sun.mthd <- list()
+
+# create an object with the parameters for simple method for Jaz
+# suitable for any light source, but not as good for irradiance.
+FLMS04133_simple.mthd <- list(
+  spectrometer.sn = descriptor$spectrometer.sn,
+  stray.light.method = "simple",
+  stray.light.wl = c(240.01, 249.89),
+  flt.dark.wl = c(240.01, 249.89),
+  flt.ref.wl = c(360.0815, 379.8590),
+  flt.Tfr = 1,
+  inst.dark.pixs = 1:16,
+  tail.coeffs = c(NA_real_, NA_real_),
+  worker.fun = NULL,
+  trim = 1/8
+)
+
+# create an object with the parameters for simple method for Jaz
+# suitable for any light source, but not as good for irradiance.
+FLMS04133_none.mthd <- list(
+  spectrometer.sn = descriptor$spectrometer.sn,
+  stray.light.method = "none",
+  stray.light.wl = c(NA_real_, NA_real_),
+  flt.dark.wl = c(240.01, 249.89),
+  flt.ref.wl = c(NA_real_, NA_real_),
+  flt.Tfr = 1,
+  inst.dark.pixs = NA_integer_,
+  tail.coeffs = c(NA_real_, NA_real_),
+  worker.fun = NULL,
+  trim = 0
+)
 
 # find calibration files
 files <- list.files("data-raw/calibrations-FLMS04133",

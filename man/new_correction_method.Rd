@@ -5,8 +5,8 @@
 \title{Make default method from descriptor}
 \usage{
 new_correction_method(descriptor, stray.light.method = "none",
-  stray.light.wl = c(220, 230), flt.dark.wl = c(200, 210),
-  flt.ref.wl = c(360, 379.5), flt.Tfr = 1)
+  stray.light.wl = c(NA_real_, NA_real_), flt.dark.wl = c(NA_real_,
+  NA_real_), flt.ref.wl = c(NA_real_, NA_real_), flt.Tfr = NA_real_)
 }
 \arguments{
 \item{descriptor}{list, as returned by \code{get_oo_descriptr()}}
@@ -26,7 +26,8 @@ Useful when the spectrometers has not been characterized as needed for
 the more sofisticated methods. Can use stray light correction
 but not slit function correction. Stray light correction is valid
 only if it was also used during irradiance callibration. Suitablity
-of wavelengths and method depends on the instrument configuration.
+of wavelengths and method depends on the instrument configuration so
+they are set to \code{NA} as default..
 }
 \details{
 The currently recognized methods for stray-light correction are

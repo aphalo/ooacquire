@@ -1,4 +1,5 @@
 ## Calibration dates
 inst.sn, name, calib.date, start.date, end.date, coeffs.file
 MAYP112785, cal_2016xa, 2016-12-22, 2016-12-01, 2018-12-22, cal-coeffs-2016xa.xlsx
+MAYP112785, cal_2019xa, 2019-04-16, 2018-12-22, 2021-04-16, cal-coeffs-2019xa.xlsx
 

@@ -12,7 +12,9 @@ list_instruments(w)
 ## Daniel's Flame
 descriptor <- which_descriptor(descriptors = ooacquire::FLMS04133_descriptors)
 ## new Maya
-# descriptor <- which_descriptor(descriptors = ooacquire::MAYP112785_descriptors)
+descriptor <- which_descriptor(descriptors = ooacquire::MAYP112785_descriptors)
+
+descriptor <- which_descriptor(descriptors = ooacquire::MAYP11278_descriptors)
 
 descriptor[["w"]] <- w
 descriptor[["sr.index"]] <- 0
@@ -40,6 +42,7 @@ plot(raw2corr_cps(spct_1))
 spct_1 <- s_irrad_corrected(spct_1, correction.method = FLMS04133_none.mthd)
 # spct_1 <- s_irrad_corrected(spct_1, correction.method = MAYP112785_ylianttila.mthd)
 plot(spct_1, unit.out = "photon")
+plot(smooth_spct(spct_1, method = "supsmu"), unit.out = "photon")
 
 ## PROTOCOL 2
 # acquire a measure in the light and a dark reference spectrum

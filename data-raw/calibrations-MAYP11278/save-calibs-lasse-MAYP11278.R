@@ -2,9 +2,18 @@ library(readxl)
 library(readr)
 library(ooacquire)
 
+# load an instrument descriptor
+load(file = "./data-raw/maya-descriptor/MAYP11278.Rda")
+
+descriptor$num.pixs <- 2068
+descriptor$num.dark.pixs <- 20
+
+descriptor$w <- NULL
+
 # create an object with the parameters for Lasse Ylianttila's original method
 # for Maya suitable for sunlight
 MAYP11278_ylianttila.mthd <- list(
+  spectrometer.sn = descriptor$spectrometer.sn,
   stray.light.method = "original",
   stray.light.wl = c(218.5, 228.5),
   flt.dark.wl = c(193, 209.5),        # used for $N$2 in Lasse's calc worksheet
@@ -19,6 +28,7 @@ MAYP11278_ylianttila.mthd <- list(
 # create an object with the parameters for a method good only for sunlight,
 # based on Lasse Ylianttila's original method suitable ONLY for sunlight.
 MAYP11278_sun.mthd <- list(
+  spectrometer.sn = descriptor$spectrometer.sn,
   stray.light.method = "sun",
   stray.light.wl = c(218.5, 228.5),
   flt.dark.wl = c(193, 209.5),
@@ -33,6 +43,7 @@ MAYP11278_sun.mthd <- list(
 # create an object with the parameters for simple method for Maya
 # suitable for any light source, but not as good for sunlight
 MAYP11278_simple.mthd <- list(
+  spectrometer.sn = descriptor$spectrometer.sn,
   stray.light.method = "simple",
   stray.light.wl = c(218.5, 228.5),
   flt.dark.wl = c(193, 209.5),
@@ -44,13 +55,20 @@ MAYP11278_simple.mthd <- list(
   trim = 0.05
 )
 
-# load an instrument descriptor
-load(file = "./data-raw/maya-descriptor/MAYP11278.Rda")
-
-descriptor$num.pixs <- 2068
-descriptor$num.dark.pixs <- 20
-
-descriptor$w <- NULL
+# create an object with the parameters for skipping correction method for Maya
+# suitable for any light source, but not as good for sunlight
+MAYP11278_none.mthd <- list(
+  spectrometer.sn = descriptor$spectrometer.sn,
+  stray.light.method = "none",
+  stray.light.wl = c(218.5, 228.5),
+  flt.dark.wl = c(193, 209.5),
+  flt.ref.wl = c(360, 379.5),
+  flt.Tfr = 1,
+  inst.dark.pixs = NA_integer_,
+  tail.coeffs =  c(NA_real_, NA_real_),
+  worker.fun = NULL,
+  trim = 0
+)
 
 # find calibration files
 files <- list.files("data-raw/calibrations-MAYP11278",

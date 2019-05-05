@@ -5,7 +5,8 @@
 #' the more sofisticated methods. Can use stray light correction
 #' but not slit function correction. Stray light correction is valid
 #' only if it was also used during irradiance callibration. Suitablity
-#' of wavelengths and method depends on the instrument configuration.
+#' of wavelengths and method depends on the instrument configuration so
+#' they are set to \code{NA} as default..
 #'
 #' @param descriptor list, as returned by \code{get_oo_descriptr()}
 #' @param stray.light.method character Name of method.
@@ -25,10 +26,10 @@
 #'
 new_correction_method <- function(descriptor,
                                   stray.light.method = "none",
-                                  stray.light.wl = c(220, 230),
-                                  flt.dark.wl = c(200, 210),
-                                  flt.ref.wl = c(360, 379.5),
-                                  flt.Tfr = 1) {
+                                  stray.light.wl = c(NA_real_, NA_real_),
+                                  flt.dark.wl =  c(NA_real_, NA_real_),
+                                  flt.ref.wl =  c(NA_real_, NA_real_),
+                                  flt.Tfr = NA_real_) {
   ## Configuration is not known
   # We find the dark pixels from the descriptor
   inst.dark.pixs <- 1:descriptor[["num.dark.pixs"]]
@@ -57,6 +58,7 @@ new_correction_method <- function(descriptor,
   }
 
   method <- list(
+    spectrometer.sn = descriptor$spectrometer.sn,
     stray.light.method = stray.light.method,
     stray.light.wl = stray.light.wl,
     flt.dark.wl = flt.dark.wl,        # used for $N$2 in Lasse's calc worksheet
@@ -75,3 +77,39 @@ new_correction_method <- function(descriptor,
     )
 
 }
+
+#' Check consistency of serial number
+#'
+#' This method checks that the sn of the instrument used to acquire the raw
+#' counts matches that in the definition of a correction method.
+#'
+#' @param x a generic_mspct object, in normal use a raw_mspct object.
+#' @param correction.method a list describing the correction method. Must
+#'   incluse a member named \code{"spectrometer.sn"}.
+#' @param missmatch.action a function, in practice one of \code{stop},
+#'   \code{warning}, \code{message} or \code{NULL}.
+#'
+#' @return A logical vector of length one, with \code{FALSE} indicating a
+#'   missmatch.
+#'
+#' @export
+#'
+check_sn_match <- function(x,
+                           correction.method,
+                           missmatch.action = stop) {
+  equal.sn <- TRUE
+  for (s in x) {
+    if (getInstrDesc(s)[["spectrometer.sn"]] != correction.method[["spectrometer.sn"]]) {
+      equal.sn <- FALSE
+    }
+  }
+  if (!all(equal.sn)) {
+    if (!is.null(missmatch.action)) {
+      missmatch.action("Serial number mismatch with 'correction.method' definition: ",
+                       names(x[!equal.sn]))
+    }
+  }
+
+  all(equal.sn)
+}
+

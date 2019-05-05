@@ -3,8 +3,18 @@ library(readr)
 library(ooacquire)
 library(polynom)
 
+# load an instrument descriptor
+load(file = "./data-raw/maya-descriptor/MAYP112785.Rda")
+descriptor$num.pixs <- 2068
+descriptor$num.dark.pixs <- 20
+
+descriptor$w <- NULL
+descriptor$sr.index <- 0L
+descriptor$bad.pixs <- numeric()
+
 # create an object with the parameters for Lasse Ylianttila's method for Maya
 MAYP112785_ylianttila.mthd <- list(
+  spectrometer.sn = descriptor$spectrometer.sn,
   stray.light.method = "original",
   stray.light.wl = c(218.5, 228.5),
   flt.dark.wl = c(204.6, 219.1),
@@ -19,6 +29,7 @@ MAYP112785_ylianttila.mthd <- list(
 # create an object with the parameters for a method good only for sunlight,
 # based on Lasse Ylianttila's original method suitable ONLY for sunlight.
 MAYP112785_sun.mthd <- list(
+  spectrometer.sn = descriptor$spectrometer.sn,
   stray.light.method = "sun",
   stray.light.wl = c(218.5, 228.5),
   flt.dark.wl = c(204.6, 219.1),
@@ -33,6 +44,7 @@ MAYP112785_sun.mthd <- list(
 # create an object with the parameters for simple method for Maya
 # suitable for any light source, but not as good for sunlight
 MAYP112785_simple.mthd <- list(
+  spectrometer.sn = descriptor$spectrometer.sn,
   stray.light.method = "simple",
   stray.light.wl = c(218.5, 228.5),
   flt.dark.wl = c(204.6, 219.1),
@@ -44,14 +56,20 @@ MAYP112785_simple.mthd <- list(
   trim = 0.05
 )
 
-# load an instrument descriptor
-load(file = "./data-raw/maya-descriptor/MAYP112785.Rda")
-descriptor$num.pixs <- 2068
-descriptor$num.dark.pixs <- 20
-
-descriptor$w <- NULL
-descriptor$sr.index <- 0L
-descriptor$bad.pixs <- numeric()
+# create an object with the parameters for simple method for Maya
+# suitable for any light source, but not as good for sunlight
+MAYP112785_simple.mthd <- list(
+  spectrometer.sn = descriptor$spectrometer.sn,
+  stray.light.method = "none",
+  stray.light.wl = c(218.5, 228.5),
+  flt.dark.wl = c(204.6, 219.1),
+  flt.ref.wl = c(368.3, 388.3),
+  flt.Tfr = 1,
+  inst.dark.pixs = NA_integer_,
+  tail.coeffs = c(NA_real_, NA_real_),
+  worker.fun = NULL,
+  trim = 0.05
+)
 
 # find calibration files
 files <- list.files("data-raw/calibrations-MAYP112785",

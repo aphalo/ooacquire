@@ -107,9 +107,7 @@ s_fraction_corrected.raw_mspct <- function(x,
                                            verbose = getOption("photobiology.verbose", default = FALSE),
                                            ...) {
 
-  # if (length(setdiff(names(x), spct.names)) > 0L) {
-  #   stop("Bad member names in 'spct.names': ", names(spct.names))
-  # }
+  check_sn_match(x, correction.method, missmatch.action = stop)
 
   if (length(x[[spct.names["sample"]]]) == 0 || length(x[[spct.names["reference"]]]) == 0) {
     if (verbose) {
@@ -171,9 +169,7 @@ s_fraction_corrected.raw_mspct <- function(x,
                                flt.ref.wl = correction.method[["flt.ref.wl"]],
                                flt.Tfr = correction.method[["flt.Tfr"]],
                                inst.dark.pixs = correction.method[["inst.dark.pixs"]],
-                               worker.fun = get(correction.method[["worker.fun"]],
-                                                mode = "function",
-                                                envir = as.environment("package:ooacquire")),
+                               worker.fun = worker.fun,
                                trim = correction.method[["trim"]],
                                verbose = verbose)
 

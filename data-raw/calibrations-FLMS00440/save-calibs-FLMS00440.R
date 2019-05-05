@@ -4,6 +4,17 @@ rm(list = ls(pattern = "*"))
 library(readr)
 library(ooacquire)
 
+# load an instrument descriptor
+load(file = "./data-raw/flame-s-descriptor/FLMS00440.Rda")
+
+# we make sure not to depend on Java code
+descriptor$w <- NULL
+
+descriptor <- set_descriptor_nl(descriptor,
+                                nl.coeff = c(0.847773, 6.69476e-6, 2.72833e-11,
+                                             -9.19219e-15, 3.13902e-19, -5.59827e-24,
+                                             5.83296e-29, -2.88581e-34))
+
 # create an object with the parameters for Lasse Ylianttila's original method
 # for Maya, not vavailable.
 FLMS00440_ylianttila.mthd <- list()
@@ -19,6 +30,7 @@ FLMS00440_simple.mthd <- list()
 # create an object with the parameters for simple method for Jaz
 # suitable for any light source, but not as good for irradiance.
 FLMS00440_none.mthd <- list(
+  spectrometer.sn = descriptor$spectrometer.sn,
   stray.light.method = "none",
   stray.light.wl = c(NA_real_, NA_real_),
   flt.dark.wl = c(340.17, 346.3),
@@ -29,17 +41,6 @@ FLMS00440_none.mthd <- list(
   worker.fun = NULL,
   trim = 0.05
 )
-
-# load an instrument descriptor
-load(file = "./data-raw/flame-s-descriptor/FLMS00440.Rda")
-
-# we make sure not to depend on Java code
-descriptor$w <- NULL
-
-descriptor <- set_descriptor_nl(descriptor,
-                                nl.coeff = c(0.847773, 6.69476e-6, 2.72833e-11,
-                                             -9.19219e-15, 3.13902e-19, -5.59827e-24,
-                                             5.83296e-29, -2.88581e-34))
 
 # find calibration files
 files <- list.files("data-raw/calibrations-FLMS00440",
