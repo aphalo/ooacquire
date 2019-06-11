@@ -84,7 +84,11 @@ The integration time is set automatically so that the peak number of
   the number of scans. The default protocols are usually suitable, if new
   protocols are passed, each character vector must contain strings "light",
   "filter" and "dark", or "sample", "reference", and "dark", depending on
-  the function.
+  the function. Plots are produced with functions from
+  package 'ggspectra' and respect the default annotations set with function
+  \code{set_annotations_default()}, default wavebands set with function
+  \code{set_w.band_default()}, and irradiance quantities set with
+  \code{photon_as_default()}, and \code{energy_as_default()}.
 
 The calculations for reflectance and transmittance are very similar,
   so we provide a single function capable of handling both. For

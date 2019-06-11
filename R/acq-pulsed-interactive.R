@@ -43,7 +43,11 @@
 #'   this "window" one or more times. The default protocols are usually
 #'   suitable, if new protocols are passed, each character vector must contain
 #'   strings "light", "filter" and "dark", or "sample", "reference", and "dark",
-#'   depending on the function.
+#'   depending on the function. Plots are produced with functions from
+#'   package 'ggspectra' and respect the default annotations set with function
+#'   \code{set_annotations_default()}, default wavebands set with function
+#'   \code{set_plot_wavebands()}, and irradiance quantities set with
+#'   \code{photon_as_default()}, and \code{energy_as_default()}.
 #'
 #' @details The different interface modes are suitable for different types of
 #'   measurements.
@@ -257,7 +261,7 @@ acq_fluence_interactive <-
         save(list = c(raw.name, fluence.name), file = file.name)
 
         repeat {
-          fig <- graphics::plot(fluence.spct) +
+          fig <- ggplot2::autoplot(fluence.spct, annotations = c("-", "title*")) +
             ggplot2::labs(title = paste(raw.name, "sample", sep = "$"),
                           subtitle = paste(photobiology::getWhenMeasured(fluence.spct), " UTC, ",
                                            session.label, sep = ""),
@@ -288,7 +292,7 @@ acq_fluence_interactive <-
       } else {
         assign(raw.name, raw.mspct)
         save(list = c(raw.name), file = file.name)
-        fig <- graphics::plot(raw.mspct[["light"]]) +
+        fig <- ggplot2::autoplot(raw.mspct[["light"]], annotations = c("-", "title*")) +
           ggplot2::labs(title = obj.name,
                         subtitle = paste(photobiology::getWhenMeasured(raw.mspct[["light"]]), " UTC, ",
                                          session.label, sep = ""),
@@ -570,7 +574,7 @@ acq_fraction_pulsed_interactive <-
       assign(raw.name, raw.mspct)
 
       if (qty.out == "raw") {
-        fig <- graphics::plot(raw.mspct[["sample"]]) +
+        fig <- ggplot2::autoplot(raw.mspct[["sample"]], annotations = c("-", "title*")) +
           ggplot2::labs(title = paste(raw.name, "sample", sep = "$"),
                         subtitle = paste(photobiology::getWhenMeasured(raw.mspct[["sample"]]), " UTC, ",
                                          session.label, sep = ""),
@@ -600,7 +604,7 @@ acq_fraction_pulsed_interactive <-
         save(list = c(raw.name, filter.name), file = file.name)
 
         repeat {
-          fig <- graphics::plot(filter.spct) +
+          fig <- ggplot2::autoplot(filter.spct, annotations = c("-", "title*")) +
             ggplot2::labs(title = filter.name,
                           subtitle = paste(photobiology::getWhenMeasured(filter.spct), " UTC, ",
                                            session.label, sep = ""),

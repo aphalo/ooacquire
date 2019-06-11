@@ -97,7 +97,7 @@ uvb_corrections <- function(x,
   spct.present <- which(spct.nms %in% names(x))
 
   spct.names <- spct.nms[spct.present]
-  names(spct.names) <- c("light", "filter", "dark")[spct.present]
+ # names(spct.names) <- c("light", "filter", "dark")[spct.present]
 
   if (length(setdiff(c("light", "filter", "dark"), names(spct.names))) == 0) {
     y <- raw2merged_cps(xx = x,
@@ -164,16 +164,17 @@ uvb_corrections <- function(x,
                               flt.Tfr = flt.Tfr,
                               trim = trim,
                               verbose = verbose)
-  } else {
-    # no corrections, just subtract dark spectrum
-    z <- clean(y[["light"]] - y[["dark"]])
-    setInstrDesc(z, getInstrDesc(y[[spct.names["light"]]]))
-    setInstrSettings(z, getInstrSettings(y[[spct.names["light"]]]))
-    setWhenMeasured(z, getWhenMeasured(y[[spct.names["light"]]]))
-    setWhereMeasured(z, getWhereMeasured(y[[spct.names["light"]]]))
-    setWhatMeasured(z, getWhatMeasured(y[[spct.names["light"]]]))
-    attr(x, "straylight.corrected") <- FALSE
-  }
+   }  else {
+     z <- y[["light"]]
+  #   # no corrections, just subtract dark spectrum
+  #   z <- clean(y[["light"]] - y[["dark"]])
+  #   setInstrDesc(z, getInstrDesc(y[[spct.names["light"]]]))
+  #   setInstrSettings(z, getInstrSettings(y[[spct.names["light"]]]))
+  #   setWhenMeasured(z, getWhenMeasured(y[[spct.names["light"]]]))
+  #   setWhereMeasured(z, getWhereMeasured(y[[spct.names["light"]]]))
+  #   setWhatMeasured(z, getWhatMeasured(y[[spct.names["light"]]]))
+  #   attr(x, "straylight.corrected") <- FALSE
+   }
 
   if (is.null(worker.fun) && stray.light.method != "none") {
     if (verbose) {

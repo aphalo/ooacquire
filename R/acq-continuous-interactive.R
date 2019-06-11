@@ -44,7 +44,11 @@
 #'   the number of scans. The default protocols are usually suitable, if new
 #'   protocols are passed, each character vector must contain strings "light",
 #'   "filter" and "dark", or "sample", "reference", and "dark", depending on
-#'   the function.
+#'   the function. Plots are produced with functions from
+#'   package 'ggspectra' and respect the default annotations set with function
+#'   \code{set_annotations_default()}, default wavebands set with function
+#'   \code{set_w.band_default()}, and irradiance quantities set with
+#'   \code{photon_as_default()}, and \code{energy_as_default()}.
 #'
 #' @details The different interface modes are suitable for different types of
 #'   measurements.
@@ -279,7 +283,7 @@ acq_irrad_interactive <-
         save(list = c(raw.name, irrad.name), file = file.name)
 
         repeat {
-          fig <- graphics::plot(irrad.spct) +
+          fig <- ggplot2::autoplot(irrad.spct, annotations = c("-", "title*")) +
             ggplot2::labs(title = obj.name,
                           subtitle = paste(photobiology::getWhenMeasured(irrad.spct), " UTC, ",
                                            session.label, sep = ""),
@@ -555,7 +559,7 @@ acq_fraction_interactive <-
       assign(raw.name, raw.mspct)
 
       if (qty.out == "raw") {
-        fig <- graphics::plot(raw.mspct[["sample"]]) +
+        fig <- ggplot2::autoplot(raw.mspct[["sample"]], annotations = c("-", "title*")) +
           ggplot2::labs(title = raw.name,
                         subtitle = paste(photobiology::getWhenMeasured(raw.mspct[["sample"]]), " UTC, ",
                                          session.label, sep = ""),
@@ -585,7 +589,7 @@ acq_fraction_interactive <-
         save(list = c(raw.name, filter.name), file = file.name)
 
         repeat {
-          fig <- graphics::plot(filter.spct) +
+          fig <- ggplot2::autoplot(filter.spct, annotations = c("-", "title*")) +
             ggplot2::labs(title = filter.name,
                           subtitle = paste(photobiology::getWhenMeasured(filter.spct), " UTC, ",
                                            session.label, sep = ""),
@@ -829,13 +833,13 @@ acq_rfr_tfr_interactive <-
              file = file.name)
 
         repeat {
-          fig1 <- graphics::plot(rfr.spct, range = c(280, 850)) +
+          fig1 <- ggplot2::autoplot(rfr.spct, range = c(280, 850), annotations = c("-", "title*")) +
             ggplot2::labs(title = spct.name,
                           subtitle = paste(photobiology::getWhenMeasured(rfr.spct), " UTC, ",
                                            session.label, sep = ""),
                           caption = paste("ooacquire", utils::packageVersion("ooacquire"))) +
             ggplot2::theme_bw()
-          fig2 <- graphics::plot(tfr.spct, range = c(280, 850)) +
+          fig2 <- ggplot2::autoplot(tfr.spct, range = c(280, 850), annotations = c("-", "title*")) +
             ggplot2::labs(title = spct.name,
                           subtitle = paste(photobiology::getWhenMeasured(tfr.spct), " UTC, ",
                                            session.label, sep = ""),
