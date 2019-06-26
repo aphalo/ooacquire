@@ -2,7 +2,7 @@ library(readr)
 library(ooacquire)
 
 # load an instrument descriptor
-load(file = "./data-raw/flame-descriptor/FLMS04133.Rda")
+load(file = "./data-raw/flame-s-descriptor/FLMS04133.Rda")
 
 # we make sure not to depend on Java code
 descriptor$w <- NULL
