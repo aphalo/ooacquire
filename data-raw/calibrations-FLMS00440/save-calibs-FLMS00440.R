@@ -48,7 +48,7 @@ files <- list.files("data-raw/calibrations-FLMS00440",
                     full.names = TRUE)
 
 FLMS00440_calib_dates.df <-
-  read_csv("data-raw/calibrations-FLMS00440/calibration-dates.csv", skip = 1)
+  read_csv("data-raw/calibrations-FLMS00440/calibration-dates.csv", col_types = "ccDDDc", skip = 1)
 
 # create a new descriptor for each calibration file
 descriptors <- list()

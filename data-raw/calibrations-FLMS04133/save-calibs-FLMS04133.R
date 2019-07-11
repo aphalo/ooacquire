@@ -44,10 +44,10 @@ FLMS04133_none.mthd <- list(
   flt.dark.wl = c(240.01, 249.89),
   flt.ref.wl = c(NA_real_, NA_real_),
   flt.Tfr = 1,
-  inst.dark.pixs = NA_integer_,
+  inst.dark.pixs = 1:16,
   tail.coeffs = c(NA_real_, NA_real_),
   worker.fun = NULL,
-  trim = 0
+  trim = 1/8
 )
 
 # find calibration files
@@ -56,7 +56,7 @@ files <- list.files("data-raw/calibrations-FLMS04133",
                     full.names = TRUE)
 
 FLMS04133_calib_dates.df <-
-  read_csv("data-raw/calibrations-FLMS04133/calibration-dates.csv", skip = 1)
+  read_csv("data-raw/calibrations-FLMS04133/calibration-dates.csv", col_types = "ccDDDc", skip = 1)
 
 # create a new descriptor for each calibration file
 descriptors <- list()

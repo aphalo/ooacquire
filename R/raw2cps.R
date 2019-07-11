@@ -69,7 +69,7 @@ raw2cps.raw_spct <- function(x,
   }
   descriptor <- getInstrDesc(x)
   setInstrDesc(z, descriptor)
-  if (is.na(acq_settings[["rel.signal"]])) {
+  if (length(acq_settings[["rel.signal"]]) == 0L || is.na(acq_settings[["rel.signal"]])) {
     # e.g. when read from files
     acq_settings[["rel.signal"]] <-
       min(max.counts, na.rm = TRUE) / descriptor[["max.counts"]]
