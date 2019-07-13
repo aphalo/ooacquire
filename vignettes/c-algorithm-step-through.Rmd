@@ -98,7 +98,7 @@ summary(LED_lamp_recalc.spct)
 By plotting the spectral irradiance data, either in whole or a range of wavelengths we can better see the shape of the emission spectrum of the lamp, and in this example also obtain summaries for the irradiance in different wavebands.
 
 ```{r, fig.width=8, fig.asp=0.5}
-plot(LED_lamp_recalc.spct)
+autoplot(LED_lamp_recalc.spct)
 ```
 
 What we show bellow are the individual computation steps that the RAW spectral data have gone through to obtain the spectral irradiance spectrum shown in the figure above.
@@ -109,13 +109,13 @@ We have described above the structure of the object containing the RAW counts da
 Plotting the three bracketed spectra shows the effect of using the optimal integration time plus two longer integration times. To understand the figure one needs to be aware that the spectrometer detector saturates at approximately 64000 counts. In other words if more photons imping the detector cell/pixel than needed for 64000 counts, the reading remains at 64000 counts. This is usually called "signal clipping".
 
 ```{r, fig.width=8, fig.asp=0.5}
-plot(white_LED_2min.raw_mspct[["light"]])
+autoplot(white_LED_2min.raw_mspct[["light"]])
 ```
 
 In the figure above, we can see that in addition to clipping, increasing the integration time, at least in some spectrometers significantly increases the "noise floor" or dark readings. This is even clearly seen in the measurements done in darkness. In this spectra, we can easily see some hot pixels in the detector (bad pixels).
 
 ```{r, fig.width=8, fig.asp=0.5}
-plot(white_LED_2min.raw_mspct[["dark"]])
+autoplot(white_LED_2min.raw_mspct[["dark"]])
 ```
 
 The **first step** in the processing is removal of bad pixels, as recorded in the calibration data. What this step achieves can be clearly seen by comparing the plots before and after this step.
@@ -124,7 +124,7 @@ The **first step** in the processing is removal of bad pixels, as recorded in th
 for (m in names(white_LED_2min.raw_mspct)) {
   white_LED_2min.raw_mspct[[m]] <-
     skip_bad_pixs(white_LED_2min.raw_mspct[[m]])
-  print(plot(white_LED_2min.raw_mspct[[m]]) + ggtitle(m))
+  print(autoplot(white_LED_2min.raw_mspct[[m]]) + ggtitle(m))
 }
 ```
 
@@ -134,7 +134,7 @@ The **second step** is to replace saturated (clipped) pixel data, with the missi
 for (m in names(white_LED_2min.raw_mspct)) {
   white_LED_2min.raw_mspct[[m]] <-
     trim_counts(white_LED_2min.raw_mspct[[m]])
-  print(plot(white_LED_2min.raw_mspct[[m]]) + ggtitle(m))
+  print(autoplot(white_LED_2min.raw_mspct[[m]]) + ggtitle(m))
 }
 ```
 
@@ -144,7 +144,7 @@ An important consideration is that when a pixel _well_ fills some of the excessi
 for (m in names(white_LED_2min.raw_mspct)) {
   white_LED_2min.raw_mspct[[m]] <-
     bleed_nas(white_LED_2min.raw_mspct[[m]])
-  print(plot(white_LED_2min.raw_mspct[[m]]) + ggtitle(m))
+  print(autoplot(white_LED_2min.raw_mspct[[m]]) + ggtitle(m))
 }
 ```
 
@@ -155,7 +155,7 @@ The **fourth step** is to apply a linearisation function, in most cases supplied
 for (m in names(white_LED_2min.raw_mspct)) {
   white_LED_2min.raw_mspct[[m]] <-
     linearize_counts(white_LED_2min.raw_mspct[[m]])
-  print(plot(white_LED_2min.raw_mspct[[m]], ylim = c(NA, 65000)) + ggtitle(m))
+  print(autoplot(white_LED_2min.raw_mspct[[m]], ylim = c(NA, 65000)) + ggtitle(m))
 }
 ```
 
@@ -165,7 +165,7 @@ The first few pixels in the detector of most array spectrometers are covered and
 for (m in names(white_LED_2min.raw_mspct)) {
   white_LED_2min.raw_mspct[[m]] <-
     fshift(white_LED_2min.raw_mspct[[m]], range = c(250,290))
-  print(plot(white_LED_2min.raw_mspct[[m]], ylim = c(NA, 65000)) + ggtitle(m))
+  print(autoplot(white_LED_2min.raw_mspct[[m]], ylim = c(NA, 65000)) + ggtitle(m))
 }
 ```
 
@@ -193,7 +193,7 @@ The **seventh step** splicing of the _light_ and _dark_ three counts-per-second 
 for (m in names(white_LED_2min.cps_mspct)) {
   white_LED_2min.cps_mspct[[m]] <-
     merge_cps(white_LED_2min.cps_mspct[[m]])
-  print(plot(white_LED_2min.cps_mspct[[m]], ylim = c(NA, 40000)) + ggtitle(m))
+  print(autoplot(white_LED_2min.cps_mspct[[m]], ylim = c(NA, 40000)) + ggtitle(m))
 }
 ```
 
@@ -206,21 +206,21 @@ white_LED_2min.cps_spct <-
   copy_attributes(white_LED_2min.raw_mspct[["light"]],
                   white_LED_2min.cps_spct,
                   copy.class = FALSE)
-plot(white_LED_2min.cps_spct) + ggtitle("Dark subtracted")
+autoplot(white_LED_2min.cps_spct) + ggtitle("Dark subtracted")
 ```
 
 At this point we have a clean counts-per-second spectrum. The **ninth step** is to apply the calibration multipliers and any additional instrument specific correction to obtain spectral irradiance in a `"source_spct"` object.
 
 ```{r, fig.width=8, fig.asp=0.5}
 white_LED_2min.spct <- cps2irrad(white_LED_2min.cps_spct)
-plot(white_LED_2min.spct)
+autoplot(white_LED_2min.spct)
 ```
 
 In an optional, final **tenth step** we apply smoothing to remove some of the noise.
 
 ```{r, fig.width=8, fig.asp=0.5}
 white_LED_2min.spct <- smooth_spct(white_LED_2min.spct)
-plot(white_LED_2min.spct)
+autoplot(white_LED_2min.spct)
 ```
 With an LED source, at least in the case of our Maya 2000 Pro, we do not need to worry about stray light. However, when we measure light sources with a significant emission in the infra-red above 1000 nm, stray light becomes a problem. In addition sources with narrow peaks of emission may benefit from deconvolution of a measured slit function.
 
@@ -251,7 +251,7 @@ As above for the LED lamp, we first calculate spectral irradiance from a set of 
 ```{r, fig.width=8, fig.asp=0.5}
 halogen.spct <-
   s_irrad_corrected(halogen.raw_mspct, correction.method= MAYP11278_ylianttila.mthd)
-plot(halogen.spct)
+autoplot(halogen.spct)
 ```
 
 In the example above we called the functions used for each of the steps in the computation individually, saving the intermediate results so as to be able to show the partly processed data at each step. The functions, however, support the use of pipes as they all have as their first parameter the one accepting the R object returned by the previous stage.
@@ -277,8 +277,8 @@ We plot the returned spectra, both in full, and the UV region by itself. By care
 
 ```{r, fig.width=8, fig.asp=0.5}
 for (m in names(halogen.cps_mspct)) {
-  print(plot(halogen.cps_mspct[[m]]) + ggtitle(m))
-  print(plot(halogen.cps_mspct[[m]], range = c(250, 410)) + ggtitle(m))
+  print(autoplot(halogen.cps_mspct[[m]]) + ggtitle(m))
+  print(autoplot(halogen.cps_mspct[[m]], range = c(250, 410)) + ggtitle(m))
 }
 ```
 
@@ -298,8 +298,8 @@ names(halogen01.cps_mspct)
 
 ```{r, fig.width=8, fig.asp=0.5}
 for (m in names(halogen01.cps_mspct)) {
-  print(plot(halogen01.cps_mspct[[m]]) + ggtitle(m))
-  print(plot(halogen01.cps_mspct[[m]], range = c(250, 410)) + ggtitle(m))
+  print(autoplot(halogen01.cps_mspct[[m]]) + ggtitle(m))
+  print(autoplot(halogen01.cps_mspct[[m]], range = c(250, 410)) + ggtitle(m))
 }
 ```
 
@@ -316,8 +316,8 @@ getTimeUnit(halogen_corrected.cps_spct)
 ```
 
 ```{r, fig.width=8, fig.asp=0.5}
-plot(halogen_corrected.cps_spct)
-plot(halogen_corrected.cps_spct, range = c(250, 410))
+autoplot(halogen_corrected.cps_spct)
+autoplot(halogen_corrected.cps_spct, range = c(250, 410))
 mean(clip_wl(halogen_corrected.cps_spct, range = c(250, 300))[["cps"]])
 ```
 
@@ -333,8 +333,8 @@ The spectrum displays some noise at the shortest wavelengths and some interferen
 We can smooth this random noise if desired.
 
 ```{r, fig.width=8, fig.asp=0.5}
-plot(halogen.source_spct)
-plot(halogen.source_spct, range = c(250, 410))
+autoplot(halogen.source_spct)
+autoplot(halogen.source_spct, range = c(250, 410))
 ```
 
 We can compute some photon ratios, expressed as $mmol\, mol^{-1}$ to diagnose whether the stray light is well controlled.
@@ -350,8 +350,8 @@ halogen_sm.source_spct <- smooth_spct(halogen.source_spct, method = "supsmu", st
 ```
 
 ```{r, fig.width=8, fig.asp=0.5}
-plot(halogen_sm.source_spct)
-plot(halogen_sm.source_spct, range = c(250, 410))
+autoplot(halogen_sm.source_spct)
+autoplot(halogen_sm.source_spct, range = c(250, 410))
 ```
 
 How much difference did smoothing do?
@@ -401,7 +401,7 @@ xenon_flash.spct <-
 getTimeUnit(xenon_flash.spct)
 ```
 ```{r, fig.width=8, fig.asp=0.5}
-plot(xenon_flash.spct, range = c(315, NA))
+autoplot(xenon_flash.spct, range = c(315, NA))
 ```
 
 
@@ -411,6 +411,6 @@ xenon_flash.cps_spct <-
 getTimeUnit(xenon_flash.cps_spct)
 ```
 ```{r, fig.width=8, fig.asp=0.5}
-plot(xenon_flash.cps_spct, range = c(315, NA))
+autoplot(xenon_flash.cps_spct, range = c(315, NA))
 ```
 

@@ -5,7 +5,7 @@
 ^inst/example-gadgets$
 ^not-inst$
 ^data-raw$
-^docs$
 ^garbage$
 ^_pkgdown\.yml$
 ^.*\.sh$
+^tests$

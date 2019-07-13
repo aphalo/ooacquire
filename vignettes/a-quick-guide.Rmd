@@ -205,7 +205,7 @@ irrad.spct <-
 The example above uses a protocol with integration-time bracketing plus subtraction of measured stray light. We can plot the result.
 
 ```{r, fig.height=5, fig.width=7}
-plot(irrad.spct)
+autoplot(irrad.spct)
 ```
 
 If what is desired are only the corrected _count-per-second_ or _counts-per-exposure_ spectral data instead of calibrated values, they can be obtained by setting `return.cps = TRUE`.
@@ -222,7 +222,7 @@ irrad.spct <-
 This example uses the same protocol as above but skips the last step of multiplying the corrected counts-per-second by each pixel's calibration multiplier.
 
 ```{r, fig.height=5, fig.width=7}
-plot(irrad.spct)
+autoplot(irrad.spct)
 ```
 
 ## Reading calibration data from files
