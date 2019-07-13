@@ -166,14 +166,6 @@ uvb_corrections <- function(x,
                               verbose = verbose)
    }  else {
      z <- y[["light"]]
-  #   # no corrections, just subtract dark spectrum
-  #   z <- clean(y[["light"]] - y[["dark"]])
-  #   setInstrDesc(z, getInstrDesc(y[[spct.names["light"]]]))
-  #   setInstrSettings(z, getInstrSettings(y[[spct.names["light"]]]))
-  #   setWhenMeasured(z, getWhenMeasured(y[[spct.names["light"]]]))
-  #   setWhereMeasured(z, getWhereMeasured(y[[spct.names["light"]]]))
-  #   setWhatMeasured(z, getWhatMeasured(y[[spct.names["light"]]]))
-  #   attr(x, "straylight.corrected") <- FALSE
    }
 
   if (is.null(worker.fun) && stray.light.method != "none") {
@@ -195,25 +187,31 @@ slit_function_correction <- function(x,
                                      worker.fun = NULL,
                                      verbose = getOption("photobiology.verbose", default = FALSE),
                                      ...) {
+  stopifnot(is.cps_spct(x))
+
+  slit.corrected <- attr(x, "slit.corrected", exact = TRUE)
+  if (!is.null(slit.corrected) && !is.na(slit.corrected) && slit.corrected) {
+    if (verbose) {
+      warning("Skipping slit function tail correction: already corrected.")
+    }
+    return(x)
+  }
+
   if (is.character(worker.fun)) {
     worker.fun = get(worker.fun,
                      mode = "function")
   }
-  stopifnot(is.cps_spct(x))
-  stopifnot(is.null(attr(x, "slit.corrected")) || !attr(x, "slit.corrected"))
+
   if (is.null(worker.fun)) {
     if (verbose) {
       warning("Skipping slit function tail correction: no function available.")
     }
     return(x)
   }
-  # check number of cps columns
-  counts.cols <- grep("^cps", names(x), value = TRUE)
-  if (length(counts.cols) > 1) {
-      stop("Multiple 'cps' variables found: aborting!")
-  } else if (length(counts.cols) < 1) {
-    stop("No 'cps' variables found: aborting!")
-  }
+
+  # check number of cps columns and merge if needed
+  x <- merge_cps(x)
+
   new.cps <- worker.fun(x[["w.length"]], x[["cps"]], ...)
   x[["cps"]] <- x[["cps"]] - new.cps[["tail"]]
   attr(x, "slit.corrected") <- TRUE
@@ -250,26 +248,22 @@ filter_correction <- function(x,
                               flt.Tfr = 1,
                               trim = 0.05,
                               verbose = getOption("photobiology.verbose", default = FALSE)) {
-  stopifnot(is.null(attr(x, "straylight.corrected")) || !attr(x, "straylight.corrected"))
   stopifnot(is.cps_spct(x) && is.cps_spct(flt))
-  stopifnot(range(x) == range(flt) && length(x) == length(flt))
-  counts.cols <- length(grep("^cps", names(x), value = TRUE))
-  if (counts.cols > 1) {
+  stopifnot(all(wl_range(x) == wl_range(flt)) && nrow(x) == nrow(flt))
+
+  straylight.corrected <- attr(x, "straylight.corrected", exact = TRUE)
+  if (!is.null(straylight.corrected) && !is.na(straylight.corrected) && straylight.corrected) {
     if (verbose) {
-      warning("Multiple 'cps' variables found in 'x': merging them before continuing!")
+      warning("Skipping straylight correction: already corrected.")
     }
-    x <- merge_cps(x)
+    return(x)
   }
-  counts.cols <- length(grep("^cps", names(flt), value = TRUE))
-  if (counts.cols > 1) {
-    if (verbose) {
-      warning("Multiple 'cps' variables found in 'flt': merging them before continuing!")
-    }
-    flt <- merge_cps(flt)
-  }
+
+  # check number of cps columns and merge if needed
+  x   <- merge_cps(x)
+  flt <- merge_cps(flt)
 
   # Find maximum cps
-
   max_x_cps <- max(x[["cps"]], na.rm = TRUE)
 
   # compute filter short wl "dark" cps

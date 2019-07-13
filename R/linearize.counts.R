@@ -29,7 +29,7 @@ linearize_counts <- function(x,
                              verbose = getOption("photobiology.verbose", default = FALSE)) {
   # guard against attempts to reapply linearization
   settings <- getInstrSettings(x)
-  if (is.null(settings[["linearized"]])) {
+  if (length(settings[["linearized"]]) == 0L) {
     warning("Linearized attr is NULL, assuming FALSE")
   } else if (is.na(settings[["linearized"]])) {
     stop("Linearization status unknown")
@@ -40,8 +40,9 @@ linearize_counts <- function(x,
     return(x)
   }
   descriptor <- getInstrDesc(x)
-  if (is.null(descriptor$inst.calib) ||
-      is.na(descriptor$inst.calib) ||
+  if (length(descriptor$inst.calib) == 0L ||
+      !is.list(descriptor$inst.calib) ||
+#      is.na(descriptor$inst.calib[[1L]]) ||
       !is.function(descriptor$inst.calib$nl.fun)) {
     stop("Non-linearity correction function is not available")
   }

@@ -20,6 +20,7 @@
 #'
 #' @import photobiology
 #' @import ggspectra
+#' @import lubridate
 #' @importFrom Rcpp evalCpp
 #' @import magrittr
 #' @useDynLib ooacquire

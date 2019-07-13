@@ -16,13 +16,13 @@
 trim_counts <- function(x,
                         range = c(NA, getInstrDesc(x)[["max.counts"]] - 1),
                         fill = NA) {
+  stopifnot(is.raw_spct(x))
   if (is.na(range[1])) {
     range[1] <- -Inf
   }
   if (is.na(range[2])) {
     range[2] <- Inf
   }
-  stopifnot(is.raw_spct(x))
   counts.cols <- grep("^counts", names(x), value = TRUE)
   for (col in counts.cols) {
     if (min(x[[col]]) < 0) {
@@ -98,8 +98,6 @@ merge_cps <- function(x) {
   }
   z <- x[ , c("w.length", "cps")]
   z <- photobiology::copy_attributes(x, z)
-#  setInstrDesc(z, instr.desc)
-#  setInstrSettings(z, instr.settings)
   z
 }
 
@@ -128,8 +126,6 @@ merge_cps <- function(x) {
 #'
 bleed_nas <- function(x, n = 10) {
   stopifnot(is.raw_spct(x))
-  instr.desc <- getInstrDesc(x)
-  instr.settings <- getInstrSettings(x)
   counts.cols <- grep("^counts", names(x), value = TRUE)
   # this is a "quick and dirty" algorithm that assumes that we do not need to
   # check for NAs the first n and last n pixels of the detector array, which in
@@ -143,7 +139,5 @@ bleed_nas <- function(x, n = 10) {
       }
     }
   }
-#  setInstrDesc(z, instr.desc)
-#  setInstrSettings(z, instr.settings)
   z
 }

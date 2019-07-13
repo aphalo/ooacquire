@@ -1,7 +1,7 @@
 context("convert raw pulsed source")
 
 library(photobiology)
-library(ggspectra)
+# library(ggspectra)
 
 test_that("ooacquire fluence", {
 
@@ -10,10 +10,9 @@ test_that("ooacquire fluence", {
   files <- list.files("test-fluence-mspct-data", pattern = "*.Rda")
 
   for (f in files) {
-    print(f)
     load(paste("test-fluence-mspct-data", f, sep = "/"))
-    old.spct <- get(sub(".Rda", "", f))
-    serial.no <- getInstrDesc(old.spct)$spectrometer.sn
+    old.raw.mspct <- get(sub("spct.Rda", "raw_mspct", f))
+    serial.no <- getInstrDesc(old.raw.mspct[[1]])$spectrometer.sn
     correction.method <-
       switch(serial.no,
              MAYP11278 = ooacquire::MAYP11278_ylianttila.mthd,
@@ -21,13 +20,8 @@ test_that("ooacquire fluence", {
              new_correction_method(descriptor,
                                    stray.light.method = NA)
       )
-    print(getInstrDesc(old.spct))
-    print(getInstrSettings(old.spct))
-    old.raw.mspct <- get(sub("spct.Rda", "raw_mspct", f))
     new.spct <- s_irrad_corrected(old.raw.mspct, correction.method = correction.method)
-    setWhatMeasured(new.spct, getWhatMeasured(old.spct))
-    expect_equal(length(old.spct), length(new.spct))
-    expect_equivalent(old.spct, new.spct)
+    expect_known_value(new.spct, file = paste("ref", f, sep = "-"), update = TRUE)
   }
 })
 
@@ -40,10 +34,9 @@ test_that("ooacquire filter pulsed source", {
 
   for (f in files) {
     load(paste("test-filter-pulsed-mspct-data", f, sep = "/"))
-    old.spct <- get(sub(".Rda", "", f))
-    ch.index <-
-    serial.no <- getInstrDesc(old.spct)$spectrometer.sn
-    ch.index <- getInstrDesc(old.spct)$ch.index
+    old.raw.mspct <- get(sub("spct.Rda", "raw_spct", f))
+    serial.no <- getInstrDesc(old.raw.mspct[[1]])$spectrometer.sn
+    ch.index <- getInstrDesc(old.raw.mspct[[1]])$ch.index
     correction.method <-
       switch(serial.no,
              MAYP11278 = ooacquire::MAYP11278_ylianttila.mthd,
@@ -59,17 +52,12 @@ test_that("ooacquire filter pulsed source", {
                                    stray.light.method = NA)
       )
 
-    old.raw.mspct <- get(sub("spct.Rda", "raw_spct", f))
     new.spct <- s_fraction_corrected(old.raw.mspct,
                                      correction.method = correction.method,
                                      type = "total",
                                      qty.out = "Tfr")
-    setWhatMeasured(new.spct, getWhatMeasured(old.spct))
-    expect_equal(length(old.spct), length(new.spct))
-    old.spct <- trim_wl(old.spct, range = c(400:1100))
     new.spct <- trim_wl(new.spct, range = c(400:1100))
-#    expect_equal(length(old.spct), length(new.spct))
-#    expect_equivalent(old.spct, new.spct)
+    expect_known_value(new.spct, file = paste("ref", f, sep = "-"), update = TRUE)
   }
 })
 
