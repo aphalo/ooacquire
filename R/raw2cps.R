@@ -74,10 +74,8 @@ raw2cps.raw_spct <- function(x,
     acq_settings[["rel.signal"]] <-
       min(max.counts, na.rm = TRUE) / descriptor[["max.counts"]]
   }
+  z <- copy_attributes(x, z)
   setInstrSettings(z, acq_settings)
-  setWhenMeasured(z, getWhenMeasured(x))
-  setWhereMeasured(z, getWhereMeasured(x))
-  setWhatMeasured(z, getWhatMeasured(x))
   z
 }
 

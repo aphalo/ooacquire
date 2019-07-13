@@ -73,12 +73,7 @@ ref_correction.raw_spct <- function(x,
   }
   setRawSpct(z)
   # add metadata to result
-  setInstrDesc(z, getInstrDesc(x))
-  setInstrSettings(z, getInstrSettings(x))
-  setWhenMeasured(z, getWhenMeasured(x))
-  setWhereMeasured(z, getWhereMeasured(x))
-  setWhatMeasured(z, getWhatMeasured(x))
-  z
+  copy_attributes(x, z)
 }
 
 #' @describeIn ref_correction Method for spectral data expressed as
@@ -115,12 +110,7 @@ ref_correction.cps_spct <- function(x,
   }
   setCpsSpct(z, time.unit = getTimeUnit(x))
   # add metadata to result
-  setInstrDesc(z, getInstrDesc(x))
-  setInstrSettings(z, getInstrSettings(x))
-  setWhenMeasured(z, getWhenMeasured(x))
-  setWhereMeasured(z, getWhereMeasured(x))
-  setWhatMeasured(z, getWhatMeasured(x))
-  z
+  copy_attributes(x, z)
 }
 
 

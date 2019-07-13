@@ -1,6 +1,6 @@
 context("convert raw continuous source")
 
-library(ggspectra)
+# library(ggspectra)
 test_that("ooacquire irrad continuous MAYA", {
 
   rm(list = ls(pattern = "*"))
@@ -8,10 +8,9 @@ test_that("ooacquire irrad continuous MAYA", {
   files <- list.files("test-irrad-mspct-maya-data", pattern = "*.Rda")
 
   for (f in files) {
-    print(f)
     load(paste("test-irrad-mspct-maya-data", f, sep = "/"))
-    old.spct <- get(sub(".Rda", "", f))
-    serial.no <- getInstrDesc(old.spct)$spectrometer.sn
+    old.raw.mspct <- get(sub("spct.Rda", "raw_mspct", f))
+    serial.no <- getInstrDesc(old.raw.mspct[[1]])$spectrometer.sn
     correction.method <-
       switch(serial.no,
              MAYP11278 = ooacquire::MAYP11278_ylianttila.mthd,
@@ -19,11 +18,8 @@ test_that("ooacquire irrad continuous MAYA", {
              new_correction_method(descriptor,
                                    stray.light.method = NA)
       )
-    print(getInstrDesc(old.spct))
-    print(getInstrSettings(old.spct))
-    old.raw.mspct <- get(sub("spct.Rda", "raw_mspct", f))
     new.spct <- s_irrad_corrected(old.raw.mspct, correction.method = correction.method)
-    expect_equivalent(old.spct, new.spct)
+    expect_known_value(new.spct, file = paste("ref", f, sep = "-"), update = TRUE)
   }
 })
 
@@ -62,9 +58,9 @@ test_that("ooacquire filter continuous", {
 
   for (f in files) {
     load(paste("test-filter-mspct-data", f, sep = "/"))
-    old.spct <- get(sub(".Rda", "", f))
-    serial.no <- getInstrDesc(old.spct)$spectrometer.sn
-    ch.index <- getInstrDesc(old.spct)$ch.index
+    old.raw.mspct <- get(sub("spct.Rda", "raw_spct", f))
+    serial.no <- getInstrDesc(old.raw.mspct[[1]])$spectrometer.sn
+    ch.index <- getInstrDesc(old.raw.mspct[[1]])$ch.index
     correction.method <-
       switch(serial.no,
              MAYP11278 = ooacquire::MAYP11278_ylianttila.mthd,
@@ -79,16 +75,12 @@ test_that("ooacquire filter continuous", {
              new_correction_method(descriptor,
                                    stray.light.method = NA)
       )
-
-    old.raw.mspct <- get(sub("spct.Rda", "raw_spct", f))
     new.spct <- s_fraction_corrected(old.raw.mspct,
                                      correction.method = correction.method,
                                      type = "total",
                                      qty.out = "Tfr")
-    old.spct <- trim_wl(smooth_spct(old.spct, method = "supsmu"), range = c(450:800))
     new.spct <- trim_wl(smooth_spct(new.spct, method = "supsmu"), range = c(450:800))
-#    autoplot(rbindspct(list(old = old.spct, new = new.spct)))
-#    expect_equivalent(old.spct, new.spct)
+    expect_known_value(new.spct, file = paste("ref", f, sep = "-"), update = TRUE)
   }
 })
 
