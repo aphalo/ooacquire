@@ -37,47 +37,47 @@ LED_lamp_recalc.spct <-
 summary(LED_lamp_recalc.spct)
 
 ## ---- fig.width=8, fig.asp=0.5-------------------------------------------
-plot(LED_lamp_recalc.spct)
+autoplot(LED_lamp_recalc.spct)
 
 ## ---- fig.width=8, fig.asp=0.5-------------------------------------------
-plot(white_LED_2min.raw_mspct[["light"]])
+autoplot(white_LED_2min.raw_mspct[["light"]])
 
 ## ---- fig.width=8, fig.asp=0.5-------------------------------------------
-plot(white_LED_2min.raw_mspct[["dark"]])
+autoplot(white_LED_2min.raw_mspct[["dark"]])
 
 ## ---- fig.width=8, fig.asp=0.5-------------------------------------------
 for (m in names(white_LED_2min.raw_mspct)) {
   white_LED_2min.raw_mspct[[m]] <-
     skip_bad_pixs(white_LED_2min.raw_mspct[[m]])
-  print(plot(white_LED_2min.raw_mspct[[m]]) + ggtitle(m))
+  print(autoplot(white_LED_2min.raw_mspct[[m]]) + ggtitle(m))
 }
 
 ## ---- fig.width=8, fig.asp=0.5-------------------------------------------
 for (m in names(white_LED_2min.raw_mspct)) {
   white_LED_2min.raw_mspct[[m]] <-
     trim_counts(white_LED_2min.raw_mspct[[m]])
-  print(plot(white_LED_2min.raw_mspct[[m]]) + ggtitle(m))
+  print(autoplot(white_LED_2min.raw_mspct[[m]]) + ggtitle(m))
 }
 
 ## ---- fig.width=8, fig.asp=0.5-------------------------------------------
 for (m in names(white_LED_2min.raw_mspct)) {
   white_LED_2min.raw_mspct[[m]] <-
     bleed_nas(white_LED_2min.raw_mspct[[m]])
-  print(plot(white_LED_2min.raw_mspct[[m]]) + ggtitle(m))
+  print(autoplot(white_LED_2min.raw_mspct[[m]]) + ggtitle(m))
 }
 
 ## ---- fig.width=8, fig.asp=0.5-------------------------------------------
 for (m in names(white_LED_2min.raw_mspct)) {
   white_LED_2min.raw_mspct[[m]] <-
     linearize_counts(white_LED_2min.raw_mspct[[m]])
-  print(plot(white_LED_2min.raw_mspct[[m]], ylim = c(NA, 65000)) + ggtitle(m))
+  print(autoplot(white_LED_2min.raw_mspct[[m]], ylim = c(NA, 65000)) + ggtitle(m))
 }
 
 ## ---- fig.width=8, fig.asp=0.5-------------------------------------------
 for (m in names(white_LED_2min.raw_mspct)) {
   white_LED_2min.raw_mspct[[m]] <-
     fshift(white_LED_2min.raw_mspct[[m]], range = c(250,290))
-  print(plot(white_LED_2min.raw_mspct[[m]], ylim = c(NA, 65000)) + ggtitle(m))
+  print(autoplot(white_LED_2min.raw_mspct[[m]], ylim = c(NA, 65000)) + ggtitle(m))
 }
 
 ## ---- fig.width=8, fig.asp=0.5-------------------------------------------
@@ -99,7 +99,7 @@ for (m in names(white_LED_2min.raw_mspct)) {
 for (m in names(white_LED_2min.cps_mspct)) {
   white_LED_2min.cps_mspct[[m]] <-
     merge_cps(white_LED_2min.cps_mspct[[m]])
-  print(plot(white_LED_2min.cps_mspct[[m]], ylim = c(NA, 40000)) + ggtitle(m))
+  print(autoplot(white_LED_2min.cps_mspct[[m]], ylim = c(NA, 40000)) + ggtitle(m))
 }
 
 ## ---- fig.width=8, fig.asp=0.5-------------------------------------------
@@ -109,15 +109,15 @@ white_LED_2min.cps_spct <-
   copy_attributes(white_LED_2min.raw_mspct[["light"]],
                   white_LED_2min.cps_spct,
                   copy.class = FALSE)
-plot(white_LED_2min.cps_spct) + ggtitle("Dark subtracted")
+autoplot(white_LED_2min.cps_spct) + ggtitle("Dark subtracted")
 
 ## ---- fig.width=8, fig.asp=0.5-------------------------------------------
 white_LED_2min.spct <- cps2irrad(white_LED_2min.cps_spct)
-plot(white_LED_2min.spct)
+autoplot(white_LED_2min.spct)
 
 ## ---- fig.width=8, fig.asp=0.5-------------------------------------------
 white_LED_2min.spct <- smooth_spct(white_LED_2min.spct)
-plot(white_LED_2min.spct)
+autoplot(white_LED_2min.spct)
 
 ## ------------------------------------------------------------------------
 names(halogen.raw_mspct)
@@ -131,7 +131,7 @@ summary(halogen.raw_mspct[["light"]])
 ## ---- fig.width=8, fig.asp=0.5-------------------------------------------
 halogen.spct <-
   s_irrad_corrected(halogen.raw_mspct, correction.method= MAYP11278_ylianttila.mthd)
-plot(halogen.spct)
+autoplot(halogen.spct)
 
 ## ------------------------------------------------------------------------
 halogen.cps_mspct <- cps_mspct()
@@ -149,8 +149,8 @@ names(halogen.cps_mspct)
 
 ## ---- fig.width=8, fig.asp=0.5-------------------------------------------
 for (m in names(halogen.cps_mspct)) {
-  print(plot(halogen.cps_mspct[[m]]) + ggtitle(m))
-  print(plot(halogen.cps_mspct[[m]], range = c(250, 410)) + ggtitle(m))
+  print(autoplot(halogen.cps_mspct[[m]]) + ggtitle(m))
+  print(autoplot(halogen.cps_mspct[[m]], range = c(250, 410)) + ggtitle(m))
 }
 
 ## ------------------------------------------------------------------------
@@ -166,8 +166,8 @@ names(halogen01.cps_mspct)
 
 ## ---- fig.width=8, fig.asp=0.5-------------------------------------------
 for (m in names(halogen01.cps_mspct)) {
-  print(plot(halogen01.cps_mspct[[m]]) + ggtitle(m))
-  print(plot(halogen01.cps_mspct[[m]], range = c(250, 410)) + ggtitle(m))
+  print(autoplot(halogen01.cps_mspct[[m]]) + ggtitle(m))
+  print(autoplot(halogen01.cps_mspct[[m]], range = c(250, 410)) + ggtitle(m))
 }
 
 ## ------------------------------------------------------------------------
@@ -180,8 +180,8 @@ names(halogen_corrected.cps_spct)
 getTimeUnit(halogen_corrected.cps_spct)
 
 ## ---- fig.width=8, fig.asp=0.5-------------------------------------------
-plot(halogen_corrected.cps_spct)
-plot(halogen_corrected.cps_spct, range = c(250, 410))
+autoplot(halogen_corrected.cps_spct)
+autoplot(halogen_corrected.cps_spct, range = c(250, 410))
 mean(clip_wl(halogen_corrected.cps_spct, range = c(250, 300))[["cps"]])
 
 ## ------------------------------------------------------------------------
@@ -189,8 +189,8 @@ cps2irrad(halogen_corrected.cps_spct) -> halogen.source_spct
 names(halogen.source_spct)
 
 ## ---- fig.width=8, fig.asp=0.5-------------------------------------------
-plot(halogen.source_spct)
-plot(halogen.source_spct, range = c(250, 410))
+autoplot(halogen.source_spct)
+autoplot(halogen.source_spct, range = c(250, 410))
 
 ## ------------------------------------------------------------------------
 q_ratio(halogen.source_spct, list(UVC(), UVB(), UVA()), PAR()) * 1e3
@@ -199,8 +199,8 @@ q_ratio(halogen.source_spct, list(UVC(), UVB(), UVA()), PAR()) * 1e3
 halogen_sm.source_spct <- smooth_spct(halogen.source_spct, method = "supsmu", strength = 3)
 
 ## ---- fig.width=8, fig.asp=0.5-------------------------------------------
-plot(halogen_sm.source_spct)
-plot(halogen_sm.source_spct, range = c(250, 410))
+autoplot(halogen_sm.source_spct)
+autoplot(halogen_sm.source_spct, range = c(250, 410))
 
 ## ------------------------------------------------------------------------
 q_ratio(halogen.source_spct, list(UVC(), UVB(), UVA()), PAR()) * 1e3
@@ -224,7 +224,7 @@ xenon_flash.spct <-
 getTimeUnit(xenon_flash.spct)
 
 ## ---- fig.width=8, fig.asp=0.5-------------------------------------------
-plot(xenon_flash.spct, range = c(315, NA))
+autoplot(xenon_flash.spct, range = c(315, NA))
 
 ## ---- fig.width=8, fig.asp=0.5-------------------------------------------
 xenon_flash.cps_spct <-
@@ -232,5 +232,5 @@ xenon_flash.cps_spct <-
 getTimeUnit(xenon_flash.cps_spct)
 
 ## ---- fig.width=8, fig.asp=0.5-------------------------------------------
-plot(xenon_flash.cps_spct, range = c(315, NA))
+autoplot(xenon_flash.cps_spct, range = c(315, NA))
 

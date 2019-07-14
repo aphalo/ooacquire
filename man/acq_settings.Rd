@@ -46,13 +46,13 @@ treat clipping as an error condition.}
 
 \item{verbose}{a logical to enable or disable warnings}
 
-\item{acq.settings}{list as returned by a previous call to \code{acq_settings()},
-or \code{tune_acq_settings()}.}
+\item{acq.settings}{list as returned by a previous call to
+\code{acq_settings()}, or \code{tune_acq_settings()}.}
 }
 \value{
 a list.
 
-a list.
+a list Containing the tuned settings.
 }
 \description{
 Validate parameters for spectral measurements and return a list of values
@@ -63,11 +63,18 @@ Find optimal settings for spectral measurements under a given measurement
 protocol.
 }
 \details{
-\code{acq_settings()} is used to manually save a complete set of
+\code{acq_settings()} is used to create a complete set of
   instrument settings in a way that they can be reused as needed for repated
-  acquisition of spectra. \code{tune_acq_settings()} and
-  \code{tune_acq_settings()} differ only in their formal parameters and
-  optimize settings to the current spectral irradiance.
+  acquisition of spectra. \code{acq_settings()} is an object constructor and
+  \code{tune_acq_settings()} takes as argument a stored object containing
+  settings and tunes them to optimize them for the measurement of the current
+  spectral irradiance.
+
+This function searches for the optimal integration time for a
+  given condition by trial and error helped by interpolation and
+  extrapolation when readings are not saturated. In the case of clipping or
+  sensor signal saturation the integration time is decreased until clipping
+  is avoided and then it is increased until optimal.
 }
 \note{
 \code{pixel.selector} can be used for two different purposes: to
@@ -83,4 +90,8 @@ Ocean Optics spectrometers can be queried for the maximum and minimum
   intrument. \code{pixel.selector} can be used for two different purposes: to
   ignore bad pixels and to restrict integration-time tuning to the response
   from a range of pixels.
+
+The returned value can be used as argument to \code{acq.settings} in
+  other functions like \code{\link{acq_raw_spct}} and
+  \code{\link{acq_raw_mspct}}
 }

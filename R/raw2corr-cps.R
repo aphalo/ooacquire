@@ -1,4 +1,4 @@
-#' Convert raw detector counts into counts-per-second and correct
+#' Convert raw detector counts into counts-per-second
 #'
 #' Replace data from bad pixels with interpolated values, replace data from
 #' saturated and nearby pixels withs NAs, apply linearization function if data

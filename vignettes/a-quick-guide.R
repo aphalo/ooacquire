@@ -85,7 +85,7 @@ irrad.spct <-
                     correction.method = MAYP11278_ylianttila.mthd)
 
 ## ---- fig.height=5, fig.width=7------------------------------------------
-plot(irrad.spct)
+autoplot(irrad.spct)
 
 ## ------------------------------------------------------------------------
 irrad.spct <- 
@@ -96,7 +96,7 @@ irrad.spct <-
                     return.cps = TRUE)
 
 ## ---- fig.height=5, fig.width=7------------------------------------------
-plot(irrad.spct)
+autoplot(irrad.spct)
 
 ## ---- eval=FALSE---------------------------------------------------------
 #  cal.spct <- read_oo_caldata("oo-calibration/xxxx")

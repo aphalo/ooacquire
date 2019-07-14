@@ -2,7 +2,7 @@
 % Please edit documentation in R/parse-oo-header.R
 \name{map_oofile_header_rows}
 \alias{map_oofile_header_rows}
-\title{Set the instrument description.}
+\title{Parse a file header to locate metadata items}
 \usage{
 map_oofile_header_rows(lines, header.end = NULL,
   grammar = oo.minimum.gr)
@@ -22,5 +22,7 @@ A data frame with two variables, "feature" of class character, and
 }
 \description{
 Locate in which lines of the file header different metadata features are
-  located.
+located. Parsing is needed because the format used varies with among Ocean
+Optics programs and instruments. Even the number of lines in the header, and
+the position of the first line with spectral data vary.
 }

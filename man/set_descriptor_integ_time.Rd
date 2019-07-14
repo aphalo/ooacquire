@@ -20,9 +20,10 @@ a copy of the argument passed for \code{oo_descriptor} with the
 integration time fields of the descriptor modified.
 }
 \description{
-This function can be needed in exceptional cases such as when the instrument
-the limits stored in the intrument firmware are wrong. In other cases in can
-be used to limit the range of values allowed to be set.
+This function can be needed in exceptional cases such as when the limits
+stored in the intrument's persistent memory are wrong. In other cases in can
+be used to restrict the range of values allowed to be set to a smaller range
+than natively supported by the spectrometer.
 }
 \note{
 This function should not be needed, but for some instruments the query

@@ -1,7 +1,7 @@
 #' Compute calibration multipliers.
 #'
 #' Function to calculate from a set of three (or optionally five or two) output
-#' files from the spectrometer, as produce by SpectraSuite, for each of two
+#' files from the spectrometer, as produced by SpectraSuite, for each of two
 #' calibration lamps (D2 and FEL), and calibration data for the lamps, a set of
 #' calibration multipliers for the instrument. This function applies a
 #' non-linearity correction, an slit-function correction, and stray-light

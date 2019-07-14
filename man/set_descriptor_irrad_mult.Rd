@@ -21,8 +21,9 @@ valid.}
 }
 \value{
 A copy of the argument passed for \code{oo_descriptor} with the
-irrad.mult field of the calibration data replaced by the new values.
+  irrad.mult field of the calibration data replaced by the new values.
 }
 \description{
-Adds calibration data for each pixel as a numeric vector
+Adds calibration data expressed as multipliers for each pixel stores in a
+numeric vector.
 }

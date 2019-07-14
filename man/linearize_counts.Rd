@@ -13,7 +13,7 @@ linearize_counts(x, force.zero = TRUE,
 \item{force.zero}{A logical indicating whether to change negative count
 values to zero.}
 
-\item{verbose}{Logical Currently ignired.}
+\item{verbose}{Logical Currently ignored.}
 }
 \value{
 A raw_spct object containing the adjusted values, still as uncalibrated

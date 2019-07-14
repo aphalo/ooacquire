@@ -28,11 +28,12 @@
 #'   as follows: first value is minimum time, second value is maximum time.
 #'   If both values are the same, then an exact measurement time is computed.
 #'
-#' @details \code{acq_settings()} is used to manually save a complete set of
+#' @details \code{acq_settings()} is used to create a complete set of
 #'   instrument settings in a way that they can be reused as needed for repated
-#'   acquisition of spectra. \code{tune_acq_settings()} and
-#'   \code{tune_acq_settings()} differ only in their formal parameters and
-#'   optimize settings to the current spectral irradiance.
+#'   acquisition of spectra. \code{acq_settings()} is an object constructor and
+#'   \code{tune_acq_settings()} takes as argument a stored object containing
+#'   settings and tunes them to optimize them for the measurement of the current
+#'   spectral irradiance.
 #'
 #' @note Ocean Optics spectrometers can be queried for the maximum and minimum
 #'   supported integration times. This function modifies the user supplied
@@ -43,6 +44,7 @@
 #'   from a range of pixels.
 #'
 #' @export
+#'
 #' @return a list.
 #'
 acq_settings <- function(descriptor,
@@ -231,11 +233,22 @@ set_num_exposures <- function(acq.settings,
 #' Find optimal settings for spectral measurements under a given measurement
 #' protocol.
 #'
-#' @rdname acq_settings
-#' @return a list.
+#' @details This function searches for the optimal integration time for a
+#'   given condition by trial and error helped by interpolation and
+#'   extrapolation when readings are not saturated. In the case of clipping or
+#'   sensor signal saturation the integration time is decreased until clipping
+#'   is avoided and then it is increased until optimal.
 #'
-#' @param acq.settings list as returned by a previous call to \code{acq_settings()},
-#'   or \code{tune_acq_settings()}.
+#' @note The returned value can be used as argument to \code{acq.settings} in
+#'   other functions like \code{\link{acq_raw_spct}} and
+#'   \code{\link{acq_raw_mspct}}
+#'
+#' @rdname acq_settings
+#'
+#' @return a list Containing the tuned settings.
+#'
+#' @param acq.settings list as returned by a previous call to
+#'   \code{acq_settings()}, or \code{tune_acq_settings()}.
 #'
 #' @export
 #'

@@ -11,10 +11,10 @@ acq_raw_mspct(descriptor, acq.settings, num.exposures = -1L,
   NA_real_), pause.fun = NULL, verbose = TRUE, ...)
 }
 \arguments{
-\item{descriptor}{list as returned by function \code{get_oo_descriptor()}}
+\item{descriptor}{list as returned by function \code{get_oo_descriptor()}.}
 
 \item{acq.settings}{list as returned by functions \code{tune_acq_settings()}
-or \code{retune_acq_settings()} or \code{acq_settings()}}
+or \code{retune_acq_settings()} or \code{acq_settings()}.}
 
 \item{num.exposures}{integer Number or light pulses (flashes) per scan. Set
 to \code{-1L} to indicate that the light source is continuous.}
@@ -26,28 +26,47 @@ return \code{TRUE} on sucess and \code{FALSE} on failure.}
 \item{seq.settings}{list with members "step" numeric value in seconds,
 "num.steps" integer.}
 
-\item{protocol}{vector of character strings}
+\item{protocol}{vector of character strings.}
 
-\item{user.label}{character string to set as label}
+\item{user.label}{character string to set as label.}
 
 \item{where.measured}{data.frame with at least columns "lon" and "lat"
-compatible with value returned by \code{ggmap::geocode()}}
+compatible with value returned by \code{ggmap::geocode()}.}
 
-\item{pause.fun}{function used for handling protocol transitions#'}
+\item{pause.fun}{function used for handling protocol transitions.}
 
-\item{verbose}{ogical to enable or disable warnings}
+\item{verbose}{ogical to enable or disable warnings.}
 
-\item{...}{passed to \code{pause.fun} (ignored by the default function)}
+\item{...}{passed to \code{pause.fun} (ignored by the default function).}
 }
 \value{
-a raw_mspct object
+A raw_mspct object. The names and number of member spectra are
+determined by \code{protocol}, and the number of columns in each member
+spectrum is determined by \code{acq.settings}.
 }
 \description{
 Take readings according to parameters from a list of settings and a protocol
 defined by a vector of names.
 }
-\note{
-The default \code{pause.fun} prompts the user at each change of value
-  in \code{protocol}. The user can write other functions, for example for a
-  time delay.
+\details{
+Function \code{acq_raw_mspct} acquires directly from a spectrometer
+  a collection of spectra. The settings used for the acquisition of each
+  member spectrum are the same, and are given by the argument passed to
+  \code{acq.settings}. The number of numbers and their names are given by the
+  argument passed to \code{protocol}.
+
+  Two types of light sources can be measured, for continuous-emission light
+  sources, the integration time can a later steps used to compute irradiance.
+  In the case of flashes, the duration of the exposure is unknown and
+  irradiance cannot be computed, while spectral energy per flash can be
+  computed if the number of flashes is known. The argument to
+  \code{num.exposures} must be set to the number of flashes.
+
+  Two parameters accept functions as arguments, and default to functions that
+  request the operator to trigger the flash or change the light conditions
+  according to the names of the steps in the argument to \code{protocol}.
+}
+\seealso{
+\code{\link{acq_raw_spct}} which is used to acquire each member
+spectrum.
 }

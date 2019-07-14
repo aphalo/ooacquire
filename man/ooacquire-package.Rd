@@ -31,8 +31,8 @@ OceanView, SpectraSuite, Raspberry Pi SDK, and Jaz firmware.
 \note{
 This package is provided \strong{without any warranty of suitability
   for any specific purpose or instrument} as it has been tested with only
-  three different models of Ocean Optics spectrometers, each one with one of
-  many possible configurations.
+  three different models of Ocean Optics spectrometers, each with one or two
+  of many available hardware configurations.
 }
 \seealso{
 Useful links:

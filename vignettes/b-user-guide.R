@@ -33,7 +33,7 @@ one_file.spct <- trim_wl(one_file.spct,
 one_file.spct
 
 ## ---- fig.height=5, fig.width=7------------------------------------------
-plot(one_file.spct, unit.out = "photon")
+autoplot(one_file.spct, unit.out = "photon")
 
 ## ------------------------------------------------------------------------
 getWhenMeasured(one_file.spct)
@@ -72,7 +72,7 @@ five_files.spct <- trim_wl(five_files.spct,
 five_files.spct
 
 ## ---- fig.height=5, fig.width=7------------------------------------------
-plot(five_files.spct, unit.out = "photon")
+autoplot(five_files.spct, unit.out = "photon")
 
 ## ------------------------------------------------------------------------
 getWhenMeasured(five_files.spct)
@@ -125,10 +125,10 @@ ov_files.spct <-
 ov_files.spct
 
 ## ---- fig.height=5, fig.width=7------------------------------------------
-plot(ov_files.spct, unit.out = "photon")
+autoplot(ov_files.spct, unit.out = "photon")
 
 ## ---- fig.height=5, fig.width=7------------------------------------------
-plot(smooth_spct(ov_files.spct, strength = 5), unit.out = "photon")
+autoplot(smooth_spct(ov_files.spct, strength = 5), unit.out = "photon")
 
 ## ------------------------------------------------------------------------
 descriptor <- 
@@ -142,7 +142,7 @@ irrad01.spct <-
 irrad01.spct
 
 ## ---- fig.height=5, fig.width=7------------------------------------------
-plot(irrad01.spct, unit.out = "photon")
+autoplot(irrad01.spct, unit.out = "photon")
 
 ## ------------------------------------------------------------------------
 getWhenMeasured(irrad01.spct)
@@ -169,13 +169,13 @@ tfr01.spct <-
 tfr01.spct
 
 ## ---- fig.height=5, fig.width=7------------------------------------------
-plot(tfr01.spct)
+autoplot(tfr01.spct)
 
 ## ------------------------------------------------------------------------
 tfr01.spct <- clip_wl(tfr01.spct, range = c(355, 1100))
 
 ## ---- fig.height=5, fig.width=7------------------------------------------
-plot(tfr01.spct, unit.out = "photon", w.band = VIS_bands())
+autoplot(tfr01.spct, unit.out = "photon", w.band = VIS_bands())
 
 ## ------------------------------------------------------------------------
 getWhenMeasured(tfr01.spct)
@@ -202,7 +202,7 @@ tfr02.spct <- trim_wl(tfr02.spct, c(460, 1000))
 tfr02.spct
 
 ## ---- fig.height=5, fig.width=7------------------------------------------
-plot(tfr02.spct)
+autoplot(tfr02.spct)
 
 ## ------------------------------------------------------------------------
 descriptor <- 
@@ -219,6 +219,6 @@ rfr01.spct <- trim_wl(rfr01.spct, c(460, 1000))
 rfr01.spct
 
 ## ---- fig.height=5, fig.width=7------------------------------------------
-plot(rfr01.spct)
-plot(tfr02.spct)
+autoplot(rfr01.spct)
+autoplot(tfr02.spct)
 

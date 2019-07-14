@@ -8,20 +8,26 @@ oo_calib2irrad_mult(x, area = NULL, diff.type = NULL,
   verbose = getOption("photobiology.verbose", default = FALSE))
 }
 \arguments{
-\item{x}{generic_spct object with variables \code{w.length} and \code{oo.cal}.}
+\item{x}{generic_spct object with variables \code{w.length} and
+\code{oo.cal}.}
 
-\item{area}{numeric area of the cosine diffuser (mm2).}
+\item{area}{numeric Area of the cosine diffuser (mm2).}
 
-\item{diff.type}{character value giving type of diffuser as in OO's documents, case
-insensitive.}
+\item{diff.type}{character Value giving type of diffuser as in OO's
+documents, case insensitive. Ignored unless \code{area = NULL}.}
 
 \item{verbose}{Logical indicating the level of warnings wanted.}
 }
 \value{
-a \code{generic_spct} object  of the same length as \code{x} containing
-the re-scaled calibration factors in variable \code{coeffs}.
+a \code{calibration_spct} object of the same number of rows as
+  \code{x} containing wavelengths in varable \code{w.length} and the
+  re-scaled calibration factors in variable \code{irrad.mult}.
 }
 \description{
-Convert an irradiance calibration as supplied by Ocean Optics into the
-format used by the functions in this package. #'
+Convert irradiance calibration values as supplied by Ocean Optics into
+multipliers expressed in the units and format expected by the functions in
+this package.
+}
+\seealso{
+\code{\link{read_oo_caldata}}
 }

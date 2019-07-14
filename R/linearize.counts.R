@@ -7,7 +7,7 @@
 #' @param x raw_spct object.
 #' @param force.zero A logical indicating whether to change negative count
 #'   values to zero.
-#' @param verbose Logical Currently ignired.
+#' @param verbose Logical Currently ignored.
 #'
 #' @return A raw_spct object containing the adjusted values, still as uncalibrated
 #'   counts. The object is tagged with the with attribute "linearized" set to

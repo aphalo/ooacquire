@@ -11,7 +11,7 @@ merge_raw_mspct(x)
 }
 \description{
 Member spectra are sorted according to integration time stored in the
-\code{inst.settings} attribute aand merged into a single \code{raw_spct}
+\code{inst.settings} attribute and merged into a single \code{raw_spct}
 object with raw counts variables named \code{counts_1}, \code{counts_2},
 etc.
 }

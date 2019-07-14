@@ -185,10 +185,12 @@ oo.minimum.gr <-
                      pattern = ~c("Spectrometers: |Spectrometer: ",
                                   "Spectrometers: |Spectrometer: ")))
 
-#' Set the instrument description.
+#' Parse a file header to locate metadata items
 #'
 #' Locate in which lines of the file header different metadata features are
-#'   located.
+#' located. Parsing is needed because the format used varies with among Ocean
+#' Optics programs and instruments. Even the number of lines in the header, and
+#' the position of the first line with spectral data vary.
 #'
 #' @param lines character The data file read line by line.
 #' @param header.end integer The index to the last line of the longest

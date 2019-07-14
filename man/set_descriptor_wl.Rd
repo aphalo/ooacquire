@@ -18,6 +18,6 @@ wavelengths field of the calibration data replaced by the new values.
 }
 \description{
 Replace wavelength values in an instrument descriptor for an Ocean Optics
-spectrometer with new values if valid. (e.g. when wavelngth calibration
-is not stored in firmware).
+spectrometer with new values. (e.g. when wavelngth calibration is not stored
+in firmware).
 }

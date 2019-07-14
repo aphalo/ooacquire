@@ -10,9 +10,9 @@ acq_raw_spct(descriptor, acq.settings, num.exposures = -1L,
   set.all = TRUE, verbose = TRUE)
 }
 \arguments{
-\item{descriptor}{list as returned by function \code{get_oo_descriptor}}
+\item{descriptor}{list as returned by function \code{get_oo_descriptor}.}
 
-\item{acq.settings}{list as returned by functions \code{tune_acq_settings}}
+\item{acq.settings}{list as returned by functions \code{tune_acq_settings}.}
 
 \item{num.exposures}{integer Number or light pulses (flashes) per scan. Set
 to \code{-1L} to indicate that the light source is continuous.}
@@ -21,21 +21,29 @@ to \code{-1L} to indicate that the light source is continuous.}
 pulse(s). Should accept as its only argument the number of pulses, and
 return \code{TRUE} on sucess and \code{FALSE} on failure.}
 
-\item{what.measured}{value used to set attribute}
+\item{what.measured}{value used to set attribute.}
 
 \item{where.measured}{data.frame with at least columns "lon" and "lat"
-compatible with value returned by \code{ggmap::geocode()}}
+compatible with value returned by \code{ggmap::geocode()}.}
 
-\item{set.all}{logical resend or not all instrument settings}
+\item{set.all}{logical resend or not all instrument settings.}
 
-\item{verbose}{logical to enable or disable warnings}
+\item{verbose}{logical to enable or disable warnings.}
 }
 \value{
-a "raw_spct" object with one or more columns containing raw counts
-and one column with wavelength data.
+A \code{raw_spct} object with one column \code{w.length} and one
+  column \code{counts}, or two or more columns \code{counts1, counts2, ...}
+  containing raw counts data. The number of columns with raw counts is
+  determined by \code{acq.settings}, with multiple columns in the case of
+  integration time bracketing or HDR.
 }
 \description{
 Take one spectral measurement which depending on the settings can consist
-on more than one raw spectrum meant to represent a SINGLE observation after
-conversion into calibrated data such as in the case of HDR.
+in multiple raw spectra meant to represent a SINGLE observation after
+conversion into calibrated data, such as in the case of bracketing of
+integration time for HDR.
+}
+\seealso{
+\code{\link{acq_raw_mspct}} which can be used to acquire multiple
+spectra according to a user defined protocol.
 }

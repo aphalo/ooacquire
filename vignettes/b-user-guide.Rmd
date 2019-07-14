@@ -522,7 +522,9 @@ autoplot(tfr02.spct)
 
 Once we have total spectral reflectance and total spectral transmittance, we can compute internal spectral transmittance and spectral absorptance. These are straightforward calculations when the spectra have been measured at the same wavelengths, which is not the case when using a two-channel array spectrometer. In either case, to create an object_spct object we can use function `merge2object_spct()` from package 'photobiology', which maps the spectra to the same wavelength values if needed.
 
-## Irradiance calibration
+## Irradiance calibration from Ocean Optics
+
+Data provide by Ocean Optics in calibration files is expressed independently of the entrance optics. The true calibration multipliers to apply to linearised counts per second data need to be calculated based on the light collecting area of the cosine diffuser used. First step is to read the file with function `read_oo_caldata()` to obtain an object of class `generic_spct` and the second step is to convert with function `oo_calib2irrad_mult()` this object into an object of class `calibration_spct` by converting the calibration values into multipliers expressed in the correct unnits and matched to the cosine diffuser used.
 
 ### Calculating calibration constants
 

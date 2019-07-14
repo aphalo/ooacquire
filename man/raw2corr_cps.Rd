@@ -5,7 +5,7 @@
 \alias{raw2corr_cps.default}
 \alias{raw2corr_cps.raw_spct}
 \alias{raw2corr_cps.raw_mspct}
-\title{Convert raw detector counts into counts-per-second and correct}
+\title{Convert raw detector counts into counts-per-second}
 \usage{
 raw2corr_cps(x, ref.pixs.range, ...)
 

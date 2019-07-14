@@ -1,18 +1,23 @@
 #' Convert an OO calibration
 #'
-#' Convert an irradiance calibration as supplied by Ocean Optics into the
-#' format used by the functions in this package. #'
+#' Convert irradiance calibration values as supplied by Ocean Optics into
+#' multipliers expressed in the units and format expected by the functions in
+#' this package.
 #'
-#' @param x generic_spct object with variables \code{w.length} and \code{oo.cal}.
-#' @param area numeric area of the cosine diffuser (mm2).
-#' @param diff.type character value giving type of diffuser as in OO's documents, case
-#'   insensitive.
+#' @param x generic_spct object with variables \code{w.length} and
+#'   \code{oo.cal}.
+#' @param area numeric Area of the cosine diffuser (mm2).
+#' @param diff.type character Value giving type of diffuser as in OO's
+#'   documents, case insensitive. Ignored unless \code{area = NULL}.
 #' @param verbose Logical indicating the level of warnings wanted.
+#'
+#' @return a \code{calibration_spct} object of the same number of rows as
+#'   \code{x} containing wavelengths in varable \code{w.length} and the
+#'   re-scaled calibration factors in variable \code{irrad.mult}.
 #'
 #' @export
 #'
-#' @return a \code{generic_spct} object  of the same length as \code{x} containing
-#' the re-scaled calibration factors in variable \code{coeffs}.
+#' @seealso \code{\link{read_oo_caldata}}
 #'
 oo_calib2irrad_mult <-
   function(x,
@@ -20,8 +25,10 @@ oo_calib2irrad_mult <-
            diff.type = NULL,
            verbose = getOption("photobiology.verbose", default = FALSE)) {
     stopifnot(is.generic_spct(x))
-    stopifnot(xor(is.null(area), is.null(diff.type)))
     if (is.null(area)) {
+      if (is.null(diff.type)) {
+        stop("Missing argument: one of 'area' or 'diff.type' must be supplied.")
+      }
       area <- # diameters in metres
         switch(toupper(diff.type),
                "CC-3-DA" = pi * (7.14e-3 / 2)^2, # OO
@@ -34,29 +41,37 @@ oo_calib2irrad_mult <-
                {warning("diff.type argument '", diff.type, "' not recognized.")
                NA_real_})
     }
+    stopifnot(is.numeric(area))
     wl.steps <- diff(x[["w.length"]])
     wl.steps <- c(wl.steps[1], wl.steps)
     wl.steps <- caTools::runmean(wl.steps, k = 2)
     x[["irrad.mult"]] <- x[["oo.cal"]] / (area * wl.steps) * 1e-6 # uW -> W
     if (!verbose) {
+      # delete values read from file
       x[["oo.cal"]] <- NULL
     }
+    # attributes retained from argument
     setCalibrationSpct(x)
   }
 
 #' Read OO irradiance calibration.
 #'
-#' Reads and parses the header of a calibration data file as supplied by
-#' Ocean Optics. The whole header is stored as a comment. The time is
-#' retrieved and decoded.
+#' Reads a calibration data file as supplied by Ocean Optics. Wavelength and
+#' calibration values are stored as data and the metadata parsed from the header
+#' or supplied as arguments as attributes of the same object, including the time
+#' and date of the calibration. The whole file header is in addition stored as a
+#' comment.
 #'
-#' @param file character string
+#' @param file character string Path or file to read.
 #' @param time a \code{POSIXct} object, but if \code{NULL} the date stored in
-#'   file is used, and if \code{NA} no date variable is added
-#' @param geocode A data frame with columns \code{lon} and \code{lat}.
+#'   file is used, and if \code{NA} the \code{when.measured} attribute is set to
+#'   \code{NA}.
+#' @param geocode A one row data frame with numeric columns \code{lon} and
+#'   \code{lat}, and optionally a character column \code{address}.
 #' @param label character string, but if \code{NULL} the value of \code{file} is
-#'   used, and if \code{NA} the "what.measured" attribute is not set.
-#' @param descriptor list A list describing the instrument used.
+#'   used, and if \code{NA} the "what.measured" attribute is set to \code{NA}.
+#' @param descriptor list A list describing the instrument, used to set
+#'   attribute \code{instr.descriptor}.
 #' @param tz character Time zone is by default read from the file.
 #' @param locale	The locale controls defaults that vary from place to place. The
 #'   default locale is US-centric (like R), but you can use
@@ -65,7 +80,11 @@ oo_calib2irrad_mult <-
 #'   names.
 #' @param verbose Logical indicating the level of warnings wanted.
 #'
-#' @return A generic_spct object.
+#' @return A generic_spct object, with columns \code{w.length} and
+#'   \code{oo.cal}.
+#'
+#' @seealso \code{\link{oo_calib2irrad_mult}}
+#'
 #' @export
 #'
 read_oo_caldata <-

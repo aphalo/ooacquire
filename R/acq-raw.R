@@ -1,26 +1,33 @@
 #' Measure one raw spectrum
 #'
 #' Take one spectral measurement which depending on the settings can consist
-#' on more than one raw spectrum meant to represent a SINGLE observation after
-#' conversion into calibrated data such as in the case of HDR.
+#' in multiple raw spectra meant to represent a SINGLE observation after
+#' conversion into calibrated data, such as in the case of bracketing of
+#' integration time for HDR.
 #'
-#' @param descriptor list as returned by function \code{get_oo_descriptor}
-#' @param acq.settings list as returned by functions \code{tune_acq_settings}
+#' @param descriptor list as returned by function \code{get_oo_descriptor}.
+#' @param acq.settings list as returned by functions \code{tune_acq_settings}.
 #' @param num.exposures integer Number or light pulses (flashes) per scan. Set
 #'   to \code{-1L} to indicate that the light source is continuous.
 #' @param f.trigger.pulses function Function to be called to trigger light
 #'   pulse(s). Should accept as its only argument the number of pulses, and
 #'   return \code{TRUE} on sucess and \code{FALSE} on failure.
-#' @param what.measured value used to set attribute
+#' @param what.measured value used to set attribute.
 #' @param where.measured data.frame with at least columns "lon" and "lat"
-#'   compatible with value returned by \code{ggmap::geocode()}
-#' @param set.all logical resend or not all instrument settings
-#' @param verbose logical to enable or disable warnings
+#'   compatible with value returned by \code{ggmap::geocode()}.
+#' @param set.all logical resend or not all instrument settings.
+#' @param verbose logical to enable or disable warnings.
 #'
 #' @export
 #'
-#' @return a "raw_spct" object with one or more columns containing raw counts
-#' and one column with wavelength data.
+#' @return A \code{raw_spct} object with one column \code{w.length} and one
+#'   column \code{counts}, or two or more columns \code{counts1, counts2, ...}
+#'   containing raw counts data. The number of columns with raw counts is
+#'   determined by \code{acq.settings}, with multiple columns in the case of
+#'   integration time bracketing or HDR.
+#'
+#' @seealso \code{\link{acq_raw_mspct}} which can be used to acquire multiple
+#' spectra according to a user defined protocol.
 #'
 acq_raw_spct <- function(descriptor,
                          acq.settings,
@@ -144,9 +151,26 @@ acq_raw_spct <- function(descriptor,
 #' Take readings according to parameters from a list of settings and a protocol
 #' defined by a vector of names.
 #'
-#' @param descriptor list as returned by function \code{get_oo_descriptor()}
+#' @details Function \code{acq_raw_mspct} acquires directly from a spectrometer
+#'   a collection of spectra. The settings used for the acquisition of each
+#'   member spectrum are the same, and are given by the argument passed to
+#'   \code{acq.settings}. The number of numbers and their names are given by the
+#'   argument passed to \code{protocol}.
+#'
+#'   Two types of light sources can be measured, for continuous-emission light
+#'   sources, the integration time can a later steps used to compute irradiance.
+#'   In the case of flashes, the duration of the exposure is unknown and
+#'   irradiance cannot be computed, while spectral energy per flash can be
+#'   computed if the number of flashes is known. The argument to
+#'   \code{num.exposures} must be set to the number of flashes.
+#'
+#'   Two parameters accept functions as arguments, and default to functions that
+#'   request the operator to trigger the flash or change the light conditions
+#'   according to the names of the steps in the argument to \code{protocol}.
+#'
+#' @param descriptor list as returned by function \code{get_oo_descriptor()}.
 #' @param acq.settings list as returned by functions \code{tune_acq_settings()}
-#'   or \code{retune_acq_settings()} or \code{acq_settings()}
+#'   or \code{retune_acq_settings()} or \code{acq_settings()}.
 #' @param num.exposures integer Number or light pulses (flashes) per scan. Set
 #'   to \code{-1L} to indicate that the light source is continuous.
 #' @param f.trigger.pulses function Function to be called to trigger light
@@ -154,20 +178,22 @@ acq_raw_spct <- function(descriptor,
 #'   return \code{TRUE} on sucess and \code{FALSE} on failure.
 #' @param seq.settings list with members "step" numeric value in seconds,
 #'   "num.steps" integer.
-#' @param protocol vector of character strings
-#' @param user.label character string to set as label
+#' @param protocol vector of character strings.
+#' @param user.label character string to set as label.
 #' @param where.measured data.frame with at least columns "lon" and "lat"
-#'   compatible with value returned by \code{ggmap::geocode()}
-#' @param pause.fun function used for handling protocol transitions#'
-#' @param verbose ogical to enable or disable warnings
-#' @param ... passed to \code{pause.fun} (ignored by the default function)
+#'   compatible with value returned by \code{ggmap::geocode()}.
+#' @param pause.fun function used for handling protocol transitions.
+#' @param verbose ogical to enable or disable warnings.
+#' @param ... passed to \code{pause.fun} (ignored by the default function).
 #'
 #' @export
-#' @return a raw_mspct object
 #'
-#' @note The default \code{pause.fun} prompts the user at each change of value
-#'   in \code{protocol}. The user can write other functions, for example for a
-#'   time delay.
+#' @return A raw_mspct object. The names and number of member spectra are
+#' determined by \code{protocol}, and the number of columns in each member
+#' spectrum is determined by \code{acq.settings}.
+#'
+#' @seealso \code{\link{acq_raw_spct}} which is used to acquire each member
+#' spectrum.
 #'
 acq_raw_mspct <- function(descriptor,
                           acq.settings,

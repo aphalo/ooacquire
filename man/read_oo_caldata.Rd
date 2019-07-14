@@ -9,17 +9,20 @@ read_oo_caldata(file, time = NULL, geocode = NULL, label = NULL,
   verbose = getOption("photobiology.verbose", default = FALSE))
 }
 \arguments{
-\item{file}{character string}
+\item{file}{character string Path or file to read.}
 
 \item{time}{a \code{POSIXct} object, but if \code{NULL} the date stored in
-file is used, and if \code{NA} no date variable is added}
+file is used, and if \code{NA} the \code{when.measured} attribute is set to
+\code{NA}.}
 
-\item{geocode}{A data frame with columns \code{lon} and \code{lat}.}
+\item{geocode}{A one row data frame with numeric columns \code{lon} and
+\code{lat}, and optionally a character column \code{address}.}
 
 \item{label}{character string, but if \code{NULL} the value of \code{file} is
-used, and if \code{NA} the "what.measured" attribute is not set.}
+used, and if \code{NA} the "what.measured" attribute is set to \code{NA}.}
 
-\item{descriptor}{list A list describing the instrument used.}
+\item{descriptor}{list A list describing the instrument, used to set
+attribute \code{instr.descriptor}.}
 
 \item{tz}{character Time zone is by default read from the file.}
 
@@ -32,10 +35,16 @@ names.}
 \item{verbose}{Logical indicating the level of warnings wanted.}
 }
 \value{
-A generic_spct object.
+A generic_spct object, with columns \code{w.length} and
+  \code{oo.cal}.
 }
 \description{
-Reads and parses the header of a calibration data file as supplied by
-Ocean Optics. The whole header is stored as a comment. The time is
-retrieved and decoded.
+Reads a calibration data file as supplied by Ocean Optics. Wavelength and
+calibration values are stored as data and the metadata parsed from the header
+or supplied as arguments as attributes of the same object, including the time
+and date of the calibration. The whole file header is in addition stored as a
+comment.
+}
+\seealso{
+\code{\link{oo_calib2irrad_mult}}
 }

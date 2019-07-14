@@ -100,9 +100,10 @@ set_descriptor_bad_pixs <- function(descriptor,
 
 #' Replace integration time limits in instrument descriptor
 #'
-#' This function can be needed in exceptional cases such as when the instrument
-#' the limits stored in the intrument firmware are wrong. In other cases in can
-#' be used to limit the range of values allowed to be set.
+#' This function can be needed in exceptional cases such as when the limits
+#' stored in the intrument's persistent memory are wrong. In other cases in can
+#' be used to restrict the range of values allowed to be set to a smaller range
+#' than natively supported by the spectrometer.
 #'
 #' @param descriptor list as returned by function \code{get_oo_descriptor}
 #' @param min.integ.time,max.integ.time numeric values in seconds in seconds.
@@ -148,8 +149,8 @@ set_descriptor_integ_time <- function(descriptor,
 #' Replace wavelength values in an instrument description
 #'
 #' Replace wavelength values in an instrument descriptor for an Ocean Optics
-#' spectrometer with new values if valid. (e.g. when wavelngth calibration
-#' is not stored in firmware).
+#' spectrometer with new values. (e.g. when wavelngth calibration is not stored
+#' in firmware).
 #'
 #' @param descriptor list as returned by function \code{get_oo_descriptor}
 #' @param wl numeric vector of sorted wavelengths values corresponding to each
@@ -211,7 +212,8 @@ set_descriptor_nl <- function(descriptor,
 
 #' Add spectral irradiance calibration
 #'
-#' Adds calibration data for each pixel as a numeric vector
+#' Adds calibration data expressed as multipliers for each pixel stores in a
+#' numeric vector.
 #'
 #' @param descriptor list as returned by function \code{get_oo_descriptor}
 #' @param irrad.mult numeric vector of the same length as the number of pixels
@@ -221,7 +223,7 @@ set_descriptor_nl <- function(descriptor,
 #' @param start.date,end.date range of dates when calibration is valid.
 #'
 #' @return A copy of the argument passed for \code{oo_descriptor} with the
-#' irrad.mult field of the calibration data replaced by the new values.
+#'   irrad.mult field of the calibration data replaced by the new values.
 #'
 #' @export
 #'
