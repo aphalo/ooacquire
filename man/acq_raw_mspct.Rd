@@ -4,7 +4,7 @@
 \alias{acq_raw_mspct}
 \title{Take one set of spectral readings}
 \usage{
-acq_raw_mspct(descriptor, acq.settings, num.exposures = -1L,
+acq_raw_mspct(descriptor, acq.settings,
   f.trigger.pulses = f.trigger.message, seq.settings = list(step = 0,
   num.steps = 1L), protocol = c("light", "filter", "dark"),
   user.label = "", where.measured = data.frame(lon = NA_real_, lat =
@@ -15,9 +15,6 @@ acq_raw_mspct(descriptor, acq.settings, num.exposures = -1L,
 
 \item{acq.settings}{list as returned by functions \code{tune_acq_settings()}
 or \code{retune_acq_settings()} or \code{acq_settings()}.}
-
-\item{num.exposures}{integer Number or light pulses (flashes) per scan. Set
-to \code{-1L} to indicate that the light source is continuous.}
 
 \item{f.trigger.pulses}{function Function to be called to trigger light
 pulse(s). Should accept as its only argument the number of pulses, and

@@ -4,23 +4,35 @@
 \alias{set_num_exposures}
 \title{Set number of exposures}
 \usage{
-set_num_exposures(acq.settings, num.exposures = -1L,
-  single.scan = FALSE, verbose = TRUE)
+set_num_exposures(acq.settings, num.exposures = -1L, HDR.mult = 1,
+  single.scan = num.exposures > -1L, verbose = TRUE)
 }
 \arguments{
 \item{acq.settings}{list as returned by function \code{acq_settings()}}
+
+\item{num.exposures, }{integer Number exposures per integration, set to
+\code{-1L} for continuous illumination.}
+
+\item{HDR.mult}{a numeric vector with integ.time multipliers to be used for
+"bracketing".}
+
+\item{single.scan, }{logical Will we use a single integration, or average
+multiple scans. By default it is \code{TRUE} when multiple exposures are
+used, and \code{FALSE} otherwise.}
+
+\item{verbose}{a logical to enable or disable warnings}
 }
 \value{
 a copy of the argument passed for \code{acq.settings} with the
 \code{integ.time} field of the settings data replaced by \code{integ.time}.
 }
 \description{
-Set the number of exposures in the instrument settings data structure. This
-value is by default missing, indicating a protocol in which one assumes
-contant illumination during an integration. If the light exposure is shorter
-than the integration time, we need to express the results per exposure, and
-consequently calculations done based on the number of exposure during each
-integration. This is the case, for example, when measuring the spectral
-emission of a xenon flash.
+Set the number of exposures and HDR.multipliers in the instrument settings
+data structure. This value is by default missing, indicating a protocol in
+which one assumes contant illumination during an integration. If the light
+exposure is shorter than the integration time, we need to express the results
+per exposure, and consequently calculations done based on the number of
+exposure events during each integration. This is the case, for example, when
+measuring the spectral emission of a xenon flash.
 }
 \keyword{internal}

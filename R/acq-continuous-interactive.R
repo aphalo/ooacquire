@@ -93,6 +93,7 @@ acq_irrad_interactive <-
     }
 
     w <- start_session()
+    on.exit(end_session(w))
 
     instruments <- list_srs_interactive(w = w)
     sr.index <- choose_sr_interactive(instruments = instruments)
@@ -187,6 +188,8 @@ acq_irrad_interactive <-
     folder.name <- set_folder_interactive()
 
     oldwd <- setwd(folder.name)
+    on.exit(setwd(oldwd))
+    on.exit(message("Folder reset to: ", getwd(), "\nBye!"), add = TRUE)
     message("Files will be saved to '", folder.name, "'", sep="")
 
     protocol <- protocol_interactive(protocols = protocols)
@@ -382,9 +385,6 @@ acq_irrad_interactive <-
 
     print("Ending...")
     end_session(w)
-    setwd(oldwd)
-    message("Folder reset to: ", getwd())
-    message("Bye!")
   }
 
 #' @rdname acq_irrad_interactive
@@ -520,6 +520,8 @@ acq_fraction_interactive <-
     folder.name <- set_folder_interactive()
 
     oldwd <- setwd(folder.name)
+    on.exit(setwd(oldwd), add = TRUE)
+    on.exit(message("Folder reset to: ", getwd(), "\nBye!"), add = TRUE)
     message("Files will be saved to '", folder.name, "'", sep="")
 
     protocol <- protocol_interactive(protocols = protocols)
@@ -635,10 +637,8 @@ acq_fraction_interactive <-
       }
     }
     print("Ending...")
-    end_session(w)
-    setwd(oldwd)
-    message("Folder reset to: ", getwd())
-    message("Bye!")
+
+    # clean up is done using 'on.exit()'
   }
 
 
@@ -662,6 +662,7 @@ acq_rfr_tfr_interactive <-
                       rs = c("reference", "sample"))
 
     w <- start_session()
+    on.exit(end_session(w))
 
     instruments <- list_srs_interactive(w = w)
     sr.index <- choose_sr_interactive(instruments = instruments)
@@ -715,6 +716,8 @@ acq_rfr_tfr_interactive <-
       dir.create(folder.name)
     }
     oldwd <- setwd(folder.name)
+    on.exit(setwd(oldwd))
+    on.exit(message("Folder reset to: ", getwd(), "\nBye!"), add = TRUE)
     message("Files will be saved to '", folder.name, "'", sep="")
 
     protocol <- protocol_interactive(protocols = protocols)
@@ -888,8 +891,6 @@ acq_rfr_tfr_interactive <-
       }
     }
     print("Ending...")
-    end_session(w)
-    setwd(oldwd)
-    message("Folder reset to: ", getwd())
-    message("Bye!")
+
+    # clean up is done using 'on.exit()'
   }

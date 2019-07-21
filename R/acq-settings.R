@@ -53,7 +53,9 @@ acq_settings <- function(descriptor,
                          min.integ.time = -Inf, # seconds
                          max.integ.time = Inf, # seconds
                          tot.time.range = c(0, Inf), # seconds
-                         HDR.mult = c(short = 1, long = 10),
+                         HDR.mult = ifelse(any(num.exposures != -1L),
+                                           rep(1, length(num.exposures)),
+                                           c(short = 1, long = 10)),
                          target.margin = 0.10, # fraction
                          pix.selector = TRUE,
                          corr.elect.dark = 0L,
@@ -64,6 +66,8 @@ acq_settings <- function(descriptor,
                          verbose = TRUE) {
   # Check length consistency
   stopifnot(length(integ.time) == length(num.scans))
+  # if calculations are per exposure, HDR.mult should be all 1
+  stopifnot(all(num.exposures == -1L) || all(HDR.mult == 1))
   # convert times to microseconds
   integ.time <- integ.time * 1e6
   min.integ.time <- min.integ.time * 1e6
@@ -187,15 +191,23 @@ set_integ_time <- function(acq.settings,
 
 #' Set number of exposures
 #'
-#' Set the number of exposures in the instrument settings data structure. This
-#' value is by default missing, indicating a protocol in which one assumes
-#' contant illumination during an integration. If the light exposure is shorter
-#' than the integration time, we need to express the results per exposure, and
-#' consequently calculations done based on the number of exposure during each
-#' integration. This is the case, for example, when measuring the spectral
-#' emission of a xenon flash.
+#' Set the number of exposures and HDR.multipliers in the instrument settings
+#' data structure. This value is by default missing, indicating a protocol in
+#' which one assumes contant illumination during an integration. If the light
+#' exposure is shorter than the integration time, we need to express the results
+#' per exposure, and consequently calculations done based on the number of
+#' exposure events during each integration. This is the case, for example, when
+#' measuring the spectral emission of a xenon flash.
 #'
 #' @param acq.settings list as returned by function \code{acq_settings()}
+#' @param num.exposures, integer Number exposures per integration, set to
+#'   \code{-1L} for continuous illumination.
+#' @param HDR.mult a numeric vector with integ.time multipliers to be used for
+#'   "bracketing".
+#' @param single.scan, logical Will we use a single integration, or average
+#'   multiple scans. By default it is \code{TRUE} when multiple exposures are
+#'   used, and \code{FALSE} otherwise.
+#' @param verbose a logical to enable or disable warnings
 #'
 #' @return a copy of the argument passed for \code{acq.settings} with the
 #' \code{integ.time} field of the settings data replaced by \code{integ.time}.
@@ -204,15 +216,17 @@ set_integ_time <- function(acq.settings,
 #'
 set_num_exposures <- function(acq.settings,
                               num.exposures = -1L,
-                              single.scan = FALSE,
+                              HDR.mult = 1,
+                              single.scan = num.exposures > -1L,
                               verbose = TRUE) {
   num.exposures <- as.integer(num.exposures)
-  stopifnot(all(is.na(num.exposures) | num.exposures >= -1L))
-  if (length(num.exposures) == 1) {
-    num.exposures <- rep(num.exposures, times = length(acq.settings$HDR.mult))
-  } else if (length(num.exposures) != length(acq.settings$HDR.mult)) {
+  stopifnot(all(num.exposures == -1L) || all(HDR.mult == 1))
+
+  if (length(num.exposures) == 1 && length(HDR.mult) > 1) {
+    num.exposures <- rep(num.exposures, times = length(HDR.mult))
+  } else if (length(num.exposures) != length(HDR.mult)) {
     warning("Length missmatch in 'num.exposures', using only first value")
-    num.exposures  <- rep(num.exposures[1], times = length(acq.settings$HDR.mult))
+    num.exposures  <- rep(num.exposures[1], times = length(HDR.mult))
   }
 
   if (single.scan || any(num.exposures > 0L)) {
@@ -220,11 +234,8 @@ set_num_exposures <- function(acq.settings,
     acq.settings$num.scans <- num.scans
   }
   acq.settings$num.exposures <- num.exposures
+  acq.settings$HDR.mult <- HDR.mult
 
-  if (verbose && any(acq.settings$num.exposures >= 0L)) {
-    message("Exposures (n / scan): ",
-            format(acq.settings$num.exposures, width = 10, digits = 3), " ")
-  }
   acq.settings
 }
 

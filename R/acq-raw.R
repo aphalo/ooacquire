@@ -7,8 +7,6 @@
 #'
 #' @param descriptor list as returned by function \code{get_oo_descriptor}.
 #' @param acq.settings list as returned by functions \code{tune_acq_settings}.
-#' @param num.exposures integer Number or light pulses (flashes) per scan. Set
-#'   to \code{-1L} to indicate that the light source is continuous.
 #' @param f.trigger.pulses function Function to be called to trigger light
 #'   pulse(s). Should accept as its only argument the number of pulses, and
 #'   return \code{TRUE} on sucess and \code{FALSE} on failure.
@@ -31,7 +29,6 @@
 #'
 acq_raw_spct <- function(descriptor,
                          acq.settings,
-                         num.exposures = -1L,
                          f.trigger.pulses = f.trigger.message,
                          what.measured = NA,
                          where.measured = data.frame(lon = NA_real_, lat = NA_real_),
@@ -42,7 +39,7 @@ acq_raw_spct <- function(descriptor,
 
   num.readings <- length(x$integ.time)
 
-  num.exposures <- as.integer(num.exposures)
+  num.exposures <- x$num.exposures
   if (length(num.exposures) == 1L) {
     if (num.readings > 1L) {
       num.exposures <- rep(num.exposures, num.readings)
@@ -171,8 +168,6 @@ acq_raw_spct <- function(descriptor,
 #' @param descriptor list as returned by function \code{get_oo_descriptor()}.
 #' @param acq.settings list as returned by functions \code{tune_acq_settings()}
 #'   or \code{retune_acq_settings()} or \code{acq_settings()}.
-#' @param num.exposures integer Number or light pulses (flashes) per scan. Set
-#'   to \code{-1L} to indicate that the light source is continuous.
 #' @param f.trigger.pulses function Function to be called to trigger light
 #'   pulse(s). Should accept as its only argument the number of pulses, and
 #'   return \code{TRUE} on sucess and \code{FALSE} on failure.
@@ -197,7 +192,6 @@ acq_raw_spct <- function(descriptor,
 #'
 acq_raw_mspct <- function(descriptor,
                           acq.settings,
-                          num.exposures = -1L,
                           f.trigger.pulses = f.trigger.message,
                           seq.settings = list(step = 0, num.steps = 1L),
                           protocol = c("light", "filter", "dark"),
@@ -236,7 +230,6 @@ acq_raw_mspct <- function(descriptor,
     idx <- idx + 1
     z[[idx]] <- acq_raw_spct(descriptor = descriptor,
                              acq.settings = acq.settings,
-                             num.exposures = num.exposures,
                              f.trigger.pulses = f.current,
                              what.measured = paste(p, ": ", user.label, sep = ""),
                              where.measured = where.measured)

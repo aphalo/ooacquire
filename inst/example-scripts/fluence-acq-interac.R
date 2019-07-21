@@ -62,4 +62,4 @@ yocto.flash.trigger(n = 2, delay = 0.5)
 
 acq_fluence_interactive(f.trigger.pulses = yocto.flash.trigger)
 
-acq_fluence_interactive()
+acq_fluence_interactive(3)

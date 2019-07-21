@@ -1,4 +1,4 @@
 cd ..
-R CMD INSTALL --build ooacquire_0.1.999.tar.gz
+R CMD INSTALL --build ooacquire_0.2.0.tar.gz
 cd ./photobiology
 

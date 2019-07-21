@@ -93,13 +93,12 @@ acq_fluence_interactive <-
     }
 
     w <- start_session()
+    on.exit(end_session(w))
 
     instruments <- list_srs_interactive(w = w)
     sr.index <- choose_sr_interactive(instruments = instruments)
     if (sr.index < 0L) {
       print("Aborting...")
-      end_session(w = w)
-      message("Bye!")
     }
     ch.index <- choose_ch_interactive(instruments = instruments,
                                       sr.index = sr.index)
@@ -169,6 +168,8 @@ acq_fluence_interactive <-
     folder.name <- set_folder_interactive()
 
     oldwd <- setwd(folder.name)
+    on.exit(setwd(oldwd), add = TRUE)
+    on.exit(message("Folder reset to: ", getwd(), "\nBye!"), add = TRUE)
     message("Files will be saved to '", folder.name, "'", sep="")
 
     protocol <- protocol_interactive(protocols = protocols)
@@ -177,9 +178,11 @@ acq_fluence_interactive <-
 
     settings <- acq_settings(descriptor = descriptor,
                              integ.time = integ.time,
+                             num.scans = num.scans,
                              target.margin = 0,
                              tot.time.range = integ.time,
-                             HDR.mult = 1)
+                             HDR.mult = 1,
+                             num.exposures = num.exposures)
 
     seq.settings <- list(step = 0,
                          num.steps = 1L)
@@ -223,7 +226,6 @@ acq_fluence_interactive <-
 
       raw.mspct <- acq_raw_mspct(descriptor = descriptor,
                                  acq.settings = settings,
-                                 num.exposures = num.exposures,
                                  seq.settings = seq.settings,
                                  protocol = protocol,
                                  f.trigger.pulses = f.trigger.pulses,
@@ -360,10 +362,8 @@ acq_fluence_interactive <-
             paste(file.names, collapse = ",\n"), ".", sep = "")
 
     print("Ending...")
-    end_session(w)
-    setwd(oldwd)
-    message("Folder reset to: ", getwd())
-    message("Bye!")
+
+    # clean up is done using 'on.exit()'
   }
 
 #' @rdname acq_fluence_interactive
@@ -425,13 +425,12 @@ acq_fraction_pulsed_interactive <-
     }
 
     w <- start_session()
+    on.exit(end_session(w = w))
 
     instruments <- list_srs_interactive(w = w)
     sr.index <- choose_sr_interactive(instruments = instruments)
     if (sr.index < 0L) {
       print("Aborting...")
-      end_session(w = w)
-      message("Bye!")
     }
     ch.index <- choose_ch_interactive(instruments = instruments,
                                       sr.index = sr.index)
@@ -515,6 +514,8 @@ acq_fraction_pulsed_interactive <-
     folder.name <- set_folder_interactive()
 
     oldwd <- setwd(folder.name)
+    on.exit(setwd(oldwd), add = TRUE)
+    on.exit(message("Folder reset to: ", getwd(), "\nBye!"), add = TRUE)
     message("Files will be saved to '", folder.name, "'", sep="")
 
     protocol <- protocol_interactive(protocols = protocols)
@@ -523,7 +524,8 @@ acq_fraction_pulsed_interactive <-
                              integ.time = integ.time,
                              target.margin = 0,
                              tot.time.range = integ.time,
-                             HDR.mult = 1)
+                             HDR.mult = 1,
+                             num.exposures = num.exposures)
 
     seq.settings <- list(step = 0,
                          num.steps = 1L)
@@ -554,7 +556,6 @@ acq_fraction_pulsed_interactive <-
 
       raw.mspct <- acq_raw_mspct(descriptor = descriptor,
                                  acq.settings = settings,
-                                 num.exposures = num.exposures,
                                  seq.settings = seq.settings,
                                  protocol = protocol,
                                  f.trigger.pulses = f.trigger.pulses,
@@ -697,8 +698,6 @@ acq_fraction_pulsed_interactive <-
             paste(file.names, collapse = ",\n"), ".", sep = "")
 
     print("Ending...")
-    end_session(w)
-    setwd(oldwd)
-    message("Folder reset to: ", getwd())
-    message("Bye!")
+
+    # clean up is done using 'on.exit()'
   }
