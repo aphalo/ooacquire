@@ -4,8 +4,9 @@
 \alias{set_num_exposures}
 \title{Set number of exposures}
 \usage{
-set_num_exposures(acq.settings, num.exposures = -1L, HDR.mult = 1,
-  single.scan = num.exposures > -1L, verbose = TRUE)
+set_num_exposures(acq.settings, num.exposures = rep(-1L,
+  length(HDR.mult)), HDR.mult = 1, single.scan = num.exposures > -1L,
+  verbose = TRUE)
 }
 \arguments{
 \item{acq.settings}{list as returned by function \code{acq_settings()}}

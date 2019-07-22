@@ -43,10 +43,11 @@ acq_raw_spct <- function(descriptor,
   if (length(num.exposures) == 1L) {
     if (num.readings > 1L) {
       num.exposures <- rep(num.exposures, num.readings)
+      x <- set_num_exposures(x, num.exposures)
     }
   }
   stopifnot(length(num.exposures) == num.readings)
-  x <- set_num_exposures(x, num.exposures)
+  stopifnot(length(x$HDR.mult) == num.readings)
 
   y <- descriptor
 

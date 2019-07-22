@@ -65,9 +65,22 @@ acq_settings <- function(descriptor,
                          num.exposures = -1L,
                          verbose = TRUE) {
   # Check length consistency
+  if (length(num.exposures) == 1 && length(HDR.mult) > 1) {
+    num.exposures <- rep(num.exposures, times = length(HDR.mult))
+  } else if (length(num.exposures) != length(HDR.mult)) {
+    warning("Length missmatch in 'num.exposures', using only first value")
+    num.exposures  <- rep(num.exposures[1], times = length(HDR.mult))
+  }
+
+  if (any(num.exposures > 0L)) {
+    num.scans <- rep(1, times = length(num.exposures))
+  }
+
   stopifnot(length(integ.time) == length(num.scans))
+
   # if calculations are per exposure, HDR.mult should be all 1
   stopifnot(all(num.exposures == -1L) || all(HDR.mult == 1))
+
   # convert times to microseconds
   integ.time <- integ.time * 1e6
   min.integ.time <- min.integ.time * 1e6
@@ -215,11 +228,11 @@ set_integ_time <- function(acq.settings,
 #' @keywords internal
 #'
 set_num_exposures <- function(acq.settings,
-                              num.exposures = -1L,
+                              num.exposures = rep(-1L, length(HDR.mult)),
                               HDR.mult = 1,
                               single.scan = num.exposures > -1L,
                               verbose = TRUE) {
-  num.exposures <- as.integer(num.exposures)
+#  num.exposures <- as.integer(num.exposures)
   stopifnot(all(num.exposures == -1L) || all(HDR.mult == 1))
 
   if (length(num.exposures) == 1 && length(HDR.mult) > 1) {
