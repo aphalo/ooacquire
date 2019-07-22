@@ -5,6 +5,8 @@ home:
   links:
   - text: Photobiology packages
     href: https://www.r4photobiology.info/
+  - text: Ocean Insight (formerly Ocean Optics)
+    href: https://oceanoptics.com/
 
 reference:
   - title: Package overview

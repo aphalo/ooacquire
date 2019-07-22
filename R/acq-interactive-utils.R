@@ -87,11 +87,24 @@ tune_interactive <- function(descriptor,
         cat("Value not changed!")
       }
     }  else if (substr(answ, 1, 1) == "h") {
+      old.hdr.mult.len <- length(acq.settings[["HDR.mult"]])
       cat("HDR multipliers, 1 to 4 numbers: ")
       HDR.mult <- sort(scan(nmax = 4))
       if (HDR.mult[1] >= 0  && HDR.mult[length(HDR.mult)] < 1000) {
         acq.settings[["HDR.mult"]] <- HDR.mult
         tuned <- FALSE
+        if (length(HDR.mult) != old.hdr.mult.len) {
+          # ensure 'num.exposures' matches 'HDR.mult' in length
+          num.exposures <- acq.settings[["num.exposures"]]
+          if (length(num.exposures) < length(HDR.mult)) {
+            acq.settings[["num.exposures"]] <- rep(acq.settings[["num.exposures"]][1], length(HDR.mult))
+            if (!all(num.exposures == -1L)) {
+              warning("Resetting 'num.exposures'")
+            }
+          } else if (length(num.exposures) > length(HDR.mult)) {
+            acq.settings[["num.exposures"]] <- num.exposures[1:length(HDR.mult)]
+          }
+        }
       } else {
         cat("Value not changed!")
       }
