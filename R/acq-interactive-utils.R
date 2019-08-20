@@ -21,20 +21,31 @@ tune_interactive <- function(descriptor,
   }
   # configure interface for active mode
   prompt.text <- switch(interface.mode,
-                        simple = "t = retune, r = range, h = HDR mult., u = undo (t/r/h/u/-): ",
-                        auto = "t = retune, T = tune, s = skip, m = margin, r = range, h = HDR mult., u = undo (t/s/m/r/h/u/-): ",
-                        manual = "f = fixed, s = skip, r = range, h = HDR mult., u = undo (f/r/h/u/-): "
+                        simple = "t = retune, r = range, h = HDR mult., u = undo, H = help (t/r/h/u/H/-): ",
+                        auto = "t = retune, T = tune, s = skip, m = margin, r = range, h = HDR mult., u = undo, H = help (t/s/m/r/h/u/H/-): ",
+                        manual = "f = fixed, s = skip, r = range, h = HDR mult., u = undo, H = help (f/r/h/u/H/-): "
   )
   valid.input <- switch(interface.mode,
-                        simple = c("t", "r", "h", "u", ""),
-                        auto = c("t", "T", "s", "m", "r", "h", "u", ""),
-                        manual = c("f", "s", "r", "h", "u", "")
+                        simple = c("t", "r", "h", "u", "H", ""),
+                        auto = c("t", "T", "s", "m", "r", "h", "u", "H", ""),
+                        manual = c("f", "s", "r", "h", "u", "H", "")
   )
   default.input <- switch(interface.mode,
                           simple = c("t", "s"),
                           auto = c("t", "s"),
                           manual = c("f", "s")
   )
+  # set help
+  all.help <- c(t = "t = retune. Adjust integration time starting from last value.",
+                T = "T = tune. Adjust integration time starting from default value.",
+                s = "s = skip. Use last integration time, skip adjustment.",
+                m = "m = margin. Target integration time is maximum * (100 - margin).",
+                r = "r = range. Total measurement time in seconds, as a single value or a range.",
+                h = "h = HDR mult. High dynamic range or bracketing, as multipliers for target integration time.",
+                f = "f = fixed. User-suplied \"base\" integration time in seconds.",
+                u = "u = undo. Restore settings from last measurement.",
+                H = "H = help. Show this help text.")
+  help.text <- paste(all.help[setdiff(valid.input, "")], collapse = "\n")
   # common code to all modes
   old.settings <- acq.settings # allow starting over
   tuned <- FALSE
@@ -54,7 +65,9 @@ tune_interactive <- function(descriptor,
       break()                       ## <- exit point for loop
     }
 
-    if (substr(answ, 1, 1) == "t") {
+    if (substr(answ, 1, 1) == "H") {
+      cat(help.text)
+    } else if (substr(answ, 1, 1) == "t") {
       acq.settings <- tune_acq_settings(descriptor = descriptor, acq.settings = acq.settings)
       tuned <- TRUE
     } else if (substr(answ, 1, 1) == "T") {

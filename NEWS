@@ -4,7 +4,7 @@ Add more test cases.
 Finish writing algorithms vignette.
 Document support for OO calibrations and add example scripts.
 
-ooacquire 0.2.0 (2019-07-13)
+ooacquire 0.2.0 (2019-08-20)
 ============================
 
 * Update acq_irrad_interactive() adding alternative user-interface modes,
