@@ -11,6 +11,8 @@
 #' Tail correction is a reimplementation of the calculations developed by Lasse
 #' Ylianttila (STUK, Finland), originally in Excel.
 #'
+#' @family spectral data-processing functions
+#'
 #' @export
 #'
 MAYP11278_tail_correction <- function(w_length, cts_second) {
@@ -26,6 +28,8 @@ MAYP11278_tail_correction <- function(w_length, cts_second) {
 #'
 #' Tail correction is a reimplementation of the calculations developed by Lasse
 #' Ylianttila (STUK, Finland), originally in Excel.
+#'
+#' @family spectral data-processing functions
 #'
 #' @export
 #'

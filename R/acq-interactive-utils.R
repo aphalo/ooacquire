@@ -1,7 +1,8 @@
 #' Interactively adjust the integration time settings
 #'
 #' Adjust integration time settings, allowing the user to repeat the tunning,
-#' and to change some of the parameters used for tunning.
+#' and to change some of the parameters used for tunning such as total
+#' compound integration time and intergration time bracketing.
 #'
 #' @param descriptor list Descriptor of the instrument, including wrapper to
 #'   Java object used to acces the instrument.
@@ -9,6 +10,25 @@
 #' @param start.int.time numeric Integration time to use as starting guess when
 #'   tuning the settings.
 #' @param interface.mode character One of "simple", "auto", or "manual".
+#'
+#' @details
+#' This function implements three different user interfaces: 1) "simple" is an
+#' interface suitable for the most usual measurements using automatic tuning
+#' of integration time and hides some of the
+#' less frequently used options, 2) "auto" gives access to all available
+#' options offering maximum flexibility when using automatic tuning of
+#' integration time, and 3) "manual" supports use of fixed integration times
+#' directly entered by the user.
+#'
+#' Tuning of the integration time takes into account the range of times
+#' supported by the connected instrument, read from the instrument descriptor.
+#' The algorithm also makes use of the linearization function when extrapolating
+#' to guess the integration time needed. Initial (default) values are read from
+#' \code{acq.settings} while \code{start.int.time} provides a default starting
+#' value for integration time for tuning when the user choses not to use the
+#' value stored in \code{acq.settings}.
+#'
+#' @family interactive acquisition utility functions
 #'
 #' @export
 #'
@@ -132,9 +152,24 @@ tune_interactive <- function(descriptor,
 #' Interactively select a measurement protocol
 #'
 #' Choose a protocol by name from a list of protocols, allowing the user to
-#' correct the selection if needed.
+#' correct the selection if needed. Protocols are not hard-wired, but instead
+#' defined by the list passed as argument to \code{protocols}.
 #'
-#' @param protocols list Measuring protocol defifinitions and names.
+#' @details
+#' A protocol is defined as a named list of character strings, and consist in
+#' multiple acquisition of spectra contributing to the same logical measurement.
+#' The name of the list member is the name of the protocol, while the members
+#' of each character vector correspond to spectra to be acquired, after some
+#' change in the measurement conditions. For example the list
+#' \code{list(rsd = c("reference", "sample", "dark"), rs = c("reference", "sample"))}
+#' defines two protocols.
+#'
+#' @family interactive acquisition utility functions
+#'
+#' @param protocols named list Measuring protocol defifinitions and names.
+#'
+#' @return The member vector corresponding to the protocol selected by
+#' the user.
 #'
 #' @export
 #'
@@ -168,6 +203,8 @@ protocol_interactive <- function(protocols) {
 #' @param w handle to Omni Driver, used to test if an spectrometer is still
 #'   connected.
 #'
+#' @family interactive acquisition utility functions
+#'
 #' @export
 #'
 list_srs_interactive <- function(w) {
@@ -182,10 +219,15 @@ list_srs_interactive <- function(w) {
 
 #' Interactively select an instrument
 #'
-#' Choice of spectrometer by name from a list of serial numbers, allowing the
+#' Choice of spectrometer from a list of serial numbers, allowing the
 #' user to correct the selection if needed.
 #'
 #' @param instruments the returm value of \code{list_instruments(w)}.
+#'
+#' @return A numeric index suitable for use in calls to functions defined in
+#' package 'rOmniDriver' based on which package 'ooacquire' is coded.
+#'
+#' @family interactive acquisition utility functions
 #'
 #' @export
 #'
@@ -236,6 +278,11 @@ choose_sr_interactive <- function(instruments) {
 #'   following Omni Driver indexing conventions.
 #' @param prompt.text character string to use as prompt.
 #'
+#' @return A numeric index suitable for use in calls to functions defined in
+#' package 'rOmniDriver' based on which package 'ooacquire' is coded.
+#'
+#' @family interactive acquisition utility functions
+#'
 #' @export
 #'
 choose_ch_interactive <- function(instruments,
@@ -266,16 +313,28 @@ choose_ch_interactive <- function(instruments,
 
 #' Interactively set sequential measurements
 #'
-#' Adjust integration time settings, allowing the user to repeat the tunning,
-#' and to change some of the parameters used for tunning.
+#' Enter settings defining a sequence of spectra to be measured as a time
+#' series.
 #'
 #' @param seq.settings numeric Definition of time steps for a sequence of repeated
 #'   measurements. Named vector with member names \code{"step"}, and
 #'   \code{"steps"}.
 #'
+#' @details Function \code{seq.settings()} allows users to enter values needed
+#' to define a sequence of spectral acquisitions. These are the delay or time
+#' step between succesive acquisitions and the number of acquisitions in the
+#' series.
+#'
+#' A sequence of measurements are expected to share a single reference or
+#' dark scan, and be done in rapid sequence.
+#'
+#' @family interactive acquisition utility functions
+#'
+#' @return A named numeric vector of length two.
+#'
 #' @export
 #'
-set_seq_interactive <- function(seq.settings = c(step.delay = 0, num.steps = 1L)) {
+set_seq_interactive <- function(seq.settings = c(step.delay = 0, num.steps = 1)) {
   old.seq.settings <- seq.settings
   repeat{
     cat("Ready to set sequence parameters?\n")
@@ -318,6 +377,10 @@ set_seq_interactive <- function(seq.settings = c(step.delay = 0, num.steps = 1L)
 #'
 #' @param user.attrs character Default values for the attributes.
 #'
+#' @family interactive acquisition utility functions
+#'
+#' @return a named list of character vectors.
+#'
 set_attributes_interactive <- function(user.attrs = list(what.measured = "",
                                                          comment.text = "")) {
   repeat{
@@ -338,6 +401,11 @@ set_attributes_interactive <- function(user.attrs = list(what.measured = "",
 #' Enter values for "user supplied" folder.
 #'
 #' @param folder.name character Default name of the folder.
+#'
+#' @details If the requested folder does not already exist it will be created.
+#' The name of the folder is returned, but NOT set as working directory.
+#'
+#' @family interactive acquisition utility functions
 #'
 #' @export
 #'
@@ -366,8 +434,11 @@ set_folder_interactive <- function(folder.name = ".") {
 #' hardware can be used to automatically trigger the light source, or to
 #' enable hard triggering of the light source by the spectrometer itself.
 #'
-#' @note When using this function, use an integration time that gives enough
-#' time for the manual triggering of the flash reliably within the integration.
+#' @note When using this function, set an integration time that gives enough
+#'   time for the manual triggering of the flash to reliably fall within the
+#'   integration.
+#'
+#' @family interactive acquisition utility functions
 #'
 #' @param n integer Number of pulses (flashes) to trigger per call.
 #'

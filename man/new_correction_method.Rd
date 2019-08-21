@@ -39,3 +39,13 @@ are ignored.
 Defaults for indexes are for the first channel of the first
   spectrometer currently connected.
 }
+\seealso{
+Other spectral data-processing functions: \code{\link{MAYP112785_tail_correction}},
+  \code{\link{MAYP11278_tail_correction}},
+  \code{\link{check_sn_match}},
+  \code{\link{linearize_counts}},
+  \code{\link{merge_raw_mspct}},
+  \code{\link{ref_correction}}, \code{\link{trim_counts}},
+  \code{\link{uvb_corrections}}
+}
+\concept{spectral data-processing functions}

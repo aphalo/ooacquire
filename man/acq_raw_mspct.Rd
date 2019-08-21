@@ -66,4 +66,7 @@ Function \code{acq_raw_mspct} acquires directly from a spectrometer
 \seealso{
 \code{\link{acq_raw_spct}} which is used to acquire each member
 spectrum.
+
+Other raw-counts-spectra acquisition functions: \code{\link{acq_raw_spct}}
 }
+\concept{raw-counts-spectra acquisition functions}

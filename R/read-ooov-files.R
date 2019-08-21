@@ -20,6 +20,9 @@
 #' @param verbose Logical indicating the level of warnings wanted.
 #'
 #' @return A raw_spct object.
+#'
+#' @family functions for importing spectral data from files
+#'
 #' @export
 #'
 read_oo_ovdata <- function(file,

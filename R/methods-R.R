@@ -21,6 +21,8 @@
 #' the default method \code{"none"}, the values of the remaining parameters
 #' are ignored.
 #'
+#' @family spectral data-processing functions
+#'
 #' @export
 #' @return a list
 #'
@@ -91,6 +93,8 @@ new_correction_method <- function(descriptor,
 #'
 #' @return A logical vector of length one, with \code{FALSE} indicating a
 #'   missmatch.
+#'
+#' @family spectral data-processing functions
 #'
 #' @export
 #'

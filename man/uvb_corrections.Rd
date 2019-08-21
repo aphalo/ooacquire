@@ -68,7 +68,17 @@ for.
 \references{
 \url{http://www.r4photobiology.info}
 }
+\seealso{
+Other spectral data-processing functions: \code{\link{MAYP112785_tail_correction}},
+  \code{\link{MAYP11278_tail_correction}},
+  \code{\link{check_sn_match}},
+  \code{\link{linearize_counts}},
+  \code{\link{merge_raw_mspct}},
+  \code{\link{new_correction_method}},
+  \code{\link{ref_correction}}, \code{\link{trim_counts}}
+}
 \author{
 Algorithm for method "original" developed by Lasse Ylianttila. Other
   methods are modified from Ylianttila's method by Pedro J. Aphalo.
 }
+\concept{spectral data-processing functions}

@@ -16,4 +16,10 @@ linearized field of the settings data replaced by TRUE.
 \description{
 Tag the settings as linearized
 }
+\seealso{
+Other acquisition-settings related functions: \code{\link{acq_settings}},
+  \code{\link{set_integ_time}},
+  \code{\link{set_num_exposures}}
+}
+\concept{acquisition-settings related functions}
 \keyword{internal}

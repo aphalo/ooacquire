@@ -9,6 +9,8 @@
 #'   numerical vectors of equal length (e.g. a binary numerical operator).
 #' @param ... not used in current version
 #'
+#' @family spectral data-processing functions
+#'
 #' @export ref_correction
 #'
 #' @note In the case of objects of class "raw_spct" the columns with names

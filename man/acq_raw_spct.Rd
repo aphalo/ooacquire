@@ -43,4 +43,7 @@ integration time for HDR.
 \seealso{
 \code{\link{acq_raw_mspct}} which can be used to acquire multiple
 spectra according to a user defined protocol.
+
+Other raw-counts-spectra acquisition functions: \code{\link{acq_raw_mspct}}
 }
+\concept{raw-counts-spectra acquisition functions}

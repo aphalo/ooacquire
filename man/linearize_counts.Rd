@@ -35,3 +35,13 @@ In contrast to other classes defined in package 'photobiology', class
   name starts with "counts" will have the intrument response linearization
   function applied.
 }
+\seealso{
+Other spectral data-processing functions: \code{\link{MAYP112785_tail_correction}},
+  \code{\link{MAYP11278_tail_correction}},
+  \code{\link{check_sn_match}},
+  \code{\link{merge_raw_mspct}},
+  \code{\link{new_correction_method}},
+  \code{\link{ref_correction}}, \code{\link{trim_counts}},
+  \code{\link{uvb_corrections}}
+}
+\concept{spectral data-processing functions}

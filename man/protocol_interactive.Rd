@@ -7,9 +7,34 @@
 protocol_interactive(protocols)
 }
 \arguments{
-\item{protocols}{list Measuring protocol defifinitions and names.}
+\item{protocols}{named list Measuring protocol defifinitions and names.}
+}
+\value{
+The member vector corresponding to the protocol selected by
+the user.
 }
 \description{
 Choose a protocol by name from a list of protocols, allowing the user to
-correct the selection if needed.
+correct the selection if needed. Protocols are not hard-wired, but instead
+defined by the list passed as argument to \code{protocols}.
 }
+\details{
+A protocol is defined as a named list of character strings, and consist in
+multiple acquisition of spectra contributing to the same logical measurement.
+The name of the list member is the name of the protocol, while the members
+of each character vector correspond to spectra to be acquired, after some
+change in the measurement conditions. For example the list
+\code{list(rsd = c("reference", "sample", "dark"), rs = c("reference", "sample"))}
+defines two protocols.
+}
+\seealso{
+Other interactive acquisition utility functions: \code{\link{choose_ch_interactive}},
+  \code{\link{choose_sr_interactive}},
+  \code{\link{f.trigger.message}},
+  \code{\link{list_srs_interactive}},
+  \code{\link{set_attributes_interactive}},
+  \code{\link{set_folder_interactive}},
+  \code{\link{set_seq_interactive}},
+  \code{\link{tune_interactive}}
+}
+\concept{interactive acquisition utility functions}

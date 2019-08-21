@@ -7,6 +7,8 @@
 #' @keywords datasets
 #' @format A list.
 #'
+#' @family objects containg instrument-specific data
+#'
 "MAYP11278_descriptors"
 
 #' Dates for which the different descriptors conatin valid calibrations.
@@ -17,6 +19,8 @@
 #' @docType data
 #' @keywords datasets
 #' @format A list.
+#'
+#' @family objects containg instrument-specific data
 #'
 "MAYP11278_calib_dates.df"
 
@@ -30,6 +34,8 @@
 #' @keywords datasets
 #' @format A list.
 #'
+#' @family objects containg instrument-specific data
+#'
 "MAYP11278_ylianttila.mthd"
 
 #' Correction method definition
@@ -41,6 +47,8 @@
 #' @docType data
 #' @keywords datasets
 #' @format A list.
+#'
+#' @family objects containg instrument-specific data
 #'
 "MAYP11278_sun.mthd"
 
@@ -54,6 +62,8 @@
 #' @keywords datasets
 #' @format A list.
 #'
+#' @family objects containg instrument-specific data
+#'
 "MAYP11278_simple.mthd"
 
 #' Instrument descriptors for a Maya2000 Pro  spectrometer
@@ -65,6 +75,8 @@
 #' @keywords datasets
 #' @format A list.
 #'
+#' @family objects containg instrument-specific data
+#'
 "MAYP112785_descriptors"
 
 #' Dates for which the different descriptors conatin valid calibrations.
@@ -75,6 +87,8 @@
 #' @docType data
 #' @keywords datasets
 #' @format A list.
+#'
+#' @family objects containg instrument-specific data
 #'
 "MAYP112785_calib_dates.df"
 
@@ -88,6 +102,8 @@
 #' @keywords datasets
 #' @format A list.
 #'
+#' @family objects containg instrument-specific data
+#'
 "MAYP112785_ylianttila.mthd"
 
 #' Correction method definition
@@ -100,6 +116,8 @@
 #' @keywords datasets
 #' @format A list.
 #'
+#' @family objects containg instrument-specific data
+#'
 "MAYP112785_sun.mthd"
 
 #' Correction method definition
@@ -111,5 +129,7 @@
 #' @docType data
 #' @keywords datasets
 #' @format A list.
+#'
+#' @family objects containg instrument-specific data
 #'
 "MAYP112785_simple.mthd"

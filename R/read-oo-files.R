@@ -19,6 +19,8 @@
 #'   names.
 #' @param verbose Logical indicating the level of warnings wanted.
 #'
+#' @family functions for importing spectral data from files
+#'
 #' @return A raw_spct object.
 #' @export
 #'
@@ -64,6 +66,8 @@ read_oo_data <- function(file,
 #'
 #' @note Depending of the function passed to \code{read.f} more or less complete
 #' metadata information will be stored as attributes in the raw_spct objects.
+#'
+#' @family functions for importing spectral data from files
 #'
 #' @export
 #'

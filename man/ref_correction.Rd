@@ -72,3 +72,13 @@ If \code{x} and \code{y} are both cps_mspct objects,
   should be a cps_spct and will be used as is. In all cases variables in
   ref.name will be skipped in \code{x}.
 }
+\seealso{
+Other spectral data-processing functions: \code{\link{MAYP112785_tail_correction}},
+  \code{\link{MAYP11278_tail_correction}},
+  \code{\link{check_sn_match}},
+  \code{\link{linearize_counts}},
+  \code{\link{merge_raw_mspct}},
+  \code{\link{new_correction_method}},
+  \code{\link{trim_counts}}, \code{\link{uvb_corrections}}
+}
+\concept{spectral data-processing functions}

@@ -13,4 +13,12 @@ A red long-pass filter from Heliopan (695 nm) measured using a household
 incandescent lamp as light source. The spectrometer used was an Ocean Optics
 Maya2000 Pro.
 }
+\seealso{
+Other objects containing example raw-counts data: \code{\link{blue_filter.raw_mspct}},
+  \code{\link{halogen.raw_mspct}},
+  \code{\link{white_LED.raw_mspct}},
+  \code{\link{white_LED_2min.raw_mspct}},
+  \code{\link{xenon_flash.raw_mspct}}
+}
+\concept{objects containing example raw-counts data}
 \keyword{datasets}

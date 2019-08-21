@@ -12,6 +12,8 @@
 #' @param na.rm a logical value indicating whether NA values should be stripped
 #'   before the computation proceeds.
 #'
+#' @family functions for importing spectral data from files
+#'
 #' @export
 #'
 #' @note If the argument passed to \code{method} is of length 2, the first
@@ -85,6 +87,8 @@ plot_spct_file <- function(file, range = NULL, method = NULL, strength = 0, na.r
 #'   the collection.
 #' @param na.rm a logical value indicating whether NA values should be stripped
 #'   before the computation proceeds.
+#'
+#' @family functions for importing spectral data from files
 #'
 #' @export
 #'

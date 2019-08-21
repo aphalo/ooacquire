@@ -14,6 +14,8 @@
 #' @return a cps_spct object with one spectrum preserving the metadata present in
 #'   \code{x}.
 #'
+#' @family functions for conversion of raw-counts data
+#'
 #' @export raw2corr_cps
 #'
 raw2corr_cps  <- function(x,

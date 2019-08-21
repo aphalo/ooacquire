@@ -13,6 +13,8 @@ using namespace std;
 //' Tail correction is a reimplementation of the calculations developed by Lasse
 //' Ylianttila (STUK, Finland), originally in Excel.
 //'
+//' @family spectral data-processing functions
+//'
 //' @export
 //'
 // [[Rcpp::export]]

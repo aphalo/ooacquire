@@ -7,6 +7,8 @@
 #' @keywords datasets
 #' @format A raw_mspct
 #'
+#' @family objects containing example raw-counts data
+#'
 "blue_filter.raw_mspct"
 
 #' Raw counts data for a filter measurement
@@ -19,6 +21,8 @@
 #' @keywords datasets
 #' @format A raw_mspct
 #'
+#' @family objects containing example raw-counts data
+#'
 "red_filter.raw_mspct"
 
 #' Raw counts data for a lamp measurement.
@@ -29,6 +33,8 @@
 #' @docType data
 #' @keywords datasets
 #' @format A raw_mspct
+#'
+#' @family objects containing example raw-counts data
 #'
 "white_LED.raw_mspct"
 
@@ -43,6 +49,8 @@
 #' @keywords datasets
 #' @format A raw_mspct
 #'
+#' @family objects containing example raw-counts data
+#'
 "white_LED_2min.raw_mspct"
 
 #' Raw counts data for a lamp measurement.
@@ -54,6 +62,8 @@
 #' @keywords datasets
 #' @format A raw_mspct
 #'
+#' @family objects containing example raw-counts data
+#'
 "halogen.raw_mspct"
 
 #' Raw counts data for a lamp measurement.
@@ -64,6 +74,8 @@
 #' @docType data
 #' @keywords datasets
 #' @format A raw_mspct
+#'
+#' @family objects containing example raw-counts data
 #'
 "xenon_flash.raw_mspct"
 

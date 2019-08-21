@@ -8,6 +8,8 @@
 #' @keywords datasets
 #' @format A list.
 #'
+#' @family objects containg instrument-specific data
+#'
 "JAZA3098_calib_dates.df"
 
 # Channel 1 ---------------------------------------------------------------
@@ -20,6 +22,8 @@
 #' @docType data
 #' @keywords datasets
 #' @format A list.
+#'
+#' @family objects containg instrument-specific data
 #'
 "JAZA3098_ch1_descriptors"
 
@@ -35,6 +39,8 @@
 #' @keywords datasets
 #' @format A list.
 #'
+#' @family objects containg instrument-specific data
+#'
 "JAZA3098_ch1_ylianttila.mthd"
 
 #' Correction method definition
@@ -49,6 +55,8 @@
 #' @keywords datasets
 #' @format A list.
 #'
+#' @family objects containg instrument-specific data
+#'
 "JAZA3098_ch1_sun.mthd"
 
 #' Correction method definition
@@ -60,6 +68,8 @@
 #' @docType data
 #' @keywords datasets
 #' @format A list.
+#'
+#' @family objects containg instrument-specific data
 #'
 "JAZA3098_ch1_simple.mthd"
 
@@ -86,6 +96,8 @@
 #' @keywords datasets
 #' @format A list.
 #'
+#' @family objects containg instrument-specific data
+#'
 "JAZA3098_ch2_descriptors"
 
 #' Correction method definition
@@ -99,6 +111,8 @@
 #' @docType data
 #' @keywords datasets
 #' @format A list.
+#'
+#' @family objects containg instrument-specific data
 #'
 "JAZA3098_ch2_ylianttila.mthd"
 
@@ -114,6 +128,8 @@
 #' @keywords datasets
 #' @format A list.
 #'
+#' @family objects containg instrument-specific data
+#'
 "JAZA3098_ch2_sun.mthd"
 
 #' Correction method definition
@@ -126,6 +142,8 @@
 #' @keywords datasets
 #' @format A list.
 #'
+#' @family objects containg instrument-specific data
+#'
 "JAZA3098_ch2_simple.mthd"
 
 #' Correction method definition
@@ -137,6 +155,8 @@
 #' @docType data
 #' @keywords datasets
 #' @format A list.
+#'
+#' @family objects containg instrument-specific data
 #'
 "JAZA3098_ch2_none.mthd"
 

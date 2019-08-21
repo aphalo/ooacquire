@@ -55,9 +55,17 @@ created on-the-fly.}
 
 \item{type}{character Type of transmittance or reflectance measured.}
 }
+\value{
+These functions return the acquired spectra through "side effects"
+as each spectrum is saved, both as raw counts data and calibrated
+spectral data in an \code{.rda} file as objects of the classes defined in
+package 'photobiology'. Optionally, the plot for each spectrum is saved as
+a \code{.pdf} file. The value returned by the function is that from
+closing the connection to the spectrometer.
+}
 \description{
 Functions providing a simple interactive front-end to the functions in the
-package. Mostly as example code that can be modified for diferent
+package, also working as example code that can be modified for diferent
 uses.
 }
 \details{
@@ -65,14 +73,20 @@ These functions can be useful for commonly done measurements but
   they also play the role of examples that users can modify according to
   their needs. They are all composed in a modular way from functions that can
   be reshuffled and combined with other functions to define new variations
-  better suited to users' needs and tastes. The examples we provide cover the
+  better suited to users' needs and tastes. Functions \code{acq_irrad_interactive()}
+  and \code{acq_fraction_interactive} provide support the
   measurement of spectral irradiance of continuous light sources, and
-  transmittance, reflectance and absorbance using continuous light sources.
+  transmittance, reflectance and absorbance using continuous light sources,
+  respectively.
 
   The default behaviour of the functions can be changed by passing different
   arguments through parameters, but for special use cases it could be best
-  for users to define case specific data acquisition functions from the
+  for users to define case-specific data acquisition functions from the
   same building blocks.
+
+  Using these functions only requires an Ocean Optics spectrometer to be
+  connected. The connection to the spectrometer and selection of channel,
+  when relevant, is done from within these functions.
 
 The different interface modes are suitable for different types of
   measurements.
@@ -112,3 +126,10 @@ acquire_interactive()
 }
 
 }
+\seealso{
+This function calls functions \code{\link{tune_interactive}},
+\code{\link{protocol_interactive}}  and \code{\link{set_attributes_interactive}}.
+
+Other interactive acquisition functions: \code{\link{acq_fluence_interactive}}
+}
+\concept{interactive acquisition functions}

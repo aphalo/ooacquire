@@ -36,4 +36,10 @@ per exposure, and consequently calculations done based on the number of
 exposure events during each integration. This is the case, for example, when
 measuring the spectral emission of a xenon flash.
 }
+\seealso{
+Other acquisition-settings related functions: \code{\link{acq_settings}},
+  \code{\link{set_integ_time}},
+  \code{\link{set_linearized}}
+}
+\concept{acquisition-settings related functions}
 \keyword{internal}

@@ -30,6 +30,9 @@
 #'
 #' @author Algorithm for method "original" developed by Lasse Ylianttila. Other
 #'   methods are modified from Ylianttila's method by Pedro J. Aphalo.
+#'
+#' @family spectral data-processing functions
+#'
 #' @export
 #'
 #' @references \url{http://www.r4photobiology.info}

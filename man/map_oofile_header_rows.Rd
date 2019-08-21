@@ -26,3 +26,15 @@ located. Parsing is needed because the format used varies with among Ocean
 Optics programs and instruments. Even the number of lines in the header, and
 the position of the first line with spectral data vary.
 }
+\seealso{
+Other functions for importing spectral data from files: \code{\link{collect_spct_files}},
+  \code{\link{oofile_data_rows}},
+  \code{\link{plot_spct_file}},
+  \code{\link{read_files2mspct}},
+  \code{\link{read_oo_data}}, \code{\link{read_oo_ovdata}},
+  \code{\link{read_oo_pidata}},
+  \code{\link{read_oo_ssdata}},
+  \code{\link{set_oo_ssdata_descriptor}},
+  \code{\link{set_oo_ssdata_settings}}
+}
+\concept{functions for importing spectral data from files}

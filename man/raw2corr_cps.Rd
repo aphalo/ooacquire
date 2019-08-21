@@ -43,3 +43,9 @@ splice the different spectra.
 \item \code{raw_mspct}: raw_spct method
 }}
 
+\seealso{
+Other functions for conversion of raw-counts data: \code{\link{raw2cps}},
+  \code{\link{s_fraction_corrected}},
+  \code{\link{s_irrad_corrected}}
+}
+\concept{functions for conversion of raw-counts data}

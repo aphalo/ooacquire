@@ -8,6 +8,8 @@
 #' @param fill an integer value (including NA) to be used to replace the values
 #'   that are outside range.
 #'
+#' @family spectral data-processing functions
+#'
 #' @export
 #'
 #' @return a copy of x with values replaced as needed in all counts columns

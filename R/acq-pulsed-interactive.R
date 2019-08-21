@@ -18,6 +18,11 @@
 #'   for users to define case specific data acquisition functions from the
 #'   same building blocks.
 #'
+#' @seealso This function calls functions \code{\link{tune_interactive}},
+#' \code{\link{protocol_interactive}}  and \code{\link{set_attributes_interactive}}.
+#'
+#' @family interactive acquisition functions
+#'
 #' @param integ.time numeric Integration time for a measurement event
 #'   in seconds.
 #' @param num.scans integer Number of scans to average.

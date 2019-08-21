@@ -10,7 +10,21 @@ set_attributes_interactive(user.attrs = list(what.measured = "",
 \arguments{
 \item{user.attrs}{character Default values for the attributes.}
 }
+\value{
+a named list of character vectors.
+}
 \description{
 Allow user to provide values for "user supplied" attribute values
 \code{"comment"} and \code{"what.measured"}.
 }
+\seealso{
+Other interactive acquisition utility functions: \code{\link{choose_ch_interactive}},
+  \code{\link{choose_sr_interactive}},
+  \code{\link{f.trigger.message}},
+  \code{\link{list_srs_interactive}},
+  \code{\link{protocol_interactive}},
+  \code{\link{set_folder_interactive}},
+  \code{\link{set_seq_interactive}},
+  \code{\link{tune_interactive}}
+}
+\concept{interactive acquisition utility functions}

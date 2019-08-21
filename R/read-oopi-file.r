@@ -19,7 +19,11 @@
 #' @param npixels integer Number of pixels in spectral data.
 #'
 #' @return A raw_spct object.
+#'
+#' @family functions for importing spectral data from files
+#'
 #' @export
+#'
 #' @references \url{http://www.r4photobiology.info}
 #'
 #' @note The header in these files has very little information, so the user

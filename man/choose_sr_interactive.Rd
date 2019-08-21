@@ -9,7 +9,22 @@ choose_sr_interactive(instruments)
 \arguments{
 \item{instruments}{the returm value of \code{list_instruments(w)}.}
 }
+\value{
+A numeric index suitable for use in calls to functions defined in
+package 'rOmniDriver' based on which package 'ooacquire' is coded.
+}
 \description{
-Choice of spectrometer by name from a list of serial numbers, allowing the
+Choice of spectrometer from a list of serial numbers, allowing the
 user to correct the selection if needed.
 }
+\seealso{
+Other interactive acquisition utility functions: \code{\link{choose_ch_interactive}},
+  \code{\link{f.trigger.message}},
+  \code{\link{list_srs_interactive}},
+  \code{\link{protocol_interactive}},
+  \code{\link{set_attributes_interactive}},
+  \code{\link{set_folder_interactive}},
+  \code{\link{set_seq_interactive}},
+  \code{\link{tune_interactive}}
+}
+\concept{interactive acquisition utility functions}

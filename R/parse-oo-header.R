@@ -11,6 +11,9 @@
 #'   descriptor in \code{x} should be overwritten.
 #'
 #' @return A copy of \code{x} with updated attributes.
+#'
+#' @family functions for importing spectral data from files
+#'
 #' @export
 #'
 set_oo_ssdata_settings <- function(x,
@@ -120,6 +123,8 @@ set_oo_ssdata_settings <- function(x,
 #'
 #' @return A copy of \code{x} with updated attributes.
 #'
+#' @family functions for importing spectral data from files
+#'
 #' @export
 #'
 set_oo_ssdata_descriptor <- function(x,
@@ -201,6 +206,8 @@ oo.minimum.gr <-
 #' @return A data frame with two variables, "feature" of class character, and
 #'   "line.idx" of class integer.
 #'
+#' @family functions for importing spectral data from files
+#'
 #' @export
 #'
 map_oofile_header_rows <- function(lines,
@@ -233,6 +240,8 @@ map_oofile_header_rows <- function(lines,
 #'
 #' @note This is a rather slow operation, so if all files to be read have
 #'   the same format, it is inefficient to call this function for each file.
+#'
+#' @family functions for importing spectral data from files
 #'
 #' @export
 #'

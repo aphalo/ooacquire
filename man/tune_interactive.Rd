@@ -20,5 +20,34 @@ tuning the settings.}
 }
 \description{
 Adjust integration time settings, allowing the user to repeat the tunning,
-and to change some of the parameters used for tunning.
+and to change some of the parameters used for tunning such as total
+compound integration time and intergration time bracketing.
 }
+\details{
+This function implements three different user interfaces: 1) "simple" is an
+interface suitable for the most usual measurements using automatic tuning
+of integration time and hides some of the
+less frequently used options, 2) "auto" gives access to all available
+options offering maximum flexibility when using automatic tuning of
+integration time, and 3) "manual" supports use of fixed integration times
+directly entered by the user.
+
+Tuning of the integration time takes into account the range of times
+supported by the connected instrument, read from the instrument descriptor.
+The algorithm also makes use of the linearization function when extrapolating
+to guess the integration time needed. Initial (default) values are read from
+\code{acq.settings} while \code{start.int.time} provides a default starting
+value for integration time for tuning when the user choses not to use the
+value stored in \code{acq.settings}.
+}
+\seealso{
+Other interactive acquisition utility functions: \code{\link{choose_ch_interactive}},
+  \code{\link{choose_sr_interactive}},
+  \code{\link{f.trigger.message}},
+  \code{\link{list_srs_interactive}},
+  \code{\link{protocol_interactive}},
+  \code{\link{set_attributes_interactive}},
+  \code{\link{set_folder_interactive}},
+  \code{\link{set_seq_interactive}}
+}
+\concept{interactive acquisition utility functions}

@@ -16,3 +16,8 @@ a list
 List all connected spectrometers by model name and serial number, plus
 the number of channels in each of them.
 }
+\seealso{
+Other spectrometer-connection functions: \code{\link{end_session}},
+  \code{\link{start_session}}
+}
+\concept{spectrometer-connection functions}

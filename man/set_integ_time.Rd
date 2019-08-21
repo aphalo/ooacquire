@@ -17,4 +17,10 @@ a copy of the argument passed for \code{acq.settings} with the
 \description{
 Set the integration time in the instrument settings data structure.
 }
+\seealso{
+Other acquisition-settings related functions: \code{\link{acq_settings}},
+  \code{\link{set_linearized}},
+  \code{\link{set_num_exposures}}
+}
+\concept{acquisition-settings related functions}
 \keyword{internal}

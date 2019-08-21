@@ -43,6 +43,8 @@
 #'   ignore bad pixels and to restrict integration-time tuning to the response
 #'   from a range of pixels.
 #'
+#' @family acquisition-settings related functions
+#'
 #' @export
 #'
 #' @return a list.
@@ -140,6 +142,8 @@ acq_settings <- function(descriptor,
 #' @return a copy of the argument passed for \code{acq.settings} with the
 #' linearized field of the settings data replaced by TRUE.
 #'
+#' @family acquisition-settings related functions
+#'
 #' @keywords internal
 #'
 set_linearized <- function(acq.settings) {
@@ -155,6 +159,8 @@ set_linearized <- function(acq.settings) {
 #'
 #' @return a copy of the argument passed for \code{acq.settings} with the
 #' \code{integ.time} field of the settings data replaced by \code{integ.time}.
+#'
+#' @family acquisition-settings related functions
 #'
 #' @keywords internal
 #'
@@ -224,6 +230,8 @@ set_integ_time <- function(acq.settings,
 #'
 #' @return a copy of the argument passed for \code{acq.settings} with the
 #' \code{integ.time} field of the settings data replaced by \code{integ.time}.
+#'
+#' @family acquisition-settings related functions
 #'
 #' @keywords internal
 #'

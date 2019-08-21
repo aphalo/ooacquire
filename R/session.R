@@ -12,6 +12,8 @@
 #' @return On success a java wrapper which allows access to the driver with an open
 #' connection to the instrument.
 #'
+#' @family spectrometer-connection functions
+#'
 #' @export
 #'
 start_session <- function(error.action = stop) {
@@ -39,7 +41,10 @@ start_session <- function(error.action = stop) {
 #'
 #' @return a list
 #'
+#' @family spectrometer-connection functions
+#'
 #' @export
+#'
 list_instruments <- function(w) {
   number.srs <- rOmniDriver::number_srs(w)
   srs.idxs <- seq(from = 0, length.out = number.srs)
@@ -63,6 +68,8 @@ list_instruments <- function(w) {
 #' at by the Java object referenced in \code{x}.
 #'
 #' @param w a java wrapper as returned by \code{start_session()}
+#'
+#' @family spectrometer-connection functions
 #'
 #' @export
 #'

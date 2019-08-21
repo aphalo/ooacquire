@@ -9,6 +9,8 @@
 #' @keywords datasets
 #' @format A list.
 #'
+#' @family objects containg instrument-specific data
+#'
 "FLMS00416_descriptors"
 
 #' Instrument calibration for a Flame S spectrometer
@@ -20,6 +22,8 @@
 #' @keywords datasets
 #' @format A \code{calibration_spct} object.
 #'
+#' @family objects containg instrument-specific data
+#'
 "FLMS00416_cal.spct"
 
 #' Dates for which the different descriptors conatin valid calibrations.
@@ -30,6 +34,8 @@
 #' @docType data
 #' @keywords datasets
 #' @format A list.
+#'
+#' @family objects containg instrument-specific data
 #'
 "FLMS00416_calib_dates.df"
 
@@ -45,6 +51,8 @@
 #' @keywords datasets
 #' @format A list.
 #'
+#' @family objects containg instrument-specific data
+#'
 "FLMS00416_ylianttila.mthd"
 
 #' Correction method definition
@@ -58,6 +66,8 @@
 #' @docType data
 #' @keywords datasets
 #' @format A list.
+#'
+#' @family objects containg instrument-specific data
 #'
 "FLMS00416_sun.mthd"
 
@@ -73,6 +83,8 @@
 #' @keywords datasets
 #' @format A list.
 #'
+#' @family objects containg instrument-specific data
+#'
 "FLMS00416_simple.mthd"
 
 #' Correction method definition
@@ -84,6 +96,8 @@
 #' @docType data
 #' @keywords datasets
 #' @format A list.
+#'
+#' @family objects containg instrument-specific data
 #'
 "FLMS00416_none.mthd"
 
@@ -98,6 +112,8 @@
 #' @keywords datasets
 #' @format A list.
 #'
+#' @family objects containg instrument-specific data
+#'
 "FLMS00440_descriptors"
 
 
@@ -109,6 +125,8 @@
 #' @docType data
 #' @keywords datasets
 #' @format A \code{calibration_spct} object.
+#'
+#' @family objects containg instrument-specific data
 #'
 "FLMS00440_cal.spct"
 
@@ -135,6 +153,8 @@
 #' @keywords datasets
 #' @format A list.
 #'
+#' @family objects containg instrument-specific data
+#'
 "FLMS00440_ylianttila.mthd"
 
 #' Correction method definition
@@ -148,6 +168,8 @@
 #' @docType data
 #' @keywords datasets
 #' @format A list.
+#'
+#' @family objects containg instrument-specific data
 #'
 "FLMS00440_sun.mthd"
 
@@ -163,6 +185,8 @@
 #' @keywords datasets
 #' @format A list.
 #'
+#' @family objects containg instrument-specific data
+#'
 "FLMS00440_simple.mthd"
 
 #' Correction method definition
@@ -174,6 +198,8 @@
 #' @docType data
 #' @keywords datasets
 #' @format A list.
+#'
+#' @family objects containg instrument-specific data
 #'
 "FLMS00440_none.mthd"
 
@@ -188,6 +214,8 @@
 #' @keywords datasets
 #' @format A list.
 #'
+#' @family objects containg instrument-specific data
+#'
 "FLMS00673_descriptors"
 
 #' Instrument calibration for a Flame S spectrometer
@@ -199,6 +227,8 @@
 #' @keywords datasets
 #' @format A \code{calibration_spct} object.
 #'
+#' @family objects containg instrument-specific data
+#'
 "FLMS00673_cal.spct"
 
 #' Dates for which the different descriptors conatin valid calibrations.
@@ -209,6 +239,8 @@
 #' @docType data
 #' @keywords datasets
 #' @format A list.
+#'
+#' @family objects containg instrument-specific data
 #'
 "FLMS00673_calib_dates.df"
 
@@ -224,6 +256,8 @@
 #' @keywords datasets
 #' @format A list.
 #'
+#' @family objects containg instrument-specific data
+#'
 "FLMS00673_ylianttila.mthd"
 
 #' Correction method definition
@@ -237,6 +271,8 @@
 #' @docType data
 #' @keywords datasets
 #' @format A list.
+#'
+#' @family objects containg instrument-specific data
 #'
 "FLMS00673_sun.mthd"
 
@@ -252,6 +288,8 @@
 #' @keywords datasets
 #' @format A list.
 #'
+#' @family objects containg instrument-specific data
+#'
 "FLMS00673_simple.mthd"
 
 #' Correction method definition
@@ -263,6 +301,8 @@
 #' @docType data
 #' @keywords datasets
 #' @format A list.
+#'
+#' @family objects containg instrument-specific data
 #'
 "FLMS00673_none.mthd"
 
@@ -277,6 +317,8 @@
 #' @keywords datasets
 #' @format A list.
 #'
+#' @family objects containg instrument-specific data
+#'
 "FLMS04133_descriptors"
 
 #' Instrument calibration for a Flame S spectrometer
@@ -288,6 +330,8 @@
 #' @keywords datasets
 #' @format A \code{calibration_spct} object.
 #'
+#' @family objects containg instrument-specific data
+#'
 "FLMS04133_cal.spct"
 
 #' Dates for which the different descriptors conatin valid calibrations.
@@ -298,6 +342,8 @@
 #' @docType data
 #' @keywords datasets
 #' @format A list.
+#'
+#' @family objects containg instrument-specific data
 #'
 "FLMS04133_calib_dates.df"
 
@@ -313,6 +359,8 @@
 #' @keywords datasets
 #' @format A list.
 #'
+#' @family objects containg instrument-specific data
+#'
 "FLMS04133_ylianttila.mthd"
 
 #' Correction method definition
@@ -326,6 +374,8 @@
 #' @docType data
 #' @keywords datasets
 #' @format A list.
+#'
+#' @family objects containg instrument-specific data
 #'
 "FLMS04133_sun.mthd"
 
@@ -341,6 +391,8 @@
 #' @keywords datasets
 #' @format A list.
 #'
+#' @family objects containg instrument-specific data
+#'
 "FLMS04133_simple.mthd"
 
 #' Correction method definition
@@ -352,5 +404,7 @@
 #' @docType data
 #' @keywords datasets
 #' @format A list.
+#'
+#' @family objects containg instrument-specific data
 #'
 "FLMS04133_none.mthd"

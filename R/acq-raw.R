@@ -16,6 +16,8 @@
 #' @param set.all logical resend or not all instrument settings.
 #' @param verbose logical to enable or disable warnings.
 #'
+#' @family raw-counts-spectra acquisition functions
+#'
 #' @export
 #'
 #' @return A \code{raw_spct} object with one column \code{w.length} and one
@@ -165,6 +167,8 @@ acq_raw_spct <- function(descriptor,
 #'   Two parameters accept functions as arguments, and default to functions that
 #'   request the operator to trigger the flash or change the light conditions
 #'   according to the names of the steps in the argument to \code{protocol}.
+#'
+#' @family raw-counts-spectra acquisition functions
 #'
 #' @param descriptor list as returned by function \code{get_oo_descriptor()}.
 #' @param acq.settings list as returned by functions \code{tune_acq_settings()}

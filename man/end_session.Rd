@@ -13,3 +13,8 @@ end_session(w)
 Close the connection to the spectrometer pointed
 at by the Java object referenced in \code{x}.
 }
+\seealso{
+Other spectrometer-connection functions: \code{\link{list_instruments}},
+  \code{\link{start_session}}
+}
+\concept{spectrometer-connection functions}

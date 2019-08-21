@@ -19,3 +19,8 @@ Open a connection to the first spectrometer found
 and initialize an object with a reference to the
 Java object returned by Omni Driver.
 }
+\seealso{
+Other spectrometer-connection functions: \code{\link{end_session}},
+  \code{\link{list_instruments}}
+}
+\concept{spectrometer-connection functions}

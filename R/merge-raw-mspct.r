@@ -10,6 +10,8 @@
 #' @note The individual \code{raw_spct} objects contained in \code{x} must have
 #'   identical values in \code{w.length}.
 #'
+#' @family spectral data-processing functions
+#'
 #' @export
 #'
 merge_raw_mspct <- function(x) {

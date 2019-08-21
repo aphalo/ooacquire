@@ -79,3 +79,8 @@ Currently \code{s_irrad_corrected.list} allows processing of files
   detector non-linearity or not. All three spectra should be acquired using
   the same instrument settings to achieve good accuracy.
 }
+\seealso{
+Other functions for conversion of raw-counts data: \code{\link{raw2corr_cps}},
+  \code{\link{raw2cps}}, \code{\link{s_fraction_corrected}}
+}
+\concept{functions for conversion of raw-counts data}

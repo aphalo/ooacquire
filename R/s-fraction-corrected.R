@@ -35,6 +35,8 @@
 #'   should be acquired using the same instrument settings to achieve good
 #'   accuracy.
 #'
+#' @family functions for conversion of raw-counts data
+#'
 #' @export
 #'
 s_fraction_corrected <- function(x, ...) UseMethod("s_fraction_corrected")

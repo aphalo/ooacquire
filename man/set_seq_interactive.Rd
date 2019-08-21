@@ -4,14 +4,37 @@
 \alias{set_seq_interactive}
 \title{Interactively set sequential measurements}
 \usage{
-set_seq_interactive(seq.settings = c(step.delay = 0, num.steps = 1L))
+set_seq_interactive(seq.settings = c(step.delay = 0, num.steps = 1))
 }
 \arguments{
 \item{seq.settings}{numeric Definition of time steps for a sequence of repeated
 measurements. Named vector with member names \code{"step"}, and
 \code{"steps"}.}
 }
-\description{
-Adjust integration time settings, allowing the user to repeat the tunning,
-and to change some of the parameters used for tunning.
+\value{
+A named numeric vector of length two.
 }
+\description{
+Enter settings defining a sequence of spectra to be measured as a time
+series.
+}
+\details{
+Function \code{seq.settings()} allows users to enter values needed
+to define a sequence of spectral acquisitions. These are the delay or time
+step between succesive acquisitions and the number of acquisitions in the
+series.
+
+A sequence of measurements are expected to share a single reference or
+dark scan, and be done in rapid sequence.
+}
+\seealso{
+Other interactive acquisition utility functions: \code{\link{choose_ch_interactive}},
+  \code{\link{choose_sr_interactive}},
+  \code{\link{f.trigger.message}},
+  \code{\link{list_srs_interactive}},
+  \code{\link{protocol_interactive}},
+  \code{\link{set_attributes_interactive}},
+  \code{\link{set_folder_interactive}},
+  \code{\link{tune_interactive}}
+}
+\concept{interactive acquisition utility functions}

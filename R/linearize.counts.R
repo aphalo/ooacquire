@@ -22,6 +22,8 @@
 #'   name starts with "counts" will have the intrument response linearization
 #'   function applied.
 #'
+#' @family spectral data-processing functions
+#'
 #' @export
 #'
 linearize_counts <- function(x,

@@ -14,4 +14,12 @@ spectrometer used was an Ocean Optics Maya2000 Pro. Measured using three
 level bracketing and a 120 seconds total time per measurement through scan
 averaging.
 }
+\seealso{
+Other objects containing example raw-counts data: \code{\link{blue_filter.raw_mspct}},
+  \code{\link{halogen.raw_mspct}},
+  \code{\link{red_filter.raw_mspct}},
+  \code{\link{white_LED.raw_mspct}},
+  \code{\link{xenon_flash.raw_mspct}}
+}
+\concept{objects containing example raw-counts data}
 \keyword{datasets}

@@ -16,6 +16,18 @@ hardware can be used to automatically trigger the light source, or to
 enable hard triggering of the light source by the spectrometer itself.
 }
 \note{
-When using this function, use an integration time that gives enough
-time for the manual triggering of the flash reliably within the integration.
+When using this function, set an integration time that gives enough
+  time for the manual triggering of the flash to reliably fall within the
+  integration.
 }
+\seealso{
+Other interactive acquisition utility functions: \code{\link{choose_ch_interactive}},
+  \code{\link{choose_sr_interactive}},
+  \code{\link{list_srs_interactive}},
+  \code{\link{protocol_interactive}},
+  \code{\link{set_attributes_interactive}},
+  \code{\link{set_folder_interactive}},
+  \code{\link{set_seq_interactive}},
+  \code{\link{tune_interactive}}
+}
+\concept{interactive acquisition utility functions}

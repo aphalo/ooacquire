@@ -6,6 +6,8 @@
 #' @param x an R object
 #' @param ... not used in current version
 #'
+#' @family functions for conversion of raw-counts data
+#'
 #' @export raw2cps
 #'
 #' @note In the case of objects of class "raw_spct" the columns with names
