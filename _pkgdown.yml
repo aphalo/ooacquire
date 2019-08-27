@@ -49,6 +49,7 @@ reference:
     - tune_acq_settings
     - acq_raw_spct
     - acq_raw_mspct
+    - check_sn_match
   - title: Read raw-counts data from text files
     desc: Functions for reading raw-counts and metadata from output files from **OceanView**, **SpectraSuite**, Raspberry Pi software and the inbuilt-firmware of the Jaz modular spectrometer.
     contents:

@@ -1,8 +1,3 @@
-## ---- eval = FALSE-------------------------------------------------------
-#  folderpath <- system.file("extdata", package="ooacquire")
-#  file.copy(from = folderpath, to = ".", recursive = TRUE)
-#  oldwd <- setwd("./extdata")
-
 ## ----"setup", include=FALSE----------------------------------------------
 require("knitr")
 opts_knit$set(cache = FALSE, root.dir = system.file("extdata", package = "ooacquire"))
@@ -17,6 +12,7 @@ library(ooacquire)
 options(warn = 1)
 
 # change this to TRUE to run acquisition examples
+# these examples require user interaction to complete!!
 sr.online <- FALSE
 
 ## ---- eval=sr.online, echo=FALSE, message=FALSE, warning=FALSE-----------
@@ -26,7 +22,8 @@ sr.online <- FALSE
 
 ## ---- eval=sr.online-----------------------------------------------------
 #  acq_irrad_interactive(correction.method = ooacquire::MAYP11278_ylianttila.mthd,
-#                        descriptors = ooacquire::MAYP11278_descriptors)
+#                        descriptors = ooacquire::MAYP11278_descriptors,
+#                        interface.mode = "simple")
 
 ## ---- eval=sr.online-----------------------------------------------------
 #  acq_irrad_interactive(HDR.mult = 1,
@@ -53,7 +50,7 @@ sr.online <- FALSE
 
 ## ---- eval=sr.online-----------------------------------------------------
 #  acq_fluence_interactive(correction.method = ooacquire::MAYP11278_ylianttila.mthd,
-#                        descriptors = ooacquire::MAYP11278_descriptors)
+#                          descriptors = ooacquire::MAYP11278_descriptors)
 
 ## ---- eval=sr.online-----------------------------------------------------
 #  acq_fluence_interactive(integ.time = 4, # seconds
