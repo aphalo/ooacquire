@@ -133,6 +133,7 @@ acq_irrad_interactive <-
         switch(serial_no,
                MAYP11278 = which_descriptor(descriptors = ooacquire::MAYP11278_descriptors),
                MAYP112785 = which_descriptor(descriptors = ooacquire::MAYP112785_descriptors),
+               MAYP114590 = which_descriptor(descriptors = ooacquire::MAYP114590_descriptors),
                FLMS04133 = which_descriptor(descriptors = ooacquire::FLMS04133_descriptors),
                FLMS00673 = which_descriptor(descriptors = ooacquire::FLMS00673_descriptors),
                {
@@ -146,6 +147,7 @@ acq_irrad_interactive <-
         switch(serial_no,
                MAYP11278 = ooacquire::MAYP11278_ylianttila.mthd,
                MAYP112785 = ooacquire::MAYP112785_ylianttila.mthd,
+               MAYP114590 = ooacquire::MAYP114590_simple.mthd,
                FLMS04133 = ooacquire::FLMS04133_none.mthd,
                FLMS00673 = ooacquire::FLMS00673_none.mthd,
                {

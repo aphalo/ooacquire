@@ -18,7 +18,7 @@ JAZA3098_ch1_simple.mthd <- list(
   flt.dark.wl = c(199.3, 215.1),
   flt.ref.wl = c(360, 379.5),
   flt.Tfr = 1,
-  inst.dark.pixs = 1:24,
+  inst.dark.pixs = 1:5,
   tail.coeffs = c(NA_real_, NA_real_),
   worker.fun = NULL,
   trim = 0.05
@@ -32,7 +32,7 @@ JAZA3098_ch1_none.mthd <- list(
   flt.dark.wl = c(NA_real_, NA_real_),
   flt.ref.wl = c(NA_real_, NA_real_),
   flt.Tfr = 1,
-  inst.dark.pixs = 1:24,
+  inst.dark.pixs = 1:5,
   tail.coeffs = c(NA_real_, NA_real_),
   worker.fun = NULL,
   trim = 0.05
@@ -54,7 +54,7 @@ JAZA3098_ch2_simple.mthd <- list(
   flt.dark.wl = c(199.3, 215.1),
   flt.ref.wl = c(360, 379.5),
   flt.Tfr = 1,
-  inst.dark.pixs = 1:24,
+  inst.dark.pixs = 1:5,
   tail.coeffs = c(NA_real_, NA_real_),
   worker.fun = NULL,
   trim = 0.05
@@ -68,7 +68,7 @@ JAZA3098_ch2_none.mthd <- list(
   flt.dark.wl = c(NA_real_, NA_real_),
   flt.ref.wl = c(NA_real_, NA_real_),
   flt.Tfr = 1,
-  inst.dark.pixs = 1:24,
+  inst.dark.pixs = 1:5,
   tail.coeffs = c(NA_real_, NA_real_),
   worker.fun = NULL,
   trim = 0.05
@@ -80,6 +80,8 @@ load(file = "./data-raw/jaz-descriptor/JAZA3098.Rda")
 # we make sure not to depend on Java code
 descriptor_ch1$w <- NULL
 descriptor_ch2$w <- NULL
+descriptor_ch1$num.dark.pixs <- 5 # from looking at data, 24 seems to be wrong!
+descriptor_ch2$num.dark.pixs <- 5 # from looking at data, 24 seems to be wrong!
 
 # we do not have calibration files for this spectrometer
 

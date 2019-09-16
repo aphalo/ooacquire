@@ -47,7 +47,7 @@ FLMS00673_none.mthd <- list(
   flt.dark.wl = c(202.88, 195.42),
   flt.ref.wl = c(359.99, 379.64),
   flt.Tfr = 1,
-  inst.dark.pixs = 1:16,
+  inst.dark.pixs = 3:16,
   tail.coeffs = c(NA_real_, NA_real_),
   worker.fun = NULL,
   trim = 1/16

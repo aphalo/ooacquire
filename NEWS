@@ -4,6 +4,12 @@ Add more test cases.
 Finish writing algorithms vignette.
 Document support for OO calibrations and add example scripts.
 
+ooacquire 0.2.1 (2019-09-16)
+============================
+
+* Add pre-built calibration and methods for one MAYA 2000 Pro instrument using
+calibration data from Ocean Optics.
+
 ooacquire 0.2.0 (2019-08-20)
 ============================
 
