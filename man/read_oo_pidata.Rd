@@ -4,8 +4,11 @@
 \alias{read_oo_pidata}
 \title{Read File Saved by Ocean Optics' Raspberry Pi software.}
 \usage{
-read_oo_pidata(file, date = NA, geocode = NULL, label = NULL,
-  tz = NULL, locale = readr::default_locale(), npixels = 2048)
+read_oo_pidata(file, date = NULL, geocode = NULL, label = NULL,
+  tz = NULL, locale = readr::default_locale(), descriptor = NULL,
+  corr.sensor.nl = FALSE,
+  spectrometer.name = "Unknown via Raspberry Pi",
+  spectrometer.sn = "Unknown via Raspberry Pi", npixels = 2048)
 }
 \arguments{
 \item{file}{character string}
@@ -25,6 +28,12 @@ default locale is US-centric (like R), but you can use
 \code{\link[readr]{locale}} to create your own locale that controls things
 like the default time zone, encoding, decimal mark, big mark, and day/month
 names.}
+
+\item{descriptor}{list as returned by function \code{get_oo_descriptor}.}
+
+\item{corr.sensor.nl}{logical.}
+
+\item{spectrometer.name, spectrometer.sn}{character.}
 
 \item{npixels}{integer Number of pixels in spectral data.}
 }

@@ -16,6 +16,9 @@
 #'   \code{\link[readr]{locale}} to create your own locale that controls things
 #'   like the default time zone, encoding, decimal mark, big mark, and day/month
 #'   names.
+#' @param descriptor list as returned by function \code{get_oo_descriptor}.
+#' @param corr.sensor.nl logical.
+#' @param spectrometer.name,spectrometer.sn character.
 #' @param npixels integer Number of pixels in spectral data.
 #'
 #' @return A raw_spct object.
@@ -33,11 +36,15 @@
 #' since the Pi was switched on.
 #'
 read_oo_pidata <- function(file,
-                           date = NA,
+                           date = NULL,
                            geocode = NULL,
                            label = NULL,
                            tz = NULL,
                            locale = readr::default_locale(),
+                           descriptor = NULL,
+                           corr.sensor.nl = FALSE,
+                           spectrometer.name = "Unknown via Raspberry Pi",
+                           spectrometer.sn = "Unknown via Raspberry Pi",
                            npixels = 2048) {
   if (is.null(tz)) {
     tz <- locale$tz
@@ -83,14 +90,13 @@ read_oo_pidata <- function(file,
       correct.elec.dark =
         NA_integer_,
       corr.sensor.nl =
-        NA_integer_,
+        corr.sensor.nl,
       correct.stray.light =
         NA_integer_,
       boxcar.width =
         as.integer(stringr::str_split(file.header[lines.map[["boxcar"]]], " ")[[1]][3]),
       integ.time =
-        as.numeric(stringr::str_split(file.header[lines.map[["integ.time"]]], " ")[[1]][3]) * 1e-6,
-      # micro-seconds -> seconds
+        as.numeric(stringr::str_split(file.header[lines.map[["integ.time"]]], " ")[[1]][3]), # * 1e-6 # micro-seconds -> seconds
       num.scans =
         as.integer(stringr::str_split(file.header[lines.map[["scans"]]], " ")[[1]][4])
     )
@@ -98,26 +104,27 @@ read_oo_pidata <- function(file,
   inst.settings[["linearized"]] <- as.logical(inst.settings[["corr.sensor.nl"]])
   # diagnosis
   inst.settings[["tot.time"]] = with(inst.settings, integ.time * num.scans)
-  inst.settings[["rel.signal"]] = NA
 
-  descriptor <-
-    list(
-      time = date,
-      w = NA,
-      sr.index = NA_integer_,
-      ch.index = NA_integer_,
-      spectrometer.name = "Unknown via Raspberry Pi",
-      spectrometer.sn =  "Unknown via Raspberry Pi",
-      bench.grating = NA_character_,
-      bench.filter = NA_character_,
-      bench.slit = NA_character_,
-      min.integ.time = NA_real_,
-      max.integ.time = NA_real_,
-      max.counts = NA_integer_,
-      wavelengths = NA_real_,
-      bad.pixs = numeric(),
-      inst.calib = NA
-    )
+  if (is.null(descriptor)) {
+    descriptor <-
+      list(
+        time = date,
+        w = NULL,
+        sr.index = NA_integer_,
+        ch.index = NA_integer_,
+        spectrometer.name = spectrometer.name,
+        spectrometer.sn =  spectrometer.sn,
+        bench.grating = NA_character_,
+        bench.filter = NA_character_,
+        bench.slit = NA_character_,
+        min.integ.time = NA_real_,
+        max.integ.time = NA_real_,
+        max.counts = NA_integer_,
+        wavelengths = NA_real_,
+        bad.pixs = numeric(),
+        inst.calib = NA
+      )
+  }
 
   skip <- which(stringr::str_detect(file.header, "Wavelengths"))
 
@@ -130,6 +137,8 @@ read_oo_pidata <- function(file,
   )
 
   z <- photobiology::as.raw_spct(z)
+
+  inst.settings[["rel.signal"]] = max(z[["counts"]]) / descriptor[["max.counts"]]
 
   comment(z) <-
     paste(paste(file.header[1:(skip - 1)], collapse = "\n"),
