@@ -31,7 +31,9 @@ names.}
 
 \item{descriptor}{list as returned by function \code{get_oo_descriptor}.}
 
-\item{corr.sensor.nl}{logical.}
+\item{corr.sensor.nl}{logical, indicating if spectral data is already
+linearized. If TRUE the spectrum is marked as linearized, and
+linearization skipped during processing.}
 
 \item{spectrometer.name, spectrometer.sn}{character.}
 

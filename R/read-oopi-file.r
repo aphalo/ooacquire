@@ -17,7 +17,9 @@
 #'   like the default time zone, encoding, decimal mark, big mark, and day/month
 #'   names.
 #' @param descriptor list as returned by function \code{get_oo_descriptor}.
-#' @param corr.sensor.nl logical.
+#' @param corr.sensor.nl logical, indicating if spectral data is already
+#'   linearized. If TRUE the spectrum is marked as linearized, and
+#'   linearization skipped during processing.
 #' @param spectrometer.name,spectrometer.sn character.
 #' @param npixels integer Number of pixels in spectral data.
 #'

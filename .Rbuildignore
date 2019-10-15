@@ -9,3 +9,4 @@
 ^_pkgdown\.yml$
 ^.*\.sh$
 ^tests$
+README.Rmd
