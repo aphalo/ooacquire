@@ -42,7 +42,7 @@ s_irrad_corrected.default <- function(x, ...) {
 
 #' @describeIn s_irrad_corrected Default for generic function.
 #' @param time a \code{POSIXct} object, but if \code{NULL} the date stored in
-#'   file is used, and if \code{NA} no date variable is added
+#'   file is used, and if \code{NA}, date is set to NA.
 #' @export
 s_irrad_corrected.list <- function(x,
                                    time = NULL,

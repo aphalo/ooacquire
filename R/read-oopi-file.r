@@ -5,8 +5,8 @@
 #' time field is retrieved and decoded.
 #'
 #' @param file character string
-#' @param date a \code{POSIXct} object, but if \code{NULL} the date stored in
-#'   file is used, and if \code{NA} no date variable is added
+#' @param date a \code{POSIXct} object, but if \code{NULL} file modification
+#'   date is used with a warning and if \code{NA} date is set to NA.
 #' @param geocode A data frame with columns \code{lon} and \code{lat}.
 #' @param label character string, but if \code{NULL} the value of \code{file} is
 #'   used, and if \code{NA} the "what.measured" attribute is not set.
@@ -54,11 +54,14 @@ read_oo_pidata <- function(file,
   if (is.null(label)) {
     label <- paste("File:", file)
   }
-  if (is.null(date) || is.na(date)) {
-    if (is.null(date)) {
-      warning("Setting date to NA as file contains no date information")
-    }
+  if (is.null(date)) {
+    date <- file.mtime(file)
+    warning("Setting spectrum date to file modification date: ", format(date), "\nCheck! (used to select calibration).")
+  } else if (is.na(date)) {
+    warning("Setting date to 'NA'.\nAdd! (used to select calibration).")
     date <- as.POSIXct(NA_real_, origin = lubridate::origin)
+  } else if (!is.POSIXct(date)) {
+    stop("Argument passed to 'date' should be a POSIXct object.\nUse functions from package 'lubirdate' or 'anytime' for conversions.")
   }
   file.header <- scan(file = file, nlines = 10,
                       skip = 0, what = "character", sep = "\n")
