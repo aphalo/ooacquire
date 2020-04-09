@@ -4,8 +4,12 @@
 \alias{which_descriptor}
 \title{Select which instrument descriptor to use}
 \usage{
-which_descriptor(date = lubridate::today(),
-  descriptors = ooacquire::MAYP11278_descriptors, verbose = NULL, ...)
+which_descriptor(
+  date = lubridate::today(),
+  descriptors = ooacquire::MAYP11278_descriptors,
+  verbose = NULL,
+  ...
+)
 }
 \arguments{
 \item{date}{Any object that \code{anytime::anydate()} will decode as a date

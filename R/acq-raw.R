@@ -53,7 +53,7 @@ acq_raw_spct <- function(descriptor,
 
   y <- descriptor
 
-  z <- dplyr::data_frame(w.length = y$wavelengths)
+  z <- tibble::tibble(w.length = y$wavelengths)
   start.time <- lubridate::now()
 
   if (set.all) {

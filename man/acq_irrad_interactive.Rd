@@ -6,21 +6,42 @@
 \alias{acq_rfr_tfr_interactive}
 \title{Acquire spectra interactively}
 \usage{
-acq_irrad_interactive(tot.time.range = c(5, 15), target.margin = 0.1,
-  HDR.mult = c(short = 1, long = 10), protocols = NULL,
-  correction.method = NA, descriptors = NA,
-  stray.light.method = "none", qty.out = "irrad", save.pdfs = TRUE,
-  interface.mode = "auto")
+acq_irrad_interactive(
+  tot.time.range = c(5, 15),
+  target.margin = 0.1,
+  HDR.mult = c(short = 1, long = 10),
+  protocols = NULL,
+  correction.method = NA,
+  descriptors = NA,
+  stray.light.method = "none",
+  qty.out = "irrad",
+  save.pdfs = TRUE,
+  interface.mode = "auto"
+)
 
-acq_fraction_interactive(tot.time.range = c(5, 15),
-  target.margin = 0.2, HDR.mult = c(short = 1, long = 10),
-  protocols = NULL, correction.method = NA, descriptors = NA,
-  ref.value = 1, qty.out = "Tfr", type = "total",
-  stray.light.method = "simple", save.pdfs = TRUE)
+acq_fraction_interactive(
+  tot.time.range = c(5, 15),
+  target.margin = 0.2,
+  HDR.mult = c(short = 1, long = 10),
+  protocols = NULL,
+  correction.method = NA,
+  descriptors = NA,
+  ref.value = 1,
+  qty.out = "Tfr",
+  type = "total",
+  stray.light.method = "simple",
+  save.pdfs = TRUE
+)
 
-acq_rfr_tfr_interactive(tot.time.range = c(10, 15),
-  target.margin = 0.1, HDR.mult = c(1, 10), descriptors = NA,
-  ref.value = 1, save.pdfs = TRUE, qty.out = "Tfr")
+acq_rfr_tfr_interactive(
+  tot.time.range = c(10, 15),
+  target.margin = 0.1,
+  HDR.mult = c(1, 10),
+  descriptors = NA,
+  ref.value = 1,
+  save.pdfs = TRUE,
+  qty.out = "Tfr"
+)
 }
 \arguments{
 \item{tot.time.range}{numeric vector Range of total times for a measurement
@@ -130,6 +151,7 @@ acquire_interactive()
 This function calls functions \code{\link{tune_interactive}},
 \code{\link{protocol_interactive}}  and \code{\link{set_attributes_interactive}}.
 
-Other interactive acquisition functions: \code{\link{acq_fluence_interactive}}
+Other interactive acquisition functions: 
+\code{\link{acq_fluence_interactive}()}
 }
 \concept{interactive acquisition functions}

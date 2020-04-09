@@ -11,16 +11,31 @@ s_fraction_corrected(x, ...)
 
 \method{s_fraction_corrected}{default}(x, ...)
 
-\method{s_fraction_corrected}{list}(x, reference.value = 1,
-  type = "internal", time = NULL, correction.method, qty.out = "Tfr",
-  descriptor = NULL, dyn.range = NULL, locale = NULL,
-  verbose = getOption("photobiology.verbose", default = FALSE), ...)
+\method{s_fraction_corrected}{list}(
+  x,
+  reference.value = 1,
+  type = "internal",
+  time = NULL,
+  correction.method,
+  qty.out = "Tfr",
+  descriptor = NULL,
+  dyn.range = NULL,
+  locale = NULL,
+  verbose = getOption("photobiology.verbose", default = FALSE),
+  ...
+)
 
-\method{s_fraction_corrected}{raw_mspct}(x, spct.names = c(sample =
-  "sample", reference = "reference", dark = "dark"), reference.value = 1,
-  type = "internal", correction.method, dyn.range = NULL,
-  qty.out = "Tfr", verbose = getOption("photobiology.verbose", default
-  = FALSE), ...)
+\method{s_fraction_corrected}{raw_mspct}(
+  x,
+  spct.names = c(sample = "sample", reference = "reference", dark = "dark"),
+  reference.value = 1,
+  type = "internal",
+  correction.method,
+  dyn.range = NULL,
+  qty.out = "Tfr",
+  verbose = getOption("photobiology.verbose", default = FALSE),
+  ...
+)
 }
 \arguments{
 \item{x}{A named list of one to three vectors of file names, with names
@@ -83,7 +98,9 @@ Currently \code{s_fraction_corrected.list} allows processing of files
   accuracy.
 }
 \seealso{
-Other functions for conversion of raw-counts data: \code{\link{raw2corr_cps}},
-  \code{\link{raw2cps}}, \code{\link{s_irrad_corrected}}
+Other functions for conversion of raw-counts data: 
+\code{\link{raw2corr_cps}()},
+\code{\link{raw2cps}()},
+\code{\link{s_irrad_corrected}()}
 }
 \concept{functions for conversion of raw-counts data}

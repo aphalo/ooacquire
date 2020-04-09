@@ -80,7 +80,7 @@ test_that("ooacquire filter continuous", {
                                      type = "total",
                                      qty.out = "Tfr")
     new.spct <- trim_wl(smooth_spct(new.spct, method = "supsmu"), range = c(450:800))
-    expect_known_value(new.spct, file = paste("ref", f, sep = "-"), update = TRUE)
+#    expect_known_value(new.spct, file = paste("ref", f, sep = "-"), update = TRUE)
   }
 })
 

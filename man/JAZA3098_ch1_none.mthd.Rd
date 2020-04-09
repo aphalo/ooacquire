@@ -4,7 +4,9 @@
 \name{JAZA3098_ch1_none.mthd}
 \alias{JAZA3098_ch1_none.mthd}
 \title{Correction method definition}
-\format{A list.}
+\format{
+A list.
+}
 \usage{
 JAZA3098_ch1_none.mthd
 }

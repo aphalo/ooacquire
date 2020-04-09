@@ -4,10 +4,15 @@
 \alias{acq_raw_spct}
 \title{Measure one raw spectrum}
 \usage{
-acq_raw_spct(descriptor, acq.settings,
-  f.trigger.pulses = f.trigger.message, what.measured = NA,
+acq_raw_spct(
+  descriptor,
+  acq.settings,
+  f.trigger.pulses = f.trigger.message,
+  what.measured = NA,
   where.measured = data.frame(lon = NA_real_, lat = NA_real_),
-  set.all = TRUE, verbose = TRUE)
+  set.all = TRUE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{descriptor}{list as returned by function \code{get_oo_descriptor}.}
@@ -44,6 +49,7 @@ integration time for HDR.
 \code{\link{acq_raw_mspct}} which can be used to acquire multiple
 spectra according to a user defined protocol.
 
-Other raw-counts-spectra acquisition functions: \code{\link{acq_raw_mspct}}
+Other raw-counts-spectra acquisition functions: 
+\code{\link{acq_raw_mspct}()}
 }
 \concept{raw-counts-spectra acquisition functions}

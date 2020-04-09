@@ -4,9 +4,16 @@
 \alias{read_oo_caldata}
 \title{Read OO irradiance calibration.}
 \usage{
-read_oo_caldata(file, time = NULL, geocode = NULL, label = NULL,
-  descriptor = NULL, tz = NULL, locale = NULL,
-  verbose = getOption("photobiology.verbose", default = FALSE))
+read_oo_caldata(
+  file,
+  time = NULL,
+  geocode = NULL,
+  label = NULL,
+  descriptor = NULL,
+  tz = NULL,
+  locale = NULL,
+  verbose = getOption("photobiology.verbose", default = FALSE)
+)
 }
 \arguments{
 \item{file}{character string Path or file to read.}

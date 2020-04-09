@@ -4,8 +4,7 @@
 \alias{map_oofile_header_rows}
 \title{Parse a file header to locate metadata items}
 \usage{
-map_oofile_header_rows(lines, header.end = NULL,
-  grammar = oo.minimum.gr)
+map_oofile_header_rows(lines, header.end = NULL, grammar = oo.minimum.gr)
 }
 \arguments{
 \item{lines}{character The data file read line by line.}
@@ -27,14 +26,16 @@ Optics programs and instruments. Even the number of lines in the header, and
 the position of the first line with spectral data vary.
 }
 \seealso{
-Other functions for importing spectral data from files: \code{\link{collect_spct_files}},
-  \code{\link{oofile_data_rows}},
-  \code{\link{plot_spct_file}},
-  \code{\link{read_files2mspct}},
-  \code{\link{read_oo_data}}, \code{\link{read_oo_ovdata}},
-  \code{\link{read_oo_pidata}},
-  \code{\link{read_oo_ssdata}},
-  \code{\link{set_oo_ssdata_descriptor}},
-  \code{\link{set_oo_ssdata_settings}}
+Other functions for importing spectral data from files: 
+\code{\link{collect_spct_files}()},
+\code{\link{oofile_data_rows}()},
+\code{\link{plot_spct_file}()},
+\code{\link{read_files2mspct}()},
+\code{\link{read_oo_data}()},
+\code{\link{read_oo_ovdata}()},
+\code{\link{read_oo_pidata}()},
+\code{\link{read_oo_ssdata}()},
+\code{\link{set_oo_ssdata_descriptor}()},
+\code{\link{set_oo_ssdata_settings}()}
 }
 \concept{functions for importing spectral data from files}

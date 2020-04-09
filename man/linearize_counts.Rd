@@ -4,8 +4,11 @@
 \alias{linearize_counts}
 \title{Function to apply linearization correction to raw counts data.}
 \usage{
-linearize_counts(x, force.zero = TRUE,
-  verbose = getOption("photobiology.verbose", default = FALSE))
+linearize_counts(
+  x,
+  force.zero = TRUE,
+  verbose = getOption("photobiology.verbose", default = FALSE)
+)
 }
 \arguments{
 \item{x}{raw_spct object.}
@@ -36,12 +39,14 @@ In contrast to other classes defined in package 'photobiology', class
   function applied.
 }
 \seealso{
-Other spectral data-processing functions: \code{\link{MAYP112785_tail_correction}},
-  \code{\link{MAYP11278_tail_correction}},
-  \code{\link{check_sn_match}},
-  \code{\link{merge_raw_mspct}},
-  \code{\link{new_correction_method}},
-  \code{\link{ref_correction}}, \code{\link{trim_counts}},
-  \code{\link{uvb_corrections}}
+Other spectral data-processing functions: 
+\code{\link{MAYP112785_tail_correction}()},
+\code{\link{MAYP11278_tail_correction}()},
+\code{\link{check_sn_match}()},
+\code{\link{merge_raw_mspct}()},
+\code{\link{new_correction_method}()},
+\code{\link{ref_correction}()},
+\code{\link{trim_counts}()},
+\code{\link{uvb_corrections}()}
 }
 \concept{spectral data-processing functions}

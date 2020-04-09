@@ -66,7 +66,7 @@ read_oo_pidata <- function(file,
   file.header <- scan(file = file, nlines = 10,
                       skip = 0, what = "character", sep = "\n")
 
-  my.gr <- dplyr::data_frame_(list(
+  my.gr <- tibble::tibble_(list(
     feature = ~c("date",
                  "boxcar",
                  "integ.time",

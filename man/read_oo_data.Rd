@@ -4,9 +4,16 @@
 \alias{read_oo_data}
 \title{Read Files Saved by Ocean Optics' instruments or software.}
 \usage{
-read_oo_data(file, time = NULL, geocode = NULL, label = NULL,
-  descriptor = NULL, tz = NULL, locale = NULL,
-  verbose = getOption("photobiology.verbose", default = FALSE))
+read_oo_data(
+  file,
+  time = NULL,
+  geocode = NULL,
+  label = NULL,
+  descriptor = NULL,
+  tz = NULL,
+  locale = NULL,
+  verbose = getOption("photobiology.verbose", default = FALSE)
+)
 }
 \arguments{
 \item{file}{character string}
@@ -40,15 +47,16 @@ SpectraSuite to extract the whole header remark field. The time field is
 retrieved and decoded.
 }
 \seealso{
-Other functions for importing spectral data from files: \code{\link{collect_spct_files}},
-  \code{\link{map_oofile_header_rows}},
-  \code{\link{oofile_data_rows}},
-  \code{\link{plot_spct_file}},
-  \code{\link{read_files2mspct}},
-  \code{\link{read_oo_ovdata}},
-  \code{\link{read_oo_pidata}},
-  \code{\link{read_oo_ssdata}},
-  \code{\link{set_oo_ssdata_descriptor}},
-  \code{\link{set_oo_ssdata_settings}}
+Other functions for importing spectral data from files: 
+\code{\link{collect_spct_files}()},
+\code{\link{map_oofile_header_rows}()},
+\code{\link{oofile_data_rows}()},
+\code{\link{plot_spct_file}()},
+\code{\link{read_files2mspct}()},
+\code{\link{read_oo_ovdata}()},
+\code{\link{read_oo_pidata}()},
+\code{\link{read_oo_ssdata}()},
+\code{\link{set_oo_ssdata_descriptor}()},
+\code{\link{set_oo_ssdata_settings}()}
 }
 \concept{functions for importing spectral data from files}

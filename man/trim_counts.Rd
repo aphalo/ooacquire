@@ -4,8 +4,7 @@
 \alias{trim_counts}
 \title{Replace out-of-range instrument counts}
 \usage{
-trim_counts(x, range = c(NA, getInstrDesc(x)[["max.counts"]] - 1),
-  fill = NA)
+trim_counts(x, range = c(NA, getInstrDesc(x)[["max.counts"]] - 1), fill = NA)
 }
 \arguments{
 \item{x}{raw_spct object}
@@ -24,13 +23,14 @@ Trim out-of-range counts values in data stored in a "raw_spct" object. The
 values are replaced with the supplied \code{fill} value.
 }
 \seealso{
-Other spectral data-processing functions: \code{\link{MAYP112785_tail_correction}},
-  \code{\link{MAYP11278_tail_correction}},
-  \code{\link{check_sn_match}},
-  \code{\link{linearize_counts}},
-  \code{\link{merge_raw_mspct}},
-  \code{\link{new_correction_method}},
-  \code{\link{ref_correction}},
-  \code{\link{uvb_corrections}}
+Other spectral data-processing functions: 
+\code{\link{MAYP112785_tail_correction}()},
+\code{\link{MAYP11278_tail_correction}()},
+\code{\link{check_sn_match}()},
+\code{\link{linearize_counts}()},
+\code{\link{merge_raw_mspct}()},
+\code{\link{new_correction_method}()},
+\code{\link{ref_correction}()},
+\code{\link{uvb_corrections}()}
 }
 \concept{spectral data-processing functions}

@@ -24,12 +24,14 @@ This method checks that the sn of the instrument used to acquire the raw
 counts matches that in the definition of a correction method.
 }
 \seealso{
-Other spectral data-processing functions: \code{\link{MAYP112785_tail_correction}},
-  \code{\link{MAYP11278_tail_correction}},
-  \code{\link{linearize_counts}},
-  \code{\link{merge_raw_mspct}},
-  \code{\link{new_correction_method}},
-  \code{\link{ref_correction}}, \code{\link{trim_counts}},
-  \code{\link{uvb_corrections}}
+Other spectral data-processing functions: 
+\code{\link{MAYP112785_tail_correction}()},
+\code{\link{MAYP11278_tail_correction}()},
+\code{\link{linearize_counts}()},
+\code{\link{merge_raw_mspct}()},
+\code{\link{new_correction_method}()},
+\code{\link{ref_correction}()},
+\code{\link{trim_counts}()},
+\code{\link{uvb_corrections}()}
 }
 \concept{spectral data-processing functions}

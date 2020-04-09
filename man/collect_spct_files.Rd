@@ -4,8 +4,14 @@
 \alias{collect_spct_files}
 \title{Collect spectra into a collection}
 \usage{
-collect_spct_files(path = ".", range = NULL, method = NULL,
-  strength = 0, name.root = "", na.rm = FALSE)
+collect_spct_files(
+  path = ".",
+  range = NULL,
+  method = NULL,
+  strength = 0,
+  name.root = "",
+  na.rm = FALSE
+)
 }
 \arguments{
 \item{path}{a character string giving
@@ -47,14 +53,16 @@ Function \code{\link[photobiology]{trim_wl}} is used to trim the
   prameters \code{range}, and \code{strength} and \code{method} are passed to
   them, respectively.
 
-Other functions for importing spectral data from files: \code{\link{map_oofile_header_rows}},
-  \code{\link{oofile_data_rows}},
-  \code{\link{plot_spct_file}},
-  \code{\link{read_files2mspct}},
-  \code{\link{read_oo_data}}, \code{\link{read_oo_ovdata}},
-  \code{\link{read_oo_pidata}},
-  \code{\link{read_oo_ssdata}},
-  \code{\link{set_oo_ssdata_descriptor}},
-  \code{\link{set_oo_ssdata_settings}}
+Other functions for importing spectral data from files: 
+\code{\link{map_oofile_header_rows}()},
+\code{\link{oofile_data_rows}()},
+\code{\link{plot_spct_file}()},
+\code{\link{read_files2mspct}()},
+\code{\link{read_oo_data}()},
+\code{\link{read_oo_ovdata}()},
+\code{\link{read_oo_pidata}()},
+\code{\link{read_oo_ssdata}()},
+\code{\link{set_oo_ssdata_descriptor}()},
+\code{\link{set_oo_ssdata_settings}()}
 }
 \concept{functions for importing spectral data from files}

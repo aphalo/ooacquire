@@ -4,7 +4,9 @@
 \name{FLMS00440_calib_dates.df}
 \alias{FLMS00440_calib_dates.df}
 \title{Dates for which the different descriptors conatin valid calibrations.}
-\format{A list.}
+\format{
+A list.
+}
 \usage{
 FLMS00440_calib_dates.df
 }

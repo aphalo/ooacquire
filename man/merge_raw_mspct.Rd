@@ -20,12 +20,14 @@ The individual \code{raw_spct} objects contained in \code{x} must have
   identical values in \code{w.length}.
 }
 \seealso{
-Other spectral data-processing functions: \code{\link{MAYP112785_tail_correction}},
-  \code{\link{MAYP11278_tail_correction}},
-  \code{\link{check_sn_match}},
-  \code{\link{linearize_counts}},
-  \code{\link{new_correction_method}},
-  \code{\link{ref_correction}}, \code{\link{trim_counts}},
-  \code{\link{uvb_corrections}}
+Other spectral data-processing functions: 
+\code{\link{MAYP112785_tail_correction}()},
+\code{\link{MAYP11278_tail_correction}()},
+\code{\link{check_sn_match}()},
+\code{\link{linearize_counts}()},
+\code{\link{new_correction_method}()},
+\code{\link{ref_correction}()},
+\code{\link{trim_counts}()},
+\code{\link{uvb_corrections}()}
 }
 \concept{spectral data-processing functions}

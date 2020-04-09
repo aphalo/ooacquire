@@ -57,7 +57,8 @@ test_that("ooacquire filter pulsed source", {
                                      type = "total",
                                      qty.out = "Tfr")
     new.spct <- trim_wl(new.spct, range = c(400:1100))
-    expect_known_value(new.spct, file = paste("ref", f, sep = "-"), update = TRUE)
+    print(getWhenMeasured(new.spct))
+#    expect_known_value(new.spct, file = paste("ref", f, sep = "-"), update = TRUE)
   }
 })
 

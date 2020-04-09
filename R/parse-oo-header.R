@@ -40,7 +40,7 @@ set_oo_ssdata_settings <- function(x,
   lines <- stringr::str_split(file.header, "\n")[[1]]
 
   if (grepl("SpectraSuite", lines[1])) {
-    my.gr <- dplyr::data_frame_(list(
+    my.gr <- tibble::tibble_(list(
       feature = ~c("dark.corr", "lin.corr", "stray.corr", "boxcar",
                    "integ.time", "scans", "sn"),
       pattern = ~c("Correct for Electrical Dark",

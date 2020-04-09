@@ -28,13 +28,14 @@ change in the measurement conditions. For example the list
 defines two protocols.
 }
 \seealso{
-Other interactive acquisition utility functions: \code{\link{choose_ch_interactive}},
-  \code{\link{choose_sr_interactive}},
-  \code{\link{f.trigger.message}},
-  \code{\link{list_srs_interactive}},
-  \code{\link{set_attributes_interactive}},
-  \code{\link{set_folder_interactive}},
-  \code{\link{set_seq_interactive}},
-  \code{\link{tune_interactive}}
+Other interactive acquisition utility functions: 
+\code{\link{choose_ch_interactive}()},
+\code{\link{choose_sr_interactive}()},
+\code{\link{f.trigger.message}()},
+\code{\link{list_srs_interactive}()},
+\code{\link{set_attributes_interactive}()},
+\code{\link{set_folder_interactive}()},
+\code{\link{set_seq_interactive}()},
+\code{\link{tune_interactive}()}
 }
 \concept{interactive acquisition utility functions}

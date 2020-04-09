@@ -4,9 +4,13 @@
 \alias{set_num_exposures}
 \title{Set number of exposures}
 \usage{
-set_num_exposures(acq.settings, num.exposures = rep(-1L,
-  length(HDR.mult)), HDR.mult = 1, single.scan = num.exposures > -1L,
-  verbose = TRUE)
+set_num_exposures(
+  acq.settings,
+  num.exposures = rep(-1L, length(HDR.mult)),
+  HDR.mult = 1,
+  single.scan = num.exposures > -1L,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{acq.settings}{list as returned by function \code{acq_settings()}}
@@ -37,9 +41,10 @@ exposure events during each integration. This is the case, for example, when
 measuring the spectral emission of a xenon flash.
 }
 \seealso{
-Other acquisition-settings related functions: \code{\link{acq_settings}},
-  \code{\link{set_integ_time}},
-  \code{\link{set_linearized}}
+Other acquisition-settings related functions: 
+\code{\link{acq_settings}()},
+\code{\link{set_integ_time}()},
+\code{\link{set_linearized}()}
 }
 \concept{acquisition-settings related functions}
 \keyword{internal}

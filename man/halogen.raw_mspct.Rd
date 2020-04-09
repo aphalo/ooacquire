@@ -4,7 +4,9 @@
 \name{halogen.raw_mspct}
 \alias{halogen.raw_mspct}
 \title{Raw counts data for a lamp measurement.}
-\format{A raw_mspct}
+\format{
+A raw_mspct
+}
 \usage{
 halogen.raw_mspct
 }
@@ -13,11 +15,12 @@ A household Osram tungsten halogen 25W E27 lamp measured at short distance. The
 spectrometer used was an Ocean Optics Maya2000 Pro.
 }
 \seealso{
-Other objects containing example raw-counts data: \code{\link{blue_filter.raw_mspct}},
-  \code{\link{red_filter.raw_mspct}},
-  \code{\link{white_LED.raw_mspct}},
-  \code{\link{white_LED_2min.raw_mspct}},
-  \code{\link{xenon_flash.raw_mspct}}
+Other objects containing example raw-counts data: 
+\code{\link{blue_filter.raw_mspct}},
+\code{\link{red_filter.raw_mspct}},
+\code{\link{white_LED.raw_mspct}},
+\code{\link{white_LED_2min.raw_mspct}},
+\code{\link{xenon_flash.raw_mspct}}
 }
 \concept{objects containing example raw-counts data}
 \keyword{datasets}

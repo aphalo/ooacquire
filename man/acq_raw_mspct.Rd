@@ -4,11 +4,18 @@
 \alias{acq_raw_mspct}
 \title{Take one set of spectral readings}
 \usage{
-acq_raw_mspct(descriptor, acq.settings,
-  f.trigger.pulses = f.trigger.message, seq.settings = list(step = 0,
-  num.steps = 1L), protocol = c("light", "filter", "dark"),
-  user.label = "", where.measured = data.frame(lon = NA_real_, lat =
-  NA_real_), pause.fun = NULL, verbose = TRUE, ...)
+acq_raw_mspct(
+  descriptor,
+  acq.settings,
+  f.trigger.pulses = f.trigger.message,
+  seq.settings = list(step = 0, num.steps = 1L),
+  protocol = c("light", "filter", "dark"),
+  user.label = "",
+  where.measured = data.frame(lon = NA_real_, lat = NA_real_),
+  pause.fun = NULL,
+  verbose = TRUE,
+  ...
+)
 }
 \arguments{
 \item{descriptor}{list as returned by function \code{get_oo_descriptor()}.}
@@ -67,6 +74,7 @@ Function \code{acq_raw_mspct} acquires directly from a spectrometer
 \code{\link{acq_raw_spct}} which is used to acquire each member
 spectrum.
 
-Other raw-counts-spectra acquisition functions: \code{\link{acq_raw_spct}}
+Other raw-counts-spectra acquisition functions: 
+\code{\link{acq_raw_spct}()}
 }
 \concept{raw-counts-spectra acquisition functions}

@@ -12,18 +12,34 @@ s_irrad_corrected(x, ...)
 
 \method{s_irrad_corrected}{default}(x, ...)
 
-\method{s_irrad_corrected}{list}(x, time = NULL, correction.method,
-  return.cps = FALSE, descriptor, locale = NULL,
-  verbose = getOption("photobiology.verbose", default = FALSE), ...)
+\method{s_irrad_corrected}{list}(
+  x,
+  time = NULL,
+  correction.method,
+  return.cps = FALSE,
+  descriptor,
+  locale = NULL,
+  verbose = getOption("photobiology.verbose", default = FALSE),
+  ...
+)
 
-\method{s_irrad_corrected}{raw_mspct}(x, spct.names = c(light = "light",
-  filter = "filter", dark = "dark"), correction.method,
-  return.cps = FALSE, verbose = getOption("photobiology.verbose",
-  default = FALSE), ...)
+\method{s_irrad_corrected}{raw_mspct}(
+  x,
+  spct.names = c(light = "light", filter = "filter", dark = "dark"),
+  correction.method,
+  return.cps = FALSE,
+  verbose = getOption("photobiology.verbose", default = FALSE),
+  ...
+)
 
-\method{s_irrad_corrected}{raw_spct}(x, time = NULL, correction.method,
-  return.cps = FALSE, verbose = getOption("photobiology.verbose",
-  default = FALSE), ...)
+\method{s_irrad_corrected}{raw_spct}(
+  x,
+  time = NULL,
+  correction.method,
+  return.cps = FALSE,
+  verbose = getOption("photobiology.verbose", default = FALSE),
+  ...
+)
 }
 \arguments{
 \item{x}{A named list of one to three vectors of file names, with names
@@ -33,7 +49,7 @@ s_irrad_corrected(x, ...)
 the final calculation step.}
 
 \item{time}{a \code{POSIXct} object, but if \code{NULL} the date stored in
-file is used, and if \code{NA} no date variable is added}
+file is used, and if \code{NA}, date is set to NA.}
 
 \item{correction.method}{A named list of constants and functions defining the
 method to be sued for stray light and dark signal corrections.}
@@ -80,7 +96,9 @@ Currently \code{s_irrad_corrected.list} allows processing of files
   the same instrument settings to achieve good accuracy.
 }
 \seealso{
-Other functions for conversion of raw-counts data: \code{\link{raw2corr_cps}},
-  \code{\link{raw2cps}}, \code{\link{s_fraction_corrected}}
+Other functions for conversion of raw-counts data: 
+\code{\link{raw2corr_cps}()},
+\code{\link{raw2cps}()},
+\code{\link{s_fraction_corrected}()}
 }
 \concept{functions for conversion of raw-counts data}

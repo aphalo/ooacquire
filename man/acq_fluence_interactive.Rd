@@ -5,18 +5,37 @@
 \alias{acq_fraction_pulsed_interactive}
 \title{Acquire flash spectra interactively}
 \usage{
-acq_fluence_interactive(integ.time = 2, num.scans = 1L,
-  num.exposures = 1L, f.trigger.pulses = f.trigger.message,
-  protocols = NULL, correction.method = NA, descriptors = NA,
-  stray.light.method = "none", qty.out = "fluence", save.pdfs = TRUE,
-  interface.mode = "manual")
+acq_fluence_interactive(
+  integ.time = 2,
+  num.scans = 1L,
+  num.exposures = 1L,
+  f.trigger.pulses = f.trigger.message,
+  protocols = NULL,
+  correction.method = NA,
+  descriptors = NA,
+  stray.light.method = "none",
+  qty.out = "fluence",
+  save.pdfs = TRUE,
+  interface.mode = "manual"
+)
 
-acq_fraction_pulsed_interactive(integ.time = 2, num.scans = 1L,
-  num.exposures = 1L, f.trigger.pulses = f.trigger.message,
-  protocols = NULL, correction.method = NA, descriptors = NA,
-  ref.value = 1, ref.absolute = TRUE, ref.persistence = 1,
-  qty.out = "Tfr", type = "total", stray.light.method = "simple",
-  save.pdfs = TRUE, interface.mode = "manual")
+acq_fraction_pulsed_interactive(
+  integ.time = 2,
+  num.scans = 1L,
+  num.exposures = 1L,
+  f.trigger.pulses = f.trigger.message,
+  protocols = NULL,
+  correction.method = NA,
+  descriptors = NA,
+  ref.value = 1,
+  ref.absolute = TRUE,
+  ref.persistence = 1,
+  qty.out = "Tfr",
+  type = "total",
+  stray.light.method = "simple",
+  save.pdfs = TRUE,
+  interface.mode = "manual"
+)
 }
 \arguments{
 \item{integ.time}{numeric Integration time for a measurement event
@@ -118,6 +137,7 @@ acq_fluence_interactive()
 This function calls functions \code{\link{tune_interactive}},
 \code{\link{protocol_interactive}}  and \code{\link{set_attributes_interactive}}.
 
-Other interactive acquisition functions: \code{\link{acq_irrad_interactive}}
+Other interactive acquisition functions: 
+\code{\link{acq_irrad_interactive}()}
 }
 \concept{interactive acquisition functions}

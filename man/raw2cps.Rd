@@ -44,8 +44,9 @@ starting with "counts" are processed and renamed to columns with names
 starting with "cps". All other columns are left unchanded.
 }
 \seealso{
-Other functions for conversion of raw-counts data: \code{\link{raw2corr_cps}},
-  \code{\link{s_fraction_corrected}},
-  \code{\link{s_irrad_corrected}}
+Other functions for conversion of raw-counts data: 
+\code{\link{raw2corr_cps}()},
+\code{\link{s_fraction_corrected}()},
+\code{\link{s_irrad_corrected}()}
 }
 \concept{functions for conversion of raw-counts data}

@@ -24,14 +24,16 @@ Depending of the function passed to \code{read.f} more or less complete
 metadata information will be stored as attributes in the raw_spct objects.
 }
 \seealso{
-Other functions for importing spectral data from files: \code{\link{collect_spct_files}},
-  \code{\link{map_oofile_header_rows}},
-  \code{\link{oofile_data_rows}},
-  \code{\link{plot_spct_file}}, \code{\link{read_oo_data}},
-  \code{\link{read_oo_ovdata}},
-  \code{\link{read_oo_pidata}},
-  \code{\link{read_oo_ssdata}},
-  \code{\link{set_oo_ssdata_descriptor}},
-  \code{\link{set_oo_ssdata_settings}}
+Other functions for importing spectral data from files: 
+\code{\link{collect_spct_files}()},
+\code{\link{map_oofile_header_rows}()},
+\code{\link{oofile_data_rows}()},
+\code{\link{plot_spct_file}()},
+\code{\link{read_oo_data}()},
+\code{\link{read_oo_ovdata}()},
+\code{\link{read_oo_pidata}()},
+\code{\link{read_oo_ssdata}()},
+\code{\link{set_oo_ssdata_descriptor}()},
+\code{\link{set_oo_ssdata_settings}()}
 }
 \concept{functions for importing spectral data from files}

@@ -1,8 +1,8 @@
 Package: ooacquire
 Type: Package
 Title: Acquire Data from OO Spectrometers
-Version: 0.2.0.9000
-Date: 2019-10-15
+Version: 0.2.0.9001
+Date: 2020-04-09
 Authors@R:
    c(
     person("Pedro J.", "Aphalo", email = "pedro.aphalo@helsinki.fi", role = c("aut", "trl", "cre")),
@@ -46,9 +46,9 @@ LazyData: yes
 LazyLoad: yes
 ByteCompile: true
 LinkingTo: Rcpp
-URL: http://www.r4photobiology.info,
+URL: https://docs.r4photobiology.info/ooacquire/,
     https://bitbucket.org/aphalo/ooacquire
 BugReports: https://bitbucket.org/aphalo/ooacquire/issues
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.0
 Encoding: UTF-8
 VignetteBuilder: knitr

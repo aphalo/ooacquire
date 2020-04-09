@@ -4,9 +4,13 @@
 \alias{set_descriptor_irrad_mult}
 \title{Add spectral irradiance calibration}
 \usage{
-set_descriptor_irrad_mult(descriptor, irrad.mult, wl.range = NULL,
+set_descriptor_irrad_mult(
+  descriptor,
+  irrad.mult,
+  wl.range = NULL,
   start.date = lubridate::today() - lubridate::days(1),
-  end.date = lubridate::today() + lubridate::days(1))
+  end.date = lubridate::today() + lubridate::days(1)
+)
 }
 \arguments{
 \item{descriptor}{list as returned by function \code{get_oo_descriptor}}

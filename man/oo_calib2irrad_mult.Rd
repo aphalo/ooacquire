@@ -4,8 +4,12 @@
 \alias{oo_calib2irrad_mult}
 \title{Convert an OO calibration}
 \usage{
-oo_calib2irrad_mult(x, area = NULL, diff.type = NULL,
-  verbose = getOption("photobiology.verbose", default = FALSE))
+oo_calib2irrad_mult(
+  x,
+  area = NULL,
+  diff.type = NULL,
+  verbose = getOption("photobiology.verbose", default = FALSE)
+)
 }
 \arguments{
 \item{x}{generic_spct object with variables \code{w.length} and

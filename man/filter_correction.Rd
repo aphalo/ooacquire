@@ -5,15 +5,27 @@
 \alias{no_filter_correction}
 \title{Correct for stray light}
 \usage{
-filter_correction(x, flt, stray.light.method = "original",
-  stray.light.wl = c(218.5, 228.5), flt.dark.wl = c(193, 209.5),
-  flt.ref.wl = c(360, 379.5), flt.Tfr = 1, trim = 0.05,
-  verbose = getOption("photobiology.verbose", default = FALSE))
+filter_correction(
+  x,
+  flt,
+  stray.light.method = "original",
+  stray.light.wl = c(218.5, 228.5),
+  flt.dark.wl = c(193, 209.5),
+  flt.ref.wl = c(360, 379.5),
+  flt.Tfr = 1,
+  trim = 0.05,
+  verbose = getOption("photobiology.verbose", default = FALSE)
+)
 
-no_filter_correction(x, stray.light.wl = c(218.5, 228.5),
-  flt.dark.wl = c(193, 209.5), flt.ref.wl = NULL, flt.Tfr = 1,
-  trim = 0, verbose = getOption("photobiology.verbose", default =
-  FALSE))
+no_filter_correction(
+  x,
+  stray.light.wl = c(218.5, 228.5),
+  flt.dark.wl = c(193, 209.5),
+  flt.ref.wl = NULL,
+  flt.Tfr = 1,
+  trim = 0,
+  verbose = getOption("photobiology.verbose", default = FALSE)
+)
 }
 \arguments{
 \item{x, flt}{cps_spct objects, containig spectral data from which to subtract

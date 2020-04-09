@@ -44,8 +44,9 @@ splice the different spectra.
 }}
 
 \seealso{
-Other functions for conversion of raw-counts data: \code{\link{raw2cps}},
-  \code{\link{s_fraction_corrected}},
-  \code{\link{s_irrad_corrected}}
+Other functions for conversion of raw-counts data: 
+\code{\link{raw2cps}()},
+\code{\link{s_fraction_corrected}()},
+\code{\link{s_irrad_corrected}()}
 }
 \concept{functions for conversion of raw-counts data}

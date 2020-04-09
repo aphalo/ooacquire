@@ -5,15 +5,27 @@
 \alias{slit_function_correction}
 \title{Apply filter-based stray-light correction}
 \usage{
-uvb_corrections(x, spct.names = c(light = "light", filter = "filter",
-  dark = "dark"), stray.light.method = "original",
-  stray.light.wl = c(218.5, 228.5), flt.dark.wl = c(193, 209.5),
-  flt.ref.wl = c(360, 379.5), flt.Tfr = 0.9, inst.dark.pixs = 1:4,
-  worker.fun = NULL, trim = 0.05,
-  verbose = getOption("photobiology.verbose", default = FALSE), ...)
+uvb_corrections(
+  x,
+  spct.names = c(light = "light", filter = "filter", dark = "dark"),
+  stray.light.method = "original",
+  stray.light.wl = c(218.5, 228.5),
+  flt.dark.wl = c(193, 209.5),
+  flt.ref.wl = c(360, 379.5),
+  flt.Tfr = 0.9,
+  inst.dark.pixs = 1:4,
+  worker.fun = NULL,
+  trim = 0.05,
+  verbose = getOption("photobiology.verbose", default = FALSE),
+  ...
+)
 
-slit_function_correction(x, worker.fun = NULL,
-  verbose = getOption("photobiology.verbose", default = FALSE), ...)
+slit_function_correction(
+  x,
+  worker.fun = NULL,
+  verbose = getOption("photobiology.verbose", default = FALSE),
+  ...
+)
 }
 \arguments{
 \item{x}{\code{raw_mspct} The raw counts from measurements.}
@@ -69,13 +81,15 @@ for.
 \url{http://www.r4photobiology.info}
 }
 \seealso{
-Other spectral data-processing functions: \code{\link{MAYP112785_tail_correction}},
-  \code{\link{MAYP11278_tail_correction}},
-  \code{\link{check_sn_match}},
-  \code{\link{linearize_counts}},
-  \code{\link{merge_raw_mspct}},
-  \code{\link{new_correction_method}},
-  \code{\link{ref_correction}}, \code{\link{trim_counts}}
+Other spectral data-processing functions: 
+\code{\link{MAYP112785_tail_correction}()},
+\code{\link{MAYP11278_tail_correction}()},
+\code{\link{check_sn_match}()},
+\code{\link{linearize_counts}()},
+\code{\link{merge_raw_mspct}()},
+\code{\link{new_correction_method}()},
+\code{\link{ref_correction}()},
+\code{\link{trim_counts}()}
 }
 \author{
 Algorithm for method "original" developed by Lasse Ylianttila. Other

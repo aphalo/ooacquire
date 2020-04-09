@@ -4,8 +4,7 @@
 \alias{set_integ_time}
 \title{Set integration time}
 \usage{
-set_integ_time(acq.settings, integ.time, single.scan = FALSE,
-  verbose = TRUE)
+set_integ_time(acq.settings, integ.time, single.scan = FALSE, verbose = TRUE)
 }
 \arguments{
 \item{acq.settings}{list as returned by function \code{acq_settings()}}
@@ -18,9 +17,10 @@ a copy of the argument passed for \code{acq.settings} with the
 Set the integration time in the instrument settings data structure.
 }
 \seealso{
-Other acquisition-settings related functions: \code{\link{acq_settings}},
-  \code{\link{set_linearized}},
-  \code{\link{set_num_exposures}}
+Other acquisition-settings related functions: 
+\code{\link{acq_settings}()},
+\code{\link{set_linearized}()},
+\code{\link{set_num_exposures}()}
 }
 \concept{acquisition-settings related functions}
 \keyword{internal}

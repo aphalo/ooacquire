@@ -4,9 +4,14 @@
 \alias{new_correction_method}
 \title{Make default method from descriptor}
 \usage{
-new_correction_method(descriptor, stray.light.method = "none",
-  stray.light.wl = c(NA_real_, NA_real_), flt.dark.wl = c(NA_real_,
-  NA_real_), flt.ref.wl = c(NA_real_, NA_real_), flt.Tfr = NA_real_)
+new_correction_method(
+  descriptor,
+  stray.light.method = "none",
+  stray.light.wl = c(NA_real_, NA_real_),
+  flt.dark.wl = c(NA_real_, NA_real_),
+  flt.ref.wl = c(NA_real_, NA_real_),
+  flt.Tfr = NA_real_
+)
 }
 \arguments{
 \item{descriptor}{list, as returned by \code{get_oo_descriptr()}}
@@ -40,12 +45,14 @@ Defaults for indexes are for the first channel of the first
   spectrometer currently connected.
 }
 \seealso{
-Other spectral data-processing functions: \code{\link{MAYP112785_tail_correction}},
-  \code{\link{MAYP11278_tail_correction}},
-  \code{\link{check_sn_match}},
-  \code{\link{linearize_counts}},
-  \code{\link{merge_raw_mspct}},
-  \code{\link{ref_correction}}, \code{\link{trim_counts}},
-  \code{\link{uvb_corrections}}
+Other spectral data-processing functions: 
+\code{\link{MAYP112785_tail_correction}()},
+\code{\link{MAYP11278_tail_correction}()},
+\code{\link{check_sn_match}()},
+\code{\link{linearize_counts}()},
+\code{\link{merge_raw_mspct}()},
+\code{\link{ref_correction}()},
+\code{\link{trim_counts}()},
+\code{\link{uvb_corrections}()}
 }
 \concept{spectral data-processing functions}

@@ -5,13 +5,24 @@
 \alias{tune_acq_settings}
 \title{Settings for spectral measurement}
 \usage{
-acq_settings(descriptor, integ.time = 0.01, num.scans = 10L,
-  min.integ.time = -Inf, max.integ.time = Inf, tot.time.range = c(0,
-  Inf), HDR.mult = ifelse(any(num.exposures != -1L), rep(1,
-  length(num.exposures)), c(short = 1, long = 10)), target.margin = 0.1,
-  pix.selector = TRUE, corr.elect.dark = 0L, corr.sensor.nl = 0L,
-  boxcar.width = 0L, force.valid = FALSE, num.exposures = -1L,
-  verbose = TRUE)
+acq_settings(
+  descriptor,
+  integ.time = 0.01,
+  num.scans = 10L,
+  min.integ.time = -Inf,
+  max.integ.time = Inf,
+  tot.time.range = c(0, Inf),
+  HDR.mult = ifelse(any(num.exposures != -1L), rep(1, length(num.exposures)), c(short =
+    1, long = 10)),
+  target.margin = 0.1,
+  pix.selector = TRUE,
+  corr.elect.dark = 0L,
+  corr.sensor.nl = 0L,
+  boxcar.width = 0L,
+  force.valid = FALSE,
+  num.exposures = -1L,
+  verbose = TRUE
+)
 
 tune_acq_settings(descriptor, acq.settings, verbose = TRUE)
 }
@@ -97,8 +108,9 @@ The returned value can be used as argument to \code{acq.settings} in
   \code{\link{acq_raw_mspct}}
 }
 \seealso{
-Other acquisition-settings related functions: \code{\link{set_integ_time}},
-  \code{\link{set_linearized}},
-  \code{\link{set_num_exposures}}
+Other acquisition-settings related functions: 
+\code{\link{set_integ_time}()},
+\code{\link{set_linearized}()},
+\code{\link{set_num_exposures}()}
 }
 \concept{acquisition-settings related functions}

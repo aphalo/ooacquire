@@ -4,17 +4,25 @@
 \alias{read_oo_pidata}
 \title{Read File Saved by Ocean Optics' Raspberry Pi software.}
 \usage{
-read_oo_pidata(file, date = NULL, geocode = NULL, label = NULL,
-  tz = NULL, locale = readr::default_locale(), descriptor = NULL,
+read_oo_pidata(
+  file,
+  date = NULL,
+  geocode = NULL,
+  label = NULL,
+  tz = NULL,
+  locale = readr::default_locale(),
+  descriptor = NULL,
   corr.sensor.nl = FALSE,
   spectrometer.name = "Unknown via Raspberry Pi",
-  spectrometer.sn = "Unknown via Raspberry Pi", npixels = 2048)
+  spectrometer.sn = "Unknown via Raspberry Pi",
+  npixels = 2048
+)
 }
 \arguments{
 \item{file}{character string}
 
-\item{date}{a \code{POSIXct} object, but if \code{NULL} the date stored in
-file is used, and if \code{NA} no date variable is added}
+\item{date}{a \code{POSIXct} object, but if \code{NULL} file modification
+date is used with a warning and if \code{NA} date is set to NA.}
 
 \item{geocode}{A data frame with columns \code{lon} and \code{lat}.}
 
@@ -58,14 +66,16 @@ since the Pi was switched on.
 \url{http://www.r4photobiology.info}
 }
 \seealso{
-Other functions for importing spectral data from files: \code{\link{collect_spct_files}},
-  \code{\link{map_oofile_header_rows}},
-  \code{\link{oofile_data_rows}},
-  \code{\link{plot_spct_file}},
-  \code{\link{read_files2mspct}},
-  \code{\link{read_oo_data}}, \code{\link{read_oo_ovdata}},
-  \code{\link{read_oo_ssdata}},
-  \code{\link{set_oo_ssdata_descriptor}},
-  \code{\link{set_oo_ssdata_settings}}
+Other functions for importing spectral data from files: 
+\code{\link{collect_spct_files}()},
+\code{\link{map_oofile_header_rows}()},
+\code{\link{oofile_data_rows}()},
+\code{\link{plot_spct_file}()},
+\code{\link{read_files2mspct}()},
+\code{\link{read_oo_data}()},
+\code{\link{read_oo_ovdata}()},
+\code{\link{read_oo_ssdata}()},
+\code{\link{set_oo_ssdata_descriptor}()},
+\code{\link{set_oo_ssdata_settings}()}
 }
 \concept{functions for importing spectral data from files}

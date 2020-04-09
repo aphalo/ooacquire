@@ -4,7 +4,9 @@
 \name{blue_filter.raw_mspct}
 \alias{blue_filter.raw_mspct}
 \title{Raw counts data for a filter measurement}
-\format{A raw_mspct}
+\format{
+A raw_mspct
+}
 \usage{
 blue_filter.raw_mspct
 }
@@ -13,11 +15,12 @@ A blue interference filter from UQG measured using a household incandescent
 lamp as light source. The spectrometer used was an Ocean Optics Maya2000 Pro.
 }
 \seealso{
-Other objects containing example raw-counts data: \code{\link{halogen.raw_mspct}},
-  \code{\link{red_filter.raw_mspct}},
-  \code{\link{white_LED.raw_mspct}},
-  \code{\link{white_LED_2min.raw_mspct}},
-  \code{\link{xenon_flash.raw_mspct}}
+Other objects containing example raw-counts data: 
+\code{\link{halogen.raw_mspct}},
+\code{\link{red_filter.raw_mspct}},
+\code{\link{white_LED.raw_mspct}},
+\code{\link{white_LED_2min.raw_mspct}},
+\code{\link{xenon_flash.raw_mspct}}
 }
 \concept{objects containing example raw-counts data}
 \keyword{datasets}

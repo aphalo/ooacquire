@@ -15,13 +15,14 @@ Get list of spectrometers requesting user to connect one or abort if none
 fould.
 }
 \seealso{
-Other interactive acquisition utility functions: \code{\link{choose_ch_interactive}},
-  \code{\link{choose_sr_interactive}},
-  \code{\link{f.trigger.message}},
-  \code{\link{protocol_interactive}},
-  \code{\link{set_attributes_interactive}},
-  \code{\link{set_folder_interactive}},
-  \code{\link{set_seq_interactive}},
-  \code{\link{tune_interactive}}
+Other interactive acquisition utility functions: 
+\code{\link{choose_ch_interactive}()},
+\code{\link{choose_sr_interactive}()},
+\code{\link{f.trigger.message}()},
+\code{\link{protocol_interactive}()},
+\code{\link{set_attributes_interactive}()},
+\code{\link{set_folder_interactive}()},
+\code{\link{set_seq_interactive}()},
+\code{\link{tune_interactive}()}
 }
 \concept{interactive acquisition utility functions}
