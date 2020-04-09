@@ -1,4 +1,5 @@
 destination: ../ooacquire-docs
+url: https://docs.r4photobiology.info/ooacquire/
 
 home:
   strip_header: true
