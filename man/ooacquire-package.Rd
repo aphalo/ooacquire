@@ -37,7 +37,7 @@ This package is provided \strong{without any warranty of suitability
 \seealso{
 Useful links:
 \itemize{
-  \item \url{http://www.r4photobiology.info}
+  \item \url{https://docs.r4photobiology.info/ooacquire/}
   \item \url{https://bitbucket.org/aphalo/ooacquire}
   \item Report bugs at \url{https://bitbucket.org/aphalo/ooacquire/issues}
 }

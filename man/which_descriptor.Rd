@@ -7,7 +7,8 @@
 which_descriptor(
   date = lubridate::today(),
   descriptors = ooacquire::MAYP11278_descriptors,
-  verbose = NULL,
+  verbose = getOption("photobiology.verbose", TRUE),
+  strict.calib = getOption("photobiology.strict.calib", FALSE),
   ...
 )
 }
@@ -20,6 +21,8 @@ data valid for a given day.}
 the spectrometer including calibration data.}
 
 \item{verbose}{Logical indicating the level of warnings wanted.}
+
+\item{strict.calib}{Logical indicating the level of warnings wanted.}
 
 \item{...}{Currently ignored.}
 }

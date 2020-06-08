@@ -175,6 +175,7 @@ s_irrad_corrected.raw_spct <- function(x,
 #' @param descriptors A named list of descriptors of the characteristics of
 #'   the spectrometer including calibration data.
 #' @param verbose Logical indicating the level of warnings wanted.
+#' @param strict.calib Logical indicating the level of warnings wanted.
 #' @param ... Currently ignored.
 #'
 #' @note The default argument for \code{verbose} is for this function
@@ -190,30 +191,37 @@ s_irrad_corrected.raw_spct <- function(x,
 #'
 which_descriptor <- function(date = lubridate::today(),
                              descriptors = ooacquire::MAYP11278_descriptors,
-                             verbose = NULL,
+                             verbose = getOption("photobiology.verbose", TRUE),
+                             strict.calib = getOption("photobiology.strict.calib", FALSE),
                              ...) {
-  if (is.null(verbose)) {
-    verbose <- !lubridate::is.instant(date)
-  }
 
   if (!lubridate::is.Date(date)) {
     date <- anytime::anydate(date)
   }
 
+  descriptor <- list()
   for (d in rev(names(descriptors))) {
     if (descriptors[[d]][["inst.calib"]][["start.date"]] < date &
         descriptors[[d]][["inst.calib"]][["end.date"]] > date) {
       if (verbose) {
         message("Descriptor ", d, " selected for ", date)
       }
-      return(descriptors[[d]])
+      descriptor <- descriptors[[d]]
     }
   }
 
-  if (verbose) {
-    warning("No valid descriptor found for ", date)
+  if (!length(descriptor) && strict.calib) {
+    if (verbose) {
+      warning("No valid calibration available for ", date)
+    }
   } else {
-    message("No valid descriptor found for ", date)
+    descriptor <- descriptors[[length(descriptors)]]
+    if (verbose) {
+      warning("Using a calibration ",
+              date - descriptor[["inst.calib"]][["end.date"]],
+              "past validity")
+    }
   }
-  return(list())
-}
+
+  descriptor
+ }
