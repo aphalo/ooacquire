@@ -210,7 +210,9 @@ which_descriptor <- function(date = lubridate::today(),
     }
   }
 
-  if (!length(descriptor) && strict.calib) {
+  if (!length(descriptor) &&
+      (strict.calib ||
+       ! date > descriptors[[length(descriptors)]][["inst.calib"]][["end.date"]])) {
     if (verbose) {
       warning("No valid calibration available for ", date)
     }
