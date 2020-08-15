@@ -3,6 +3,7 @@ context("read raw Ocean Optics")
 library(photobiology)
 library(lubridate)
 library(readr)
+library(tibble)
 
 # test_that("SpectraSuite", {
 #
