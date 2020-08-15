@@ -40,17 +40,17 @@ set_oo_ssdata_settings <- function(x,
   lines <- stringr::str_split(file.header, "\n")[[1]]
 
   if (grepl("SpectraSuite", lines[1])) {
-    my.gr <- tibble::tibble_(list(
-      feature = ~c("dark.corr", "lin.corr", "stray.corr", "boxcar",
-                   "integ.time", "scans", "sn"),
-      pattern = ~c("Correct for Electrical Dark",
-                   "Correct for Detector Non-linearity:",
-                   "Correct for Stray Light:",
-                   "Boxcar Smoothing:",
-                   "Integration Time",
-                   "Spectra Averaged:",
-                   "Spectrometers:")
-    ))
+    my.gr <- tibble::tibble(
+      feature = c("dark.corr", "lin.corr", "stray.corr", "boxcar",
+                  "integ.time", "scans", "sn"),
+      pattern = c("Correct for Electrical Dark",
+                  "Correct for Detector Non-linearity:",
+                  "Correct for Stray Light:",
+                  "Boxcar Smoothing:",
+                  "Integration Time",
+                  "Spectra Averaged:",
+                  "Spectrometers:")
+    )
     position  <- c(-1, -1, -1, 3, 4, 3, -1)
     names(position) <- my.gr[["feature"]]
   } else { # we assume OceanView file
