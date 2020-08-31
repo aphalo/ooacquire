@@ -4,6 +4,13 @@ Add more test cases.
 Finish writing algorithms vignette.
 Document support for OO calibrations and add example scripts.
 
+ooacquire 0.2.1-1 (2020-08-15)
+==============================
+
+* Update for new versions of packages 'tibble' and 'photobiology'.
+* Bug fix in calibration date checks (dates before start of validity of oldest
+available calibration trigger an error).
+
 ooacquire 0.2.1 (2020-06-08)
 ============================
 
