@@ -1,0 +1,126 @@
+---
+title: "Import and conversion"
+subtitle: "`ooacquire` `r packageVersion('ooacquire')`"
+author: "Pedro J. Aphalo"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: yes
+vignette: >
+  %\VignetteIndexEntry{Import and conversion}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Summary
+***
+* This package supports only Ocean Optics (now Ocean Insight) spectrometers.
+* Allows spectral data acquisition from within an R session in real-time.
+* Allows conversion of raw-counts data acquired using SpectraSuite or
+OceanView on PCs and the software xxxx running
+on the Raspberry Pi single-board microcomputers from attached spectrometers, 
+and those acquired autonomously with the Jaz spectrometer.
+* Irradiance, reflectance, transmittance, absorptance and absorbance can be
+derived from row spectra.
+* Measurments of both continuous and pulsed light sources is possible.
+* Different measurement protocols, data averaging, integration time
+bracketing, automatic adjustment of integration time can be used and corrections 
+for stray light and slit function can be applied.
+***
+
+## Preliminaries
+
+```{r "setup", include=FALSE}
+require("knitr")
+opts_knit$set(cache = FALSE, root.dir = system.file("extdata", package = "ooacquire"))
+```
+
+We first load the R packages to be used.
+
+```{r}
+library(photobiology)
+library(photobiologyWavebands)
+library(ggspectra)
+library(ooacquire)
+```
+
+
+## Introduction
+
+This brief document describes only high level functions for importing and
+converting raw counts data into physical quantities. We show simple examples of
+their use, assuming that R, the needed R packages are installed (see this
+package's User Guide and README for details). Of course, a suitable instrument
+calibration and correction method description should be also available for
+conversion. In the example below we use in the examples calibration included as
+part of the package as well as example data acquired with the same
+spectrometers. To use the functions with your own data, in most cases you will
+need to either import calibration data as provided by Ocean Optics or manually
+add the calibration from other sources.
+
+## Importing raw counts from files
+
+The files output by most instruments and software from Ocean Optics include a header with metadata describing the instrument settings used for acquisition. In many case this information is enough, together with a calibration, for expression in physical units such as irradiance. The same measuring protocols are supported as for direct data acquisition as long as the necessary raw counts from the different measurements are available.
+
+The functions recognize which file(s) correspond to each step in the protocols based on their name in a list. The names in the list should correspond to the role of each spectrum or each group of spectra in a given protocol. As long as the input files with the necessary data are available, the results are exactly the same as if the
+spectra had been acquired in R.
+
+```{r}
+file_names <- list(light = c("irrad-files/light-short.txt",
+                             "irrad-files/light-long.txt"),
+                   filter = "irrad-files/flt-long.txt",
+                   dark = c("irrad-files/dark-short.txt",
+                            "irrad-files/dark-long.txt"))
+```
+
+In this case, a call to a high level function both reads five files with raw data, and converts these to a single spectral irradiance spectrum. For this to work, a valid calibration specific to the spectrometer used to acquire the RAW data must be available and already imported into R.
+
+```{r}
+irrad.spct <- 
+  s_irrad_corrected(x = file_names,
+                    descriptor = which_descriptor("2016-10-11", 
+                                                  MAYP11278_descriptors),
+                    correction.method = MAYP11278_ylianttila.mthd)
+```
+
+The example above uses a protocol with integration-time bracketing plus subtraction of measured stray light. We can plot the result.
+
+```{r, fig.height=5, fig.width=7}
+autoplot(irrad.spct)
+```
+
+If what is desired are only the corrected _count-per-second_ or _counts-per-exposure_ spectral data instead of calibrated values, they can be obtained by setting `return.cps = TRUE`.
+
+```{r}
+cps.spct <- 
+  s_irrad_corrected(x = file_names,
+                    descriptor = which_descriptor("2016-10-11", 
+                                                  MAYP11278_descriptors),
+                    correction.method = MAYP11278_ylianttila.mthd,
+                    return.cps = TRUE)
+```
+
+This example uses the same protocol as above but skips the last step of multiplying the corrected counts-per-second by each pixel's calibration multiplier.
+
+```{r, fig.height=5, fig.width=7}
+autoplot(cps.spct)
+```
+
+## Reading calibration data from files
+
+Package 'oacquire' uses its own format for storage of calibration data. This format supports storage of data for various corrections in addition to calibration multipliers. A full calibration and instrument characterization as needed to use all the capabilities implemented in 'ooacuire' needs to be custom made. However, some of the methods and protocols implemented can be also applied when only _regular_ calibration data are available. Ocean Optics provides calibration data expressed differently than they are stored and used in 'ooacquire'. Function `read_oo_caldata()` imports calibration data from text files as supplied by Ocean Optics. A problem is that the format used by Ocean Optics seems not to be fully consistent over time resulting occasionally in the import with `read_oo_caldata()` failing.
+
+```{r, eval=FALSE}
+cal.spct <- read_oo_caldata("oo-calibration/xxxx")
+```
+
+Because of the way calibration data is provided by Ocean Optics, one additional piece of information is needed for the calculation of multipliers usable with the functions in this package. This is the area of the cosine diffuser in square millimetres or the name of one of the "known" diffuser types.
+
+```{r, eval=FALSE}
+cal.multipliers <- oo_calib2irrad_mult(cal.spct,
+                                       diff.type = "CC-3")
+```
+
+
+
+

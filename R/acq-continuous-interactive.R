@@ -357,21 +357,49 @@ acq_irrad_interactive <-
         message("Raw objects to collect: ",
                 paste(raw.names, collapse = ", "), sep = " ")
         collection.name <- make.names(readline("Name of the collection?: "))
+        collection.title <- readline("Title for figure and plot?:")
         irrad.collection.name <- paste(collection.name, "irrad", "mspct", sep = ".")
         raw.collection.name <- paste(collection.name, "raw", "lst", sep = ".")
         collection.file.name <- paste(collection.name, "Rda", sep = ".")
+        collection.pdf.name <- paste(collection.name, "pdf", sep = ".")
 
         if (qty.out != "raw") {
           collection.mspct <- switch(qty.out,
                                      irrad = source_mspct(mget(irrad.names)),
                                      cps =   cps_mspct(mget(irrad.names)))
 
+          # plot collection and summaries
+          collection.fig <- ggplot2::autoplot(collection.mspct) +
+            ggplot2::ggtitle(collection.title)
+          print(collection.fig)
+
+          irrad.tb <- irrad(collection.mspct,
+                            w.band = getOption("photobiology.mplot.bands",
+                                               default = c(photobiologyWavebands::PAR(),
+                                                           photobiologyWavebands::Plant_bands())),
+                            attr2tb = c(time = "when.measured"))
+          irrad.table.fig <- ggplot2::ggplot() +
+            ggplot2::annotate(geom = "table_npc",
+                              label = irrad.tb,
+                              x_npc = "center",
+                              y_npc = "top") +
+            ggplot2::ggtitle(collection.title) +
+            ggplot2::theme_void()
+
+          if (save.pdfs) {
+            grDevices::pdf(file = collection.pdf.name)
+            print(collection.fig)
+            print(irrad.table.fig)
+            grDevices::dev.off()
+          }
+
           assign(irrad.collection.name, collection.mspct)
           assign(raw.collection.name, mget(raw.names))
-
           save(list = c(irrad.collection.name, raw.collection.name),
                file = collection.file.name)
-          rm(list = c(irrad.names, raw.names))
+
+          rm(list = c(irrad.names, raw.names, collection.fig, irrad.table.fig,
+                      irrad.tb, collection.title, collection.pdf.name))
         } else {
           assign(raw.collection.name, mget(raw.names))
 

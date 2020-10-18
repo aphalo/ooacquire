@@ -88,7 +88,14 @@ raw2cps.raw_spct <- function(x,
 #' @return an object of class "cps_mspct"
 #'
 raw2cps.raw_mspct <- function(x, ...) {
-  msmsply(x, raw2cps, ...)
+  if (length(x) == 1) {
+    # temporary fix for bug in photobiology::msmsply()
+    z <- cps_mspct(list(raw2cps(x[[1]], ...)))
+    names(z) <- names(x)
+    z
+  } else {
+    msmsply(x, raw2cps, ...)
+  }
 }
 
 

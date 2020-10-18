@@ -94,6 +94,9 @@ s_irrad_corrected.raw_mspct <-
            verbose = getOption("photobiology.verbose", default = FALSE),
            ...) {
 
+    check_spct_prev_state <- disable_check_spct()
+    on.exit(set_check_spct(check_spct_prev_state), add = TRUE)
+
     check_sn_match(x, correction.method, missmatch.action = stop)
 
     if (length(setdiff(names(x), spct.names)) > 0L) {
@@ -122,20 +125,20 @@ s_irrad_corrected.raw_mspct <-
     stopifnot(is.null(worker.fun) || is.function(worker.fun))
 
     corrected.spct <-
-      ooacquire::uvb_corrections(x = x,
-                                 spct.names = spct.names,
-                                 stray.light.method = correction.method[["stray.light.method"]],
-                                 stray.light.wl = correction.method[["stray.light.wl"]],
-                                 flt.dark.wl = correction.method[["flt.dark.wl"]],
-                                 flt.ref.wl = correction.method[["flt.ref.wl"]],
-                                 flt.Tfr = correction.method[["flt.Tfr"]],
-                                 inst.dark.pixs = correction.method[["inst.dark.pixs"]],
-                                 worker.fun = worker.fun,
-                                 trim = correction.method[["trim"]],
-                                 verbose = verbose)
+      uvb_corrections(x = x,
+                      spct.names = spct.names,
+                      stray.light.method = correction.method[["stray.light.method"]],
+                      stray.light.wl = correction.method[["stray.light.wl"]],
+                      flt.dark.wl = correction.method[["flt.dark.wl"]],
+                      flt.ref.wl = correction.method[["flt.ref.wl"]],
+                      flt.Tfr = correction.method[["flt.Tfr"]],
+                      inst.dark.pixs = correction.method[["inst.dark.pixs"]],
+                      worker.fun = worker.fun,
+                      trim = correction.method[["trim"]],
+                      verbose = verbose)
 
     if (return.cps) {
-      corrected.spct
+      check_spct(corrected.spct)
     } else {
       descriptor <- getInstrDesc(corrected.spct)
       if (any(is.na(descriptor$inst.calib$irrad.mult)) ||
@@ -143,7 +146,7 @@ s_irrad_corrected.raw_mspct <-
           length(descriptor$wavelengths)) {
         stop("The 'instrument descriptor' lacks valid irradiance calibration data!")
       }
-      photobiology::cps2irrad(corrected.spct, ...)
+      check_spct(photobiology::cps2irrad(corrected.spct, ...))
     }
   }
 

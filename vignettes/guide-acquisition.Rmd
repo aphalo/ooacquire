@@ -1,0 +1,223 @@
+---
+title: "Acquisition of Spectra"
+subtitle: "`ooacquire` `r packageVersion('ooacquire')`"
+author: "Pedro J. Aphalo"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: yes
+vignette: >
+  %\VignetteIndexEntry{Acquisition of Spectra}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Summary
+***
+* This package supports only Ocean Optics (now Ocean Insight) spectrometers.
+* Allows spectral data acquisition from within an R session in real-time.
+* Allows conversion of raw-counts data acquired using SpectraSuite or
+OceanView on PCs and the software xxxx running
+on the Raspberry Pi single-board microcomputers from attached spectrometers, 
+and those acquired autonomously with the Jaz spectrometer.
+* Irradiance, reflectance, transmittance, absorptance and absorbance can be
+derived from row spectra.
+* Measurments of both continuous and pulsed light sources is possible.
+* Different measurement protocols, data averaging, integration time
+bracketing, automatic adjustment of integration time can be used and corrections 
+for stray light and slit function can be applied.
+***
+
+## Introduction
+
+This brief document describes only high level functions for interactive data acquisition. We first show simple examples of their use, assuming that R, the needed R packages, the Java **JDK** and Ocean Optics' free OmniDriver runtime are all installed and working together (see this package's User Guide for details). Of course, to acquire irradiance, a suitable instrument calibration and correction method description should be also available. In the example below we use the as examples calibration included as part of the package. As the serial number stored with the calibration is validated against that retrieved from the instrument, the examples below will work only with our own instrument, rather than with the one you intend to use. In most cases you will need to either import calibration data as provided by OceanOptics or manually add the calibration from other sources.
+
+**NOTE:** This vignette can be built even if a spectrometer is not connected as the code chunks with code that "talks" with the instrument are by default not evaluated.
+l
+## Preliminaries
+
+```{r "setup", include=FALSE}
+require("knitr")
+opts_knit$set(cache = FALSE, root.dir = system.file("extdata", package = "ooacquire"))
+```
+
+We first load the R packages to be used.
+
+```{r}
+library(photobiology)
+library(photobiologyWavebands)
+library(ggspectra)
+library(ooacquire)
+
+# print warnings at the time they are triggered
+options(warn = 1)
+
+# change this to TRUE to run acquisition examples
+# these examples require user interaction to complete!!
+sr.online <- FALSE
+```
+
+For spectral data acquisition the first step is to connect an Ocean Optics spectrometer to a USB port and start a measuring session.
+
+```{r, eval=sr.online, echo=FALSE, message=FALSE, warning=FALSE}
+w <- start_session(error.action = warning)
+sr.online <- rOmniDriver::number_srs(w) > 0
+# is_valid_wrapper(w)
+```
+
+Please, see the documentation for the individual functions, and below, for examples of data acquisition, and other vignettes for descriptions of the different algorithms implemented.
+
+## Continuous versus pulsed light sources
+
+When sunlight or radiation emitted by lamps driven by direct or alternating current are measured the integration time can be used as reference to compute fluxes such as energy irradiance or photon irradiance. In the case of many lamps driven by alternating current accurate measurments require us to consider the line frequency (50 Hz in Europe, 60 Hz in USA) because light output will usually vary cyclically at twice these frequencies (100 Hz or 120 Hz) making it necessary to use integration times that are multiples of the durantion of one half cycle of line frequency (10 ms and 8.3333 ms, respectively) or alternatively use long-enough integration times for several cycles to be included in the measurement interval. The same considerations apply to transmittance, reflectance, absorptance measurements using continuous radiation sources.
+
+When measuring radiation from pulsed light sources such as xenon flashes we express the measurements as spectral power or photons per event (pulse or "flash") and the integration time must simply be long enough to encompass a known number of _whole_ pulses. We use the number of pulses to compute fluence rate per pulse or event. The same considerations apply to transmittance, reflectance and absorptance measurements using pulsed radiation sources.
+
+In the remaining of this vignette we provide examples for measurement of different spectral quantities.
+
+## Interactive acquisition of spectral data
+
+The functions described in this section by default acquire for each measurement one or more raw-counts spectra from the spectrometer. They compute the corresponding spectrum expressed in a physical quantity, and save the data, raw and computed, immediately, creating one `.rda` R-data file per measurement. It is possible to select a different physical quantity to be plotted and returned by passing an argument to `qty.out`, such as `cps` for counts per second. The returned data objects include metadata as attributes storing the settings used for the measurement and a descriptor of the spectrometer and version of the package used.
+
+The operator is presented with an annotated plot, with annotations the user can adjust before continuing. The plot corresponding to the measurement is saved to a `.pdf` file, before a new measurement is started. Spectra grouped into collections can be also saved and plotted at any time during a measurement session. Please, see the help pages for the functions. 
+
+### Spectral irradiance
+
+Energy irradiance ($W m^{-2} nm^{-1}$) and photon iradiance ($mol s^{-1} m^{m-2} nm^{-1}$$) are fluxes expressed as energy or quanta, respectively. They can be interconverted and there is no difference in how they are measured.
+
+After loading the packages as shown above in section _Preliminaries_ and opening a connection to an attached spectrometer, calling function `acq_irrad_interactive()` starts an interactive spectral-data acquisition session. The function takes several arguments, which have as defaults the most frequently used values. Two parameters will require explicit arguments as they are specific to the instrument and calibration being used:  `correction.method` and `descriptors`. These definitions are specific to each
+individual spectrometer and are checked to match the serial number of the
+attached spectrometer. If this test fails, the function aborts.
+
+```{r, eval=sr.online}
+acq_irrad_interactive(correction.method = ooacquire::MAYP11278_ylianttila.mthd,
+                      descriptors = ooacquire::MAYP11278_descriptors,
+                      interface.mode = "simple")
+```
+
+The code above is run at the R console. I normally use the RStudio IDE, but this is not required as long as graphical display is enabled. Alternatively, the statements can be saved into an R script (as plain-text file) and then the file `source`d from the R console. As scripts can be also run from the operating system shell or command prompt, it is possible, if desired to partly hide R from users' view.
+
+Of the parameters of function `acq_irrad_interactive()`, `interface.mode` selects different sets of settings to be controlled interactively during a session. The difference between the interface modes is in which of the different possible settings can be modified by the user at run time. The simplified interfaces make measurements simpler and faster in specific situations. The default `interface.mode = "auto"` retains the behaviour of earlier versions, but in many cases `interface.mode = "simple"` will still allow all the parameters needed for measurements at hand to be set at runtime.
+
+Within the measurement session the user can modify settings through simple menus. These functions, however, have parameters which can be used to set default values for the  settings (i.e., a script can override the built-in defaults). In all cases when values supplied by the user fall outside those accepted by the connected instrument, these values will be adjusted to the nearest valid value.
+
+Although we here discuss settings in relation to parameter arguments, the same settings can be set interactively by the user. It should also be remembered that the functions described here, except when in interface mode `"fixed"`, will set a suitable integration time automatically.
+
+_Simple approach_ Pass a single numeric value as argument to `HDR.mult` to indicate acquisition using a single integration time. Except in very unusual cases, always use 1.
+
+The argument passed to `tot.time.range` indicates the allowed range for total integration, which is used internally to set the number of scans to be averaged for each measurement. The integration time for individual scans is adjusted automatically and used to compute the number of scans to average. The maximum and minimum integration times supported by the spectrometer are the limits.
+
+```{r, eval=sr.online}
+acq_irrad_interactive(HDR.mult = 1,
+                      tot.time.range = c(0, Inf),
+                      correction.method = ooacquire::MAYP11278_ylianttila.mthd,
+                      descriptors = ooacquire::MAYP11278_descriptors)
+```
+
+It would be possible to use in the example above a value larger than one for `HDR.mult` even if a single integration time is used. This is unusual, but if we indeed would like to force clipping of part of the spectrum, this would be the way to achieve this automatically.
+
+```{r, eval=sr.online}
+acq_irrad_interactive(HDR.mult = c(short = 1, long = 10), # the default
+                      tot.time.range = c(5, 15), # the default
+                      correction.method = ooacquire::MAYP11278_ylianttila.mthd,
+                      descriptors = ooacquire::MAYP11278_descriptors)
+```
+
+The dynamic range in the spectral data can be increased by splicing spectra measured using increasing integration times (a sort of "exposure bracketing").
+In this case spectral data are acquired using two ore more integration times, and the resulting spectra are merged choosing the _most suitable_ of the used integration times for each wavelength region. Usually using two integration times using 1 and 10 as multipliers for optimal one is a good compromise. However, there is no built-in limitation in the package code making it possible to a vector three or more values, which combined with a very long total acquisition time of the order of minutes, can yield very good control of noise for light sources with stable output. Consequently, although the default setting `HDR.mult = c(1, 10)` tends to work well, settings like `HDR.mult = c(1, 5, 25)` may be useful in special circumstances.
+
+We next set total acquisition time to a fixed length of 10 seconds. Once this setting is active, each time the integration time is automatically set, both the integration time and number of scans are adjusted so that total acquisition time is exactly 10 seconds, for both short and long integration times. Averaging multiple scans smooths out noise but retains the spectral resolution. A constant total measurement time is useful as it controls the influence of "noise" on the acquired data consitently irrespective of the integration time used.
+
+```{r, eval=sr.online}
+acq_irrad_interactive(HDR.mult = c(1, 10),  # the default
+                      tot.time.range = 10,
+                      correction.method = ooacquire::MAYP11278_ylianttila.mthd,
+                      descriptors = ooacquire::MAYP11278_descriptors)
+```
+
+If long integration times are needed, the setting above may result in the use of suboptimal integration times, as the desired integration time may have be to be shortened until it becomes an exact fraction of the total acquisition time. To avoid this, we can supply instead of a single fixed value for the total acquisition time, a range of values.
+
+```{r, eval=sr.online}
+acq_irrad_interactive(HDR.mult = c(1, 10), 
+                      tot.time.range = c(10, 20),
+                      correction.method = ooacquire::MAYP11278_ylianttila.mthd,
+                      descriptors = ooacquire::MAYP11278_descriptors)
+```
+
+Sometimes we may want to avoid long integration times even at the cost of not using the whole dynamic range of the detector. For example, when following some fast kinetics, we would usually need the integration time not to exceed a certain time, say 50 milliseconds, we would simply use smaller values, such as `tot.time.range = c(0.03, 0.05)`. 
+
+One problem with automatic setting of integration time is that depending on the stability of the light source we will need to set a different value for the target relative to the longest integration time that would result in no clipping during automatic tuning. Parameter `target.margin` allows the user to set a _safety margin_ different from the default of 0.1 (or 10%). The example below could help prevent clipping in cases when irradiance changes so fast that it could be up to 25% higher during actual measurement than during the preceding tuning of the integration time.
+
+```{r, eval=sr.online}
+acq_irrad_interactive(target.margin = 0.25,
+                      correction.method = ooacquire::MAYP11278_ylianttila.mthd,
+                      descriptors = ooacquire::MAYP11278_descriptors)
+```
+
+Of course, the automatic tuning step can be also skipped.
+
+### Spectral fluence
+
+Fluence, also called radiant exposure, is defined per exposure event rather than per unit time. When measuring pulsed light sources, the length of exposure is determined by the duration of the pulse, which is usually not known with precision. In the discussion below we assume that the quantity of interest is fluence per pulse. For this type of measurements the integration time setting in the spectrometer only affects the window within which pulses will be measured, consequently, it is always set manually, and in the current implementation kept constant for the whole session. The way of controlling the number of photons reaching the detector during an integration is through the number of pulses per integration and/or the fluence provided by each pulse (e.g. by altering the distance between source and instrument light entrance).
+
+We start the session as described above for irradiance, but using function `acq_fluence_interactive()`. Using defaults.
+
+```{r, eval=sr.online}
+acq_fluence_interactive(correction.method = ooacquire::MAYP11278_ylianttila.mthd,
+                        descriptors = ooacquire::MAYP11278_descriptors)
+```
+
+The integration time can be set when calling the function to start a session.
+
+```{r, eval=sr.online}
+acq_fluence_interactive(integ.time = 4, # seconds
+                        correction.method = ooacquire::MAYP11278_ylianttila.mthd,
+                        descriptors = ooacquire::MAYP11278_descriptors)
+```
+
+Another important parameter is the number of exposure events. This determines how the resulting data are expressed. If we consider that each individual pulse is an exposure event, and for example, we trigger five flashes per spectrometer integration (or "scan"), we would set `num.exposures = 5`.
+
+By default the user is prompted to manually trigger a pulse. However, when triggering of pulses can be automated, a function accepting as only argument the number of pulses can be passed as argument to parameter `f.trigger.pulses`. **It is important to be aware that no multitasking support is provided, so for automation, the pulse trigger function should return to the caller before the pulses are triggered and the train of pulses start with enough delay for the integration to be started before them.**
+
+### Spectral transmittance, absorptance and reflectance
+
+A single function can be used for the acquisition of data where the quantities of interest are expressed relative to a reference. This is the case for transmittance, reflectance and absorptance. The same parameters as discussed for `acq_irrad_interactive()` iare available in function `acq_fraction_interactive()`. We will here describe three additional parameters only present in this function. The first one is `ref.value` which needs to be supplied if the reference target is imperfect, such as a white reference patch which reflects less than 100%. The default is `ref.value = 1`, but this parameter not only accepts numeric values as argument but also transmittance or reflectance spectra for the target used as reference. Consequently if the reflectance of an "imperfect" reference is know, such reference can be used. (e.g. In the case of measuring the reflectance of very dark objects, it might be convenient to use a grey reference instead of a white reference). For a reference with 97% reflectance across the whole range of wavelengths of interest one would use.
+
+```{r, eval=sr.online}
+acq_fraction_interactive(ref.value = 0.97,
+                         correction.method = ooacquire::MAYP11278_ylianttila.mthd,
+                         descriptors = ooacquire::MAYP11278_descriptors)
+```
+
+Parameters `qty.out` and `type` determine the class of object and the quantity stored in the returned objects. If the optical set-up used is for measuring specular spectral reflectance, we use the following code. This information will also be used when plotting the data.
+
+```{r, eval=sr.online}
+acq_fraction_interactive(qty.out = "Rfr", type = "specular",
+                         correction.method = ooacquire::MAYP11278_ylianttila.mthd,
+                         descriptors = ooacquire::MAYP11278_descriptors)
+```
+
+Wen using _light sources with pulsed emission_ we start a session by calling function `acq_fraction_pulsed_interactive()` instead of `acq_fraction_interactive` and we set manually the integration time as when measuring spectral fluence. In other respects the procedure is similar to that for continuous light sources except for the need to either manually or automatically trigger the light pulses.
+
+## Rolling your own
+
+The functions for interactive acquisition of spectral data described above, although useful in many cases, are meant also as examples. In cases of routine measurements one could simplify menus by removing entries that are not needed, or even converting the functions to non-interactive, and possibly adding support for scheduled sequences of spectral data acquisitions. This should be fairly simple, not requiring advanced knowledge of the R language as we export the lower level functions that can be used as building blocks for new variations. It should be even possible to use these functions to develop a user interface based of package 'shinny'.
+
+## Using scripts
+
+It is also possibly to combine lower level functions using R scripts instead of through writing higher level R functions from them. Several example scripts are included with the package. I recommend that you open them, and save them to your own working directory before sourcing them or editing them.
+
+You will need first to locate where in your computer's file system the 'ooacquire' package is installed, and where the file you are interested in is, and to copy it to your own workspace. Here we copy the script called `"irrad-acq-interac.R"`.
+
+```{r, eval=FALSE}
+filepath <- system.file("example-scripts", "irrad-acq-interac.R", package="ooacquire")
+file.copy(from = filepath, to = ".")
+```
+
+Here we copy all the example scripts.
+
+```{r, eval=FALSE}
+folderpath <- system.file("example-scripts", package="ooacquire")
+list.files(path = folderpath, pattern = ".*[.]R")
+file.copy(from = list.files(path = folderpath, pattern = ".*[.]R", full.names = TRUE), to = ".")
+```

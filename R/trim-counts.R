@@ -28,10 +28,16 @@ trim_counts <- function(x,
   counts.cols <- grep("^counts", names(x), value = TRUE)
   for (col in counts.cols) {
     if (min(x[[col]]) < 0) {
-      warning("Negative raw counts in data!\n",
-              "These are not raw detector counts.")
+      if (min(x[[col]]) < 100) {
+        warning("Negative raw counts in data!\n",
+                "These are not true raw detector counts.\n",
+                "A dark correction may have been applied.\n")
+      }
+      shift <- min(x[[col]])
+    } else {
+      shift <- 0
     }
-    x[[col]] <- ifelse(x[[col]] < range[1] | x[[col]] > range[2],
+    x[[col]] <- ifelse(x[[col]] < range[1] | x[[col]] > range[2] + shift,
                        fill,
                        x[[col]])
   }

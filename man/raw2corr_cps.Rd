@@ -11,16 +11,18 @@ raw2corr_cps(x, ref.pixs.range, ...)
 
 \method{raw2corr_cps}{default}(x, ref.pixs.range = NULL, ...)
 
-\method{raw2corr_cps}{raw_spct}(x, ref.pixs.range = c(1, 100), ...)
+\method{raw2corr_cps}{raw_spct}(x, ref.pixs.range = c(1, 100), despike = FALSE, ...)
 
-\method{raw2corr_cps}{raw_mspct}(x, ref.pixs.range = c(1, 100), ...)
+\method{raw2corr_cps}{raw_mspct}(x, ref.pixs.range = c(1, 100), despike = FALSE, ...)
 }
 \arguments{
 \item{x}{raw_spct object.}
 
 \item{ref.pixs.range}{integer vector of length 2.}
 
-\item{...}{currently ignored.}
+\item{...}{passed to \code{photobiology::despike}.}
+
+\item{despike}{logical flag, if TRUE despiking will be attempted.}
 }
 \value{
 a cps_spct object with one spectrum preserving the metadata present in

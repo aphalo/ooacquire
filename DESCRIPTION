@@ -1,8 +1,8 @@
 Package: ooacquire
 Type: Package
 Title: Acquire Data from OO Spectrometers
-Version: 0.2.1-1
-Date: 2020-08-15
+Version: 0.2.1.9002
+Date: 2020-10-18
 Authors@R:
    c(
     person("Pedro J.", "Aphalo", email = "pedro.aphalo@helsinki.fi", role = c("aut", "trl", "cre")),
@@ -27,6 +27,7 @@ Imports:
     utils,
     tibble (>= 3.0.3),
     ggplot2 (>= 3.3.2),
+    ggpmisc (>= 0.3.6),
     caTools (>= 1.18.0),
     devtools (>= 2.3.1),
     Rcpp (>= 1.0.5),

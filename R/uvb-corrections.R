@@ -58,80 +58,56 @@ uvb_corrections <- function(x,
                             verbose = getOption("photobiology.verbose", default = FALSE),
                             ...) {
 
-  raw2merged_cps <- function(xx,
-                             spct.names,
-                             inst.dark.pixs = NA_real_) {
-    spct.names <- intersect(spct.names, names(xx))
-    zz <- cps_mspct()
-    for (n in spct.names) {
-      temp.spct <- xx[[n]]
-      inst.dark.wl <-
-        range(temp.spct[["w.length"]][inst.dark.pixs])
-      temp.spct <- skip_bad_pixs(temp.spct)
-      temp.spct <- trim_counts(temp.spct)
-      temp.spct <- bleed_nas(temp.spct)
-      temp.spct <- linearize_counts(temp.spct)
-      if (all(!is.na(inst.dark.wl))) {
-        temp.spct <- fshift(temp.spct, range = inst.dark.wl)
-      }
-      temp.spct <- raw2cps(temp.spct)
-      zz[[n]] <- merge_cps(temp.spct)
-    }
-    zz
-  }
-
   stopifnot(length(x) > 0L)
   stopifnot(length(spct.names) > 0L)
-  stopifnot(length(setdiff(names(spct.names), c("light", "filter", "dark"))) == 0L)
+  stopifnot(names(spct.names) %in% c("light", "filter", "dark"))
+  stopifnot(all(names(x) %in% spct.names))
+
+  if (!all(spct.names == names(spct.names))) {
+    # rename columns
+    names.to.map <- spct.names != names(spct.names) & spct.names %in% names(x)
+    names(x)[names(x) == spct.names[names.to.map]] <- names(spct.names[names.to.map])
+  }
+  stopifnot("light" %in% names(x)) # no measurement
 
   flt.flag <- !is.na(stray.light.method) && stray.light.method != "none"
+
+  if (!flt.flag && "filter" %in% names(x)) {
+    # if method does not support a filter measurement
+    # we discard the filter data
+    x[["filter"]] <- NULL
+  }
+  spct.names <- names(x)
+
+  if (is.raw_mspct(x)) {
+    y <- raw2corr_cps(x, ref.pixs.range = inst.dark.pixs)
+  } else if (is.cps_mspct(x)) {
+    y <- x
+  }
 
   if (is.character(worker.fun)) {
     worker.fun = get(worker.fun,
                      mode = "function")
   }
 
-  if (stray.light.method %in% c("none")) {
-    # if method does not support a filter measurement, we discard these data if present
-    spct.nms <- spct.names[c("light", "dark")]
-  } else {
-    spct.nms <- spct.names[c("light", "filter", "dark")]
-  }
-  spct.present <- which(spct.nms %in% names(x))
-
-  spct.names <- spct.nms[spct.present]
- # names(spct.names) <- c("light", "filter", "dark")[spct.present]
-
-  if (length(setdiff(c("light", "filter", "dark"), names(spct.names))) == 0) {
-    y <- raw2merged_cps(xx = x,
-                        spct.names = spct.names,
-                        inst.dark.pixs = inst.dark.pixs)
-    y <- ref_correction(y, ref_name = spct.names["dark"])
-  } else if (length(setdiff(c("light", "dark"), names(spct.names))) == 0) {
+  if (length(setdiff(c("light", "filter", "dark"), spct.names)) == 0) {
+    y <- ref_correction(y, ref_name = "dark")
+  } else if (length(setdiff(c("light", "dark"), spct.names)) == 0) {
     if (verbose && !stray.light.method %in% c("none")) {
       warning("No 'filter' measurement available: continuing without filter correction")
     }
     flt.flag <- FALSE   # overrides flt.flag <- TRUE set above based on method
-    y <- raw2merged_cps(xx = x,
-                        spct.names = spct.names[c("light", "dark")],
-                        inst.dark.pixs = inst.dark.pixs)
-    y <- ref_correction(y, ref_name = spct.names["dark"])
-  } else if (length(setdiff(c("light", "filter"), names(spct.names))) == 0) {
+    y <- ref_correction(y, ref_name = "dark")
+  } else if (length(setdiff(c("light", "filter"), spct.names)) == 0) {
     # added 2019-01-09
     if (verbose) {
       warning("No 'dark' measurement available: using internal reference")
     }
-    y <- raw2merged_cps(xx = x,
-                        spct.names = spct.names,
-                        inst.dark.pixs = inst.dark.pixs)
-  } else if (length(setdiff("light", names(spct.names))) == 0) {
+  } else if (length(setdiff("light", spct.names)) == 0) {
     if (verbose) {
       warning("No 'dark' or 'filter' measurements available: using internal reference")
     }
     flt.flag <- FALSE  # overrides flt.flag  <- TRUE set above based on method
-    y <- raw2merged_cps(xx = x,
-                        spct.names = spct.names,
-                        inst.dark.pixs = inst.dark.pixs)
   } else {
     if (verbose) {
       warning("No 'light' measurement available: aborting")
@@ -140,15 +116,15 @@ uvb_corrections <- function(x,
   }
 
   if (flt.flag && stray.light.method != "simple" &&
-      average_spct(clip_wl(y[[spct.names["light"]]], range = flt.ref.wl)) < 0.001 *
-      max(y[[spct.names["light"]]][["cps"]], na.rm = TRUE)) {
+      average_spct(clip_wl(y[["light"]], range = flt.ref.wl)) < 0.001 *
+      max(y[["light"]][["cps"]], na.rm = TRUE)) {
     warning("Too low cps in filter reference region, setting method to 'simple'.")
     stray.light.method <- "simple"
   }
 
   if (flt.flag) {
-    z <- filter_correction(x = y[[spct.names["light"]]],
-                           flt = y[[spct.names["filter"]]],
+    z <- filter_correction(x = y[["light"]],
+                           flt = y[["filter"]],
                            stray.light.method = stray.light.method,
                            stray.light.wl = stray.light.wl,
                            flt.dark.wl = flt.dark.wl,
@@ -161,7 +137,7 @@ uvb_corrections <- function(x,
       warning("Assuming pure stray light in ",
               stray.light.wl[1], " to ", stray.light.wl[2], " nm")
     }
-    z <- no_filter_correction(x = y[[spct.names["light"]]],
+    z <- no_filter_correction(x = y[["light"]],
                               stray.light.wl = stray.light.wl,
                               flt.dark.wl = flt.dark.wl,
                               flt.Tfr = flt.Tfr,
@@ -426,7 +402,7 @@ no_filter_correction <- function(x,
   x_clip_dark <- clip_wl(x, range = flt.dark.wl)
 
   mean_x_cps_short <- mean(x_clip_dark[["cps"]],
-                          trim = trim, na.rm = TRUE)
+                           trim = trim, na.rm = TRUE)
 
   # Estimate for stray light + dark count
   x_clip_stray <- clip_wl(x, range = stray.light.wl)

@@ -29,7 +29,7 @@ s_fraction_corrected(x, ...)
   x,
   spct.names = c(sample = "sample", reference = "reference", dark = "dark"),
   reference.value = 1,
-  type = "internal",
+  type = switch(qty.out, Tfr = "internal", Rfr = "total"),
   correction.method,
   dyn.range = NULL,
   qty.out = "Tfr",

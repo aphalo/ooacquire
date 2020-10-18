@@ -102,16 +102,26 @@ s_fraction_corrected.raw_mspct <- function(x,
                                                           reference = "reference",
                                                           dark = "dark"),
                                            reference.value = 1,
-                                           type = "internal",
+                                           type = switch(qty.out,
+                                                         Tfr = "internal",
+                                                         Rfr = "total"),
                                            correction.method,
                                            dyn.range = NULL,
                                            qty.out = "Tfr",
                                            verbose = getOption("photobiology.verbose", default = FALSE),
                                            ...) {
 
+  check_spct_prev_state <- disable_check_spct()
+  on.exit(set_check_spct(check_spct_prev_state), add = TRUE)
+
   check_sn_match(x, correction.method, missmatch.action = stop)
 
-  if (length(x[[spct.names["sample"]]]) == 0 || length(x[[spct.names["reference"]]]) == 0) {
+  if (!all(spct.names == names(spct.names))) {
+    # rename columns
+    names.to.map <- spct.names != names(spct.names) & spct.names %in% names(x)
+    names(x)[names(x) == spct.names[names.to.map]] <- names(spct.names[names.to.map])
+  }
+  if (!all(c("sample", "reference") %in% names(x)))  {
     if (verbose) {
       warning("Raw spectra for 'sample' and/or 'reference' missing")
     }
@@ -122,20 +132,18 @@ s_fraction_corrected.raw_mspct <- function(x,
     }
   }
 
-  # build selectors
+  spct.names <- names(x)
+  dark.available <- "dark" %in% spct.names
 
-  if ("dark" %in% names(spct.names) && spct.names["dark"] %in% names(x)) {
-    smp.names <- spct.names[c("sample", "dark")]
+  if (dark.available) {
+    smp.names <- c("sample", "dark")
     names(smp.names) <- c("light", "dark")
-
-    ref.names <- spct.names[c("reference", "dark")]
+    ref.names <- c("reference", "dark")
     names(ref.names) <- c("light", "dark")
-  } else {
-    # no dark reading available
-    smp.names <- spct.names["sample"]
+  } else { # no dark reading available
+    smp.names <- "sample"
     names(smp.names) <- "light"
-
-    ref.names <- spct.names["reference"]
+    ref.names <- "reference"
     names(ref.names) <- "light"
   }
 
@@ -179,11 +187,13 @@ s_fraction_corrected.raw_mspct <- function(x,
     z <- photobiology::cps2Rfr(corrected_smp.spct,
                                corrected_ref.spct,
                                dyn.range = dyn.range) / reference.value
-    setRfrType(z, type)
+    z["Rfr"] <- ifelse()
+    z <- setRfrType(z, type)
   } else if (qty.out == "Tfr") {
     z <- photobiology::cps2Tfr(corrected_smp.spct,
                                corrected_ref.spct,
                                dyn.range = dyn.range) / reference.value
-    setRfrType(z, type)
+    z <- setRfrType(z, type)
   }
+  check_spct(z)
 }

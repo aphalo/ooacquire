@@ -9,7 +9,8 @@
 #'
 #' @param x raw_spct object.
 #' @param ref.pixs.range integer vector of length 2.
-#' @param ... currently ignored.
+#' @param despike logical flag, if TRUE despiking will be attempted.
+#' @param ... passed to \code{photobiology::despike}.
 #'
 #' @return a cps_spct object with one spectrum preserving the metadata present in
 #'   \code{x}.
@@ -38,7 +39,8 @@ raw2corr_cps.default <- function(x,
 #' @export
 #'
 raw2corr_cps.raw_spct <- function(x,
-                                  ref.pixs.range = c(1,100),
+                                  ref.pixs.range = c(1, 100),
+                                  despike = FALSE,
                                   ...) {
   # replace bad data with NAs
   x <- trim_counts(x)
@@ -58,6 +60,15 @@ raw2corr_cps.raw_spct <- function(x,
   x <- merge_cps(x)
   # apply slit function correction
   x <- slit_function_correction(x)
+  # check for spikes and remove them
+  if (despike) {
+    spike.wls <- photobiology::spikes(x, ...)[["w.length"]]
+    if (length(spike.wls) > 0) {
+      warning("Despiking as spikes were detected at: ",
+              paste(round(spike.wls, digits = 0), collapse = ", "), " nm.")
+      x <- photobiology::despike(x, ...) # may need to adjust arguments
+    }
+  }
   x
 }
 
@@ -66,9 +77,14 @@ raw2corr_cps.raw_spct <- function(x,
 #' @export
 #'
 raw2corr_cps.raw_mspct <- function(x,
-                                   ref.pixs.range = c(1,100),
+                                   ref.pixs.range = c(1, 100),
+                                   despike = FALSE,
                                    ...) {
-  msmsply(x, .fun = raw2corr_cps.raw_spct, ref.pixs.range = ref.pixs.range, ...)
+  msmsply(x,
+          .fun = raw2corr_cps.raw_spct,
+          ref.pixs.range = ref.pixs.range,
+          despike = despike,
+          ...)
 }
 
 
