@@ -361,8 +361,13 @@ We can now plot the result from the OceanView files.
 ```{r, fig.height=5, fig.width=7}
 autoplot(ov_files.spct, unit.out = "photon")
 ```
+
+The default smoothing method, with strength set 0.4 instead of the default of 1,
+removes some of the noise in the low signal regions without affecting the 
+regions with higher signal.
+
 ```{r, fig.height=5, fig.width=7}
-autoplot(smooth_spct(ov_files.spct, strength = 5), unit.out = "photon")
+autoplot(smooth_spct(ov_files.spct, strength = 0.4), unit.out = "photon")
 ```
 
 #### From `"raw_mspct"` objects
@@ -372,8 +377,8 @@ descriptor <-
   which_descriptor(getWhenMeasured(white_LED.raw_mspct$light))
 irrad01.spct <- 
   s_irrad_corrected(x = white_LED.raw_mspct,
-                       descriptor = descriptor,
-                       correction.method = MAYP11278_ylianttila.mthd)
+                    descriptor = descriptor,
+                    correction.method = MAYP11278_ylianttila.mthd)
 ```
 
 ```{r}

@@ -128,15 +128,15 @@ ov_files.spct
 autoplot(ov_files.spct, unit.out = "photon")
 
 ## ---- fig.height=5, fig.width=7-----------------------------------------------
-autoplot(smooth_spct(ov_files.spct, strength = 5), unit.out = "photon")
+autoplot(smooth_spct(ov_files.spct, strength = 0.4), unit.out = "photon")
 
 ## -----------------------------------------------------------------------------
 descriptor <- 
   which_descriptor(getWhenMeasured(white_LED.raw_mspct$light))
 irrad01.spct <- 
   s_irrad_corrected(x = white_LED.raw_mspct,
-                       descriptor = descriptor,
-                       correction.method = MAYP11278_ylianttila.mthd)
+                    descriptor = descriptor,
+                    correction.method = MAYP11278_ylianttila.mthd)
 
 ## -----------------------------------------------------------------------------
 irrad01.spct

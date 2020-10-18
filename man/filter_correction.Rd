@@ -28,7 +28,7 @@ no_filter_correction(
 )
 }
 \arguments{
-\item{x, flt}{cps_spct objects, containig spectral data from which to subtract
+\item{x, flt}{cps_spct objects, containing spectral data from which to subtract
 stray light, and measured stray light, respectively.}
 
 \item{stray.light.method}{Method variant used, "original" (Ylianttila),
@@ -38,8 +38,8 @@ stray light, and measured stray light, respectively.}
 wavelengths to use for the final stray light correction.}
 
 \item{flt.dark.wl, flt.ref.wl}{numeric vectors of length 2 giving the ranges
-of wavelengths to use for the "dark" and "illuminated" regions of the
-array in the filter correction.}
+of wavelengths to use for the "dark" and "illuminated" regions of the array
+in the filter correction.}
 
 \item{flt.Tfr}{numeric fractional transmittance of the filter to the source
 of stray light, used only for method "simple".}
@@ -49,6 +49,6 @@ of stray light, used only for method "simple".}
 \item{verbose}{Logical indicating the level of warnings wanted.}
 }
 \description{
-Correct cps readings for stray light, using either masured stray light, or
+Correct cps readings for stray light, using either measured stray light, or
 using a non-excited region of the detector array.
 }

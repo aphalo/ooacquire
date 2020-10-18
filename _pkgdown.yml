@@ -120,6 +120,13 @@ reference:
     - MAYP112785_tail_correction
     - MAYP112785_simple.mthd
     - MAYP112785_sun.mthd
+    - MAYP114590_cal.spct
+    - MAYP114590_calib_dates.df
+    - MAYP114590_descriptors
+    - MAYP114590_none.mthd
+    - MAYP114590_simple.mthd
+    - MAYP114590_sun.mthd
+    - MAYP114590_ylianttila.mthd
     - JAZA3098_calib_dates.df
     - JAZA3098_ch1_descriptors
     - JAZA3098_ch1_ylianttila.mthd
