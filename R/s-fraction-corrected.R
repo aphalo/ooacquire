@@ -187,7 +187,6 @@ s_fraction_corrected.raw_mspct <- function(x,
     z <- photobiology::cps2Rfr(corrected_smp.spct,
                                corrected_ref.spct,
                                dyn.range = dyn.range) / reference.value
-    z["Rfr"] <- ifelse()
     z <- setRfrType(z, type)
   } else if (qty.out == "Tfr") {
     z <- photobiology::cps2Tfr(corrected_smp.spct,
