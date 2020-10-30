@@ -356,7 +356,14 @@ acq_irrad_interactive <-
                 paste(irrad.names, collapse = ", "))
         message("Raw objects to collect: ",
                 paste(raw.names, collapse = ", "), sep = " ")
-        collection.name <- make.names(readline("Name of the collection?: "))
+        user.collection.name <- make.names(readline("Name of the collection?: "))
+        collection.name <- make.names(user.collection.name)
+        if (user.collection.name == "") {
+          collection.name <- make.names(paste("Collected on", lubridate::now()))
+        }
+        if (collection.name != user.collection.name) {
+          message("Using sanitised/generated name: '", collection.name, "'.", sep = "")
+        }
         collection.title <- readline("Title for figure and plot?:")
         irrad.collection.name <- paste(collection.name, "irrad", "mspct", sep = ".")
         raw.collection.name <- paste(collection.name, "raw", "lst", sep = ".")
@@ -373,23 +380,23 @@ acq_irrad_interactive <-
             ggplot2::ggtitle(collection.title)
           print(collection.fig)
 
-          irrad.tb <- irrad(collection.mspct,
-                            w.band = getOption("photobiology.mplot.bands",
-                                               default = c(photobiologyWavebands::PAR(),
-                                                           photobiologyWavebands::Plant_bands())),
-                            attr2tb = c(time = "when.measured"))
-          irrad.table.fig <- ggplot2::ggplot() +
-            ggplot2::annotate(geom = "table_npc",
-                              label = irrad.tb,
-                              x_npc = "center",
-                              y_npc = "top") +
-            ggplot2::ggtitle(collection.title) +
-            ggplot2::theme_void()
+          # irrad.tb <- irrad(collection.mspct,
+          #                   w.band = getOption("photobiology.mplot.bands",
+          #                                      default = c(photobiologyWavebands::PAR(),
+          #                                                  photobiologyWavebands::Plant_bands())),
+          #                   attr2tb = c(time = "when.measured"))
+          # irrad.table.fig <- ggplot2::ggplot() +
+          #   ggplot2::annotate(geom = "table_npc",
+          #                     label = irrad.tb,
+          #                     x_npc = "center",
+          #                     y_npc = "top") +
+          #   ggplot2::ggtitle(collection.title) +
+          #   ggplot2::theme_void()
 
           if (save.pdfs) {
             grDevices::pdf(file = collection.pdf.name)
             print(collection.fig)
-            print(irrad.table.fig)
+#            print(irrad.table.fig)
             grDevices::dev.off()
           }
 
@@ -398,8 +405,8 @@ acq_irrad_interactive <-
           save(list = c(irrad.collection.name, raw.collection.name),
                file = collection.file.name)
 
-          rm(list = c(irrad.names, raw.names, collection.fig, irrad.table.fig,
-                      irrad.tb, collection.title, collection.pdf.name))
+          rm(list = c(irrad.names, raw.names, collection.fig, # irrad.table.fig,
+                      collection.title, collection.pdf.name)) # irrad.tb,
         } else {
           assign(raw.collection.name, mget(raw.names))
 
