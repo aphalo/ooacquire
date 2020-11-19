@@ -136,6 +136,8 @@ acq_irrad_interactive <-
                MAYP114590 = which_descriptor(descriptors = ooacquire::MAYP114590_descriptors),
                FLMS04133 = which_descriptor(descriptors = ooacquire::FLMS04133_descriptors),
                FLMS00673 = which_descriptor(descriptors = ooacquire::FLMS00673_descriptors),
+               FLMS00440 = which_descriptor(descriptors = ooacquire::FLMS00440_descriptors),
+               FLMS00416 = which_descriptor(descriptors = ooacquire::FLMS00416_descriptors),
                {
                  warning("No instrument descriptor found, retrieving from the spectrometer")
                  get_oo_descriptor(w, sr.index = sr.index, ch.index = ch.index)
@@ -150,6 +152,8 @@ acq_irrad_interactive <-
                MAYP114590 = ooacquire::MAYP114590_simple.mthd,
                FLMS04133 = ooacquire::FLMS04133_none.mthd,
                FLMS00673 = ooacquire::FLMS00673_none.mthd,
+               FLMS00440 = ooacquire::FLMS00440_none.mthd,
+               FLMS00416 = ooacquire::FLMS00416_none.mthd,
                {
                  warning("No spectrometer-specific method found, using a generic one")
                  new_correction_method(descriptor,
@@ -314,8 +318,8 @@ acq_irrad_interactive <-
             ggplot2::theme_bw()
           print(fig)
           plot.prompt <- ifelse(qty.out == "cps",
-                                "Plot as wavebands/discard/save and continue (w/d/-): ",
-                                "Plot as photons/energy/wavebands/discard/save and continue (p/e/w/d/-): ")
+                                "Plot: wavebands/discard/save and continue (w/d/-): ",
+                                "Plot: photons/energy/wavebands/discard/save and continue (p/e/w/d/-): ")
           # TODO: accept only valid answers!!
           ####
           answer <- readline(plot.prompt)
@@ -356,10 +360,10 @@ acq_irrad_interactive <-
                 paste(irrad.names, collapse = ", "))
         message("Raw objects to collect: ",
                 paste(raw.names, collapse = ", "), sep = " ")
-        user.collection.name <- make.names(readline("Name of the collection?: "))
-        collection.name <- make.names(user.collection.name)
+        user.collection.name <- readline("Name of the collection?: ")
+        collection.name <- make.names(paste("collection ", user.collection.name, sep = ""))
         if (user.collection.name == "") {
-          collection.name <- make.names(paste("Collected on", lubridate::now()))
+          collection.name <- make.names(paste("collection ", lubridate::now()), sep = "")
         }
         if (collection.name != user.collection.name) {
           message("Using sanitised/generated name: '", collection.name, "'.", sep = "")
@@ -380,24 +384,41 @@ acq_irrad_interactive <-
             ggplot2::ggtitle(collection.title)
           print(collection.fig)
 
-          # irrad.tb <- irrad(collection.mspct,
-          #                   w.band = getOption("photobiology.mplot.bands",
-          #                                      default = c(photobiologyWavebands::PAR(),
-          #                                                  photobiologyWavebands::Plant_bands())),
-          #                   attr2tb = c(time = "when.measured"))
-          # irrad.table.fig <- ggplot2::ggplot() +
-          #   ggplot2::annotate(geom = "table_npc",
-          #                     label = irrad.tb,
-          #                     x_npc = "center",
-          #                     y_npc = "top") +
-          #   ggplot2::ggtitle(collection.title) +
-          #   ggplot2::theme_void()
+          if (qty.out == "irrad") {
+            irrad.tb <-
+              photobiology::q_irrad(collection.mspct,
+                                w.band = c(photobiologyWavebands::UV_bands(),
+                                           list(photobiologyWavebands::PAR())))
+            uv_ratios.tb <-
+              photobiology::q_ratio(collection.mspct,
+                                    w.band.num = photobiologyWavebands::UV_bands(),
+                                    w.band.denom = photobiologyWavebands::PAR())
+            vis_ratios.tb <-
+              photobiology::q_ratio(collection.mspct,
+                                    w.band.num = list(blue = photobiologyWavebands::Blue("Sellaro"),
+                                                      red = photobiologyWavebands::Red("Smith10")),
+                                    w.band.denom = list(green = photobiologyWavebands::Green("Sellaro"),
+                                                        "far-red" = photobiologyWavebands::Far_red("Smith10")),
+                                    attr2tb = c("when.measured"))
+            summary.tb <- dplyr::full_join(irrad.tb, uv_ratios.tb)
+            summary.tb <- dplyr::full_join(summary.tb, vis_ratios.tb)
+            selector <- unname(sapply(summary.tb, is.numeric))
+            summary.tb[ , selector] <-
+              signif(summary.tb[ , selector], digits = 3L)
+          }
 
           if (save.pdfs) {
-            grDevices::pdf(file = collection.pdf.name)
+            grDevices::pdf(file = collection.pdf.name, onefile = TRUE,
+                           width = 11, height = 7, paper = "a4r")
             print(collection.fig)
-#            print(irrad.table.fig)
             grDevices::dev.off()
+
+            if (qty.out == "irrad") {
+              grDevices::pdf(file = paste("table-", collection.pdf.name, sep = ""), onefile = TRUE,
+                           width = 11, height = 8, paper = "a4r")
+              print(gridExtra::grid.table(summary.tb))
+              grDevices::dev.off()
+            }
           }
 
           assign(irrad.collection.name, collection.mspct)
@@ -405,18 +426,23 @@ acq_irrad_interactive <-
           save(list = c(irrad.collection.name, raw.collection.name),
                file = collection.file.name)
 
-          rm(list = c(irrad.names, raw.names, collection.fig, # irrad.table.fig,
-                      collection.title, collection.pdf.name)) # irrad.tb,
+          rm(collection.fig,
+                      collection.title, collection.pdf.name)
+          if (qty.out == "irrad") {
+            rm(irrad.tb, uv_ratios.tb, vis_ratios.tb, summary.tb)
+          }
         } else {
           assign(raw.collection.name, mget(raw.names))
 
           save(list = raw.collection.name, file = collection.file.name)
-          rm(list = c(raw.names))
         }
 
         file.names <- c(file.names, collection.file.name)
 
-        # clean up
+        # clean up by removing the spectra that have been added to the
+        # collection, and clearing the stored names afterwards
+        rm(list = c(irrad.names))
+        rm(list = c(raw.names))
         irrad.names <- character()
         raw.names <- character()
       }
@@ -427,7 +453,12 @@ acq_irrad_interactive <-
       } else if (user.input[1] == "p") {
         protocol <- protocol_interactive(protocols)
       } else if (user.input[1] == "q") {
-        break()
+        if (length(irrad.names) > 0L) {
+          user.input <- readline("Quit without creating collection, s = stay, q = quit (-/s/q): ")
+        }
+        if (user.input[1] == "q") {
+          break()
+        }
       }
     }
     save(file.names,

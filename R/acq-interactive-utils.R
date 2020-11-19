@@ -409,11 +409,17 @@ set_attributes_interactive <- function(user.attrs = list(what.measured = "",
 #'
 #' @export
 #'
-set_folder_interactive <- function(folder.name = ".") {
+set_folder_interactive <- function(folder.name = NULL) {
+  if (is.null(folder.name)) {
+    current.folder <- getwd()
+    folder.name <- "."
+    message("Current folder (default): ", current.folder)
+  }
   old.folder.name <- folder.name
+
   folder.name <- readline("Enter folder name (use forward slashes '/' instead of '\'): ")
   message("Folder: ", folder.name)
-  # needs to be replaced by a proper vailidity check
+  # needs to be replaced by a proper validity check
   if (folder.name == "") {
     folder.name <- old.folder.name
     message("Folder: ", folder.name)

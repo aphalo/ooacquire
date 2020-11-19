@@ -25,6 +25,7 @@ Imports:
     grDevices,
     graphics,
     utils,
+    gridExtra  (>= 2.3),
     tibble (>= 3.0.3),
     ggplot2 (>= 3.3.2),
     ggpmisc (>= 0.3.6),
