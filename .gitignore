@@ -4,13 +4,8 @@
 vignettes/a-quick-guide_files
 vignettes/b-user-guide_files
 vignettes/c-algorithm-step-through_files
-not-inst
 src-i386
 src-x64
-inst/doc/a-quick-guide.html
-inst/doc/b-user-guide.html
-inst/doc/c-algorithm-step-through.html
-docs
 garbage
 tests/garbage
 tests/garbagge

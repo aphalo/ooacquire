@@ -1,0 +1,214 @@
+Received: from HE1PR07MB3226.eurprd07.prod.outlook.com (2603:10a6:4:7b::16) by
+ DB6PR07MB3224.eurprd07.prod.outlook.com with HTTPS via
+ DB6PR0601CA0006.EURPRD06.PROD.OUTLOOK.COM; Wed, 30 May 2018 12:56:13 +0000
+Received: from HE1PR07CA0045.eurprd07.prod.outlook.com (2603:10a6:7:66::31) by
+ HE1PR07MB3226.eurprd07.prod.outlook.com (2603:10a6:7:2f::17) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.820.5; Wed, 30 May 2018 12:56:12 +0000
+Received: from HE1EUR01FT041.eop-EUR01.prod.protection.outlook.com
+ (2a01:111:f400:7e1f::206) by HE1PR07CA0045.outlook.office365.com
+ (2603:10a6:7:66::31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.20.797.5 via Frontend
+ Transport; Wed, 30 May 2018 12:56:12 +0000
+Authentication-Results: spf=pass (sender IP is 128.214.191.138)
+ smtp.mailfrom=helsinki.fi; helsinkifi.mail.onmicrosoft.com; dkim=none
+ (message not signed) header.d=none;helsinkifi.mail.onmicrosoft.com;
+ dmarc=bestguesspass action=none header.from=helsinki.fi;
+Received-SPF: Pass (protection.outlook.com: domain of helsinki.fi designates
+ 128.214.191.138 as permitted sender) receiver=protection.outlook.com;
+ client-ip=128.214.191.138; helo=ex16casmbx02.ad.helsinki.fi;
+Received: from ex16casmbx02.ad.helsinki.fi (128.214.191.138) by
+ HE1EUR01FT041.mail.protection.outlook.com (10.152.1.3) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.20.776.10 via Frontend Transport; Wed, 30 May 2018 12:56:11 +0000
+Received: from ex16casmbx02.ad.helsinki.fi (128.214.191.138) by
+ ex16casmbx02.ad.helsinki.fi (128.214.191.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1415.2; Wed, 30 May 2018 15:55:51 +0300
+Received: from smtp-rs1-vallila2.fe.helsinki.fi (128.214.173.75) by
+ ex16casmbx02.ad.helsinki.fi (128.214.191.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1415.2 via Frontend Transport; Wed, 30 May 2018 15:55:51 +0300
+Received: from [172.17.56.199] (hupnet-fw.fe.helsinki.fi [128.214.173.46])
+	(authenticated bits=0)
+	by smtp-rs1.it.helsinki.fi (8.14.4/8.14.4) with ESMTP id w4UCto3g000341
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=NOT)
+	for <pedro.aphalo@helsinki.fi>; Wed, 30 May 2018 15:55:50 +0300
+Subject: Re: Two error messages
+From: Matthew Robson <matthew.robson@helsinki.fi>
+To: Pedro J Aphalo <pedro.aphalo@helsinki.fi>
+References: <cdfa4db4-fb7d-0c81-02e9-d4b0f73e8c0e@helsinki.fi>
+ <6e540f2f-e84f-960e-1657-c84c0697e981@helsinki.fi>
+Message-ID: <b3bd4059-3cf4-1d60-ff1e-559b0b45656e@helsinki.fi>
+Date: Wed, 30 May 2018 15:55:48 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.8.0
+In-Reply-To: <6e540f2f-e84f-960e-1657-c84c0697e981@helsinki.fi>
+Content-Type: multipart/alternative;
+	boundary="------------9AC502C6A638F4C2F545BE40"
+Content-Language: en-GB
+Return-Path: matthew.robson@helsinki.fi
+X-OrganizationHeadersPreserved: ex16casmbx02.ad.helsinki.fi
+X-MS-Exchange-Organization-ExpirationStartTime: 30 May 2018 12:56:11.9395
+ (UTC)
+X-MS-Exchange-Organization-ExpirationStartTimeReason: Original Submit
+X-MS-Exchange-Organization-ExpirationInterval: 2:00:00:00.0000000
+X-MS-Exchange-Organization-ExpirationIntervalReason: Original Submit
+X-MS-Exchange-Organization-Network-Message-Id: 6e868a0d-5252-44fb-4473-08d5c62cb885
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Organization-MessageDirectionality: Originating
+X-CrossPremisesHeadersPromoted: HE1EUR01FT041.eop-EUR01.prod.protection.outlook.com
+X-CrossPremisesHeadersFiltered: HE1EUR01FT041.eop-EUR01.prod.protection.outlook.com
+X-Forefront-Antispam-Report: CIP:128.214.191.138;IPV:NLI;CTRY:FI;EFV:NLI;SFV:SKA;SFS:;DIR:INB;SFP:;SCL:-1;SRVR:HE1PR07MB3226;H:ex16casmbx02.ad.helsinki.fi;FPR:;SPF:None;LANG:en;
+X-Microsoft-Exchange-Diagnostics: 1;HE1EUR01FT041;1:kiKQD7oKz3Q7HpDc5bfk2at48zQrBCnFrp8YgQnl0KZROILgGaLtdSSyf02B/UKagIr5ozUnbMyVUrLkSuH1YyglfniAfOxmggWSYT0+5Z9gmpaa60bAfiKlyb+1N0In
+X-MS-Exchange-Organization-AuthSource: ex16casmbx02.ad.helsinki.fi
+X-MS-Exchange-Organization-AuthAs: Anonymous
+X-OriginatorOrg: office365.helsinki.fi
+X-MS-PublicTrafficType: Email
+X-Microsoft-Antispam: UriScan:(104073047261496);BCL:0;PCL:0;RULEID:(7020095)(4652020)(8989080)(5600026)(4608076)(2017052603328)(7153060);SRVR:HE1PR07MB3226;
+X-Microsoft-Exchange-Diagnostics: 1;HE1PR07MB3226;3:XgsRtS+d6p62zE1VbHobzvZ3sm2N0+c2R+0tsBUYLTSCthtVNcwXe/E5bqEmo2Nl6ueWplcvMc1HECLXXD2fPw1zoZ4dDa1ao8mpStMtc1uEC8NCpccXoTDl/UrESKFisU/BQ7qEXRX9y71Uu2kh+2XetyuIU0/QIWULcH5oM9Z7JKpzhS0rTy7ovHec/OVlQMlT3EWhxVbDFUUdHqXGGUCuMmdZ50oqKF7IevNumbEwidPto1iJIVE21kEpR/7rgGAa99lBT3AKyMEYeH+AX+/gUhZzqOzcmD35CWqD7N6M627N/4XBXjjZ+0rn2sIOWfyTORrrOEl6BUDEdDaHgq2GNbtK0R1kraecIfJ8sLBIc8q1rtBxNkylEjTasmIfo27WT6B/ZnPWLQeB045Jfg==;25:FTOR/W8qCFO2tiCYCioNUgZ8i9kdgCOPeBenwu0SC9XEZww8EPVK3cclvTVLgXkQY57iHGP6f8Vu11lTP+8aiz223XYSUyxv9wvdtjXjvghw+KfslC34ocGhHIR+3LDTnaEgdRaWxhEz6JHAEqIqRxdzKcTs/MvR2R6QNQH2XE9fxrM0hb/3G2ac5PDdDzOzyCgsu7pcktIQ6Aocgm32pnJYpsqP2i6LEZFOsurLJ2/5ci1MJXMb73ZiqXe2uXYxo8g3GIksk8Ex93XH4Oa71k3Dp+lLdg9AqbODDpVs8nZTQu9m72VThEL5luyBrcZpQG8pKP2XPdXIooop1/wj0Q==
+X-MS-TrafficTypeDiagnostic: HE1PR07MB3226:
+X-Microsoft-Exchange-Diagnostics: 1;HE1PR07MB3226;31:U5/XtExL+DoozuLmIXn4qZdjVeVCxPoj4y+2x6lAcePGeO+7h2guAtVwGQ9sz7c6y/Omra4rYX7chx2ho9X9JNzexbqRbRv3zHQTUk5y6lLA4v7pIYarhdujiFgkElc0DTg3dAVYdW9pjn6HKvRHbtQjCd/ePSu1YSzegcY5lw4HIWSZpzbQ/VJ8PEjEizHMf2AfGlap4nSk2nwI0cltiaKImJ2wsrPUhdOmic53am8=;20:/Zna9//D7RviRm8bHjA+MII8JVW5/QKdDaBAUJMlGajMp4TbPxU4sZdcjJoZcMCzLx8oTY9L96WJyouoPcVH2+GKDbSmhyBnkNNYXSWeATBF1wqYnWkRQoWaDVCg42ZxADq4DXSjFFlSxXxb3PgBDiMSzMxJY9+7LyCUiwlJsximVpzmPZ41JYt5Ynz5/5BeF19/6XyEukWgJjyE17qm4rAoFhucCbGb0K7Lf89MFZLg7wUcmd+lQFEwBx1zoQQNj2VtNz1iutzw7vLP0w2pnvbGc/u+Q2Jt1eI7c08uqGuprSZXhJQiygXVgDPI5Cx9LzynxdUFxx1NxtVEbOKrSNXt4mkMjTdZYGE1fAjjhnmUQ7G4NBEx1tk0YrKXh4pb2FORJ3+DavRz32HTJMpnI9EyW7fr8uLUFiL8FfcdDoP6O/cdOdwEdxiFQjEsADmYSNQ8oacu3z9zPRXcEQft7aH7tee00A+rZSQ9404jRKCZVY5zH2A8psqLq+8alytZ
+X-Exchange-Antispam-Report-Test: UriScan:(148322886591682)(60067363179207)(157537322789937)(122605397693432)(249562145798500)(104073047261496)(111668773159252);
+X-Exchange-Antispam-Report-CFA-Test: BCL:0;PCL:0;RULEID:(9101521199)(2401047)(8121501046)(93006095)(93004095)(3002001)(3231254)(901025)(902075)(913088)(7045084)(11241501184)(806099)(944501410)(52103095)(52105095)(52106170)(52401190)(52601095)(52606095)(52606095)(52505095)(52406095)(52305095)(52206095)(10201501046)(1610001)(9300000083)(9301000104)(8301001075)(8301003183)(201708071742011)(7699016);SRVR:HE1PR07MB3226;BCL:0;PCL:0;RULEID:;SRVR:HE1PR07MB3226;
+X-Microsoft-Exchange-Diagnostics: 1;HE1PR07MB3226;4:80g2+FE5g/lkaPdzCovlwJ344ui26v3FCjIv9rOxwXu9lSA3ceJo0UqAYz/+TAzTR5Om6Q+2dxpuQkLxJjXLiS0NUbWk5GrEZDglj+nmK8jHhhxcFzClFRs+cKCdRQfVX5oFfRTpElDscvLonmOOTYxoVtVV4Qu+TB1MFbX2syQTKRrtVLF/TJXgi9gEf6EuN6K5AYp7mmfFm6TfTBuMbIRe+NTrbhBpaC1wGe64d0PwFv/eXZ82Rr1xl4xfM1cwjLbta4+bqGkr9blBaU9pADzL+pZ8i9PIemd8W1W+uPTtiXPFFnAqODcGVXTduzd6L+L5Ef0dH9KseoFLqRtNRi4AysRBSUeqOmM9tXZALBj7RyPL+eovJ07SowE9L1gkA1P6HRUdGUaN22gcQ4B/IucS3cjJxPFFsxB7d1IzkJYnQIxjjtNOaNflfFforo8ErfTdvu6a2YTSWnVp+Hojg/5ZSYahSqGFG5R9XfXKewuiI0hoFD+vvPd5mvj95wdMeiMtutVn8YaitMNvsyIqmg==;23:EqFhPVq0///bJ85/6m9wJ8X+XqlUUmL7BbAaQhr/lHfZRGqVgjzcda7GxK4MRboW9aF0/+4kUn/FC2YwOofdjZqwrkavhM1EbMx5BhwnWcL+1YJArC4h/SWl2s/PIpZEXffktlA4f+T4fYNV6vCWDpf0oTN7CmH01KWH05wsQEKI0vqEaPul4d+y32Bg8Q6z
+X-MS-Exchange-Organization-SCL: -1
+X-Microsoft-Antispam-Message-Info: 58JufW76GudsuOZowIvrnqZa3Mqp9P2kEJ+VNg0e67JCianh/LNLHoqbwqK+2GF03NxHIYsiAeb0A4wcDWVZp2J7WEQdfDp5ABiFoTLDkhxUb62XN+ZWhOa35mtIJwPTyKnb1GJWEp9URzQQLD9M2oiJ1oV6CD0LDy8eM0GWq701WF9DWTJyiMv0BxbN/phX9AUoZamnM+7xUR4YN9fzji8pBCpGQATkafbzoO3oIApOLJ+nAUnrZL8rew59aAExzTBf285O6RCUtUr1A2bAtlsJFUC1QdoP6krSzQQFK46E7MvgwkUi0mUoX3eZ60pnu9L3xqOEZhA7PlbGcQvk2X2YwMLf9DHDMJ5o6kve3X8q/+RWu1yog5zXS+sgUTHfdpVD4aX3e2csyyloNcaM0McUqexzoEve+ZUpH//mPUlZ92t2V8jMIfmSqmOBk4p2jwXbjUswzOhRh1wx05Z7opBk4D2/MI6UybpbgCo8mmjqNvoymswsAzRlUiDp5vxc2GxUlmRHpub5TNy5bE6Ra2WLJqaY5l5Df+L6lWrxfSLAVNsWupDX8zp1b3Su0zgVu6+CexfVp3h5OSQbXvHhi3iNsECea8Ye4pTOnOWVNwME8/5Ebr5p0HhRJDQbV3+Z
+X-Microsoft-Exchange-Diagnostics: 1;HE1PR07MB3226;6:fM/G0dnSVj4e0VuvAj9s+sSW6tiNfA/YXpPKvRYjBUZxMg/zpqmne3bl20bZKG9j3w0aJ1Q3SVWXBrzcmmXAvxwKUCGGHIBpl7wFnFIt7w6BtSQfrAZSOy/PzMZ7aJ9Bxf2kXY8BrT7hgVyiAL7p7n90OLmi468VgwhaGDB2fcdBH53O2QofNwJTTJ3qv5T5v+uN8gT9NA+Te3Tp08i2+PUt0MOV7mpE7p15/SXl0ilm+oPU90mwe9mfkKwZEjTg3vzJli1YchrKaUQJuIump2Wrk00+FWDhvfj/svaACyi9xbNNBMejQ+sWMtrzUP/ttFQue5U0GGYRHOmuc67qYSdprCui4zDjTd4ZSDn+yA1SNbhZs1QQqPQs4x9K6kjBxEdsSFn4OR1wAAakhMMCYsvvmcdvrsIGAsfi05+TaQfX9SOUZ/PDzTNa48GNA0D0VtAbkPWylFkcw7u8TV6WjjHfUrStG+q7w03g7PU3sM0Rcrcd24zNnImYEhhHJrYE;5:L1B9cLHjaCHHAN156viNjVH62mmMF+2PLEeyTqPDYsDl7lGwiT9iwv2pfXtb8nZZ0kVDi6CswaPsNCuBzn9IGk5dKNXferulXWZ5RSvjtI9oTrfzxfAKrHxi24tz4QfcUUz3lFmrffZGEygekOzSzVQQV+T7P3FHxTKmO+O2ppo=;24:SJ6h3/vf5BrWSYXNKAL0fY9thOBS91lez4CbqLTR+DLFnGkDEIJt0uEGRXyhO4C1fJp1H5Y6VvnAkI0c24dD8IUljRZRU3Gz9x8PC06nHtU=
+SpamDiagnosticOutput: 1:24
+SpamDiagnosticMetadata: Default
+X-Microsoft-Exchange-Diagnostics: 1;HE1PR07MB3226;7:+J0CqVVHicoKs6RUzBTS+F8rS8wiDO/GgesG8riPX3Xxs0Q82b/t/kGPqs5nIWfffg56OKXoJJpiKSldpFidP79sQNr/M9ZCt0DUufT+49KEMrZQkIqwjDTAhhmEJfpl6WH0vm2zvip7wa9X9goC8BoNs7ZuJ0+5QUXPulBc8eE7mO1OJgq/y7eQ+PqppLRgTAtA5/FxvDpMx+5T5pRRAEOYrDss1NvzAtR3jA49rmItlcuiHy9g2tmsqDZXlacX
+X-MS-Office365-Filtering-Correlation-Id: 6e868a0d-5252-44fb-4473-08d5c62cb885
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 May 2018 12:56:11.8926
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6e868a0d-5252-44fb-4473-08d5c62cb885
+X-MS-Exchange-CrossTenant-Id: 98ae7559-10dc-4288-8e2e-4593e62fe3ee
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=98ae7559-10dc-4288-8e2e-4593e62fe3ee;Ip=[128.214.191.138];Helo=[ex16casmbx02.ad.helsinki.fi]
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR07MB3226
+X-MS-Exchange-Transport-EndToEndLatency: 00:00:01.4598338
+X-MS-Exchange-Processed-By-BccFoldering: 15.20.0820.003
+Keywords: Green category
+X-Microsoft-Exchange-Diagnostics:
+	1;DB6PR07MB3224;27:4J7+9Jra3ipvgAh6u1IETlCOP+bgvkBAQYOvCnyY3Q6rUGMPuQJ+N5I4qH4efogwHjz7a8g683+ygipO6pFuaAOUyoMd7WoJ9QTuQ02C6J7kluPMToU3cjOzIVnE6S7z
+X-Microsoft-Antispam-Message-Info:
+	nDI8QKF43erp5rfSHUCfRlAYvl4yJbqPWjdXd+G9Ocf0w9yKDRjexmPP2gd2TM81WiUXKOQXe6IcgWjCKiURf+uXvcfMBmTgCcu3Et+vjd77FfcMtTbHVXF11DexG3IA1aFWy1+2EJN+pPIsfRbZkJ+ojEJWwGkmacFcb2UlYXuIIx5wignp1bJJTVWqXXMMvmSSQN/d+iwRTcobQTOIq73qQjSlDIPQ5FASzZvADuF3AXtjbKhWKtJsf3ZFTixzPfRN4JXu1IxzsOqdLQBIZQQ9Ua6/6uIhGkizkNkKly7U1vbSu2HMw4ALH3uS5zRymcHf1kGcKOjnvG/LS6+ofpqrevQ4zvHoXXb8gan32uWgpKRGyllfXS+Whx9Q0dmQ/tLQ5w6JaDzdeX2wgWXdLiu0uI0m1LauNMrr8mB/mYwmKv3bP7ghJL9Nem7fjwywr6/R8OsZfvEX7m3Tbar+wGfm5hU25kG54Urg51Sr6+osQkMSJN6/xb6YJkMXeG54yYUFeC+UNsYPNODfSwk/rtBZsAx9g/+QwQkMMhq6s8tCHVMfsAKmDqDnViYELtqvQ5/TWN3/lfCig5WjfXCRE23eLeGxdl6lC895AAHEaJZ9rMDMx8KDR7w9vkeykp/B
+MIME-Version: 1.0
+
+--------------9AC502C6A638F4C2F545BE40
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Microsoft-Exchange-Diagnostics:
+	1;DB6PR07MB3224;27:4J7+9Jra3ipvgAh6u1IETlCOP+bgvkBAQYOvCnyY3Q6rUGMPuQJ+N5I4qH4efogwHjz7a8g683+ygipO6pFuaAOUyoMd7WoJ9QTuQ02C6J7kluPMToU3cjOzIVnE6S7z
+X-Microsoft-Antispam-Message-Info:
+	nDI8QKF43erp5rfSHUCfRlAYvl4yJbqPWjdXd+G9Ocf0w9yKDRjexmPP2gd2TM81WiUXKOQXe6IcgWjCKiURf+uXvcfMBmTgCcu3Et+vjd77FfcMtTbHVXF11DexG3IA1aFWy1+2EJN+pPIsfRbZkJ+ojEJWwGkmacFcb2UlYXuIIx5wignp1bJJTVWqXXMMvmSSQN/d+iwRTcobQTOIq73qQjSlDIPQ5FASzZvADuF3AXtjbKhWKtJsf3ZFTixzPfRN4JXu1IxzsOqdLQBIZQQ9Ua6/6uIhGkizkNkKly7U1vbSu2HMw4ALH3uS5zRymcHf1kGcKOjnvG/LS6+ofpqrevQ4zvHoXXb8gan32uWgpKRGyllfXS+Whx9Q0dmQ/tLQ5w6JaDzdeX2wgWXdLiu0uI0m1LauNMrr8mB/mYwmKv3bP7ghJL9Nem7fjwywr6/R8OsZfvEX7m3Tbar+wGfm5hU25kG54Urg51Sr6+osQkMSJN6/xb6YJkMXeG54yYUFeC+UNsYPNODfSwk/rtBZsAx9g/+QwQkMMhq6s8tCHVMfsAKmDqDnViYELtqvQ5/TWN3/lfCig5WjfXCRE23eLeGxdl6lC895AAHEaJZ9rMDMx8KDR7w9vkeykp/B
+
+HI Pedro,
+
+sorry for the delay, I was double checking everything.
+
+Here is the link for the files for the 2nd error
+
+https://www.dropbox.com/sh/45v69xw80b00kg4/AACz9ACsw9LQQK-C4SQf8Hk3a?dl=0
+
+The error occurs on file MapleSun34A00016.txt
+(000000-00015 run fine)
+
+The other error I think was my fault
+
+Thanks,
+
+Matt
+
+On 2018-05-30 15:30, Matthew Robson wrote:
+>
+> can you tell me what they mean please.
+>
+> m
+>
+> Error in if (file == "") file <- stdin() else { : missing value where 
+> TRUE/FALSE needed
+>> Descriptor cal_2016xa selected for 2017-10-06 Error in if (flt.flag 
+>> && stray.light.method != "simple" && 
+>> average_spct(clip_wl(y[[spct.names["light"]]], : missing value where 
+>> TRUE/FALSE needed
+>
+
+-- 
+-.---.-----.-------.-----------.-------------.
+https://blogs.helsinki.fi/robson/
+Twitter @CanopySEE
+
+Matt Robson
+Academy of Finland Research Fellow
+Docent in Plant Ecology
+Canopy Spectral Ecology & Ecophysiology Group (CanSEE)
+Viikki Plant Science Centre (ViPS)
+Faculty of Biological & Environmental Science
+P.O. Box 65 (Viikinkaari 1)
+00014 University of Helsinki
+Finland
+
+
+--------------9AC502C6A638F4C2F545BE40
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Microsoft-Exchange-Diagnostics:
+	1;DB6PR07MB3224;27:4J7+9Jra3ipvgAh6u1IETlCOP+bgvkBAQYOvCnyY3Q6rUGMPuQJ+N5I4qH4efogwHjz7a8g683+ygipO6pFuaAOUyoMd7WoJ9QTuQ02C6J7kluPMToU3cjOzIVnE6S7z
+X-Microsoft-Antispam-Message-Info:
+	nDI8QKF43erp5rfSHUCfRlAYvl4yJbqPWjdXd+G9Ocf0w9yKDRjexmPP2gd2TM81WiUXKOQXe6IcgWjCKiURf+uXvcfMBmTgCcu3Et+vjd77FfcMtTbHVXF11DexG3IA1aFWy1+2EJN+pPIsfRbZkJ+ojEJWwGkmacFcb2UlYXuIIx5wignp1bJJTVWqXXMMvmSSQN/d+iwRTcobQTOIq73qQjSlDIPQ5FASzZvADuF3AXtjbKhWKtJsf3ZFTixzPfRN4JXu1IxzsOqdLQBIZQQ9Ua6/6uIhGkizkNkKly7U1vbSu2HMw4ALH3uS5zRymcHf1kGcKOjnvG/LS6+ofpqrevQ4zvHoXXb8gan32uWgpKRGyllfXS+Whx9Q0dmQ/tLQ5w6JaDzdeX2wgWXdLiu0uI0m1LauNMrr8mB/mYwmKv3bP7ghJL9Nem7fjwywr6/R8OsZfvEX7m3Tbar+wGfm5hU25kG54Urg51Sr6+osQkMSJN6/xb6YJkMXeG54yYUFeC+UNsYPNODfSwk/rtBZsAx9g/+QwQkMMhq6s8tCHVMfsAKmDqDnViYELtqvQ5/TWN3/lfCig5WjfXCRE23eLeGxdl6lC895AAHEaJZ9rMDMx8KDR7w9vkeykp/B
+
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  </head>
+  <body text="#000000" bgcolor="#FFFFFF">
+    <p>HI Pedro,</p>
+    <p>sorry for the delay, I was double checking everything.</p>
+    <p>Here is the link for the files for the 2nd error</p>
+    <p><a class="moz-txt-link-freetext" href="https://www.dropbox.com/sh/45v69xw80b00kg4/AACz9ACsw9LQQK-C4SQf8Hk3a?dl=0">https://www.dropbox.com/sh/45v69xw80b00kg4/AACz9ACsw9LQQK-C4SQf8Hk3a?dl=0</a><br>
+    </p>
+    The error occurs on file MapleSun34A00016.txt<br>
+    (000000-00015 run fine)<br>
+    <p>The other error I think was my fault</p>
+    <p>Thanks,</p>
+    <p>Matt<br>
+    </p>
+    <div class="moz-cite-prefix">On 2018-05-30 15:30, Matthew Robson
+      wrote:<br>
+    </div>
+    <blockquote type="cite" cite="mid:6e540f2f-e84f-960e-1657-c84c0697e981@helsinki.fi">
+      
+      <p>can you tell me what they mean please.</p>
+      <p>m<br>
+      </p>
+      <pre tabindex="0" class="GEM3DMTCFGB" id="rstudio_console_output" style="font-family: 'Lucida Console'; font-size: 10pt !important; outline: none; border: none; word-break: break-all; margin: 0px; -webkit-user-select: text; white-space: pre-wrap !important; line-height: 15px; color: rgb(0, 0, 0); font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; orphans: auto; text-align: -webkit-left; text-indent: 0px; text-transform: none; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px; background-color: rgb(255, 255, 255);"><span class="GEM3DMTCPFB  ace_constant" style="color: rgb(197, 6, 11);">Error in if (file == &quot;&quot;) file &lt;- stdin() else { : 
+  missing value where TRUE/FALSE needed
+
+</span></pre>
+      <blockquote type="cite" cite="mid:cdfa4db4-fb7d-0c81-02e9-d4b0f73e8c0e@helsinki.fi">
+        
+        <pre tabindex="0" class="GEM3DMTCFGB" id="rstudio_console_output" style="font-family: 'Lucida Console'; font-size: 10pt !important; outline: none; border: none; word-break: break-all; margin: 0px; -webkit-user-select: text; white-space: pre-wrap !important; line-height: 15px; color: rgb(0, 0, 0); font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; orphans: auto; text-align: -webkit-left; text-indent: 0px; text-transform: none; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0px; background-color: rgb(255, 255, 255);"><span class="GEM3DMTCPFB  ace_constant" style="color: rgb(197, 6, 11);">Descriptor cal_2016xa selected for 2017-10-06
+</span><span class="GEM3DMTCPFB  ace_constant" style="color: rgb(197, 6, 11);">Error in if (flt.flag &amp;&amp; stray.light.method != &quot;simple&quot; &amp;&amp; average_spct(clip_wl(y[[spct.names[&quot;light&quot;]]],  : 
+  missing value where TRUE/FALSE needed</span></pre>
+      </blockquote>
+      <br>
+    </blockquote>
+    <br>
+    <pre class="moz-signature" cols="72">-- 
+-.---.-----.-------.-----------.-------------.
+<a class="moz-txt-link-freetext" href="https://blogs.helsinki.fi/robson/">https://blogs.helsinki.fi/robson/</a>
+Twitter @CanopySEE
+
+Matt Robson
+Academy of Finland Research Fellow
+Docent in Plant Ecology
+Canopy Spectral Ecology &amp; Ecophysiology Group (CanSEE)
+Viikki Plant Science Centre (ViPS)
+Faculty of Biological &amp; Environmental Science
+P.O. Box 65 (Viikinkaari 1)
+00014 University of Helsinki
+Finland</pre>
+  </body>
+</html>
+
+--------------9AC502C6A638F4C2F545BE40--
