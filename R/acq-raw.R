@@ -208,7 +208,7 @@ acq_raw_mspct <- function(descriptor,
 
   default_pause_fun <- function(acq.what, ...) {
     answ <- readline(paste("Ready to acquire", acq.what,
-                           "measurement ('z' = abort)"))
+                           "measurement, z = abort (-/z):"))
     tolower(answ[1]) != "z"
   }
 

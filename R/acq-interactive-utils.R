@@ -209,7 +209,7 @@ protocol_interactive <- function(protocols) {
 #'
 list_srs_interactive <- function(w) {
   while (rOmniDriver::number_srs(w) < 1L) {
-    answ <- readline("Please, connect a spectrometer to an USB port. <enter> = try again, z = abort.")
+    answ <- readline("Please, connect a spectrometer to an USB port. <enter> = try again, z = abort (-/z):")
     if (answ[1] %in% c("z", "Z")) {
       break()
     }

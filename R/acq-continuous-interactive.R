@@ -454,7 +454,7 @@ acq_irrad_interactive <-
         protocol <- protocol_interactive(protocols)
       } else if (user.input[1] == "q") {
         if (length(irrad.names) > 0L) {
-          user.input <- readline("Quit without creating collection, s = stay, q = quit (-/s/q): ")
+          user.input <- readline("Quit without creating collection, z = don't quit, q = quit (-/s/q): ")
         }
         if (user.input[1] == "q") {
           break()
