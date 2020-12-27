@@ -27,8 +27,8 @@
 
 #' Raw counts data for a lamp measurement.
 #'
-#' A household Osram LED STAR CLASSIC A 60 lamp measured at short distance. The
-#' spectrometer used was an Ocean Optics Maya2000 Pro.
+#' A zhaga standard module with Nichia "horticulture" LEDs measured at short
+#' distance. The spectrometer used was an Ocean Optics Maya2000 Pro.
 #'
 #' @docType data
 #' @keywords datasets
@@ -37,21 +37,6 @@
 #' @family objects containing example raw-counts data
 #'
 "white_LED.raw_mspct"
-
-#' Raw counts data for a lamp measurement.
-#'
-#' A household Osram LED STAR CLASSIC A 60 lamp measured at short distance. The
-#' spectrometer used was an Ocean Optics Maya2000 Pro. Measured using three
-#' level bracketing and a 120 seconds total time per measurement through scan
-#' averaging.
-#'
-#' @docType data
-#' @keywords datasets
-#' @format A raw_mspct
-#'
-#' @family objects containing example raw-counts data
-#'
-"white_LED_2min.raw_mspct"
 
 #' Raw counts data for a lamp measurement.
 #'
@@ -65,6 +50,19 @@
 #' @family objects containing example raw-counts data
 #'
 "halogen.raw_mspct"
+
+#' Raw counts data for a lamp measurement.
+#'
+#' Solar radiation at ground level measured in Helsinki Finland. The
+#' spectrometer used was an Ocean Optics Maya2000 Pro.
+#'
+#' @docType data
+#' @keywords datasets
+#' @format A raw_mspct
+#'
+#' @family objects containing example raw-counts data
+#'
+"sun001.raw_mspct"
 
 #' Raw counts data for a lamp measurement.
 #'

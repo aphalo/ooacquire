@@ -1,15 +1,11 @@
 library(photobiology)
 
-load(file = "data-raw/raw-mspct-examples/white-LED-lamp.Rda")
+load(file = "data-raw/raw-mspct-examples/Nichia.horticulture.5000K.spct.Rda")
 
-white_LED.raw_mspct <- msmsply(warm_white_LED.raw_mspct, trimInstrDesc, fields = c("-", "w", "sr.index"))
+white_LED.raw_mspct <- Nichia.horticulture.5000K.raw_mspct
+rm(Nichia.horticulture.5000K.raw_mspct)
 
-white_LED.raw_mspct <-
-  msmsply(white_LED.raw_mspct,
-          setInstrDesc,
-          MAYP11278_descriptors$cal_2016a)
-
-rm(warm_white_LED.raw_mspct)
+load(file = "data-raw/raw-mspct-examples/sun001.spct.Rda")
 
 load(file = "data-raw/raw-mspct-examples/white-LED-lamp-2min.Rda")
 
@@ -61,7 +57,7 @@ blue_filter.raw_mspct <- msmsply(UQG_Blue.raw_spct, trimInstrDesc, fields = c("-
 
 rm(UQG_Blue.raw_spct)
 
-save(white_LED.raw_mspct, white_LED_2min.raw_mspct, halogen.raw_mspct, xenon_flash.raw_mspct,
+save(white_LED.raw_mspct, sun001.raw_mspct, halogen.raw_mspct, xenon_flash.raw_mspct,
      red_filter.raw_mspct, blue_filter.raw_mspct,
      file = "data/raw-counts.rda",
      compress = "xz")

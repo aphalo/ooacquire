@@ -7,7 +7,7 @@
 MAYP11278_tail_correction(w_length, cts_second)
 }
 \arguments{
-\item{w_length}{numeric vector of wavelengths in nm.}
+\item{w_length}{numeric vector of wavelengths in nanometres (nm).}
 
 \item{cts_second}{numeric vector of counts per second (stray-light corrected).}
 }

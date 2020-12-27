@@ -2,8 +2,7 @@
 ^\.Rproj\.user$
 ^.Rdata$
 ^.Rhistory$
-^inst/example-gadgets$
-^not-inst$
+^inst-not$
 ^data-raw$
 ^garbage$
 ^_pkgdown\.yml$

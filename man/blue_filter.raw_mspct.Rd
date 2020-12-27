@@ -18,8 +18,8 @@ lamp as light source. The spectrometer used was an Ocean Optics Maya2000 Pro.
 Other objects containing example raw-counts data: 
 \code{\link{halogen.raw_mspct}},
 \code{\link{red_filter.raw_mspct}},
+\code{\link{sun001.raw_mspct}},
 \code{\link{white_LED.raw_mspct}},
-\code{\link{white_LED_2min.raw_mspct}},
 \code{\link{xenon_flash.raw_mspct}}
 }
 \concept{objects containing example raw-counts data}

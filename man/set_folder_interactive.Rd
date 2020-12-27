@@ -4,7 +4,7 @@
 \alias{set_folder_interactive}
 \title{Interactively get folder to use}
 \usage{
-set_folder_interactive(folder.name = ".")
+set_folder_interactive(folder.name = NULL)
 }
 \arguments{
 \item{folder.name}{character Default name of the folder.}

@@ -102,7 +102,7 @@ reference:
     - blue_filter.raw_mspct
     - red_filter.raw_mspct
     - white_LED.raw_mspct
-    - white_LED_2min.raw_mspct
+    - sun001.raw_mspct
     - halogen.raw_mspct
     - xenon_flash.raw_mspct
   - title: Calibration data examples

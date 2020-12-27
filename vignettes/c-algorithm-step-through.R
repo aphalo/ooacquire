@@ -13,116 +13,128 @@ library(ooacquire)
 library(magrittr)
 
 ## -----------------------------------------------------------------------------
-names(white_LED.raw_mspct)
+photon_as_default()
 
 ## -----------------------------------------------------------------------------
-names(white_LED.raw_mspct[["light"]])
+names(sun001.raw_mspct)
 
 ## -----------------------------------------------------------------------------
-summary(white_LED.raw_mspct[["light"]])
-
-## ---- eval=FALSE--------------------------------------------------------------
-#  # not run
-#  str(white_LED.raw_mspct[["light"]], max.level = 3)
+colnames(sun001.raw_mspct[["light"]])
 
 ## -----------------------------------------------------------------------------
-attr(white_LED.raw_mspct[["light"]], which = "instr.desc")$spectrometer.name
+summary(sun001.raw_mspct[["light"]])
+
+## -----------------------------------------------------------------------------
+# not run
+str(sun001.raw_mspct[["light"]], max.level = 2)
+
+## -----------------------------------------------------------------------------
+getInstrSettings(sun001.raw_mspct[["light"]])
+
+## -----------------------------------------------------------------------------
+attr(sun001.raw_mspct[["light"]], which = "instr.desc")$spectrometer.name
 
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
-LED_lamp_recalc.spct <-
-  s_irrad_corrected(white_LED.raw_mspct, 
+sun001_recalc.spct <-
+  s_irrad_corrected(sun001.raw_mspct, 
                     correction.method = ooacquire::MAYP11278_ylianttila.mthd)
 
 ## -----------------------------------------------------------------------------
-summary(LED_lamp_recalc.spct)
+summary(sun001_recalc.spct)
 
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
-autoplot(LED_lamp_recalc.spct)
+autoplot(sun001_recalc.spct)
 
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
-LED_lamp_recalc.spct <-
-  s_irrad_corrected(white_LED.raw_mspct, 
+sun001_recalc.spct <-
+  s_irrad_corrected(sun001.raw_mspct, 
                     correction.method = ooacquire::MAYP11278_sun.mthd)
 
 ## -----------------------------------------------------------------------------
-summary(LED_lamp_recalc.spct)
+summary(sun001_recalc.spct)
 
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
-autoplot(LED_lamp_recalc.spct)
+autoplot(sun001_recalc.spct)
 
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
-LED_lamp_recalc.cps_spct <-
-  s_irrad_corrected(white_LED.raw_mspct, 
+sun001_recalc.cps_spct <-
+  s_irrad_corrected(sun001.raw_mspct, 
                     correction.method = ooacquire::MAYP11278_ylianttila.mthd,
                     return.cps = TRUE)
 
 ## ---- eval=FALSE--------------------------------------------------------------
-#  get_attributes(LED_lamp_recalc.cps_spct)
+#  get_attributes(sun001_recalc.cps_spct)
 
 ## -----------------------------------------------------------------------------
-summary(LED_lamp_recalc.cps_spct)
+summary(sun001_recalc.cps_spct)
 
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
-autoplot(LED_lamp_recalc.cps_spct)
+autoplot(sun001_recalc.cps_spct)
+
+## ---- eval = FALSE------------------------------------------------------------
+#  sun001_recalc.source_spct <- cps2irrad(sun001_recalc.cps_spct)
+
+## ---- eval = FALSE------------------------------------------------------------
+#  summary(sun001_recalc.source_spct)
+
+## ---- fig.width=8, fig.asp=0.5, eval = FALSE----------------------------------
+#  autoplot(sun001_recalc.source_spct)
 
 ## -----------------------------------------------------------------------------
-LED_lamp_recalc.source_spct <- cps2irrad(LED_lamp_recalc.cps_spct)
-
-## -----------------------------------------------------------------------------
-summary(LED_lamp_recalc.source_spct)
+getInstrDesc(sun001.raw_mspct[["light"]])$max.counts
 
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
-autoplot(LED_lamp_recalc.source_spct)
+autoplot(sun001.raw_mspct[["light"]])
 
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
-autoplot(white_LED.raw_mspct[["light"]])
+autoplot(sun001.raw_mspct[["filter"]])
 
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
-autoplot(white_LED.raw_mspct[["dark"]])
+autoplot(sun001.raw_mspct[["dark"]])
 
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
-for (m in names(white_LED.raw_mspct)) {
-  white_LED.raw_mspct[[m]] <-
-    skip_bad_pixs(white_LED.raw_mspct[[m]])
-  print(autoplot(white_LED.raw_mspct[[m]]) + ggtitle(m))
+for (m in names(sun001.raw_mspct)) {
+  sun001.raw_mspct[[m]] <-
+    skip_bad_pixs(sun001.raw_mspct[[m]])
+  print(autoplot(sun001.raw_mspct[[m]]) + ggtitle(m))
 }
 
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
-for (m in names(white_LED.raw_mspct)) {
-  white_LED.raw_mspct[[m]] <-
-    trim_counts(white_LED.raw_mspct[[m]])
-  print(autoplot(white_LED.raw_mspct[[m]]) + ggtitle(m))
+for (m in names(sun001.raw_mspct)) {
+  sun001.raw_mspct[[m]] <-
+    trim_counts(sun001.raw_mspct[[m]])
+  print(autoplot(sun001.raw_mspct[[m]]) + ggtitle(m))
 }
 
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
-for (m in names(white_LED.raw_mspct)) {
-  white_LED.raw_mspct[[m]] <-
-    bleed_nas(white_LED.raw_mspct[[m]])
-  print(autoplot(white_LED.raw_mspct[[m]]) + ggtitle(m))
+for (m in names(sun001.raw_mspct)) {
+  sun001.raw_mspct[[m]] <-
+    bleed_nas(sun001.raw_mspct[[m]])
+  print(autoplot(sun001.raw_mspct[[m]]) + ggtitle(m))
 }
 
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
-for (m in names(white_LED.raw_mspct)) {
-  white_LED.raw_mspct[[m]] <-
-    linearize_counts(white_LED.raw_mspct[[m]])
-  print(autoplot(white_LED.raw_mspct[[m]], ylim = c(NA, 65000)) + ggtitle(m))
+for (m in names(sun001.raw_mspct)) {
+  sun001.raw_mspct[[m]] <-
+    linearize_counts(sun001.raw_mspct[[m]])
+  print(autoplot(sun001.raw_mspct[[m]], ylim = c(NA, 65000)) + ggtitle(m))
 }
 
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
-for (m in names(white_LED.raw_mspct)) {
-  white_LED.raw_mspct[[m]] <-
-    fshift(white_LED.raw_mspct[[m]], range = c(218.5,228.5))
-  print(autoplot(white_LED.raw_mspct[[m]], ylim = c(NA, 65000)) + ggtitle(m))
+for (m in names(sun001.raw_mspct)) {
+  sun001.raw_mspct[[m]] <-
+    fshift(sun001.raw_mspct[[m]], range = c(218.5,228.5))
+  print(autoplot(sun001.raw_mspct[[m]], ylim = c(NA, 65000)) + ggtitle(m))
 }
 
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
-white_LED.cps_mspct <- cps_mspct()
-for (m in names(white_LED.raw_mspct)) {
-  white_LED.cps_mspct[[m]] <-
-    raw2cps(white_LED.raw_mspct[[m]])
+sun001.cps_mspct <- cps_mspct()
+for (m in names(sun001.raw_mspct)) {
+  sun001.cps_mspct[[m]] <-
+    raw2cps(sun001.raw_mspct[[m]])
   print(
-    ggplot(white_LED.cps_mspct[[m]], aes(x = w.length)) +
-      ylim(NA, 200000) +
+    ggplot(sun001.cps_mspct[[m]], aes(x = w.length)) +
+      ylim(NA, 5e5) +
       geom_line(aes(y = cps_1), color = "blue") +
       geom_line(aes(y = cps_2), color = "red") +
       ggtitle(m)
@@ -130,28 +142,30 @@ for (m in names(white_LED.raw_mspct)) {
 }
 
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
-for (m in names(white_LED.cps_mspct)) {
-  white_LED.cps_mspct[[m]] <-
-    merge_cps(white_LED.cps_mspct[[m]])
-  print(autoplot(white_LED.cps_mspct[[m]], ylim = c(NA, 200000)) + ggtitle(m))
+for (m in names(sun001.cps_mspct)) {
+  sun001.cps_mspct[[m]] <-
+    merge_cps(sun001.cps_mspct[[m]])
+  print(autoplot(sun001.cps_mspct[[m]], ylim = c(NA, 5e5)) + ggtitle(m))
 }
 
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
-white_LED.cps_spct <- 
-  white_LED.cps_mspct[["light"]] - white_LED.cps_mspct[["dark"]]
-white_LED.cps_spct <- 
-  copy_attributes(white_LED.raw_mspct[["light"]],
-                  white_LED.cps_spct,
-                  copy.class = FALSE)
-autoplot(white_LED.cps_spct) + ggtitle("Dark subtracted")
+sun001.cps_mspct[["light"]] <- 
+  sun001.cps_mspct[["light"]] - sun001.cps_mspct[["dark"]]
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
-white_LED.spct <- cps2irrad(white_LED.cps_spct)
-autoplot(white_LED.spct)
+sun001.cps_mspct[["filter"]] <- 
+  sun001.cps_mspct[["filter"]] - sun001.cps_mspct[["dark"]]
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
-white_LED.spct <- smooth_spct(white_LED.spct)
-autoplot(white_LED.spct)
+sun001.cps_mspct[["dark"]] <- NULL
+
+autoplot(sun001.cps_mspct) + ggtitle("Dark subtracted")
+
+## ---- fig.width=8, fig.asp=0.5, eval = FALSE----------------------------------
+#  sun001.irrad_spct <- cps2irrad(sun001.cps_spct)
+#  autoplot(sun001.irrad_spct)
+
+## ---- fig.width=8, fig.asp=0.5, eval = FALSE----------------------------------
+#  sun001.irrad_spct <- smooth_spct(sun001.irrad_spct)
+#  autoplot(sun001.irrad_spct)
 
 ## -----------------------------------------------------------------------------
 names(halogen.raw_mspct)

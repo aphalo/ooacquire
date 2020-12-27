@@ -6,11 +6,10 @@ TODO
 * Document support for OO calibrations and add example scripts.
 * Add option to remove individual spectra and their files after a collection is
 succesfuly saved.
-* Replace white led data example (in 'photobiology' as it contains negative raw
-counts.
+* Add shinny widget examples for acquisition of spectra
 ================================================================================
 
-ooacquire 0.2.2 (2020-10-xx)
+ooacquire 0.2.2 (2020-12-27)
 ============================
 
 * Revise raw2corr_cps() and uvb_corrections() so as to remove duplicated code,
@@ -23,6 +22,8 @@ with all the spectra in the collection and a summary table are also created and
 saved to a .pdf file with the same root name as the collection file.
 * Attempting to use a calibration after its end-of-life issues a warning
 instead of an error.
+* Replace white LED data (old data was bad) and add data for sunlight, which
+is a better example for the algorithms.
 
 ooacquire 0.2.1-1 (2020-08-15)
 ==============================

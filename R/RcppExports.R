@@ -3,7 +3,7 @@
 
 #' Function to compute the tail correction
 #'
-#' @param w_length numeric vector of wavelengths in nm.
+#' @param w_length numeric vector of wavelengths in nanometres (nm).
 #' @param cts_second numeric vector of counts per second (stray-light corrected).
 #'
 #' @return tail returned as numeric vector within a list.

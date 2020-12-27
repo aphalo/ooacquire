@@ -39,196 +39,220 @@ library(magrittr)
 
 ## Spectral irradiance for a continuous source
 
-We will step through the different stages of the algorithm used, plotting the spectra at each step along the way. We use raw counts data, included in the package, from the measurement of a household white LED bulb---_Osram LED Star classic A 60 E27_. Before this we will describe how the data are stored and how show the result of using a high level function to have as reference.
+We will step through the different stages of the algorithm used, plotting the spectra at each step along the way. We use raw counts data, included in the package, from the measurement of sunlight at ground level with an Ocean Optics Maya 2000 Pro array spectrometer. Before the computations walk-trhough we will describe how the data and metadata are stored. We will also show the use of a high level function that automatically through all steps needed to convert raw spectromter counts into irradiance.
+
+We will use energy photon/quantum units throughout, for which we override the default use of energy units.
+
+```{r}
+photon_as_default()
+```
+
 
 ### The raw counts data and computed spectral irradiance
 
-Spectral data were acquired with an Ocean Optics Maya 2000 Pro spectrometer, using function `acquire_irrad_interactive()` from this package. This function implements several measurement protocols from which the user can chose. However, RAW counts data returned as a collection of RAW spectra, contains also metadata including a descriptor of the instrument and a descriptor of the instrument settings used, allowing their use to compute irradiance step by step and using different approaches.
+Spectral data were acquired using function `acquire_irrad_interactive()` from this package. This function implements several measurement protocols from which the user can chose. RAW-counts data are returned as a collection of RAW spectra, contains also metadata including a descriptor of the instrument and a descriptor of the instrument settings used. The instrument descriptor contains also the instrument calibration data when available. So irrespective of the approach and number of measurements needed for measuring one irradiance spectrum, all the data and metadata are contained in a single R object of class `raw_mspct`. If the calibration data is included in the metadata, all information needed to compute irradiance is stored in this single object.
 
-The data contains a measurement of the _light_ source and a reference _dark_ measurement.
+The data contains a measurement of the _light_ source, a measurement of the same light source through a polycarbonate _filter_ and a reference or _dark_ measurement. Each of the three spectra in these collection is a `raw_spct` object.
 
 ```{r}
-names(white_LED.raw_mspct)
+names(sun001.raw_mspct)
 ```
 
 The spectrum for the light measurement contains multiple columns, one for each of three different integration times used.
 
 ```{r}
-names(white_LED.raw_mspct[["light"]])
+colnames(sun001.raw_mspct[["light"]])
 ```
 
 Summary in addition to displaying the summary for the columns, displays the most important metadata attributes, including the integration times and total measurement times.
 
 ```{r}
-summary(white_LED.raw_mspct[["light"]])
+summary(sun001.raw_mspct[["light"]])
 ```
 
-We can explore the structure of the object, to see how data and metadata are stored using `str()` as shown below.
+We can explore the structure of the object, to see how data and metadata are stored using `str()` as shown below. We here limit the nesting level so that the output is not too large.
 
-```{r, eval=FALSE}
+```{r}
 # not run
-str(white_LED.raw_mspct[["light"]], max.level = 3)
+str(sun001.raw_mspct[["light"]], max.level = 2)
+```
+A formatted printout of the instrument setting provides important information. The maximum count value observed relative to the sensor's maximum allowed counts is specially important for diagnostics of data quality, as a value of 100% indicates clipping while low values, say less than 70% result in decreased dynamic range due to sensor dark noise.
+
+```{r}
+getInstrSettings(sun001.raw_mspct[["light"]])
 ```
 
 As with any other R object we access an attribute and use indexing to extract a given metadata value.
 
 ```{r}
-attr(white_LED.raw_mspct[["light"]], which = "instr.desc")$spectrometer.name
+attr(sun001.raw_mspct[["light"]], which = "instr.desc")$spectrometer.name
 ```
 
 In normal use, we calculate irradiance from a raw-counts data set stored as a collection in a `raw_mspct` object using the high-level function `s_irrad_corrected()`. We pass as first argument the object containing the RAW counts and corresponding metadata and the _correction method_ to be used in the conversion of the RAW counts into irradiance.
 
 ```{r, fig.width=8, fig.asp=0.5}
-LED_lamp_recalc.spct <-
-  s_irrad_corrected(white_LED.raw_mspct, 
+sun001_recalc.spct <-
+  s_irrad_corrected(sun001.raw_mspct, 
                     correction.method = ooacquire::MAYP11278_ylianttila.mthd)
 ```
 
 The R object returned by `s_irrad_corrected()` belongs to class `"source_spct"` (defined in package 'photobiology') for which summary and plotting methods are available. We first have a quick look at this object. In the output bellow we will notice that the six RAW measurements, three in the light and three in the dark have been used to calculate a single estimate of spectral irradiance. We can also see that the range of wavelengths is narrower as only wavelengths for which calibration data exists have been retained.
 
 ```{r}
-summary(LED_lamp_recalc.spct)
+summary(sun001_recalc.spct)
 ```
 
-By plotting the spectral irradiance data, either in whole or a range of wavelengths we can better see the shape of the emission spectrum of the lamp, and in this example also obtain summaries for the irradiance in different wavebands.
+By plotting the spectral irradiance data, either in whole or a range of wavelengths we can better see the shape of the solar spectrum at ground level, and in this example also obtain summaries for the irradiance in different wavebands.
 
 ```{r, fig.width=8, fig.asp=0.5}
-autoplot(LED_lamp_recalc.spct)
+autoplot(sun001_recalc.spct)
 ```
-In the plot above we can see that wavelength shorter than 300 nm have been overcorrected for stray light/dark noise. 
-
-Using a different correction method.
+Using a different correction method, that assumes that the measurements are of sunlight at ground level and consequently spectral irradiance for wavelengths shorter than xxx nm should be indistinguishable from zero.
 
 ```{r, fig.width=8, fig.asp=0.5}
-LED_lamp_recalc.spct <-
-  s_irrad_corrected(white_LED.raw_mspct, 
+sun001_recalc.spct <-
+  s_irrad_corrected(sun001.raw_mspct, 
                     correction.method = ooacquire::MAYP11278_sun.mthd)
 ```
 
 The R object returned by `s_irrad_corrected()` belongs to class `"source_spct"` (defined in package 'photobiology') for which summary and plotting methods are available. We first have a quick look at this object. In the output bellow we will notice that the six RAW measurements, three in the light and three in the dark have been used to calculate a single estimate of spectral irradiance. We can also see that the range of wavelengths is narrower as only wavelengths for which calibration data exists have been retained.
 
 ```{r}
-summary(LED_lamp_recalc.spct)
+summary(sun001_recalc.spct)
 ```
 
 By plotting the spectral irradiance data, either in whole or a range of wavelengths we can better see the shape of the emission spectrum of the lamp, and in this example also obtain summaries for the irradiance in different wavebands.
 
 ```{r, fig.width=8, fig.asp=0.5}
-autoplot(LED_lamp_recalc.spct)
+autoplot(sun001_recalc.spct)
 ```
-In the plot above we can see that wavelength shorter than 300 nm have been overcorrected for stray light/dark noise. 
-
 We can also use the same function to obtain counts per second.
 
 ```{r, fig.width=8, fig.asp=0.5}
-LED_lamp_recalc.cps_spct <-
-  s_irrad_corrected(white_LED.raw_mspct, 
+sun001_recalc.cps_spct <-
+  s_irrad_corrected(sun001.raw_mspct, 
                     correction.method = ooacquire::MAYP11278_ylianttila.mthd,
                     return.cps = TRUE)
 ```
 
 ```{r, eval=FALSE}
-get_attributes(LED_lamp_recalc.cps_spct)
+get_attributes(sun001_recalc.cps_spct)
 ```
 
 ```{r}
-summary(LED_lamp_recalc.cps_spct)
+summary(sun001_recalc.cps_spct)
 ```
+
+By plotting the raw counts expressed as counts per second we can see that the shape of the curve is affected by the varying sensitivity of the spectrometer to photons of different wavelengths.
 
 ```{r, fig.width=8, fig.asp=0.5}
-autoplot(LED_lamp_recalc.cps_spct)
+autoplot(sun001_recalc.cps_spct)
 ```
-```{r}
-LED_lamp_recalc.source_spct <- cps2irrad(LED_lamp_recalc.cps_spct)
+We can in a separate step convert the counts per second data to irradadiance by applying the calibration.
+
+```{r, eval = FALSE}
+sun001_recalc.source_spct <- cps2irrad(sun001_recalc.cps_spct)
 ```
 
-```{r}
-summary(LED_lamp_recalc.source_spct)
+```{r, eval = FALSE}
+summary(sun001_recalc.source_spct)
 ```
 
-```{r, fig.width=8, fig.asp=0.5}
-autoplot(LED_lamp_recalc.source_spct)
+```{r, fig.width=8, fig.asp=0.5, eval = FALSE}
+autoplot(sun001_recalc.source_spct)
 ```
 
 ### Step-by-step walk through
 
-In this section we will apply one by one the different computation steps staring from RAW spectral data until we obtain spectral irradiance, the spectrum shown in the figure above.
+In this section we will apply one by one the different computation steps staring from RAW spectral data until we obtain spectral irradiance, the same spectrum shown in the figure above.
 
-We have described in the previous section the structure of the object containing the RAW counts data. As we saw above, measurements consisted in three measurements using three different integration times. In addition to different integration times, the number of "scans" was adjusted so that the three spectra consist in the average of scans covering the same total length of time.
+We have described in the previous section the structure of the object containing the RAW counts data. As we saw above, measurements consisted in two measurements using two different integration times. In addition to different integration times, the number of "scans" was adjusted so that each of the two spectra contain data for a similar total length of time. The three spectra, _light_, _filter_ and _dark_ where acquired in succesion and using the same settings in the spectrometer.
 
-Plotting the three bracketed spectra shows the effect of using the optimal integration time plus two longer integration times. To understand the figure one needs to be aware that the spectrometer detector saturates at approximately 64000 counts. In other words if more photons imping a detector cell/pixel than needed for 64000 counts, the reading remains at 64000 counts. This is usually called "signal clipping".
+When dealing with raw detector counts one needs to be aware that the array detector in array spectrometers saturates at a certain number of counts, ranging from 256 to 64000 or more counts. This inforamtion is stored as part of the metadata. 
 
-```{r, fig.width=8, fig.asp=0.5}
-autoplot(white_LED.raw_mspct[["light"]])
+```{r}
+getInstrDesc(sun001.raw_mspct[["light"]])$max.counts
 ```
 
-In the figure above, we can see that in addition to clipping, increasing the integration time, at least in some spectrometers significantly increases the "noise floor" or dark readings. This is even clearly seen in the measurements done in darkness. In these spectra, we can also easily see several spikes caused by "hot pixels" in the detector (over-responding pixels).
+Plotting the two bracketed spectra shows the effect of using the optimal integration time plus an integration 10 times longer. In other words if more photons imping on a detector cell/pixel during one intergration event (or "scan") than needed to reach 64000 counts, the reading remains at 64000 counts. This is usually called "signal clipping", i.e., the tips of peaks are truncated or off scale.
 
 ```{r, fig.width=8, fig.asp=0.5}
-autoplot(white_LED.raw_mspct[["dark"]])
+autoplot(sun001.raw_mspct[["light"]])
 ```
-
-The **first step** in the processing is removal of bad pixels, as recorded in the calibration data. What this step achieves can be clearly seen by comparing the plots before and after this step.
+In the figure above, we can see that in addition to clipping, increasing the integration time, at least in some spectrometers significantly increases the "noise floor" or dark readings. This is also true for the measurements done in darkness. In these spectra, we can also easily see several spikes caused by "hot pixels" in the detector (over-responding pixels). In the figure below we can see the effect of the filter.
 
 ```{r, fig.width=8, fig.asp=0.5}
-for (m in names(white_LED.raw_mspct)) {
-  white_LED.raw_mspct[[m]] <-
-    skip_bad_pixs(white_LED.raw_mspct[[m]])
-  print(autoplot(white_LED.raw_mspct[[m]]) + ggtitle(m))
+autoplot(sun001.raw_mspct[["filter"]])
+```
+In this third figure, we have a look at the spectrum measured in drakness. This spectrometer in particular has the peculiarity that the effect of warming on dark noise depends on wavelength.
+
+```{r, fig.width=8, fig.asp=0.5}
+autoplot(sun001.raw_mspct[["dark"]])
+```
+The **first step** in the processing is substituting data from bad pixels by values interpolated from the adjacent fixels. Which pixels are bad is recorded in the calibration data. What this step achieves can be clearly seen by comparing the plots before (see above) and after this step (see below). As in most array spectrometers pixel resolution is better than optical resolution this introduces little error, except possibly in the case of very narrow peaks.
+
+```{r, fig.width=8, fig.asp=0.5}
+for (m in names(sun001.raw_mspct)) {
+  sun001.raw_mspct[[m]] <-
+    skip_bad_pixs(sun001.raw_mspct[[m]])
+  print(autoplot(sun001.raw_mspct[[m]]) + ggtitle(m))
 }
 ```
+**Note:** When bad-pixel information is not available, automatic despiking can be used instead, but it needs care not to accidentaly remove true peaks from the data.
 
 The **second step** is to replace saturated (clipped) pixel data, with the missing data marker `NA`. As `NA` values are not plotted pixels exactly equal to the maximum possible reading disappear from the plot.
 
 ```{r, fig.width=8, fig.asp=0.5}
-for (m in names(white_LED.raw_mspct)) {
-  white_LED.raw_mspct[[m]] <-
-    trim_counts(white_LED.raw_mspct[[m]])
-  print(autoplot(white_LED.raw_mspct[[m]]) + ggtitle(m))
+for (m in names(sun001.raw_mspct)) {
+  sun001.raw_mspct[[m]] <-
+    trim_counts(sun001.raw_mspct[[m]])
+  print(autoplot(sun001.raw_mspct[[m]]) + ggtitle(m))
 }
 ```
 
-An important consideration is that when a pixel _well_ fills with electrical charge some of the excessive charge migrates to nearby pixels. How many nearby pixels are affected depends on the detector type, but it is at most a few tens of pixels. So in this **third step**, pixels neighbouring those set to `NA` in the second step are also set to `NA`.
+An important consideration is that when a pixel _well_ fills with electrical charge some of the excessive charge migrates to nearby pixels. How many nearby pixels are affected depends on the detector type, but it is at most a few tens of pixels. So in this **third step**, pixels neighbouring those set to `NA` in the second step are also set to `NA`. By default we replace the 10 nearest non-saturated pixels also by `NA`. 
 
 ```{r, fig.width=8, fig.asp=0.5}
-for (m in names(white_LED.raw_mspct)) {
-  white_LED.raw_mspct[[m]] <-
-    bleed_nas(white_LED.raw_mspct[[m]])
-  print(autoplot(white_LED.raw_mspct[[m]]) + ggtitle(m))
+for (m in names(sun001.raw_mspct)) {
+  sun001.raw_mspct[[m]] <-
+    bleed_nas(sun001.raw_mspct[[m]])
+  print(autoplot(sun001.raw_mspct[[m]]) + ggtitle(m))
 }
 ```
 
 The response of array detectors is not perfectly linear _vs._ to the number of photons received. Most precisely when the number of counts gets near the maximum value, the sensitivity to additional photons slightly decreases. This is a result of how "full" the sensor wells are, irrespective of the source of the charge. Consequently this correction should be applied before subtraction of the dark reading.
-The **fourth step** is to apply a linearisation function, in most cases supplied with the instrument and possibly stored in the instrument firmware. This function is part of the calibration data for the instrument that is stored as part of the metadata during acquisition of the spectra.
+
+The **fourth step** is to apply a linearisation function, in most cases supplied with the instrument and possibly stored in the instrument firmware. This function is part of the calibration data for the instrument that is stored as part of the metadata during acquisition of the spectra. Given that linearization corrects for a decrease in sensitivity at counts approaching the maximum, some values can exceed the maximum (64000 in this case).
 
 ```{r, fig.width=8, fig.asp=0.5}
-for (m in names(white_LED.raw_mspct)) {
-  white_LED.raw_mspct[[m]] <-
-    linearize_counts(white_LED.raw_mspct[[m]])
-  print(autoplot(white_LED.raw_mspct[[m]], ylim = c(NA, 65000)) + ggtitle(m))
+for (m in names(sun001.raw_mspct)) {
+  sun001.raw_mspct[[m]] <-
+    linearize_counts(sun001.raw_mspct[[m]])
+  print(autoplot(sun001.raw_mspct[[m]], ylim = c(NA, 65000)) + ggtitle(m))
 }
 ```
 
-The first few pixels in the detector of most array spectrometers are covered and never exposed to light photons. These can be used as a dark reference to correct for thermal noise. This step may appear redundant, but _might_ help in cases when instrument temperature is not the same during the _light_ and _dark_ measurements. An alternative is to use pixels known to be not exposed to radiation from the light source, but within the useful measurement range of the instrument. A white LED lamp is not expected to emit UV-C, so wavelengths between 250 nm and 290 nm can used. Consequently, as the **fifth step** we remove an estimate of dark signal based on these "non-excited pixels". As seen in the plots, this step effectively removes the overall dark signal from both _light_ and _dark_ measurements. We can, however, also see that there is residual dark noise remaining at pixel level, not all pixels have the same noise floor. Part of this variation is systematic, and some may be random. As we used a total measurement time of 120 s much of the random noise must have cancelled out through averaging.
+The first few pixels in the detector of most array spectrometers are covered and never exposed to light photons. These can be used as a dark reference to correct for thermal noise. This step may appear redundant, but _might_ help in cases when instrument temperature is not the same during the _light_ and _dark_ measurements. An alternative is to use pixels known not to be exposed to radiation from the light source, but within the useful measurement range of the instrument. Sunlight at ground level is known to lack UV-C photons, so wavelengths between 250 nm and 290 nm can used as dark reference for this light source. Consequently, as the **fifth step** we remove an estimate of dark signal based on these "non-excited pixels". As seen in the plots, this step effectively removes the overall dark signal from both _light_ and _dark_ measurements. We can, however, also see that there is residual dark noise remaining at pixel level, not all pixels have the same noise floor. Part of this variation is systematic, and some may be random. As we used a total measurement time of 120 s much of the random noise must have canceled out through averaging.
 
 ```{r, fig.width=8, fig.asp=0.5}
-for (m in names(white_LED.raw_mspct)) {
-  white_LED.raw_mspct[[m]] <-
-    fshift(white_LED.raw_mspct[[m]], range = c(218.5,228.5))
-  print(autoplot(white_LED.raw_mspct[[m]], ylim = c(NA, 65000)) + ggtitle(m))
+for (m in names(sun001.raw_mspct)) {
+  sun001.raw_mspct[[m]] <-
+    fshift(sun001.raw_mspct[[m]], range = c(218.5,228.5))
+  print(autoplot(sun001.raw_mspct[[m]], ylim = c(NA, 65000)) + ggtitle(m))
 }
 ```
+In the last plot above we can see that the correction has resulted in slightly negative values in darkness. If the bump in the noise floor, caused by warming, is consistent among all three measurements, it should cancell out. 
 
-At this point we have "clean" RAW counts data. The **sixth step** is to convert these raw counts into counts per second. As the integration time for each spectrum is stored together with the RAW count data, the function call is simple. After this step, the data acquired using different integration times are expressed in the same units. We take advantage of this to plot using different colours the data from the three different "bracketed" integration times. Blue corresponds to the shortest and optimal integration time, and green to the longest one used. Here we over-plot the three separate spectra.
+At this point we have "clean" RAW counts data. The **sixth step** is to convert these raw counts into counts per second. As the integration time for each spectrum is stored together with the RAW count data, the function call is simple. After this step, the data acquired using different integration times are expressed in the same units. We take advantage of this to plot using different colours the data from the two different "bracketed" integration times. Blue corresponds to the shortest and optimal integration time, and red to the longer one. Here we over-plot the two separate spectra.
 
 ```{r, fig.width=8, fig.asp=0.5}
-white_LED.cps_mspct <- cps_mspct()
-for (m in names(white_LED.raw_mspct)) {
-  white_LED.cps_mspct[[m]] <-
-    raw2cps(white_LED.raw_mspct[[m]])
+sun001.cps_mspct <- cps_mspct()
+for (m in names(sun001.raw_mspct)) {
+  sun001.cps_mspct[[m]] <-
+    raw2cps(sun001.raw_mspct[[m]])
   print(
-    ggplot(white_LED.cps_mspct[[m]], aes(x = w.length)) +
-      ylim(NA, 200000) +
+    ggplot(sun001.cps_mspct[[m]], aes(x = w.length)) +
+      ylim(NA, 5e5) +
       geom_line(aes(y = cps_1), color = "blue") +
       geom_line(aes(y = cps_2), color = "red") +
       ggtitle(m)
@@ -236,40 +260,42 @@ for (m in names(white_LED.raw_mspct)) {
 }
 ```
 
-The **seventh step** splicing of the _light_ and _dark_ three counts-per-second spectra each into a single combined spectrum.
+The **seventh step** splicing the three pairs of "bracketed" _light_, _filter_ and _dark_ counts-per-second spectra into three combined spectra.
 
 ```{r, fig.width=8, fig.asp=0.5}
-for (m in names(white_LED.cps_mspct)) {
-  white_LED.cps_mspct[[m]] <-
-    merge_cps(white_LED.cps_mspct[[m]])
-  print(autoplot(white_LED.cps_mspct[[m]], ylim = c(NA, 200000)) + ggtitle(m))
+for (m in names(sun001.cps_mspct)) {
+  sun001.cps_mspct[[m]] <-
+    merge_cps(sun001.cps_mspct[[m]])
+  print(autoplot(sun001.cps_mspct[[m]], ylim = c(NA, 5e5)) + ggtitle(m))
 }
 ```
 
-In the **eighth step** we subtract the dark signal from the light measurement. This reduces the remaining noise.
+In the **eighth step** we subtract the dark signal from the _light_ and _filter_ measurements. This reduces the remaining noise.
 
 ```{r, fig.width=8, fig.asp=0.5}
-white_LED.cps_spct <- 
-  white_LED.cps_mspct[["light"]] - white_LED.cps_mspct[["dark"]]
-white_LED.cps_spct <- 
-  copy_attributes(white_LED.raw_mspct[["light"]],
-                  white_LED.cps_spct,
-                  copy.class = FALSE)
-autoplot(white_LED.cps_spct) + ggtitle("Dark subtracted")
+sun001.cps_mspct[["light"]] <- 
+  sun001.cps_mspct[["light"]] - sun001.cps_mspct[["dark"]]
+
+sun001.cps_mspct[["filter"]] <- 
+  sun001.cps_mspct[["filter"]] - sun001.cps_mspct[["dark"]]
+
+sun001.cps_mspct[["dark"]] <- NULL
+
+autoplot(sun001.cps_mspct) + ggtitle("Dark subtracted")
 ```
 
 At this point we have a clean counts-per-second spectrum. The **ninth step** is to apply the calibration multipliers and any additional instrument specific correction to obtain spectral irradiance in a `"source_spct"` object.
 
-```{r, fig.width=8, fig.asp=0.5}
-white_LED.spct <- cps2irrad(white_LED.cps_spct)
-autoplot(white_LED.spct)
+```{r, fig.width=8, fig.asp=0.5, eval = FALSE}
+sun001.irrad_spct <- cps2irrad(sun001.cps_spct)
+autoplot(sun001.irrad_spct)
 ```
 
 In an optional, final **tenth step** we apply smoothing to remove some of the noise.
 
-```{r, fig.width=8, fig.asp=0.5}
-white_LED.spct <- smooth_spct(white_LED.spct)
-autoplot(white_LED.spct)
+```{r, fig.width=8, fig.asp=0.5, eval = FALSE}
+sun001.irrad_spct <- smooth_spct(sun001.irrad_spct)
+autoplot(sun001.irrad_spct)
 ```
 With an LED source, at least in the case of our Maya 2000 Pro, we do not need to worry about stray light. However, when we measure light sources with a significant emission in the infra-red above 1000 nm, stray light becomes a problem. In addition sources with narrow peaks of emission may benefit from deconvolution of a measured slit function.
 
