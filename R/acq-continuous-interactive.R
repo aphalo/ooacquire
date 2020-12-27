@@ -363,7 +363,7 @@ acq_irrad_interactive <-
         user.collection.name <- readline("Name of the collection?: ")
         collection.name <- make.names(paste("collection ", user.collection.name, sep = ""))
         if (user.collection.name == "") {
-          collection.name <- make.names(paste("collection ", lubridate::now()), sep = "")
+          collection.name <- make.names(paste("collection ", lubridate::now(), sep = ""))
         }
         if (collection.name != user.collection.name) {
           message("Using sanitised/generated name: '", collection.name, "'.", sep = "")
