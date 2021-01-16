@@ -92,40 +92,40 @@ autoplot(sun001.raw_mspct[["filter"]])
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
 autoplot(sun001.raw_mspct[["dark"]])
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ---- fig.width=8, fig.asp=1.5------------------------------------------------
 for (m in names(sun001.raw_mspct)) {
   sun001.raw_mspct[[m]] <-
     skip_bad_pixs(sun001.raw_mspct[[m]])
-  print(autoplot(sun001.raw_mspct[[m]]) + ggtitle(m))
 }
+autoplot(sun001.raw_mspct, facets = 1)
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ---- fig.width=8, fig.asp=1.5------------------------------------------------
 for (m in names(sun001.raw_mspct)) {
   sun001.raw_mspct[[m]] <-
     trim_counts(sun001.raw_mspct[[m]])
-  print(autoplot(sun001.raw_mspct[[m]]) + ggtitle(m))
 }
+autoplot(sun001.raw_mspct, facets = 1)
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ---- fig.width=8, fig.asp=1.5------------------------------------------------
 for (m in names(sun001.raw_mspct)) {
   sun001.raw_mspct[[m]] <-
     bleed_nas(sun001.raw_mspct[[m]])
-  print(autoplot(sun001.raw_mspct[[m]]) + ggtitle(m))
 }
+autoplot(sun001.raw_mspct, facets = 1)
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ---- fig.width=8, fig.asp=1.5------------------------------------------------
 for (m in names(sun001.raw_mspct)) {
   sun001.raw_mspct[[m]] <-
     linearize_counts(sun001.raw_mspct[[m]])
-  print(autoplot(sun001.raw_mspct[[m]], ylim = c(NA, 65000)) + ggtitle(m))
 }
+autoplot(sun001.raw_mspct, facets = 1)
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ---- fig.width=8, fig.asp=1.5------------------------------------------------
 for (m in names(sun001.raw_mspct)) {
   sun001.raw_mspct[[m]] <-
     fshift(sun001.raw_mspct[[m]], range = c(218.5,228.5))
-  print(autoplot(sun001.raw_mspct[[m]], ylim = c(NA, 65000)) + ggtitle(m))
 }
+autoplot(sun001.raw_mspct, facets = 1)
 
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
 sun001.cps_mspct <- cps_mspct()
@@ -160,7 +160,7 @@ sun001.cps_mspct[["dark"]] <- NULL
 autoplot(sun001.cps_mspct) + ggtitle("Dark subtracted")
 
 ## ---- fig.width=8, fig.asp=0.5, eval = FALSE----------------------------------
-#  sun001.irrad_spct <- cps2irrad(sun001.cps_spct)
+#  sun001.irrad_spct <- cps2irrad(sun001.cps_mspct)
 #  autoplot(sun001.irrad_spct)
 
 ## ---- fig.width=8, fig.asp=0.5, eval = FALSE----------------------------------

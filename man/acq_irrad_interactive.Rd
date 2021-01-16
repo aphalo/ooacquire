@@ -16,6 +16,7 @@ acq_irrad_interactive(
   stray.light.method = "none",
   qty.out = "irrad",
   save.pdfs = TRUE,
+  save.summaries = TRUE,
   interface.mode = "auto"
 )
 
@@ -63,10 +64,12 @@ calibration data.}
 \item{stray.light.method}{character Used only when the correction method is
 created on-the-fly.}
 
-\item{qty.out}{character One of "Tfr" (spectral transmittance as a fraction of one),
-"irrad" (spectral irardiance), "cps" (counts per second), or "raw" (raw sensor counts).}
+\item{qty.out}{character One of "Tfr" (spectral transmittance as a fraction
+of one), "irrad" (spectral irardiance), "cps" (counts per second), or "raw"
+(raw sensor counts).}
 
-\item{save.pdfs}{logical Whether to save PDFs to files or not.}
+\item{save.pdfs, save.summaries}{logical Whether to save plots to PDFs files
+or not, and collection summaries to csv files or not.}
 
 \item{interface.mode}{character One of "auto", "simple", "manual",
 "series", "auto-attr", "simple-attr", "manual-attr", and
@@ -81,12 +84,13 @@ These functions return the acquired spectra through "side effects"
 as each spectrum is saved, both as raw counts data and calibrated
 spectral data in an \code{.rda} file as objects of the classes defined in
 package 'photobiology'. Optionally, the plot for each spectrum is saved as
-a \code{.pdf} file. The value returned by the function is that from
+a \code{.pdf} file, and summaries for each collection created, are save to
+CSV file. The value returned by the function is that from
 closing the connection to the spectrometer.
 }
 \description{
 Functions providing a simple interactive front-end to the functions in the
-package, also working as example code that can be modified for diferent
+package, also working as example code that can be modified for different
 uses.
 }
 \details{
@@ -94,11 +98,11 @@ These functions can be useful for commonly done measurements but
   they also play the role of examples that users can modify according to
   their needs. They are all composed in a modular way from functions that can
   be reshuffled and combined with other functions to define new variations
-  better suited to users' needs and tastes. Functions \code{acq_irrad_interactive()}
-  and \code{acq_fraction_interactive} provide support the
-  measurement of spectral irradiance of continuous light sources, and
-  transmittance, reflectance and absorbance using continuous light sources,
-  respectively.
+  better suited to users' needs and tastes. Functions
+  \code{acq_irrad_interactive()} and \code{acq_fraction_interactive} provide
+  support the measurement of spectral irradiance of continuous light sources,
+  and transmittance, reflectance and absorbance using continuous light
+  sources, respectively.
 
   The default behaviour of the functions can be changed by passing different
   arguments through parameters, but for special use cases it could be best
@@ -108,9 +112,6 @@ These functions can be useful for commonly done measurements but
   Using these functions only requires an Ocean Optics spectrometer to be
   connected. The connection to the spectrometer and selection of channel,
   when relevant, is done from within these functions.
-
-The different interface modes are suitable for different types of
-  measurements.
 }
 \note{
 The integration time is set automatically so that the peak number of
@@ -124,6 +125,11 @@ The integration time is set automatically so that the peak number of
   \code{set_annotations_default()}, default wavebands set with function
   \code{set_w.band_default()}, and irradiance quantities set with
   \code{photon_as_default()}, and \code{energy_as_default()}.
+
+The different interface modes are suitable for different types of
+  measurements. The field separator in the written CSV file is according to
+  the current locale. If needed use \code{readr::set_locale()} to change it
+  before calling this function.
 
 The calculations for reflectance and transmittance are very similar,
   so we provide a single function capable of handling both. For
@@ -142,14 +148,15 @@ The calculations for reflectance and transmittance are very similar,
 \examples{
 
 \dontrun{
-# requires an Ocean Optics spectrometer to be connected via USB
-acquire_interactive()
+# requires an Ocean Insight (former Ocean Optics) spectrometer to be
+# connected via USB acquire_interactive()
 }
 
 }
 \seealso{
 This function calls functions \code{\link{tune_interactive}},
-\code{\link{protocol_interactive}}  and \code{\link{set_attributes_interactive}}.
+  \code{\link{protocol_interactive}} and
+  \code{\link{set_attributes_interactive}}.
 
 Other interactive acquisition functions: 
 \code{\link{acq_fluence_interactive}()}

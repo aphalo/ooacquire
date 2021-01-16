@@ -40,67 +40,84 @@ tune_interactive <- function(descriptor,
     interface.mode <- "auto"
   }
   # configure interface for active mode
-  prompt.text <- switch(interface.mode,
-                        simple = "t = retune, r = range, h = HDR mult., u = undo, H = help (t/r/h/u/H/-): ",
-                        auto = "t = retune, T = tune, s = skip, m = margin, r = range, h = HDR mult., u = undo, H = help (t/s/m/r/h/u/H/-): ",
-                        manual = "f = fixed, s = skip, r = range, h = HDR mult., u = undo, H = help (f/r/h/u/H/-): "
+  prompt.text1 <- switch(interface.mode,
+                        simple = "RETUNE/range/HDR mult./undo/help/measure (t-/r/h/u/?/m): ",
+                        auto = "RETUNE/tune/margin/range/HDR mult./undo/help/measure (t-/T/M/r/h/u/?/m): ",
+                        manual = "FIXED/range/HDR mult./undo/help/measure (f-/r/h/u/?/m): "
+  )
+  prompt.text2 <- switch(interface.mode,
+                        simple = "retune/range/HDR mult./undo/help/MEASURE (t/r/h/u/?/m-): ",
+                        auto = "retune/tune/margin/range/HDR mult./undo/help/MEASURE (t/T/M/r/h/u/?/m-): ",
+                        manual = "fixed/range/HDR mult./undo/help/MEASURE (f/r/h/u/?/m-): "
   )
   valid.input <- switch(interface.mode,
-                        simple = c("t", "r", "h", "u", "H", ""),
-                        auto = c("t", "T", "s", "m", "r", "h", "u", "H", ""),
-                        manual = c("f", "s", "r", "h", "u", "H", "")
+                        simple = c("t", "r", "h", "u", "?", "m", ""),
+                        auto = c("t", "T", "M", "r", "h", "u", "?", "m", ""),
+                        manual = c("f", "r", "h", "u", "?", "m", "")
   )
   default.input <- switch(interface.mode,
-                          simple = c("t", "s"),
-                          auto = c("t", "s"),
-                          manual = c("f", "s")
+                          simple = c("t", "m"),
+                          auto = c("t", "m"),
+                          manual = c("f", "m")
   )
   # set help
   all.help <- c(t = "t = retune. Adjust integration time starting from last value.",
                 T = "T = tune. Adjust integration time starting from default value.",
-                s = "s = skip. Use last integration time, skip adjustment.",
-                m = "m = margin. Target integration time is maximum * (100 - margin).",
+                M = "M = safety margin. Tuned integration time is maximum * (100 - margin).",
                 r = "r = range. Total measurement time in seconds, as a single value or a range.",
                 h = "h = HDR mult. High dynamic range or bracketing, as multipliers for target integration time.",
                 f = "f = fixed. User-suplied \"base\" integration time in seconds.",
                 u = "u = undo. Restore settings from last measurement.",
-                H = "H = help. Show this help text.")
+                H = "? = help. Show this help text.",
+                m = "m = MEASURE. Measure without setting/tuning integration time.",
+                default = "- = default. Action selected by pressing \"Enter\" key.")
   help.text <- paste(all.help[setdiff(valid.input, "")], collapse = "\n")
   # common code to all modes
   old.settings <- acq.settings # allow starting over
   tuned <- FALSE
   repeat{
-    cat("Ready to adjust integration time?\n")
+    if (tuned) {
+      prompt.text <- prompt.text2
+    } else {
+      prompt.text <- prompt.text1
+    }
     repeat {
-      answ <- readline(prompt.text)
-      if (answ[1] %in% valid.input) {
+      answ <- readline(prompt.text)[1]
+      answ <- substr(answ, 1, 1)
+      if (answ %in% valid.input) {
         break()
       }
-      cat("Unrecognized letter: ", answ[1], ". Please, try again.")
+      cat("Unrecognized letter: ", answ, ". Please, try again...")
     }
     if (answ == "") {
       answ <- ifelse(!tuned, default.input[1], default.input[2])
     }
-    if (answ %in% c("s", "g")) {
+    if (answ == "m") {
       break()                       ## <- exit point for loop
     }
 
-    if (substr(answ, 1, 1) == "H") {
+    if (answ == "?") {
       cat(help.text)
-    } else if (substr(answ, 1, 1) == "t") {
+    } else if (answ == "t") {
+      if (readline("Auto-adjust integration time?, z = abort (-/z):") == "z") {
+        next()
+      }
       acq.settings <- tune_acq_settings(descriptor = descriptor, acq.settings = acq.settings)
       tuned <- TRUE
-    } else if (substr(answ, 1, 1) == "T") {
+    } else if (answ == "T") {
+      if (readline("Auto-adjust integration time?, z = abort (-/z):") == "z") {
+        next()
+      }
       acq.settings[["integ.time"]] <- start.int.time * 1e6
       acq.settings <- tune_acq_settings(descriptor = descriptor, acq.settings = acq.settings)
       tuned <- TRUE
-    } else if (substr(answ, 1, 1) == "f") {
+    } else if (answ == "f") {
       cat("Integration time (seconds): ")
       user.integ.time <- scan(nmax = 4L) * 1e6
       acq.settings <- set_integ_time(acq.settings = acq.settings,
                                  integ.time = user.integ.time)
       tuned <- TRUE
-    } else if (substr(answ, 1, 1) == "m") {
+    } else if (answ == "M") {
       margin <- readline(sprintf("Saturation margin = %.2g, new: ",
                                  acq.settings[["target.margin"]]))
       margin <- try(as.numeric(margin))
@@ -110,7 +127,7 @@ tune_interactive <- function(descriptor,
       } else {
         print("Value not changed!")
       }
-    } else if (substr(answ, 1, 1) == "r") {
+    } else if (answ == "r") {
       cat("Total time range (seconds), 2 numbers: ")
       tot.time.range <- range(scan(nmax = 2)) * 1e6
       if (tot.time.range[1] >= 0) {
@@ -119,7 +136,7 @@ tune_interactive <- function(descriptor,
       } else {
         cat("Value not changed!")
       }
-    }  else if (substr(answ, 1, 1) == "h") {
+    }  else if (answ == "h") {
       old.hdr.mult.len <- length(acq.settings[["HDR.mult"]])
       cat("HDR multipliers, 1 to 4 numbers: ")
       HDR.mult <- sort(scan(nmax = 4))
@@ -139,10 +156,11 @@ tune_interactive <- function(descriptor,
           }
         }
       } else {
-        cat("Value not changed!")
+        cat("Bad multipliers ignored. Value not changed! Please, try again...")
       }
-    } else if (substr(answ, 1, 1) == "u") {
+    } else if (answ == "u") {
       cat("Restoring previous settings!")
+      tuned <- FALSE
       acq.settings <- old.settings
     }
   }
@@ -209,7 +227,7 @@ protocol_interactive <- function(protocols) {
 #'
 list_srs_interactive <- function(w) {
   while (rOmniDriver::number_srs(w) < 1L) {
-    answ <- readline("Please, connect a spectrometer to an USB port. <enter> = try again, z = abort (-/z):")
+    answ <- readline("Connect spectrometer to USB port. <enter> = try again, z = abort (-/z):")
     if (answ[1] %in% c("z", "Z")) {
       break()
     }

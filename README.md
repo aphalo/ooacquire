@@ -1,18 +1,20 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# R package ‘ooacquire’ for *Ocean Optics* spectrometers
+# ooacquire <img src="man/figures/logo.png" align="right" width="120" />
 
-## Abstract
+## Purpose
 
 Package **‘ooacquire’** makes it possible to control, modify settings
 and acquire spectral data directly from within R. It also supports the
 conversion of raw-counts data into physical quantities. It supports most
-types of spectrometers available from *Ocean Optics*
-(<https://oceanoptics.com/>). The free runtime of the *OmniDriver SDP*
+types of spectrometers available from former *Ocean Optics*, now *Ocean
+Insight* (<https://www.oceaninsight.com/>). The free runtime of the
+[*OmniDriver
+SDP*](https://www.oceaninsight.com/products/software/drivers/omnidriver-and-spam/)
 and *Java* need both to be installed before data acquisition is
 possible. The runtime itself and its documentation can be downloaded at
-<https://oceanoptics.com/product/omnidriver/>.
+<https://www.oceaninsight.com/support/software-downloads/>.
 
 ## Details
 
@@ -83,20 +85,21 @@ Rtools.
 Assuming that R and the build tools are installed the following software
 should be installed in sequence:
 
-1.  Java JDK (Java development kit). The Java run-time is not enough.
-2.  rOmniDriver run-time from Ocean Optics which is a free download. It
-    is the same installer as for the non-free SDP, but if run-time is
+1.  **Java JDK** (Java development kit). The Java run-time is not
+    enough.
+2.  **rOmniDriver run-time** from Ocean Optics which is a free download.
+    It is the same installer as for the non-free SDP, but if run-time is
     selected during installation no key/password are asked for.
-3.  Install the R packages ‘photobiology’ and ‘ggspectra’ plus the
+3.  Install the **R packages** ‘photobiology’ and ‘ggspectra’ plus the
     ‘tidyverse’, all available from CRAN.
 4.  Install ‘rOmniDriver’ and ‘ooacquire’ from Bitbucket.
 
-Installation of the current version from Bitbucket:
+Installation of the current version from GitHub:
 
 ``` r
 # install.packages("devtools")
-devtools::install_bitbucket("aphalo/rOmniDriver")
-devtools::install_bitbucket("aphalo/ooacquire")
+devtools::install_github("aphalo/rOmniDriver")
+devtools::install_github("aphalo/ooacquire")
 ```
 
 The package includes calibration data for the spectrometers used in
@@ -178,7 +181,7 @@ citation("ooacquire")
 #> 
 #> To cite package 'ooacquire' in publications use:
 #> 
-#>   Pedro J. Aphalo and Lasse Ylianttila (2020). ooacquire: Acquire Data
+#>   Pedro J. Aphalo and Lasse Ylianttila (2021). ooacquire: Acquire Data
 #>   from OO Spectrometers. https://docs.r4photobiology.info/ooacquire/,
 #>   https://bitbucket.org/aphalo/ooacquire.
 #> 
@@ -187,7 +190,7 @@ citation("ooacquire")
 #>   @Manual{,
 #>     title = {ooacquire: Acquire Data from OO Spectrometers},
 #>     author = {Pedro J. Aphalo and Lasse Ylianttila},
-#>     year = {2020},
+#>     year = {2021},
 #>     note = {https://docs.r4photobiology.info/ooacquire/,
 #> https://bitbucket.org/aphalo/ooacquire},
 #>   }
@@ -195,7 +198,7 @@ citation("ooacquire")
 
 ## License
 
-© 2016-2020 Pedro J. Aphalo (<pedro.aphalo@helsinki.fi>) for the code.
+© 2016-2021 Pedro J. Aphalo (<pedro.aphalo@helsinki.fi>) for the code.
 Lasse Ylianttila developed the majority of the algorithms used. Released
 under the GPL, version 2 or greater. This software carries no warranty
 of any kind.

@@ -13,12 +13,12 @@ knitr::opts_chunk$set(
 )
 ```
 
-# R package 'ooacquire' for _Ocean Optics_ spectrometers
+# ooacquire <img src="man/figures/logo.png" align="right" width="120" />
 
-## Abstract
+## Purpose
 
-Package **'ooacquire'** makes it possible to control, modify settings and acquire spectral data directly from within R. It also supports the conversion of raw-counts data into physical quantities. It supports most types of spectrometers available from _Ocean Optics_ (https://oceanoptics.com/).
-The free runtime of the _OmniDriver SDP_ and _Java_ need both to be installed before data acquisition is possible. The runtime itself and its documentation can be downloaded at https://oceanoptics.com/product/omnidriver/.
+Package **'ooacquire'** makes it possible to control, modify settings and acquire spectral data directly from within R. It also supports the conversion of raw-counts data into physical quantities. It supports most types of spectrometers available from former _Ocean Optics_, now _Ocean Insight_ (<https://www.oceaninsight.com/>).
+The free runtime of the [_OmniDriver SDP_](https://www.oceaninsight.com/products/software/drivers/omnidriver-and-spam/) and _Java_ need both to be installed before data acquisition is possible. The runtime itself and its documentation can be downloaded at <https://www.oceaninsight.com/support/software-downloads/>.
 
 ## Details
 
@@ -46,19 +46,19 @@ In MS-Windows this is achieved by installing Rtools.
 Assuming that R and the build tools are installed the following software should
 be installed in sequence:
 
-  1. Java JDK (Java development kit). The Java run-time is not enough.
-  2. rOmniDriver run-time from Ocean Optics which is a free download. It is the
+  1. **Java JDK** (Java development kit). The Java run-time is not enough.
+  2. **rOmniDriver run-time** from Ocean Optics which is a free download. It is the
   same installer as for the non-free SDP, but if run-time is selected
   during installation no key/password are asked for.
-  3. Install the R packages 'photobiology' and 'ggspectra' plus the 'tidyverse',
+  3. Install the **R packages** 'photobiology' and 'ggspectra' plus the 'tidyverse',
   all available from CRAN.
   4. Install 'rOmniDriver' and 'ooacquire' from Bitbucket.
   
-Installation of the current version from Bitbucket:
+Installation of the current version from GitHub:
 ```{r bb-installation, eval=FALSE}
 # install.packages("devtools")
-devtools::install_bitbucket("aphalo/rOmniDriver")
-devtools::install_bitbucket("aphalo/ooacquire")
+devtools::install_github("aphalo/rOmniDriver")
+devtools::install_github("aphalo/ooacquire")
 ```
 
 The package includes calibration data for the spectrometers used in testing the
@@ -121,4 +121,4 @@ citation("ooacquire")
 
 ## License
 
-© 2016-2020 Pedro J. Aphalo (pedro.aphalo@helsinki.fi) for the code. Lasse Ylianttila developed the majority of the algorithms used. Released under the GPL, version 2 or greater. This software carries no warranty of any kind.
+© 2016-2021 Pedro J. Aphalo (pedro.aphalo@helsinki.fi) for the code. Lasse Ylianttila developed the majority of the algorithms used. Released under the GPL, version 2 or greater. This software carries no warranty of any kind.

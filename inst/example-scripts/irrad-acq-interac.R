@@ -1,10 +1,7 @@
-# Using an spectrometer with a single channel
+# Using a spectrometer with a single channel
 # Tested with a Maya 2000 Pro spectrometer
 
 library(ooacquire)
-
-# print warnings when they are triggered
-options(warn = 1)
 
 # use default settings chosing instrument automatically
 acq_irrad_interactive()
@@ -33,7 +30,7 @@ acq_irrad_interactive()
 # acq_irrad_interactive(HDR.mult = 1, tot.time.range = 20)
 #
 # # no bracketing
-# # adjust number of scans so that total time remins between 0.1 and 10 seconds
+# # adjust number of scans so that total time remains between 0.1 and 10 seconds
 # acq_irrad_interactive(HDR.mult = 1, tot.time.range = c(0.1, 10))
 #
 # # bracketing, long integration 10 times longer than short one
@@ -48,7 +45,7 @@ acq_irrad_interactive()
 #
 # # bracketing, long integration 10 tines longer than short one
 # # (unless it goes over what the spectrometer accepts)
-# # adjust number of scans so that total time remins between 0.1 and 10 seconds
+# # adjust number of scans so that total time remains between 0.1 and 10 seconds
 # # total time for short and long integrations may be different
 # acq_irrad_interactive(HDR.mult = c(1, 10), tot.time.range = c(0.1, 10))
 #

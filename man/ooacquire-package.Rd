@@ -6,6 +6,8 @@
 \alias{ooacquire-package}
 \title{ooacquire: Acquire Data from OO Spectrometers}
 \description{
+\if{html}{\figure{logo.png}{options: align='right' alt='logo' width='120'}}
+
 Functions to acquire data directly from Ocean Optics spectrometers,
     and functions to read similar data files. Functions to convert raw-counts
     into counts-per-second and physical quantities. Data are saved in objects
@@ -38,8 +40,8 @@ This package is provided \strong{without any warranty of suitability
 Useful links:
 \itemize{
   \item \url{https://docs.r4photobiology.info/ooacquire/}
-  \item \url{https://bitbucket.org/aphalo/ooacquire}
-  \item Report bugs at \url{https://bitbucket.org/aphalo/ooacquire/issues}
+  \item \url{https://github.com/aphalo/ooacquire}
+  \item Report bugs at \url{https://github.com/aphalo/ooacquire/issues}
 }
 
 }

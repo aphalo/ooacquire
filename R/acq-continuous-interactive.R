@@ -1,18 +1,18 @@
 #' Acquire spectra interactively
 #'
 #' Functions providing a simple interactive front-end to the functions in the
-#' package, also working as example code that can be modified for diferent
+#' package, also working as example code that can be modified for different
 #' uses.
 #'
 #' @details These functions can be useful for commonly done measurements but
 #'   they also play the role of examples that users can modify according to
 #'   their needs. They are all composed in a modular way from functions that can
 #'   be reshuffled and combined with other functions to define new variations
-#'   better suited to users' needs and tastes. Functions \code{acq_irrad_interactive()}
-#'   and \code{acq_fraction_interactive} provide support the
-#'   measurement of spectral irradiance of continuous light sources, and
-#'   transmittance, reflectance and absorbance using continuous light sources,
-#'   respectively.
+#'   better suited to users' needs and tastes. Functions
+#'   \code{acq_irrad_interactive()} and \code{acq_fraction_interactive} provide
+#'   support the measurement of spectral irradiance of continuous light sources,
+#'   and transmittance, reflectance and absorbance using continuous light
+#'   sources, respectively.
 #'
 #'   The default behaviour of the functions can be changed by passing different
 #'   arguments through parameters, but for special use cases it could be best
@@ -24,7 +24,8 @@
 #'   when relevant, is done from within these functions.
 #'
 #' @seealso This function calls functions \code{\link{tune_interactive}},
-#' \code{\link{protocol_interactive}}  and \code{\link{set_attributes_interactive}}.
+#'   \code{\link{protocol_interactive}} and
+#'   \code{\link{set_attributes_interactive}}.
 #'
 #' @family interactive acquisition functions
 #'
@@ -40,9 +41,11 @@
 #'   calibration data.
 #' @param stray.light.method character Used only when the correction method is
 #'   created on-the-fly.
-#' @param qty.out character One of "Tfr" (spectral transmittance as a fraction of one),
-#'   "irrad" (spectral irardiance), "cps" (counts per second), or "raw" (raw sensor counts).
-#' @param save.pdfs logical Whether to save PDFs to files or not.
+#' @param qty.out character One of "Tfr" (spectral transmittance as a fraction
+#'   of one), "irrad" (spectral irardiance), "cps" (counts per second), or "raw"
+#'   (raw sensor counts).
+#' @param save.pdfs,save.summaries logical Whether to save plots to PDFs files
+#'   or not, and collection summaries to csv files or not.
 #' @param interface.mode character One of "auto", "simple", "manual",
 #'   "series", "auto-attr", "simple-attr", "manual-attr", and
 #'   "series-attr".
@@ -61,21 +64,24 @@
 #'   \code{set_w.band_default()}, and irradiance quantities set with
 #'   \code{photon_as_default()}, and \code{energy_as_default()}.
 #'
-#' @details The different interface modes are suitable for different types of
-#'   measurements.
+#' @note The different interface modes are suitable for different types of
+#'   measurements. The field separator in the written CSV file is according to
+#'   the current locale. If needed use \code{readr::set_locale()} to change it
+#'   before calling this function.
 #'
 #' @return These functions return the acquired spectra through "side effects"
 #' as each spectrum is saved, both as raw counts data and calibrated
 #' spectral data in an \code{.rda} file as objects of the classes defined in
 #' package 'photobiology'. Optionally, the plot for each spectrum is saved as
-#' a \code{.pdf} file. The value returned by the function is that from
+#' a \code{.pdf} file, and summaries for each collection created, are save to
+#' CSV file. The value returned by the function is that from
 #' closing the connection to the spectrometer.
 #'
 #' @examples
 #'
 #' \dontrun{
-#' # requires an Ocean Optics spectrometer to be connected via USB
-#' acquire_interactive()
+#' # requires an Ocean Insight (former Ocean Optics) spectrometer to be
+#' # connected via USB acquire_interactive()
 #' }
 #'
 acq_irrad_interactive <-
@@ -88,7 +94,11 @@ acq_irrad_interactive <-
            stray.light.method = "none",
            qty.out = "irrad",
            save.pdfs = TRUE,
+           save.summaries = TRUE,
            interface.mode = "auto") {
+
+    old.value <- options(warn = 1)
+    on.exit(options(old.value), add = TRUE, after = TRUE)
 
     # validate interface mode
     interface.mode <- tolower(interface.mode)
@@ -110,6 +120,7 @@ acq_irrad_interactive <-
       )
     }
 
+    # connect to spectrometer
     w <- start_session()
     on.exit(end_session(w))
 
@@ -142,7 +153,6 @@ acq_irrad_interactive <-
                  warning("No instrument descriptor found, retrieving from the spectrometer")
                  get_oo_descriptor(w, sr.index = sr.index, ch.index = ch.index)
                }
-
         )
 
       correction.method <-
@@ -212,7 +222,7 @@ acq_irrad_interactive <-
     folder.name <- set_folder_interactive()
 
     oldwd <- setwd(folder.name)
-    on.exit(setwd(oldwd))
+    on.exit(setwd(oldwd), add = TRUE)
     on.exit(message("Folder reset to: ", getwd(), "\nBye!"), add = TRUE)
     message("Files will be saved to '", folder.name, "'", sep="")
 
@@ -220,8 +230,7 @@ acq_irrad_interactive <-
 
     start.int.time <- 0.01 # seconds
 
-    # data set measured with same protocol values but adjusted integration time
-
+    # initial protocol
     settings <- acq_settings(descriptor = descriptor,
                              integ.time = start.int.time,
                              target.margin = target.margin,
@@ -231,7 +240,7 @@ acq_irrad_interactive <-
     seq.settings <- list(step = 0,
                          num.steps = 1L)
 
-    # initialize list to collect all names from session
+    # initialize lists to collect names from current session
     irrad.names <- character()
     raw.names <- character()
     file.names <- character()
@@ -241,29 +250,14 @@ acq_irrad_interactive <-
         user.obj.name <- readline("Give a name to the spectrum: ")
         obj.name <- make.names(user.obj.name)
         if (obj.name != user.obj.name) {
-          answ <- readline(paste("Use sanitised name:", obj.name, " (-/n) :"))
+          answ <- readline(paste("Use sanitised name:", obj.name, " (y-/n) :"))
           if (answ == "n") {
             obj.name <- ""
           }
         }
         if (length(obj.name) > 0 && obj.name != "" &&
             !exists(obj.name)) break()
-        print("A valid and unique name is required, please try again...")
-      }
-
-      raw.name <- paste(obj.name, "raw_mspct", sep = ".")
-      raw.names <- c(raw.names, raw.name)
-
-      if (qty.out != "raw") {
-        irrad.name <- paste(obj.name, "spct", sep = ".")
-        irrad.names <- c(irrad.names, irrad.name)
-      }
-
-      file.name <- paste(obj.name, "spct.Rda", sep = ".")
-      file.names <- c(file.names, file.name)
-
-      if (qty.out != "raw") {
-        pdf.name <- paste(obj.name, "spct.pdf", sep = ".")
+        print("A valid and unique name is required. Please try again...")
       }
 
       if (grepl("-attr", interface.mode)) {
@@ -288,6 +282,11 @@ acq_irrad_interactive <-
       if (length(raw.mspct) == 0) {
         next()
       }
+      # we make and keep names only if an spectrum was acquired
+      raw.name <- paste(obj.name, "raw_mspct", sep = ".")
+      raw.names <- c(raw.names, raw.name)
+      file.name <- paste(obj.name, "spct.Rda", sep = ".")
+      file.names <- c(file.names, file.name)
 
       if (qty.out != "raw") {
         irrad.spct <- s_irrad_corrected(x = raw.mspct,
@@ -304,6 +303,9 @@ acq_irrad_interactive <-
           comment(irrad.spct) <- paste(comment(irrad.spct), user.attrs$comment.text, sep = "\n")
         }
 
+        irrad.name <- paste(obj.name, "spct", sep = ".")
+        irrad.names <- c(irrad.names, irrad.name)
+
         assign(raw.name, raw.mspct)
         assign(irrad.name, irrad.spct)
 
@@ -314,34 +316,61 @@ acq_irrad_interactive <-
             ggplot2::labs(title = obj.name,
                           subtitle = paste(photobiology::getWhenMeasured(irrad.spct), " UTC, ",
                                            session.label, sep = ""),
-                          caption = paste("ooacquire", utils::packageVersion("ooacquire"))) +
+                          caption = paste("ooacquire",
+                                          utils::packageVersion("ooacquire"))) +
             ggplot2::theme_bw()
           print(fig)
-          plot.prompt <- ifelse(qty.out == "cps",
-                                "Plot: wavebands/discard/save and continue (w/d/-): ",
-                                "Plot: photons/energy/wavebands/discard/save and continue (p/e/w/d/-): ")
-          # TODO: accept only valid answers!!
-          ####
-          answer <- readline(plot.prompt)
+
+          if(qty.out == "cps") {
+            plot.prompt <- "Plot: wavebands/discard/SAVE+NEXT (w/d/s-): "
+            valid.answers <-  c("w", "d", "s")
+          } else {
+            plot.prompt <- "Plot: photons/energy/wavebands/discard/SAVE+NEXT (p/e/w/d/s-): "
+            valid.answers <- c("p", "e", "w", "d", "s")
+          }
+          repeat {
+            answer <- readline(plot.prompt)[1]
+            answer <- ifelse(answer == "", "s", answer)
+            if (answer %in% valid.answers) {
+              break()
+            } else {
+              print("Answer not recognized, please try again...")
+            }
+          }
           switch(answer,
                  p = {options(photobiology.radiation.unit = "photon"); next()},
                  e = {options(photobiology.radiation.unit = "energy"); next()},
-                 w = {answer1 <- readline("Waveband set to use, UV+PAR, plants, visible, total, default (u/p/v/t/-): ")
+                 w = {
+                   repeat {
+                     answer1 <-
+                       tolower(
+                         readline("Wavebands: UV+PAR/plants/visible/total/DEFAULT (u/p/v/t/d-): ")
+                       )[1]
+                     answer1 <- ifelse(answer1 == "", "d", answer1)
+                     if (answer1 %in% c("u", "p", "v", "t", "d")) {
+                       break()
+                     } else {
+                       print("Answer not recognized. Please try again...")
+                     }
+                   }
                  switch(answer1,
                         u = options(photobiology.plot.bands =
-                                      list(photobiologyWavebands::UVC(),
-                                           photobiologyWavebands::UVB(),
-                                           photobiologyWavebands::UVA(),
-                                           photobiologyWavebands::PAR())),
-                        p = options(photobiology.plot.bands = photobiologyWavebands::Plant_bands()),
-                        v = options(photobiology.plot.bands = photobiologyWavebands::VIS_bands()),
+                                      c(photobiologyWavebands::UV_bands(),
+                                        list(photobiologyWavebands::PAR()))),
+                        p = options(photobiology.plot.bands =
+                                      photobiologyWavebands::Plant_bands()),
+                        v = options(photobiology.plot.bands =
+                                      photobiologyWavebands::VIS_bands()),
                         t = options(photobiology.plot.bands =
-                                      list(new_waveband(min(irrad.spct), max(irrad.spct), wb.name = "Total"))),
+                                      list(new_waveband(wl_min(irrad.spct),
+                                                        wl_max(irrad.spct),
+                                                        wb.name = "Total"))),
                         options(photobiology.plot.bands = NULL))
                  next()},
                  d = break()
           )
           if (save.pdfs) {
+            pdf.name <- paste(obj.name, "spct.pdf", sep = ".")
             grDevices::pdf(file = pdf.name, width = 8, height = 6)
             print(fig)
             grDevices::dev.off()
@@ -354,8 +383,20 @@ acq_irrad_interactive <-
         save(list = c(raw.name), file = file.name)
       }
 
-      user.input <- readline("Next, c = make and save collection (-/c): ")
-      if (user.input[1] == "c") {
+      repeat {
+        answer2 <- readline("change protocol/collect+continue/collect+quit/abort/NEXT (p/c/q/a/n-): ")[1]
+        answer2 <- ifelse(answer2 == "", "n", answer2)
+        if (answer2 %in% c("n", "p", "c", "q", "a", "z")) {
+          break()
+        } else {
+          print("Answer not recognized. Please try again...")
+        }
+      }
+      if (answer2 == "") {
+        next()
+      } else if (answer2 == "p") {
+        protocol <- protocol_interactive(protocols)
+      } else if (answer2 %in% c("c", "q")) {
         message("Source spectra to collect: ",
                 paste(irrad.names, collapse = ", "))
         message("Raw objects to collect: ",
@@ -368,11 +409,9 @@ acq_irrad_interactive <-
         if (collection.name != user.collection.name) {
           message("Using sanitised/generated name: '", collection.name, "'.", sep = "")
         }
-        collection.title <- readline("Title for figure and plot?:")
-        irrad.collection.name <- paste(collection.name, "irrad", "mspct", sep = ".")
+        collection.title <- readline("Title for plot?:")
         raw.collection.name <- paste(collection.name, "raw", "lst", sep = ".")
         collection.file.name <- paste(collection.name, "Rda", sep = ".")
-        collection.pdf.name <- paste(collection.name, "pdf", sep = ".")
 
         if (qty.out != "raw") {
           collection.mspct <- switch(qty.out,
@@ -381,14 +420,19 @@ acq_irrad_interactive <-
 
           # plot collection and summaries
           collection.fig <- ggplot2::autoplot(collection.mspct) +
-            ggplot2::ggtitle(collection.title)
+            ggplot2::labs(title = collection.title,
+                          subtitle = session.label,
+                          caption = paste("ooacquire",
+                                          utils::packageVersion("ooacquire"))) +
+            ggplot2::theme(legend.position = "bottom")
           print(collection.fig)
 
-          if (qty.out == "irrad") {
+          if (save.summaries && qty.out == "irrad") {
             irrad.tb <-
               photobiology::q_irrad(collection.mspct,
-                                w.band = c(photobiologyWavebands::UV_bands(),
-                                           list(photobiologyWavebands::PAR())))
+                                    scale.factor = 1e6,
+                                    w.band = c(photobiologyWavebands::UV_bands(),
+                                               list(photobiologyWavebands::PAR())))
             uv_ratios.tb <-
               photobiology::q_ratio(collection.mspct,
                                     w.band.num = photobiologyWavebands::UV_bands(),
@@ -402,33 +446,31 @@ acq_irrad_interactive <-
                                     attr2tb = c("when.measured"))
             summary.tb <- dplyr::full_join(irrad.tb, uv_ratios.tb)
             summary.tb <- dplyr::full_join(summary.tb, vis_ratios.tb)
+
+            collection.csv.name <- paste(collection.name, "csv", sep = ".")
             selector <- unname(sapply(summary.tb, is.numeric))
-            summary.tb[ , selector] <-
-              signif(summary.tb[ , selector], digits = 3L)
+            readr::write_delim(signif(summary.tb[ , selector], digits = 3L),
+                               file = collection.csv.name,
+                               delim = readr::locale()$grouping_mark)
           }
 
           if (save.pdfs) {
+            collection.pdf.name <- paste(collection.name, "pdf", sep = ".")
             grDevices::pdf(file = collection.pdf.name, onefile = TRUE,
                            width = 11, height = 7, paper = "a4r")
             print(collection.fig)
             grDevices::dev.off()
-
-            if (qty.out == "irrad") {
-              grDevices::pdf(file = paste("table-", collection.pdf.name, sep = ""), onefile = TRUE,
-                           width = 11, height = 8, paper = "a4r")
-              print(gridExtra::grid.table(summary.tb))
-              grDevices::dev.off()
-            }
           }
 
+          irrad.collection.name <- paste(collection.name, "irrad", "mspct", sep = ".")
           assign(irrad.collection.name, collection.mspct)
           assign(raw.collection.name, mget(raw.names))
           save(list = c(irrad.collection.name, raw.collection.name),
                file = collection.file.name)
 
-          rm(collection.fig,
-                      collection.title, collection.pdf.name)
-          if (qty.out == "irrad") {
+          # Clean up
+          rm(collection.fig, collection.title, collection.pdf.name)
+          if (save.summaries && qty.out == "irrad") {
             rm(irrad.tb, uv_ratios.tb, vis_ratios.tb, summary.tb)
           }
         } else {
@@ -436,6 +478,8 @@ acq_irrad_interactive <-
 
           save(list = raw.collection.name, file = collection.file.name)
         }
+        message("collection saved to file '",
+                collection.file.name, "'.", sep = "")
 
         file.names <- c(file.names, collection.file.name)
 
@@ -445,21 +489,24 @@ acq_irrad_interactive <-
         rm(list = c(raw.names))
         irrad.names <- character()
         raw.names <- character()
-      }
 
-      user.input <- readline("Next, p = change protocol, q = quit (-/p/q): ")
-      if (user.input[1] == "") {
-        next()
-      } else if (user.input[1] == "p") {
-        protocol <- protocol_interactive(protocols)
-      } else if (user.input[1] == "q") {
-        if (length(irrad.names) > 0L) {
-          user.input <- readline("Quit without creating collection, z = don't quit, q = quit (-/s/q): ")
-        }
-        if (user.input[1] == "q") {
+        if (answer2 %in% c("q", "a")) {
           break()
+        } else {
+          repeat {
+            answer3 <- readline("change protocol/NEXT (p/n-): ")[1]
+            answer3 <- ifelse(answer3 == "", "n", answer3)
+            if (answer3 %in% c("n", "p")) {
+              break()
+            } else {
+              print("Answer not recognized, please try again...")
+            }
+          }
+          if (answer3 == "p") {
+            protocol <- protocol_interactive(protocols)
+          }
         }
-      }
+       }
     }
     save(file.names,
          file = paste("files4session-",
@@ -469,7 +516,7 @@ acq_irrad_interactive <-
     message("Data files created during session:\n",
             paste(file.names, collapse = ",\n"), ".", sep = "")
 
-    print("Ending...")
+    message("Ending...")
     end_session(w)
   }
 
@@ -507,6 +554,11 @@ acq_fraction_interactive <-
            stray.light.method = "simple",
            save.pdfs = TRUE) {
 
+    old.value <- options(warn = 1)
+    on.exit(options(old.value), add = TRUE, after = TRUE)
+
+    dyn.range <- 1e3
+
     stopifnot(qty.out %in% c("Tfr", "Rfr", "raw"))
 
     # define measurement protocols
@@ -520,7 +572,7 @@ acq_fraction_interactive <-
     instruments <- list_srs_interactive(w = w)
     sr.index <- choose_sr_interactive(instruments = instruments)
     if (sr.index < 0L) {
-      print("Aborting...")
+      cat("Aborting...\n")
       end_session(w = w)
       message("Bye!")
     }
@@ -626,12 +678,8 @@ acq_fraction_interactive <-
       repeat{
         obj.name <- make.names(readline("Give a name to the spectrum: "))
         if (length(obj.name) > 0 && !exists(obj.name)) break()
-        print("A valid and unique name is required, please try again...")
+        cat("A valid and unique name is required, please try again...\n")
       }
-      raw.name <- paste(obj.name, "raw_spct", sep = ".")
-      filter.name <- paste(obj.name, "spct", sep = ".")
-      file.name <- paste(filter.name, "Rda", sep = ".")
-      pdf.name <- paste(filter.name, "pdf", sep = ".")
 
       settings <- tune_interactive(descriptor = descriptor, acq.settings = settings)
 
@@ -644,7 +692,10 @@ acq_fraction_interactive <-
         next()
       }
 
+      raw.name <- paste(obj.name, "raw_spct", sep = ".")
       assign(raw.name, raw.mspct)
+
+      file.name <- paste(obj.name, "Rda", sep = ".")
 
       if (qty.out == "raw") {
         fig <- ggplot2::autoplot(raw.mspct[["sample"]], annotations = c("-", "title*")) +
@@ -660,7 +711,7 @@ acq_fraction_interactive <-
                                             type = type,
                                             correction.method = correction.method,
                                             qty.out = qty.out,
-                                            dyn.range = NULL,
+                                            dyn.range = dyn.range,
                                             ref.value = ref.value)
 
         if (length(user.attrs$what.measured) > 0) {
@@ -673,6 +724,7 @@ acq_fraction_interactive <-
           comment(filter.spct) <- paste(comment(filter.spct), user.attrs$comment.text, sep = "\n")
         }
 
+        filter.name <- paste(obj.name, "spct", sep = ".")
         assign(filter.name, filter.spct)
         save(list = c(raw.name, filter.name), file = file.name)
 
@@ -688,17 +740,19 @@ acq_fraction_interactive <-
           switch(substr(answer, 1, 1),
                  # p = {options(photobiology.radiation.unit = "photon"); next()},
                  # e = {options(photobiology.radiation.unit = "energy"); next()},
-                 w = {answer1 <- readline("Waveband set to use, UV+PAR, plants, visible, total, default (u/p/v/t/-)")
+                 w = {answer1 <- readline("Set plot wavebands to: UV+PAR, plants, visible, total, default (u/p/v/t/-)")
                  switch(substr(answer1, 1, 1),
                         u = options(photobiology.plot.bands =
-                                      list(photobiologyWavebands::UVC(),
-                                           photobiologyWavebands::UVB(),
-                                           photobiologyWavebands::UVA(),
-                                           photobiologyWavebands::PAR())),
-                        p = options(photobiology.plot.bands = photobiologyWavebands::Plant_bands()),
-                        v = options(photobiology.plot.bands = photobiologyWavebands::VIS_bands()),
+                                      c(photobiologyWavebands::UV_bands(),
+                                        list(photobiologyWavebands::PAR()))),
+                        p = options(photobiology.plot.bands =
+                                      photobiologyWavebands::Plant_bands()),
+                        v = options(photobiology.plot.bands =
+                                      photobiologyWavebands::VIS_bands()),
                         t = options(photobiology.plot.bands =
-                                      list(new_waveband(min(filter.spct), max(filter.spct), wb.name = "Total"))),
+                                      list(new_waveband(wl_min(filter.spct),
+                                                        wl_max(filter.spct),
+                                                        wb.name = "Total"))),
                         options(photobiology.plot.bands = NULL))
                  next()},
                  d = break()
@@ -707,6 +761,7 @@ acq_fraction_interactive <-
         }
       }
       if (save.pdfs) {
+        pdf.name <- paste(filter.name, "pdf", sep = ".")
         grDevices::pdf(file = pdf.name, width = 8, height = 6)
         print(fig)
         grDevices::dev.off()
@@ -722,7 +777,7 @@ acq_fraction_interactive <-
         break()
       }
     }
-    print("Ending...")
+    cat("Ending...\n")
 
     # clean up is done using 'on.exit()'
   }
@@ -743,6 +798,9 @@ acq_rfr_tfr_interactive <-
            save.pdfs = TRUE,
            qty.out = "Tfr") {
 
+    old.value <- options(warn = 1)
+    on.exit(options(old.value), add = TRUE, after = TRUE)
+
     # define measurement protocols
     protocols <- list(rsd = c("reference", "sample", "dark"),
                       rs = c("reference", "sample"))
@@ -753,7 +811,7 @@ acq_rfr_tfr_interactive <-
     instruments <- list_srs_interactive(w = w)
     sr.index <- choose_sr_interactive(instruments = instruments)
     if (sr.index < 0L) {
-      print("Aborting...")
+      cat("Aborting...\n")
       end_session(w = w)
       message("Bye!")
     }
@@ -792,7 +850,7 @@ acq_rfr_tfr_interactive <-
                            ", instrument s.n.: ", rfr.descriptor[["spectrometer.sn"]],
                            sep = "")
 
-    folder.name <- readline("Enter folder name (use forward slashes '/' instead of '\'): ")
+    folder.name <- readline("Enter folder name (use '/' instead of '\'): ")
     if (length(folder.name == 0)) {
       folder.name <- "."
     }
@@ -830,7 +888,7 @@ acq_rfr_tfr_interactive <-
       repeat{
         obj.name <- readline("Give a name to the spectrum: ")
         if (length(obj.name) > 0 && !exists(obj.name)) break()
-        print("A valid and unique name is required, please try again...")
+        cat("A valid and unique name is required, please try again...\n")
       }
       rfr.raw.name <- paste(obj.name, "rfr_raw_spct", sep = ".")
       tfr.raw.name <- paste(obj.name, "tfr_raw_spct", sep = ".")
@@ -941,17 +999,19 @@ acq_rfr_tfr_interactive <-
           switch(answer,
                  # p = {options(photobiology.radiation.unit = "photon"); next()},
                  # e = {options(photobiology.radiation.unit = "energy"); next()},
-                 w = {answer1 <- readline("Waveband set to use, UV+PAR, plants, visible, total, default (u/p/v/t/-)")
+                 w = {answer1 <- readline("Set plot wavebands: UV+PAR, plants, visible, total, default (u/p/v/t/-)")
                  switch(answer1,
                         u = options(photobiology.plot.bands =
-                                      list(photobiologyWavebands::UVC(),
-                                           photobiologyWavebands::UVB(),
-                                           photobiologyWavebands::UVA(),
-                                           photobiologyWavebands::PAR())),
-                        p = options(photobiology.plot.bands = photobiologyWavebands::Plant_bands()),
-                        v = options(photobiology.plot.bands = photobiologyWavebands::VIS_bands()),
+                                      c(photobiologyWavebands::UV_bands(),
+                                        list(photobiologyWavebands::PAR()))),
+                        p = options(photobiology.plot.bands =
+                                      photobiologyWavebands::Plant_bands()),
+                        v = options(photobiology.plot.bands =
+                                      photobiologyWavebands::VIS_bands()),
                         t = options(photobiology.plot.bands =
-                                      list(new_waveband(min(object.spct), max(object.spct), wb.name = "Total"))),
+                                      list(new_waveband(wl_min(object.spct),
+                                                        wl_max(object.spct),
+                                                        wb.name = "Total"))),
                         options(photobiology.plot.bands = NULL))
                  next()},
                  d = break()
@@ -966,7 +1026,7 @@ acq_rfr_tfr_interactive <-
         grDevices::dev.off()
       }
 
-      user.input <- readline("Next, change protocol, quit (-/p/q): ")
+      user.input <- readline("NEXT/change protocol/quit (n-/p/q): ")
 
       if (user.input[1] == "") {
         next()
@@ -976,7 +1036,7 @@ acq_rfr_tfr_interactive <-
         break()
       }
     }
-    print("Ending...")
+    cat("Ending...\n")
 
     # clean up is done using 'on.exit()'
   }

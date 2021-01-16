@@ -7,5 +7,3 @@ vignettes/c-algorithm-step-through_files
 src-i386
 src-x64
 garbage
-tests/garbage
-tests/garbagge

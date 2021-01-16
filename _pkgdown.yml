@@ -1,19 +1,13 @@
 destination: ../ooacquire-docs
 url: https://docs.r4photobiology.info/ooacquire/
 
-home:
-  strip_header: true
-  links:
-  - text: Photobiology packages
-    href: https://www.r4photobiology.info/
-  - text: Ocean Insight (formerly Ocean Optics)
-    href: https://oceanoptics.com/
-
 reference:
   - title: Package overview
     contents:
     - '`ooacquire-package`'
-  - title: Interactive data acquisition functions
+
+  - title: Data acquisition from spectrometers
+  - subtitle: Interactive data acquisition
     desc: Functions for direct acquisition of spectral data from array spectrometers.
     contents:
     - acq_irrad_interactive
@@ -21,7 +15,8 @@ reference:
     - acq_fluence_interactive
     - plot_spct_file
     - collect_spct_files
-  - title: Interactive data acquisition utility functions
+
+  - subtitle: Interactive utility functions
     desc: Functions useful for development of user defined interactive functions. Used for the implementation of the functions in the previous section.
     contents:
     - choose_ch_interactive
@@ -33,7 +28,8 @@ reference:
     - set_seq_interactive
     - tune_interactive
     - f.trigger.message
-  - title: Utility functions for data acquisition from spectrometers
+
+  - subtitle: Low level functions
     desc: Low level functions useful for development of both of user defined scripts and interactive functions.
     contents:
     - start_session
@@ -51,7 +47,9 @@ reference:
     - acq_raw_spct
     - acq_raw_mspct
     - check_sn_match
-  - title: Read raw-counts data from text files
+
+  - title: Data import from text files
+  - subtitle: Read data
     desc: Functions for reading raw-counts and metadata from output files from **OceanView**, **SpectraSuite**, Raspberry Pi software and the inbuilt-firmware of the Jaz modular spectrometer.
     contents:
     - read_oo_data
@@ -60,14 +58,16 @@ reference:
     - read_oo_pidata
     - read_oo_caldata
     - read_files2mspct
-  - title: Utility functions for reading data from text files
+  - subtitle: Utility functions
     desc: Utility functions for reading raw-counts and metadata from output files from **OceanView**, **SpectraSuite**, Raspberry Pi software and the inbuilt-firmware of the Jaz modular spectrometer.
     contents:
     - map_oofile_header_rows
     - oofile_data_rows
     - set_oo_ssdata_settings
     - set_oo_ssdata_descriptor
-  - title: High level conversion functions and methods.
+
+  - title: Conversion of raw-counts into physical quantities
+  - subtitle: High level functions and methods.
     desc: Functions related to conversion of raw detector counts into counts-per-second and physical quantities.
     contents:
     - raw2corr_cps
@@ -75,7 +75,7 @@ reference:
     - s_irrad_corrected
     - s_fraction_corrected
     - which_descriptor
-  - title: Low level conversion functions and methods.
+  - subtitle: Low level functions and methods.
     desc: Individual functions implementing different steps in the conversion of raw-counts data.
     contents:
     - merge_raw_mspct
@@ -91,12 +91,14 @@ reference:
     - merge_cps
     - new_correction_method
     - skip_bad_pixs
-  - title: Computation of calibration coefficients
+  - subtitle: Computation of calibration coefficients
     desc: Compute a calibration coefficients.
     contents:
     - compute_irrad_calibration
     - oo_calib2irrad_mult
-  - title: Raw spectral data examples
+
+  - title: Example data
+  - subtitle: Raw-counts data
     desc: Collections of raw-counts spectra stored as R objects of class `raw_mspct` defined in package 'photobiology'.
     contents:
     - blue_filter.raw_mspct
@@ -105,7 +107,7 @@ reference:
     - sun001.raw_mspct
     - halogen.raw_mspct
     - xenon_flash.raw_mspct
-  - title: Calibration data examples
+  - subtitle: Calibration data
     desc: Examples of individual instrument calibrations as used by the functions in this package, serving only as examples. Not all listed methods are currently implemented.
     contents:
     - MAYP11278_calib_dates.df
@@ -166,3 +168,48 @@ reference:
     - FLMS04133_simple.mthd
     - FLMS04133_sun.mthd
     - FLMS04133_ylianttila.mthd
+
+navbar:
+  structure:
+    left:
+    - home
+    - intro
+    - reference
+    - articles
+    - tutorials
+    - news
+    right: github
+  components:
+    home:
+      icon: fas fa-home fa-lg
+      href: index.html
+    reference:
+      text: Reference
+      href: reference/index.html
+    news:
+      text: Changelog
+      href: news/index.html
+    articles:
+      text: User Guide
+      menu:
+      - text: 'The R for Photobiology Suite'
+        href: articles/r4p-introduction.html
+      - text: 'Introduction'
+        href: articles/userguide-introduction.html
+      - text: 'Acquisition of Spectra'
+        href: articles/userguide-acquisition.html
+      - text: 'Import and conversion'
+        href: articles/userguide-import.html
+      - text: 'Ocean Optics calibrations'
+        href: articles/userguide-calibrations.html
+      - text: 'Algorithms'
+        href: articles/userguide-algorithms.html
+    tutorials:
+      text: Resources
+      menu:
+      - text: R for Photobiology packages
+        href: https://www.r4photobiology.info/
+      - text: A handbook of methods
+        href: https://doi.org/10.31885/9789521083631
+      - text: Ocean Insight (ex. Ocean Optics)
+        href: https://www.oceaninsight.com/

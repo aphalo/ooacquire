@@ -107,6 +107,7 @@ By plotting the spectral irradiance data, either in whole or a range of waveleng
 ```{r, fig.width=8, fig.asp=0.5}
 autoplot(sun001_recalc.spct)
 ```
+
 Using a different correction method, that assumes that the measurements are of sunlight at ground level and consequently spectral irradiance for wavelengths shorter than xxx nm should be indistinguishable from zero.
 
 ```{r, fig.width=8, fig.asp=0.5}
@@ -126,6 +127,7 @@ By plotting the spectral irradiance data, either in whole or a range of waveleng
 ```{r, fig.width=8, fig.asp=0.5}
 autoplot(sun001_recalc.spct)
 ```
+
 We can also use the same function to obtain counts per second.
 
 ```{r, fig.width=8, fig.asp=0.5}
@@ -148,6 +150,7 @@ By plotting the raw counts expressed as counts per second we can see that the sh
 ```{r, fig.width=8, fig.asp=0.5}
 autoplot(sun001_recalc.cps_spct)
 ```
+
 We can in a separate step convert the counts per second data to irradadiance by applying the calibration.
 
 ```{r, eval = FALSE}
@@ -179,68 +182,73 @@ Plotting the two bracketed spectra shows the effect of using the optimal integra
 ```{r, fig.width=8, fig.asp=0.5}
 autoplot(sun001.raw_mspct[["light"]])
 ```
+
 In the figure above, we can see that in addition to clipping, increasing the integration time, at least in some spectrometers significantly increases the "noise floor" or dark readings. This is also true for the measurements done in darkness. In these spectra, we can also easily see several spikes caused by "hot pixels" in the detector (over-responding pixels). In the figure below we can see the effect of the filter.
 
 ```{r, fig.width=8, fig.asp=0.5}
 autoplot(sun001.raw_mspct[["filter"]])
 ```
+
 In this third figure, we have a look at the spectrum measured in drakness. This spectrometer in particular has the peculiarity that the effect of warming on dark noise depends on wavelength.
 
 ```{r, fig.width=8, fig.asp=0.5}
 autoplot(sun001.raw_mspct[["dark"]])
 ```
+
 The **first step** in the processing is substituting data from bad pixels by values interpolated from the adjacent fixels. Which pixels are bad is recorded in the calibration data. What this step achieves can be clearly seen by comparing the plots before (see above) and after this step (see below). As in most array spectrometers pixel resolution is better than optical resolution this introduces little error, except possibly in the case of very narrow peaks.
 
-```{r, fig.width=8, fig.asp=0.5}
+```{r, fig.width=8, fig.asp=1.5}
 for (m in names(sun001.raw_mspct)) {
   sun001.raw_mspct[[m]] <-
     skip_bad_pixs(sun001.raw_mspct[[m]])
-  print(autoplot(sun001.raw_mspct[[m]]) + ggtitle(m))
 }
+autoplot(sun001.raw_mspct, facets = 1)
 ```
+
 **Note:** When bad-pixel information is not available, automatic despiking can be used instead, but it needs care not to accidentaly remove true peaks from the data.
 
 The **second step** is to replace saturated (clipped) pixel data, with the missing data marker `NA`. As `NA` values are not plotted pixels exactly equal to the maximum possible reading disappear from the plot.
 
-```{r, fig.width=8, fig.asp=0.5}
+```{r, fig.width=8, fig.asp=1.5}
 for (m in names(sun001.raw_mspct)) {
   sun001.raw_mspct[[m]] <-
     trim_counts(sun001.raw_mspct[[m]])
-  print(autoplot(sun001.raw_mspct[[m]]) + ggtitle(m))
 }
+autoplot(sun001.raw_mspct, facets = 1)
 ```
 
 An important consideration is that when a pixel _well_ fills with electrical charge some of the excessive charge migrates to nearby pixels. How many nearby pixels are affected depends on the detector type, but it is at most a few tens of pixels. So in this **third step**, pixels neighbouring those set to `NA` in the second step are also set to `NA`. By default we replace the 10 nearest non-saturated pixels also by `NA`. 
 
-```{r, fig.width=8, fig.asp=0.5}
+```{r, fig.width=8, fig.asp=1.5}
 for (m in names(sun001.raw_mspct)) {
   sun001.raw_mspct[[m]] <-
     bleed_nas(sun001.raw_mspct[[m]])
-  print(autoplot(sun001.raw_mspct[[m]]) + ggtitle(m))
 }
+autoplot(sun001.raw_mspct, facets = 1)
 ```
 
 The response of array detectors is not perfectly linear _vs._ to the number of photons received. Most precisely when the number of counts gets near the maximum value, the sensitivity to additional photons slightly decreases. This is a result of how "full" the sensor wells are, irrespective of the source of the charge. Consequently this correction should be applied before subtraction of the dark reading.
 
 The **fourth step** is to apply a linearisation function, in most cases supplied with the instrument and possibly stored in the instrument firmware. This function is part of the calibration data for the instrument that is stored as part of the metadata during acquisition of the spectra. Given that linearization corrects for a decrease in sensitivity at counts approaching the maximum, some values can exceed the maximum (64000 in this case).
 
-```{r, fig.width=8, fig.asp=0.5}
+```{r, fig.width=8, fig.asp=1.5}
 for (m in names(sun001.raw_mspct)) {
   sun001.raw_mspct[[m]] <-
     linearize_counts(sun001.raw_mspct[[m]])
-  print(autoplot(sun001.raw_mspct[[m]], ylim = c(NA, 65000)) + ggtitle(m))
 }
+autoplot(sun001.raw_mspct, facets = 1)
 ```
 
 The first few pixels in the detector of most array spectrometers are covered and never exposed to light photons. These can be used as a dark reference to correct for thermal noise. This step may appear redundant, but _might_ help in cases when instrument temperature is not the same during the _light_ and _dark_ measurements. An alternative is to use pixels known not to be exposed to radiation from the light source, but within the useful measurement range of the instrument. Sunlight at ground level is known to lack UV-C photons, so wavelengths between 250 nm and 290 nm can used as dark reference for this light source. Consequently, as the **fifth step** we remove an estimate of dark signal based on these "non-excited pixels". As seen in the plots, this step effectively removes the overall dark signal from both _light_ and _dark_ measurements. We can, however, also see that there is residual dark noise remaining at pixel level, not all pixels have the same noise floor. Part of this variation is systematic, and some may be random. As we used a total measurement time of 120 s much of the random noise must have canceled out through averaging.
 
-```{r, fig.width=8, fig.asp=0.5}
+```{r, fig.width=8, fig.asp=1.5}
 for (m in names(sun001.raw_mspct)) {
   sun001.raw_mspct[[m]] <-
     fshift(sun001.raw_mspct[[m]], range = c(218.5,228.5))
-  print(autoplot(sun001.raw_mspct[[m]], ylim = c(NA, 65000)) + ggtitle(m))
 }
+autoplot(sun001.raw_mspct, facets = 1)
 ```
+
 In the last plot above we can see that the correction has resulted in slightly negative values in darkness. If the bump in the noise floor, caused by warming, is consistent among all three measurements, it should cancell out. 
 
 At this point we have "clean" RAW counts data. The **sixth step** is to convert these raw counts into counts per second. As the integration time for each spectrum is stored together with the RAW count data, the function call is simple. After this step, the data acquired using different integration times are expressed in the same units. We take advantage of this to plot using different colours the data from the two different "bracketed" integration times. Blue corresponds to the shortest and optimal integration time, and red to the longer one. Here we over-plot the two separate spectra.
@@ -287,7 +295,7 @@ autoplot(sun001.cps_mspct) + ggtitle("Dark subtracted")
 At this point we have a clean counts-per-second spectrum. The **ninth step** is to apply the calibration multipliers and any additional instrument specific correction to obtain spectral irradiance in a `"source_spct"` object.
 
 ```{r, fig.width=8, fig.asp=0.5, eval = FALSE}
-sun001.irrad_spct <- cps2irrad(sun001.cps_spct)
+sun001.irrad_spct <- cps2irrad(sun001.cps_mspct)
 autoplot(sun001.irrad_spct)
 ```
 
@@ -297,6 +305,7 @@ In an optional, final **tenth step** we apply smoothing to remove some of the no
 sun001.irrad_spct <- smooth_spct(sun001.irrad_spct)
 autoplot(sun001.irrad_spct)
 ```
+
 With an LED source, at least in the case of our Maya 2000 Pro, we do not need to worry about stray light. However, when we measure light sources with a significant emission in the infra-red above 1000 nm, stray light becomes a problem. In addition sources with narrow peaks of emission may benefit from deconvolution of a measured slit function.
 
 ### Tungsten halogen lamp
@@ -423,6 +432,7 @@ halogen_sm0.source_spct <- smooth_spct(halogen.source_spct)
 autoplot(halogen_sm0.source_spct)
 autoplot(halogen_sm0.source_spct, range = c(250, 410))
 ```
+
 How much difference did smoothing do?
 
 ```{r}
