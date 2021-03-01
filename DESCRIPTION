@@ -1,8 +1,8 @@
 Package: ooacquire
 Type: Package
 Title: Acquire Data from OO Spectrometers
-Version: 0.2.2
-Date: 2021-01-16
+Version: 0.2.2.9000
+Date: 2021-03-01
 Authors@R:
    c(
     person("Pedro J.", "Aphalo", email = "pedro.aphalo@helsinki.fi", role = c("aut", "trl", "cre")),

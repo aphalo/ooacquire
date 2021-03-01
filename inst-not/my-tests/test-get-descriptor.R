@@ -1,0 +1,5 @@
+library(ooacquire)
+w <- start_session()
+list_instruments(w)
+get_oo_descriptor(w, ch.index = 0L)
+end_session(w)

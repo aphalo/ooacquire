@@ -17,7 +17,8 @@ acq_irrad_interactive(
   qty.out = "irrad",
   save.pdfs = TRUE,
   save.summaries = TRUE,
-  interface.mode = "auto"
+  interface.mode = "auto",
+  w = NULL
 )
 
 acq_fraction_interactive(

@@ -10,6 +10,12 @@ editor_options:
 -   Finish writing algorithms vignette.
 -   Document support for OO calibrations and add example scripts.
 
+# ooacquire 0.2.3 (2021-xx-xx)
+
+-   Test with old USB2000 spectrometer and fix the problems detected.
+-   Retrieval of instrument descriptor and calibration from spectrometer
+    EEPROM tested and bugs fixed.
+
 # ooacquire 0.2.2 (2021-01-16)
 
 -   Revise `raw2corr_cps()` and `uvb_corrections()` so as to remove

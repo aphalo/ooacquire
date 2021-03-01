@@ -23,9 +23,19 @@
 #'   connected. The connection to the spectrometer and selection of channel,
 #'   when relevant, is done from within these functions.
 #'
+#'   The irradiance calibration will be retrieved from the spectrometer
+#'   memory as a last resource if not supplied in any other way. Given that
+#'   the factors are stored in a format that ignores the entrance optics,
+#'   either the efefctive diffuser are in xxx should be passed to parameter
+#'   \code{area} or a character string with the type of the diffuser passed
+#'   to \code{diff.type}. If no irardiance calibration is available, counts
+#'   per second (cps) or raw counts are the only options available.
+#'
 #' @seealso This function calls functions \code{\link{tune_interactive}},
 #'   \code{\link{protocol_interactive}} and
-#'   \code{\link{set_attributes_interactive}}.
+#'   \code{\link{set_attributes_interactive}}. If irradiance calibration is
+#'   retrieved from the instrument, functions \code{\link{get_oo_descriptor}}
+#'   and \code{\link{oo_calib2irrad_mult}} are also called.
 #'
 #' @family interactive acquisition functions
 #'
@@ -41,6 +51,8 @@
 #'   calibration data.
 #' @param stray.light.method character Used only when the correction method is
 #'   created on-the-fly.
+#' @param area numeric Passed to \code{o_calib2irrad_mult()}.
+#' @param diff.type character Passed to \code{o_calib2irrad_mult()}.
 #' @param qty.out character One of "Tfr" (spectral transmittance as a fraction
 #'   of one), "irrad" (spectral irardiance), "cps" (counts per second), or "raw"
 #'   (raw sensor counts).
@@ -92,6 +104,8 @@ acq_irrad_interactive <-
            correction.method = NA,
            descriptors = NA,
            stray.light.method = "none",
+           area = NULL,
+           diff.type = NULL,
            qty.out = "irrad",
            save.pdfs = TRUE,
            save.summaries = TRUE,
@@ -150,8 +164,10 @@ acq_irrad_interactive <-
                FLMS00440 = which_descriptor(descriptors = ooacquire::FLMS00440_descriptors),
                FLMS00416 = which_descriptor(descriptors = ooacquire::FLMS00416_descriptors),
                {
-                 warning("No instrument descriptor found, retrieving from the spectrometer")
+                 warning("No instrument descriptor found, retrieving from the spectrometer",
+                         call. = FALSE)
                  get_oo_descriptor(w, sr.index = sr.index, ch.index = ch.index)
+                 # this can introduce NA irrad.mult, which are checked further below
                }
         )
 
@@ -165,9 +181,10 @@ acq_irrad_interactive <-
                FLMS00440 = ooacquire::FLMS00440_none.mthd,
                FLMS00416 = ooacquire::FLMS00416_none.mthd,
                {
-                 warning("No spectrometer-specific method found, using a generic one")
+                 warning("No spectrometer-specific method found, using a generic one",
+                         call. = FALSE)
                  new_correction_method(descriptor,
-                                       stray.light.method = stray.light.method)
+                                       stray.light.method = "none")
                }
         )
 
@@ -195,7 +212,8 @@ acq_irrad_interactive <-
     if (length(descriptor[["inst.calib"]][["irrad.mult"]]) != descriptor[["num.pixs"]] ||
       anyNA(descriptor[["inst.calib"]][["irrad.mult"]])) {
       if (qty.out == "irrad") {
-        warning("Bad calibration data, returning counts-per-second.")
+        warning("Bad calibration data, returning counts-per-second.",
+                call. = FALSE)
         qty.out = "cps"
       }
     }

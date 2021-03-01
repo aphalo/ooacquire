@@ -114,7 +114,9 @@ s_irrad_corrected.raw_mspct <-
       }
     }
 
-    if (is.character(correction.method[["worker.fun"]])) {
+    if (is.na(correction.method[["worker.fun"]])) {
+      worker.fun <- NULL
+    } else if (is.character(correction.method[["worker.fun"]])) {
       worker.fun <- get(correction.method[["worker.fun"]],
                         mode = "function",
                         envir = as.environment("package:ooacquire"))

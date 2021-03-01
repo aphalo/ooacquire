@@ -41,21 +41,23 @@ new_correction_method <- function(descriptor,
   if (is.null(wl.range) || anyNA(wl.range)) {
     stop("No wavelength calibration available!")
   }
-  wl.method <- range(stray.light.wl, flt.dark.wl, flt.dark.wl)
-  if (anyNA(c(wl.range, wl.method)) ||
-      wl.range[1] > wl.method[1] ||
-      wl.range[2] < wl.method[2]) {
-    wl.method[1] <- ifelse(wl.range[1] > wl.method[1], wl.range[1], wl.method[1])
-    wl.method[2] <- ifelse(wl.range[2] < wl.method[2], wl.range[2], wl.method[2])
-    stray.light.method = "none"
-    warning("Invalid wavelengths for instrument: stray-light correction disabled!")
-  }
-
-  if (!stray.light.method %in% c("original", "sun", "simple")) {
+  if (stray.light.method %in% c("original", "sun", "simple")) {
+    wl.method <- range(stray.light.wl, flt.dark.wl, flt.ref.wl)
+    if (anyNA(c(wl.range, wl.method)) ||
+        wl.range[1] > wl.method[1] ||
+        wl.range[2] < wl.method[2]) {
+      wl.method[1] <- ifelse(wl.range[1] > wl.method[1], wl.range[1], wl.method[1])
+      wl.method[2] <- ifelse(wl.range[2] < wl.method[2], wl.range[2], wl.method[2])
+      stray.light.method <- "none"
+      warning("Off-range method wavelengths: stray-light correction disabled!")
+    }
+  } else {
     stray.light.wl <- flt.dark.wl <- flt.ref.wl <- NA_real_
     if (stray.light.method != "none") {
       stray.light.method <- "none"
-      warning("Unknown stray-light method: stray-light correction disabled!")
+      warning("Unknown stray-light method '",
+              stray.light.method,
+              "' stray-light correction disabled!")
     }
   }
 
@@ -78,6 +80,7 @@ new_correction_method <- function(descriptor,
            none = 0
     )
 
+  method
 }
 
 #' Check consistency of serial number

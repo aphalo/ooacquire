@@ -4,16 +4,26 @@
 \alias{get_oo_descriptor}
 \title{Get the instrument description and EEPROM data}
 \usage{
-get_oo_descriptor(w, sr.index = 0L, ch.index = 0L)
+get_oo_descriptor(
+  w,
+  sr.index = 0L,
+  ch.index = 0L,
+  area = NULL,
+  diff.type = NULL
+)
 }
 \arguments{
-\item{w}{an open Wrapper object from Omnidriver}
+\item{w}{an open Wrapper object from OmniDriver.}
 
 \item{sr.index}{an index to address the spectrometer for the time being not
-exported}
+exported.}
 
 \item{ch.index}{an index to address the channel in a spectrometer with more
 than one channel.}
+
+\item{area}{numeric Passed to \code{o_calib2irrad_mult()}.}
+
+\item{diff.type}{character Passed to \code{o_calib2irrad_mult()}.}
 }
 \value{
 a list
@@ -22,4 +32,10 @@ a list
 Model, configuration, serial number, and calibration data stored in the
 EEPROM of an Ocean Optics spectrometer are retrieved and returned in a
 list.
+}
+\note{
+One and only one of \code{area} or \code{diff.type} is needed if an
+  irradiance calibration stored in the EEPROM is to be retrieved. If both
+  are null, as by default, the irradiance calibration factors will not be
+  retireved even if present in the EEPROM.
 }

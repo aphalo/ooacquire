@@ -4,21 +4,34 @@
 #' EEPROM of an Ocean Optics spectrometer are retrieved and returned in a
 #' list.
 #'
-#' @param w an open Wrapper object from Omnidriver
+#' @param w an open Wrapper object from OmniDriver.
 #' @param sr.index an index to address the spectrometer for the time being not
-#'   exported
+#'   exported.
 #' @param ch.index an index to address the channel in a spectrometer with more
 #'   than one channel.
+#' @param area numeric Passed to \code{o_calib2irrad_mult()}.
+#' @param diff.type character Passed to \code{o_calib2irrad_mult()}.
 #'
 #' @export
 #' @return a list
 #'
-get_oo_descriptor <- function(w, sr.index = 0L, ch.index = 0L) {
+#' @note One and only one of \code{area} or \code{diff.type} is needed if an
+#'   irradiance calibration stored in the EEPROM is to be retrieved. If both
+#'   are null, as by default, the irradiance calibration factors will not be
+#'   retireved even if present in the EEPROM.
+#'
+get_oo_descriptor <- function(w,
+                              sr.index = 0L,
+                              ch.index = 0L,
+                              area = NULL,
+                              diff.type = NULL) {
 
-  get_calib <- function() {
+  get_calib <- function(w, sr.index, ch.index, w.lengths) {
     z <- list()
     inst.calib <-
-      rOmniDriver::get_calibration_coefficients_from_buffer(w, sr.index, ch.index)
+      rOmniDriver::get_calibration_coefficients_from_buffer(jwrapper = w,
+                                                            sr.index = sr.index,
+                                                            ch.index = ch.index)
     # linearization
     oo.nl.coeff <- inst.calib$getNlCoefficients()
     z$nl.coeff <- oo.nl.coeff
@@ -36,40 +49,76 @@ get_oo_descriptor <- function(w, sr.index = 0L, ch.index = 0L) {
     # slit function
     z$slit.fun <- NA
     # irradiance calibration factors
-    if (rOmniDriver::is_feature_supported_irradiance_calibration_factor(w, sr.index)) {
-      z$irrad.mult <-
-        rOmniDriver::get_feature_irradiance_calibration_factor(w, sr.index)$getIrradianceCalibrationFactors()
-      z$start.date <- lubridate::today() - lubridate::days(1)
-      z$end.date <- lubridate::today() + lubridate::days(30)
+    if (xor(is.null(area), is.null(diff.type)) &&
+      rOmniDriver::is_feature_supported_irradiance_calibration_factor(jwrapper = w,
+                                                                        sr.index = sr.index)) {
+      irrad.calib.factor <-
+        rOmniDriver::get_feature_irradiance_calibration_factor(jwrapper = w,
+                                                               sr.index = sr.index)
+      # Even if feature is supported data may be unavailable, in which case
+      # the call may not return unless a timeout is set in the spectrometer.
+      # The timeout value seems to be irrelevant, so we set it to 0.5 s.
+      rOmniDriver::set_USB_timeout(jwrapper = w,
+                                   time.millisec = 500L,
+                                   sr.index = 0L)
+      oo.calib <- try(irrad.calib.factor$getIrradianceCalibrationFactors(),
+                      silent = TRUE)
+      if (inherits(irrad.mult, "try-error")) {
+        warning("Unable to read irradiance calibration from spectrometer",
+                call. = FALSE)
+        z$irrad.mult <- rep(NA_real_, length(w.lengths))
+        z$start.date <- NA_real_
+        z$end.date <- NA_real_
+      } else {
+        z$irrad.mult <- oo_calib2irrad_mult(oo.calib, ...)
+        z$start.date <- lubridate::today() - lubridate::days(1)
+        z$end.date <- lubridate::today() + lubridate::days(30)
+      }
     } else {
-      z$irrad.mult <- NA_real_
+      z$irrad.mult <- rep(NA_real_, length(w.lengths))
       z$start.date <- NA_real_
       z$end.date <- NA_real_
     }
     z
   }
 
-  bench <- rOmniDriver::get_bench(w, sr.index, ch.index)
-  w.lengths <- rOmniDriver::get_wavelengths(w, sr.index, ch.index)
+  bench <- rOmniDriver::get_bench(jwrapper = w,
+                                  sr.index = sr.index,
+                                  ch.index = ch.index)
+  w.lengths <- rOmniDriver::get_wavelengths(jwrapper = w,
+                                            sr.index = sr.index,
+                                            ch.index = ch.index)
   list(
     time = lubridate::now(),
     w = w,
     sr.index = sr.index,
     ch.index = ch.index,
-    spectrometer.name = rOmniDriver::get_name(w, sr.index),
-    spectrometer.sn =  rOmniDriver::get_serial_number(w, sr.index),
+    spectrometer.name = rOmniDriver::get_name(jwrapper = w,
+                                              sr.index = sr.index),
+    spectrometer.sn =  rOmniDriver::get_serial_number(jwrapper = w,
+                                                      sr.index = sr.index),
     bench.grating = bench$getGrating(),
     bench.filter = bench$getFilterWavelength(),
     bench.slit = bench$getSlitSize(),
-    num.pixs = rOmniDriver::get_number_of_pixels(w, sr.index, ch.index),
-    num.dark.pixs = rOmniDriver::get_number_of_dark_pixels(w, sr.index, ch.index),
-    min.integ.time = rOmniDriver::get_minimum_integration_time(w, sr.index),
-    max.integ.time = rOmniDriver::get_maximum_integration_time(w, sr.index),
-    max.counts = rOmniDriver::get_maximum_intensity(w, sr.index),
+    num.pixs = rOmniDriver::get_number_of_pixels(jwrapper = w,
+                                                 sr.index = sr.index,
+                                                 ch.index = ch.index),
+    num.dark.pixs = rOmniDriver::get_number_of_dark_pixels(jwrapper = w,
+                                                           sr.index = sr.index,
+                                                           ch.index = ch.index),
+    min.integ.time = rOmniDriver::get_minimum_integration_time(jwrapper = w,
+                                                               sr.index = sr.index),
+    max.integ.time = rOmniDriver::get_maximum_integration_time(jwrapper = w,
+                                                               sr.index = sr.index),
+    max.counts = rOmniDriver::get_maximum_intensity(jwrapper = w,
+                                                    sr.index = sr.index),
     wavelengths = w.lengths,
     wl.range = range(w.lengths),
     bad.pixs = numeric(),
-    inst.calib = get_calib()
+    inst.calib = get_calib(w = w,
+                           sr.index = sr.index,
+                           ch.index = ch.index,
+                           w.lengths = w.lengths)
   )
 }
 
