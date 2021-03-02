@@ -10,11 +10,16 @@ editor_options:
 -   Finish writing algorithms vignette.
 -   Document support for OO calibrations and add example scripts.
 
-# ooacquire 0.2.3 (2021-xx-xx)
+# ooacquire 0.2.3 (2021-03-xx)
 
 -   Test with old USB2000 spectrometer and fix the problems detected.
 -   Retrieval of instrument descriptor and calibration from spectrometer
-    EEPROM tested and bugs fixed.
+    EEPROM tested.
+-   Bugs fixed in retrieval of irradiance calibration factors as they
+    would have been used without proper conversion into the format used
+    in the package. (Testing with a calibrated spectrometer pending!!)
+-   TODO: items above apply only to `acq_irrad_interactive()`. Similar
+    tests and FIXES are needed in the other data acquisition functions.
 
 # ooacquire 0.2.2 (2021-01-16)
 

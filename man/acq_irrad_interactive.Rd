@@ -14,11 +14,12 @@ acq_irrad_interactive(
   correction.method = NA,
   descriptors = NA,
   stray.light.method = "none",
+  area = NULL,
+  diff.type = NULL,
   qty.out = "irrad",
   save.pdfs = TRUE,
   save.summaries = TRUE,
-  interface.mode = "auto",
-  w = NULL
+  interface.mode = "auto"
 )
 
 acq_fraction_interactive(
@@ -64,6 +65,10 @@ calibration data.}
 
 \item{stray.light.method}{character Used only when the correction method is
 created on-the-fly.}
+
+\item{area}{numeric Passed to \code{o_calib2irrad_mult()}.}
+
+\item{diff.type}{character Passed to \code{o_calib2irrad_mult()}.}
 
 \item{qty.out}{character One of "Tfr" (spectral transmittance as a fraction
 of one), "irrad" (spectral irardiance), "cps" (counts per second), or "raw"
@@ -113,6 +118,14 @@ These functions can be useful for commonly done measurements but
   Using these functions only requires an Ocean Optics spectrometer to be
   connected. The connection to the spectrometer and selection of channel,
   when relevant, is done from within these functions.
+
+  The irradiance calibration will be retrieved from the spectrometer
+  memory as a last resource if not supplied in any other way. Given that
+  the factors are stored in a format that ignores the entrance optics,
+  either the efefctive diffuser are in xxx should be passed to parameter
+  \code{area} or a character string with the type of the diffuser passed
+  to \code{diff.type}. If no irardiance calibration is available, counts
+  per second (cps) or raw counts are the only options available.
 }
 \note{
 The integration time is set automatically so that the peak number of
@@ -157,7 +170,9 @@ The calculations for reflectance and transmittance are very similar,
 \seealso{
 This function calls functions \code{\link{tune_interactive}},
   \code{\link{protocol_interactive}} and
-  \code{\link{set_attributes_interactive}}.
+  \code{\link{set_attributes_interactive}}. If irradiance calibration is
+  retrieved from the instrument, functions \code{\link{get_oo_descriptor}}
+  and \code{\link{oo_calib2irrad_mult}} are also called.
 
 Other interactive acquisition functions: 
 \code{\link{acq_fluence_interactive}()}

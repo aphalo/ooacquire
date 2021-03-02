@@ -63,14 +63,16 @@ get_oo_descriptor <- function(w,
                                    sr.index = 0L)
       oo.calib <- try(irrad.calib.factor$getIrradianceCalibrationFactors(),
                       silent = TRUE)
-      if (inherits(irrad.mult, "try-error")) {
+      if (inherits(oo.calib, "try-error")) {
         warning("Unable to read irradiance calibration from spectrometer",
                 call. = FALSE)
         z$irrad.mult <- rep(NA_real_, length(w.lengths))
         z$start.date <- NA_real_
         z$end.date <- NA_real_
       } else {
-        z$irrad.mult <- oo_calib2irrad_mult(oo.calib, ...)
+        z$irrad.mult <- oo_calib2irrad_mult(oo.calib,
+                                            area = area,
+                                            diff.type = diff.type)
         z$start.date <- lubridate::today() - lubridate::days(1)
         z$end.date <- lubridate::today() + lubridate::days(30)
       }
