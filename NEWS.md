@@ -9,17 +9,23 @@ editor_options:
 -   Add more test cases.
 -   Finish writing algorithms vignette.
 -   Document support for OO calibrations and add example scripts.
+-   Move calibration data to separate packages.
 
-# ooacquire 0.2.3 (2021-03-xx)
+# ooacquire 0.2.3 (2021-03-26)
 
--   Test with old USB2000 spectrometer and fix the problems detected.
--   Retrieval of instrument descriptor and calibration from spectrometer
-    EEPROM tested.
+-   Implement support for on-the-fly retrieval of instrument descriptor
+    and calibration data from EEPROM when calibration is not available
+    as R objects.
+-   Retrieval of instrument descriptor and wavelength calibration from
+    spectrometer EEPROM tested.
 -   Bugs fixed in retrieval of irradiance calibration factors as they
     would have been used without proper conversion into the format used
-    in the package. (Testing with a calibrated spectrometer pending!!)
--   TODO: items above apply only to `acq_irrad_interactive()`. Similar
-    tests and FIXES are needed in the other data acquisition functions.
+    in the package. (Testing with a factory-calibrated spectrometer with
+    data in EEPROM pending!!)
+-   Updated only `acq_irrad_interactive()`. Similar tests and FIXES are
+    needed in the other data acquisition functions.
+-   Update calibration data for MAYP11278 and MAYP112785.
+-   Test with old USB2000 spectrometer and fix the problems detected.
 
 # ooacquire 0.2.2 (2021-01-16)
 

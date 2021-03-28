@@ -183,7 +183,7 @@ citation("ooacquire")
 #> 
 #>   Pedro J. Aphalo and Lasse Ylianttila (2021). ooacquire: Acquire Data
 #>   from OO Spectrometers. https://docs.r4photobiology.info/ooacquire/,
-#>   https://bitbucket.org/aphalo/ooacquire.
+#>   https://github.com/aphalo/ooacquire.
 #> 
 #> A BibTeX entry for LaTeX users is
 #> 
@@ -192,7 +192,7 @@ citation("ooacquire")
 #>     author = {Pedro J. Aphalo and Lasse Ylianttila},
 #>     year = {2021},
 #>     note = {https://docs.r4photobiology.info/ooacquire/,
-#> https://bitbucket.org/aphalo/ooacquire},
+#> https://github.com/aphalo/ooacquire},
 #>   }
 ```
 
