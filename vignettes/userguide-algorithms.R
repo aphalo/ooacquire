@@ -160,8 +160,10 @@ sun001.cps_mspct[["dark"]] <- NULL
 autoplot(sun001.cps_mspct) + ggtitle("Dark subtracted")
 
 ## ---- fig.width=8, fig.asp=0.5, eval = FALSE----------------------------------
-#  sun001.irrad_spct <- cps2irrad(sun001.cps_mspct)
+#  sun001.irrad_spct <- cps2irrad(sun001.cps_mspct[["light"]])
 #  autoplot(sun001.irrad_spct)
+#  sun001_filter.irrad_spct <- cps2irrad(sun001.cps_mspct[["filter"]])
+#  autoplot(sun001_filter.irrad_spct)
 
 ## ---- fig.width=8, fig.asp=0.5, eval = FALSE----------------------------------
 #  sun001.irrad_spct <- smooth_spct(sun001.irrad_spct)

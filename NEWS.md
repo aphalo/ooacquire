@@ -11,6 +11,10 @@ editor_options:
 -   Document support for OO calibrations and add example scripts.
 -   Move calibration data to separate packages.
 
+# ooacquire 0.2.4 (2021-05-xx)
+
+-   
+
 # ooacquire 0.2.3 (2021-03-26)
 
 -   Implement support for on-the-fly retrieval of instrument descriptor

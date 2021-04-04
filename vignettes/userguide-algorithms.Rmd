@@ -177,7 +177,7 @@ When dealing with raw detector counts one needs to be aware that the array detec
 getInstrDesc(sun001.raw_mspct[["light"]])$max.counts
 ```
 
-Plotting the two bracketed spectra shows the effect of using the optimal integration time plus an integration 10 times longer. In other words if more photons imping on a detector cell/pixel during one intergration event (or "scan") than needed to reach 64000 counts, the reading remains at 64000 counts. This is usually called "signal clipping", i.e., the tips of peaks are truncated or off scale.
+Plotting the two bracketed spectra shows the effect of using the optimal integration time plus an integration 10 times longer. In other words if more photons imping on a detector cell/pixel during one intergration event (or "scan") than needed to reach 64000 counts, the reading remains at 64000 counts. This is usually called "signal clipping", i.e., the tips of peaks are truncated or off scale. Note: The first four pixels in each spectrum are "dark" pixels that are not exposed to light, i.e., the counts are smaller than for other pixels and similar for the short and long integration times. These will show in the plots of the raw spectra as a clear dip in the curve. A similar, but unexpected, dip can be seen at the other end in the infrared.
 
 ```{r, fig.width=8, fig.asp=0.5}
 autoplot(sun001.raw_mspct[["light"]])
@@ -292,11 +292,13 @@ sun001.cps_mspct[["dark"]] <- NULL
 autoplot(sun001.cps_mspct) + ggtitle("Dark subtracted")
 ```
 
-At this point we have a clean counts-per-second spectrum. The **ninth step** is to apply the calibration multipliers and any additional instrument specific correction to obtain spectral irradiance in a `"source_spct"` object.
+At this point we have a clean counts-per-second spectrum. The **ninth step** is to apply the calibration multipliers and any additional instrument specific correction to obtain spectral irradiance in a `"source_spct"` object. By comparing the "filter" and "light" measurements, we can see that a small peak and some additional signal in the UV region are the result of light of wavelengths longer than 400 nm reaching the "wrong" pixels in the array.
 
 ```{r, fig.width=8, fig.asp=0.5, eval = FALSE}
-sun001.irrad_spct <- cps2irrad(sun001.cps_mspct)
+sun001.irrad_spct <- cps2irrad(sun001.cps_mspct[["light"]])
 autoplot(sun001.irrad_spct)
+sun001_filter.irrad_spct <- cps2irrad(sun001.cps_mspct[["filter"]])
+autoplot(sun001_filter.irrad_spct)
 ```
 
 In an optional, final **tenth step** we apply smoothing to remove some of the noise.
@@ -357,7 +359,7 @@ for (m in names(halogen.raw_mspct)) {
 names(halogen.cps_mspct)
 ```
 
-We plot the returned spectra, both in full, and the UV region by itself. By careful comparison of these later plots one can see that the signal for _filter_ is larger than for _dark_. As we know from specifications and measurements that the filter used blocks radiation in this region, the difference is due to stray light (radiation of longer wavelengths being detected as ultraviolet).
+We plot the returned spectra, both in full, and the UV region by itself. Please, be aware of the difference in the _y_ scale among the plots. By careful comparison of these later plots one can see that the signal for _filter_ is larger than for _dark_. As we know from specifications and measurements that the filter used blocks radiation in this region, the difference is due to stray light (radiation of longer wavelengths being detected as ultraviolet).
 
 ```{r, fig.width=8, fig.asp=0.5}
 for (m in names(halogen.cps_mspct)) {
@@ -379,6 +381,7 @@ for (m in setdiff(names(halogen.cps_mspct), "dark")) {
 }
 names(halogen01.cps_mspct)
 ```
+The second and fourth plots display in detail the UV region. Be aware of the difference in the _y_ scale in the plots
 
 ```{r, fig.width=8, fig.asp=0.5}
 for (m in names(halogen01.cps_mspct)) {
@@ -398,6 +401,7 @@ halogen_corrected.cps_spct <-
 names(halogen_corrected.cps_spct)
 getTimeUnit(halogen_corrected.cps_spct)
 ```
+The second plot displays in detail the UV region. Be aware of the difference in the _y_ scale in the plots
 
 ```{r, fig.width=8, fig.asp=0.5}
 autoplot(halogen_corrected.cps_spct)
@@ -427,6 +431,7 @@ Using defaults, we get some minor artifacts in the UV region, but preserve the d
 ```{r}
 halogen_sm0.source_spct <- smooth_spct(halogen.source_spct)
 ```
+The second plot displays in detail the UV region. Be aware of the difference in the _y_ scale in the plots
 
 ```{r, fig.width=8, fig.asp=0.5}
 autoplot(halogen_sm0.source_spct)
@@ -444,6 +449,8 @@ With overriding the default arguments we better remove random noise and a small 
 ```{r}
 halogen_sm.source_spct <- smooth_spct(halogen.source_spct, method = "supsmu", strength = 3)
 ```
+
+The second plot displays in detail the UV region. Be aware of the difference in the _y_ scale in the plots: the ratio between the irradiance at 280 nm and at 900 nm is 1:3500.
 
 ```{r, fig.width=8, fig.asp=0.5}
 autoplot(halogen_sm.source_spct)
