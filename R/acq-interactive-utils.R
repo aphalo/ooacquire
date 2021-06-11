@@ -431,23 +431,27 @@ set_folder_interactive <- function(folder.name = NULL) {
   if (is.null(folder.name)) {
     current.folder <- getwd()
     folder.name <- "."
-    message("Current folder (default): ", current.folder)
   }
+  message("Current/default folder: ", folder.name)
+
   old.folder.name <- folder.name
 
-  folder.name <- readline("Enter folder name (use forward slashes '/' instead of '\'): ")
-  message("Folder: ", folder.name)
-  # needs to be replaced by a proper validity check
+  folder.name <- readline("Output folder name (name/-): ")
   if (folder.name == "") {
     folder.name <- old.folder.name
-    message("Folder: ", folder.name)
   }
   if (!file.exists(folder.name)) {
     message("Folder does not exist, creating it...")
-    dir.create(folder.name)
-  } else {
-    message("Using existing folder: '", folder.name, "'.")
+    # we ask for a different folder name until success
+    while (!dir.create(folder.name)) {
+      folder.name <- readline("Output folder name (name/-): ")
+      if (file.exists(folder.name)) {
+        break()
+      }
+    }
   }
+  message("Using folder: '", folder.name, "'.")
+
   folder.name
 }
 

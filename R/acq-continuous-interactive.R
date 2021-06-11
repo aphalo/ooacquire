@@ -51,6 +51,8 @@
 #'   calibration data.
 #' @param stray.light.method character Used only when the correction method is
 #'   created on-the-fly.
+#' @param seq.settings named list with numeric members \code{"step.delay"} and
+#'   \code{"num.steps"}.
 #' @param area numeric Passed to \code{o_calib2irrad_mult()}.
 #' @param diff.type character Passed to \code{o_calib2irrad_mult()}.
 #' @param qty.out character One of "Tfr" (spectral transmittance as a fraction
@@ -61,6 +63,7 @@
 #' @param interface.mode character One of "auto", "simple", "manual",
 #'   "series", "auto-attr", "simple-attr", "manual-attr", and
 #'   "series-attr".
+#' @param folder.name character Default name of the folder.
 #'
 #' @export
 #'
@@ -104,12 +107,14 @@ acq_irrad_interactive <-
            correction.method = NA,
            descriptors = NA,
            stray.light.method = "none",
+           seq.settings = NULL,
            area = NULL,
            diff.type = NULL,
            qty.out = "irrad",
            save.pdfs = TRUE,
            save.summaries = TRUE,
-           interface.mode = "auto") {
+           interface.mode = "auto",
+           folder.name = NULL) {
 
     old.value <- options(warn = 1)
     on.exit(options(old.value), add = TRUE, after = TRUE)
@@ -237,7 +242,7 @@ acq_irrad_interactive <-
     user.attrs <- list(what.measured = "",
                        comment.text = "")
 
-    folder.name <- set_folder_interactive()
+    folder.name <- set_folder_interactive(folder.name)
 
     oldwd <- setwd(folder.name)
     on.exit(setwd(oldwd), add = TRUE)
@@ -255,8 +260,9 @@ acq_irrad_interactive <-
                              tot.time.range = tot.time.range,
                              HDR.mult = HDR.mult)
 
-    seq.settings <- list(step = 0,
-                         num.steps = 1L)
+    if (is.null(seq.settings)) {
+      seq.settings <- list(step.delay = 0, num.steps = 1L)
+    }
 
     # initialize lists to collect names from current session
     irrad.names <- character()

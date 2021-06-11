@@ -11,9 +11,16 @@ editor_options:
 -   Document support for OO calibrations and add example scripts.
 -   Move calibration data to separate packages.
 
-# ooacquire 0.2.4 (2021-05-xx)
+# ooacquire 0.2.4 (2021-06-xx)
 
--   
+-   Function `acquire_continuous_interactive()` gains two new parameters
+    that make it possible to override the defaults.
+
+-   Revise the user interaction in `set_folder_interactive()` and add
+    check for success of new folder creation.
+
+-   Support in `acq_raw_mspct()` the acquisition of a timed sequence of
+    spectra.
 
 # ooacquire 0.2.3 (2021-03-26)
 

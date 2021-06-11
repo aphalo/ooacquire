@@ -14,12 +14,14 @@ acq_irrad_interactive(
   correction.method = NA,
   descriptors = NA,
   stray.light.method = "none",
+  seq.settings = NULL,
   area = NULL,
   diff.type = NULL,
   qty.out = "irrad",
   save.pdfs = TRUE,
   save.summaries = TRUE,
-  interface.mode = "auto"
+  interface.mode = "auto",
+  folder.name = NULL
 )
 
 acq_fraction_interactive(
@@ -66,6 +68,9 @@ calibration data.}
 \item{stray.light.method}{character Used only when the correction method is
 created on-the-fly.}
 
+\item{seq.settings}{named list with numeric members \code{"step.delay"} and
+\code{"num.steps"}.}
+
 \item{area}{numeric Passed to \code{o_calib2irrad_mult()}.}
 
 \item{diff.type}{character Passed to \code{o_calib2irrad_mult()}.}
@@ -80,6 +85,8 @@ or not, and collection summaries to csv files or not.}
 \item{interface.mode}{character One of "auto", "simple", "manual",
 "series", "auto-attr", "simple-attr", "manual-attr", and
 "series-attr".}
+
+\item{folder.name}{character Default name of the folder.}
 
 \item{ref.value}{numeric or filter_spct/reflector_spct object.}
 

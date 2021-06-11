@@ -14,7 +14,7 @@ on.exit(setwd(oldwd), add = TRUE)
 # set_w.band_default("UV_bands()")
 
 theme_set(theme_bw())
-ggpmisc::ttheme_set(ggpmisc::ttheme_gtbw())
+ggpp::ttheme_set(ggpp::ttheme_gtbw())
 
 acq_irrad_interactive(qty.out = "irrad", # qty.out = "cps", qty.out = "raw"
                       save.pdfs = TRUE,

@@ -198,7 +198,7 @@ acq_raw_spct <- function(descriptor,
 acq_raw_mspct <- function(descriptor,
                           acq.settings,
                           f.trigger.pulses = f.trigger.message,
-                          seq.settings = list(step = 0, num.steps = 1L),
+                          seq.settings = list(step.delay = 0, num.steps = 1L),
                           protocol = c("light", "filter", "dark"),
                           user.label = "",
                           where.measured = data.frame(lon = NA_real_, lat = NA_real_),
@@ -216,10 +216,18 @@ acq_raw_mspct <- function(descriptor,
     pause.fun <- default_pause_fun
   }
 
+  if (length(seq.settings[["step.delay"]]) == seq.settings[["num.steps"]]) {
+    steps <- seq.settings[["step.delay"]]
+  } else {
+    steps <- cumsum(rep(seq.settings[["step.delay"]],
+                        length.out = seq.settings[["num.steps"]]))
+  }
+
   previous.protocol <- "none"
-  z <- list()
+  z <- z.names <- list()
   idx <- 0
   start.time <- lubridate::now()
+
   for (p in protocol) {
     if (p != previous.protocol) {
       previous.protocol <- p
@@ -232,26 +240,40 @@ acq_raw_mspct <- function(descriptor,
     } else {
       f.current <- NULL
     }
-    idx <- idx + 1
-    z[[idx]] <- acq_raw_spct(descriptor = descriptor,
-                             acq.settings = acq.settings,
-                             f.trigger.pulses = f.current,
-                             what.measured = paste(p, ": ", user.label, sep = ""),
-                             where.measured = where.measured)
-    # next 3 statements shouldn't be needed. CHECK!
-    photobiology::setWhenMeasured(z[[idx]], start.time)
-    photobiology::setWhereMeasured(z[[idx]], where.measured)
-    photobiology::setWhatMeasured(z[[idx]], paste(p, ":", user.label))
-    # remove dependency of object on rJava
-    trimInstrDesc(z[[idx]], c("-", "w"))
+    if (p == "light") {
+      times <- lubridate::now() + seconds(steps)
+    } else {
+      times <- lubridate::now()
+    }
+    for (i in seq_along(times)) {
+      while (lubridate::now() < times[[i]]) {
+        Sys.sleep(min(0, as.numeric(times[[i]] - lubridate::now(), "seconds")))
+      }
+      idx <- idx + 1
+      z.names[[idx]] <- paste(p, as.character(i), sep = ".")
+      acq.time <- lubridate::now()
+      z[[idx]] <- acq_raw_spct(descriptor = descriptor,
+                               acq.settings = acq.settings,
+                               f.trigger.pulses = f.current,
+                               what.measured = paste(p, ": ", user.label, sep = ""),
+                               where.measured = where.measured)
+      # next 3 statements shouldn't be needed. CHECK!
+      photobiology::setWhenMeasured(z[[idx]], acq.time)
+      photobiology::setWhereMeasured(z[[idx]], where.measured)
+      photobiology::setWhatMeasured(z[[idx]], paste(p, ":", user.label))
+      # remove dependency of object on rJava
+      trimInstrDesc(z[[idx]], c("-", "w"))
+    }
   }
+  end.time <- lubridate::now()
   z <- photobiology::as.raw_mspct(z)
 
-  # assertions to catch errors early on
-  stopifnot(is.raw_mspct(z))
-  stopifnot(length(z) == length(protocol))
-
-  names(z) <- protocol
+  if (length(z) == length(protocol)) {
+    names(z) <- protocol
+  } else {
+    stopifnot(length(z) == length(protocol) + length(times) - 1)
+    names(z) <- unlist(z.names)
+  }
   z
 }
 
