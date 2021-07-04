@@ -318,9 +318,9 @@ acq_irrad_interactive <-
                                         return.cps = qty.out == "cps")
 
         if (length(user.attrs$what.measured) > 0) {
-          setWhatMeasured(irrad.spct, user.attrs$what.measured)
+          photobiology::setWhatMeasured(irrad.spct, user.attrs$what.measured)
         } else {
-          setWhatMeasured(irrad.spct, obj.name)
+          photobiology::setWhatMeasured(irrad.spct, obj.name)
         }
 
         if (length(user.attrs$comment.text) > 0) {
@@ -386,9 +386,10 @@ acq_irrad_interactive <-
                         v = options(photobiology.plot.bands =
                                       photobiologyWavebands::VIS_bands()),
                         t = options(photobiology.plot.bands =
-                                      list(new_waveband(wl_min(irrad.spct),
-                                                        wl_max(irrad.spct),
-                                                        wb.name = "Total"))),
+                                      list(photobiology::new_waveband(
+                                        photobiology::wl_min(irrad.spct),
+                                        photobiology::wl_max(irrad.spct),
+                                        wb.name = "Total"))),
                         options(photobiology.plot.bands = NULL))
                  next()},
                  d = break()
@@ -426,21 +427,25 @@ acq_irrad_interactive <-
         message("Raw objects to collect: ",
                 paste(raw.names, collapse = ", "), sep = " ")
         user.collection.name <- readline("Name of the collection?: ")
-        collection.name <- make.names(paste("collection ", user.collection.name, sep = ""))
+        collection.name <- make.names(paste("collection ",
+                                            user.collection.name, sep = ""))
         if (user.collection.name == "") {
-          collection.name <- make.names(paste("collection ", lubridate::now(), sep = ""))
+          collection.name <- make.names(paste("collection ",
+                                              lubridate::now(), sep = ""))
         }
         if (collection.name != user.collection.name) {
-          message("Using sanitised/generated name: '", collection.name, "'.", sep = "")
+          message("Using sanitised/generated name: '",
+                  collection.name, "'.", sep = "")
         }
         collection.title <- readline("Title for plot?:")
         raw.collection.name <- paste(collection.name, "raw", "lst", sep = ".")
         collection.file.name <- paste(collection.name, "Rda", sep = ".")
 
         if (qty.out != "raw") {
-          collection.mspct <- switch(qty.out,
-                                     irrad = source_mspct(mget(irrad.names)),
-                                     cps =   cps_mspct(mget(irrad.names)))
+          collection.mspct <-
+            switch(qty.out,
+                   irrad = photobiology::source_mspct(mget(irrad.names)),
+                   cps =   photobiology::cps_mspct(mget(irrad.names)))
 
           # plot collection and summaries
           collection.fig <- ggplot2::autoplot(collection.mspct) +
@@ -452,29 +457,9 @@ acq_irrad_interactive <-
           print(collection.fig)
 
           if (save.summaries && qty.out == "irrad") {
-            irrad.tb <-
-              photobiology::q_irrad(collection.mspct,
-                                    scale.factor = 1e6,
-                                    w.band = c(photobiologyWavebands::UV_bands(),
-                                               list(photobiologyWavebands::PAR())))
-            uv_ratios.tb <-
-              photobiology::q_ratio(collection.mspct,
-                                    w.band.num = photobiologyWavebands::UV_bands(),
-                                    w.band.denom = photobiologyWavebands::PAR())
-            vis_ratios.tb <-
-              photobiology::q_ratio(collection.mspct,
-                                    w.band.num = list(blue = photobiologyWavebands::Blue("Sellaro"),
-                                                      red = photobiologyWavebands::Red("Smith10")),
-                                    w.band.denom = list(green = photobiologyWavebands::Green("Sellaro"),
-                                                        "far-red" = photobiologyWavebands::Far_red("Smith10")),
-                                    attr2tb = c("when.measured"))
-            summary.tb <- dplyr::full_join(irrad.tb, uv_ratios.tb)
-            summary.tb <- dplyr::full_join(summary.tb, vis_ratios.tb)
-
-            collection.csv.name <- paste(collection.name, "csv", sep = ".")
-            selector <- unname(sapply(summary.tb, is.numeric))
-            readr::write_delim(signif(summary.tb[ , selector], digits = 3L),
-                               file = collection.csv.name,
+            summary.tb <- spct_summary(mspct = collection.mspct)
+            readr::write_delim(summary.tb,
+                               file =  paste(collection.name, "csv", sep = "."),
                                delim = readr::locale()$grouping_mark)
           }
 
@@ -495,7 +480,7 @@ acq_irrad_interactive <-
           # Clean up
           rm(collection.fig, collection.title, collection.pdf.name)
           if (save.summaries && qty.out == "irrad") {
-            rm(irrad.tb, uv_ratios.tb, vis_ratios.tb, summary.tb)
+            rm(summary.tb)
           }
         } else {
           assign(raw.collection.name, mget(raw.names))
@@ -739,9 +724,9 @@ acq_fraction_interactive <-
                                             ref.value = ref.value)
 
         if (length(user.attrs$what.measured) > 0) {
-          setWhatMeasured(filter.spct, user.attrs$what.measured)
+          photobiology::setWhatMeasured(filter.spct, user.attrs$what.measured)
         } else {
-          setWhatMeasured(filter.spct, obj.name)
+          photobiology::setWhatMeasured(filter.spct, obj.name)
         }
 
         if (length(user.attrs$comment.text) > 0) {
@@ -774,9 +759,10 @@ acq_fraction_interactive <-
                         v = options(photobiology.plot.bands =
                                       photobiologyWavebands::VIS_bands()),
                         t = options(photobiology.plot.bands =
-                                      list(new_waveband(wl_min(filter.spct),
-                                                        wl_max(filter.spct),
-                                                        wb.name = "Total"))),
+                                      list(photobiology::new_waveband(
+                                        photobiology::wl_min(filter.spct),
+                                        photobiology::wl_max(filter.spct),
+                                        wb.name = "Total"))),
                         options(photobiology.plot.bands = NULL))
                  next()},
                  d = break()
@@ -960,43 +946,43 @@ acq_rfr_tfr_interactive <-
       } else {
         # reflectance
         rfr.raw.mspct %>%
-          msmsply(trim_counts) %>%
-          msmsply(linearize_counts) %>%
+          photobiology::msmsply(trim_counts) %>%
+          photobiology::msmsply(linearize_counts) %>%
           raw2cps() %>%
-          msmsply(merge_cps) -> rfr.cps.mspct
+          photobiology::msmsply(merge_cps) -> rfr.cps.mspct
 
-        cps2Rfr(rfr.cps.mspct$sample,
-                rfr.cps.mspct$reference,
-                rfr.cps.mspct$dark) -> rfr.spct
+        photobiology::cps2Rfr(rfr.cps.mspct$sample,
+                              rfr.cps.mspct$reference,
+                              rfr.cps.mspct$dark) -> rfr.spct
 
         assign(rfr.name, rfr.spct)
 
         # transmitance
         tfr.raw.mspct %>%
-          msmsply(trim_counts) %>%
-          msmsply(linearize_counts) %>%
+          photobiology::msmsply(trim_counts) %>%
+          photobiology::msmsply(linearize_counts) %>%
           raw2cps() %>%
-          msmsply(merge_cps) -> tfr.cps.mspct
+          photobiology::msmsply(merge_cps) -> tfr.cps.mspct
 
-        cps2Tfr(tfr.cps.mspct$sample,
-                tfr.cps.mspct$reference,
-                tfr.cps.mspct$dark) -> tfr.spct
+        photobiology::cps2Tfr(tfr.cps.mspct$sample,
+                              tfr.cps.mspct$reference,
+                              tfr.cps.mspct$dark) -> tfr.spct
 
         assign(tfr.name, tfr.spct)
 
         object.spct <-
-          object_spct(w.length = rfr.spct[["w.length"]],
-                      Rfr = rfr.spct[["Rfr"]],
-                      Tfr = tfr.spct[["Tfr"]],
-                      Rfr.type = "total",
-                      Tfr.type = "total",
-                      comment = obj.name)
+          photobiology::object_spct(w.length = rfr.spct[["w.length"]],
+                                    Rfr = rfr.spct[["Rfr"]],
+                                    Tfr = tfr.spct[["Tfr"]],
+                                    Rfr.type = "total",
+                                    Tfr.type = "total",
+                                    comment = obj.name)
 
         object.spct <-
-          copy_attributes(rfr.spct, object.spct,
-                          c("what_measured", "when_measured", "instr_desc"))
+          photobiology::copy_attributes(rfr.spct, object.spct,
+                                        c("what_measured", "when_measured", "instr_desc"))
 
-        object.spct <- clip_wl(object.spct)
+        object.spct <- photobiology::clip_wl(object.spct)
 
         assign(spct.name, object.spct)
 
@@ -1033,9 +1019,10 @@ acq_rfr_tfr_interactive <-
                         v = options(photobiology.plot.bands =
                                       photobiologyWavebands::VIS_bands()),
                         t = options(photobiology.plot.bands =
-                                      list(new_waveband(wl_min(object.spct),
-                                                        wl_max(object.spct),
-                                                        wb.name = "Total"))),
+                                      list(photobiology::new_waveband(
+                                        photobiology::wl_min(object.spct),
+                                        photobiology::wl_max(object.spct),
+                                        wb.name = "Total"))),
                         options(photobiology.plot.bands = NULL))
                  next()},
                  d = break()
@@ -1064,3 +1051,59 @@ acq_rfr_tfr_interactive <-
 
     # clean up is done using 'on.exit()'
   }
+
+spct_summary <- function(mspct,
+                         unit.out = "energy",
+                         scale.factor = ifelse(unit.out == "photon",
+                                               1e6, 1),
+                         type = "plants") {
+
+  ratio <- switch(unit.out,
+                  photon = photobiology::q_ratio,
+                  quantum = photobiology::q_ratio,
+                  energy = photobiology::e_ratio)
+
+  if (type %in% c("plant", "PAR")) {
+    plant.wb <- switch(type,
+                       PAR = c(photobiologyWavebands::UV_bands("CIE"),
+                               list(photobiologyWavebands::PAR())),
+                       plant = c(photobiologyWavebands::UV_bands("CIE"),
+                                 photobiologyWavebands::Plant_bands()))
+    irrad.tb <-
+      photobiology::irrad(mspct,
+                          unit.out = unit.out,
+                          scale.factor = scale.factor,
+                          w.band = plant.wb)
+    uv_ratios.tb <-
+      ratio(mspct,
+            w.band.num = photobiologyWavebands::UV_bands(),
+            w.band.denom = photobiologyWavebands::PAR())
+    vis_ratios.tb <-
+      ratio(mspct,
+            w.band.num = list(blue = photobiologyWavebands::Blue("Sellaro"),
+                              red = photobiologyWavebands::Red("Smith10")),
+            w.band.denom = list(green = photobiologyWavebands::Green("Sellaro"),
+                                "far-red" = photobiologyWavebands::Far_red("Smith10")),
+            attr2tb = c("when.measured"))
+    summary.tb <- dplyr::full_join(irrad.tb, uv_ratios.tb)
+    summary.tb <- dplyr::full_join(summary.tb, vis_ratios.tb)
+  } else if (type == "VIS") {
+    summary.tb <-
+      photobiology::irrad(mspct,
+                          unit.out = unit.out,
+                          w.band = photobiologyWavebands::VIS_bands())
+  } else {
+    summary.tb <-
+      photobiology::irrad(mspct,
+                          unit.out = unit.out,
+                          w.band = NULL)
+  }
+
+  summary.tb <- photobiology::add_attr2tb(tb = summary.tb,
+                                          mspct = mspct)
+
+  selector <- unname(sapply(summary.tb, is.numeric))
+  summary.tb[ , selector] <- signif(summary.tb[ , selector], digits = 3L)
+
+  summary
+}
