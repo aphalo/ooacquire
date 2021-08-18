@@ -35,7 +35,6 @@ Direct acquisition has been tested with our _Maya2000Pro_, _Flame_ and _Jaz_ ins
 ## Technical aspects
 
 Package **'rOmniDriver'** makes available in R the API functions from the _OmniDriver SDP_ by wrapping the Java calls in R functions of the same name and doing argument type conversions when needed. _OmniDriver_ allows to change settings and acquire spectra using any Ocean Optics USB-connected spectrometer. 
-
 ## Installation
 
 At the moment installation needs to be done from the Git repository at Bitbucket.

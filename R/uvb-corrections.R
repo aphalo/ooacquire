@@ -1,9 +1,9 @@
 #' Apply filter-based stray-light correction
 #'
 #' Apply to a counts-per-second spectrum corrections based of a paired reading
-#' obtained with a polycarbonate filter (long-pass with cut-off at 400 nm). This
-#' is a bit more sofisticated than simple subtracting the filter reading from
-#' the mesurement as the effect of the filter itself on stray light is corrected
+#' obtained with a polycarbonate filter (long-pass with cut-in at 400 nm). This
+#' is a bit more sophisticated than simple subtracting the filter reading from
+#' the measurement as the effect of the filter itself on stray light is corrected
 #' for.
 #'
 #' @param x \code{raw_mspct} The raw counts from measurements.
@@ -309,7 +309,7 @@ filter_correction <-
         mean_flt_ratio_short <- mean_flt_cps_short / mean_x_cps_short
       }
     } else if (stray.light.method == "simple") {
-      # trust filter spectral transmitatnce
+      # trust filter spectral transmittance
       mean_flt_ratio_short <- flt.Tfr
     }else {
       stop(paste("stray.light.method '", stray.light.method, "' not supported"))

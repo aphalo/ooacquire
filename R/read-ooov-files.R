@@ -42,8 +42,12 @@ read_oo_ovdata <- function(file,
     warning("Input file was created by SpectrSuite: skipping")
     return(NA)
   }
+  # we avoid skipping blank lines to get the correct data start
   file_header <- scan(file = file, nlines = 20,
-                      skip = 0, what = "character", sep = "\n", quiet = !verbose,
+                      skip = 0,
+                      what = "character",
+                      sep = "\n",
+                      quiet = !verbose,
                       blank.lines.skip = FALSE)
 
   data.rows <- oofile_data_rows(file_header)
@@ -55,8 +59,12 @@ read_oo_ovdata <- function(file,
     }
     locale[["tz"]] <- tz
   }
-  row01 <- scan(file = file, nlines =  1, skip = data.rows[["skip"]],
-                what = "character", quiet = !verbose)
+  # skip should always be passed the number of lines including blank ones
+  row01 <- scan(file = file,
+                nlines =  1,
+                skip = data.rows[["skip"]],
+                what = "character",
+                quiet = !verbose)
   if (grepl("\\.", row01[1]) && locale[["decimal_mark"]] != ".") {
     if (verbose) {
       warning("Replacing locale's decimal mark with '.'")
@@ -92,17 +100,26 @@ read_oo_ovdata <- function(file,
     message("File '", basename(file), "' with user time: ", time)
   }
 
-  data.rows <- oofile_data_rows(file_header)
+  # skip should always be passed the number of lines including blank ones
+  z <- utils::read.table(file = file,
+                         header = FALSE,
+                         dec = locale[["decimal_mark"]],
+                         col.names = c("w.length", "counts"),
+                         skip =  data.rows[["skip"]],
+                         nrows = data.rows[["npixels"]],
+                         blank.lines.skip = TRUE)
 
-  old.opts <- options(readr.num_columns = ifelse(verbose, 6, 0))
-  z <- readr::read_tsv(
-    file = file,
-    col_names = c("w.length", "counts"),
-    skip =  data.rows[["skip"]],
-    n_max = data.rows[["npixels"]],
-    locale = locale
-  )
-  options(old.opts)
+  # old.opts <- options(readr.num_columns = ifelse(verbose, 6, 0))
+  # z <- readr::read_tsv(
+  #   file = file,
+  #   col_names = c("w.length", "counts"),
+  #   skip =  data.rows[["skip"]],
+  #   n_max = data.rows[["npixels"]],
+  #   locale = locale,
+  #   skip_empty_rows = FALSE, # if TRUE skips one line too many
+  #   lazy = FALSE
+  # )
+  # options(old.opts)
 
   old.opts <- options("photobiology.strict.range" = NA)
   z <- photobiology::as.raw_spct(z)

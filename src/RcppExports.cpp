@@ -5,6 +5,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // MAYP11278_tail_correction
 List MAYP11278_tail_correction(NumericVector w_length, NumericVector cts_second);
 RcppExport SEXP _ooacquire_MAYP11278_tail_correction(SEXP w_lengthSEXP, SEXP cts_secondSEXP) {

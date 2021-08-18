@@ -91,17 +91,24 @@ read_oo_ssdata <- function(file,
     message("File '", basename(file), "' with user time: ", time)
   }
 
-  data.rows <- oofile_data_rows(file_header)
+  z <- utils::read.table(file = file,
+                         header = FALSE,
+                         dec = locale[["decimal_mark"]],
+                         col.names = c("w.length", "counts"),
+                         skip =  data.rows[["skip"]],
+                         nrows = data.rows[["npixels"]])
 
-  old.opts <- options(readr.num_columns = ifelse(verbose, 6, 0))
-  z <- readr::read_tsv(
-    file = file,
-    col_names = c("w.length", "counts"),
-    skip =  data.rows[["skip"]],
-    n_max = data.rows[["npixels"]],
-    locale = locale
-  )
-  options(old.opts)
+  ### No longer works, interpretation of skip has changed
+  # old.opts <- options(readr.num_columns = ifelse(verbose, 6, 0))
+  # z <- readr::read_tsv(
+  #   file = file,
+  #   col_names = c("w.length", "counts"),
+  #   skip =  data.rows[["skip"]],
+  #   n_max = data.rows[["npixels"]],
+  #   skip_empty_rows = FALSE, # if TRUE skips one line too many
+  #   locale = locale
+  # )
+  # options(old.opts)
 
   old.opts <- options("photobiology.strict.range" = NA)
   z <- photobiology::as.raw_spct(z)
