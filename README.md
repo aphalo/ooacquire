@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# ooacquire <img src="man/figures/logo.png" align="right" width="120" />
+# ooacquire <img src="man/figures/logo.png" align="right" width="120"/>
 
 ## Purpose
 
@@ -77,7 +77,7 @@ USB-connected spectrometer.
 ## Installation
 
 At the moment installation needs to be done from the Git repository at
-Bitbucket. For this we can use ‘devtools’ and as the package’s is coded
+GitHub. For this we can use ‘remotes’ and as the package’s is coded
 mainly in R but with one function in C++ the build chain for R packages
 needs to be installed. In MS-Windows this is achieved by installing
 Rtools.
@@ -92,14 +92,21 @@ should be installed in sequence:
     selected during installation no key/password are asked for.
 3.  Install the **R packages** ‘photobiology’ and ‘ggspectra’ plus the
     ‘tidyverse’, all available from CRAN.
-4.  Install ‘rOmniDriver’ and ‘ooacquire’ from Bitbucket.
+4.  Install ‘rOmniDriver’ from GitHub.
+5.  Install ‘ooacquire’ from GitHub.
+
+**Steps 1, 2, 3 and 4 are described in the README file of ‘rOmniDriver’,
+which can be found in its [on-line
+documentation](https://docs.r4photobiology.info/rOmniDriver/ "README")
+site. Make sure to read it, follow step by step the installation,
+testing success after each step making sure all the required software is
+properly installed before attempting to install ‘ooacquire’.**
 
 Installation of the current version from GitHub:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("aphalo/rOmniDriver")
-devtools::install_github("aphalo/ooacquire")
+# install.packages("remotes")
+remotes::install_github("aphalo/ooacquire")
 ```
 
 The package includes calibration data for the spectrometers used in
@@ -168,13 +175,13 @@ News about updates are regularly posted at
 ## Contributing
 
 Please report bugs and request new features at
-(<https://bitbucket.org/aphalo/ooacquire/issues>). Pull requests are
-welcome at (<https://bitbucket.org/aphalo/ooacquire>).
+(<https://github.com/aphalo/ooacquire/issues>). Pull requests are
+welcome at (<https://github.com/aphalo/ooacquire>).
 
 ## Citation
 
-If you use this package to produce scientific or commercial
-publications, please cite according to:
+If you use ‘ooacquire’ to produce scientific or commercial publications,
+acknowledge this by citing the package according to:
 
 ``` r
 citation("ooacquire")

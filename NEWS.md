@@ -6,10 +6,11 @@ editor_options:
 
 ## TODO
 
--   Add more test cases.
+-   Add more test cases (e.g. for OceanView files).
 -   Finish writing algorithms vignette.
 -   Document support for OO calibrations and add example scripts.
 -   Move calibration data to separate packages.
+-   Allow file-based computations in the absence of a Java installation.
 
 # ooacquire 0.2.4 (2021-07-xx)
 
@@ -21,6 +22,9 @@ editor_options:
     spectra.
 -   Improve summary for collection of spectra in
     `acq_continuous_interactive()`.
+-   Fix bug in reading of raw data from files possibly caused by changes
+    in 'readr'.
+-   Expand description of algorithms.
 
 # ooacquire 0.2.3 (2021-03-26)
 
