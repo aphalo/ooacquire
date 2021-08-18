@@ -45,16 +45,19 @@ summary(sun001_recalc.spct)
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
 autoplot(sun001_recalc.spct)
 
+## ---- eval=FALSE--------------------------------------------------------------
+#  get_attributes(sun001_recalc.spct)
+
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
-sun001_recalc.spct <-
+sun001_recalc_sun.spct <-
   s_irrad_corrected(sun001.raw_mspct, 
                     correction.method = ooacquire::MAYP11278_sun.mthd)
 
 ## -----------------------------------------------------------------------------
-summary(sun001_recalc.spct)
+summary(sun001_recalc_sun.spct)
 
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
-autoplot(sun001_recalc.spct)
+autoplot(sun001_recalc_sun.spct)
 
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
 sun001_recalc.cps_spct <-
@@ -62,14 +65,17 @@ sun001_recalc.cps_spct <-
                     correction.method = ooacquire::MAYP11278_ylianttila.mthd,
                     return.cps = TRUE)
 
-## ---- eval=FALSE--------------------------------------------------------------
-#  get_attributes(sun001_recalc.cps_spct)
-
 ## -----------------------------------------------------------------------------
 summary(sun001_recalc.cps_spct)
 
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
 autoplot(sun001_recalc.cps_spct)
+
+## -----------------------------------------------------------------------------
+getInstrDesc(sun001_recalc.cps_spct)
+
+## -----------------------------------------------------------------------------
+str(getInstrDesc(sun001_recalc.cps_spct))
 
 ## ---- eval = FALSE------------------------------------------------------------
 #  sun001_recalc.source_spct <- cps2irrad(sun001_recalc.cps_spct)
@@ -81,7 +87,19 @@ autoplot(sun001_recalc.cps_spct)
 #  autoplot(sun001_recalc.source_spct)
 
 ## -----------------------------------------------------------------------------
+wavelengths <- getInstrDesc(sun001_recalc.cps_spct)$wavelengths
+multipliers <- getInstrDesc(sun001_recalc.cps_spct)$inst.calib$irrad.mult
+
+calib.spct <- calibration_spct(w.length = wavelengths,
+                               irrad.mult = multipliers)
+
+autoplot(calib.spct)
+
+## -----------------------------------------------------------------------------
 getInstrDesc(sun001.raw_mspct[["light"]])$max.counts
+
+## -----------------------------------------------------------------------------
+getInstrSettings(sun001.raw_mspct[["light"]])
 
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
 autoplot(sun001.raw_mspct[["light"]])
@@ -149,25 +167,58 @@ for (m in names(sun001.cps_mspct)) {
 }
 
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
-sun001.cps_mspct[["light"]] <- 
+sun001_mdark.cps_mspct <- cps_mspct()
+
+sun001_mdark.cps_mspct[["light"]] <- 
   sun001.cps_mspct[["light"]] - sun001.cps_mspct[["dark"]]
 
-sun001.cps_mspct[["filter"]] <- 
+sun001_mdark.cps_mspct[["filter"]] <- 
   sun001.cps_mspct[["filter"]] - sun001.cps_mspct[["dark"]]
 
-sun001.cps_mspct[["dark"]] <- NULL
+sun001_mdark.cps_mspct[["dark"]] <- NULL
 
-autoplot(sun001.cps_mspct) + ggtitle("Dark subtracted")
+autoplot(sun001_mdark.cps_mspct) + ggtitle("Dark subtracted")
+
+autoplot(clip_wl(sun001_mdark.cps_mspct, range = c(280, 310))) +
+  ggtitle("Dark subtracted")
+
+## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+ggplot(clip_wl(sun001_mdark.cps_mspct[["filter"]] /
+                   sun001_mdark.cps_mspct[["light"]], 
+                 range = c(280, 310))) +
+  geom_line() +
+  geom_hline(yintercept = 0.85, linetype = "dotted") +
+  ggtitle("Stray light contribution to cps") +
+  labs(y = "Contribution of stray light to readings (/1)",
+       x = "Waavelength (nm)")
+
+## -----------------------------------------------------------------------------
+sun001_mdark.cps_mspct[["light"]] <-
+  copy_attributes(sun001.cps_mspct[["light"]],
+                  sun001_mdark.cps_mspct[["light"]])
+
+sun001_mdark.cps_mspct[["filter"]] <-
+  copy_attributes(sun001.cps_mspct[["filter"]],
+                sun001_mdark.cps_mspct[["filter"]])
 
 ## ---- fig.width=8, fig.asp=0.5, eval = FALSE----------------------------------
-#  sun001.irrad_spct <- cps2irrad(sun001.cps_mspct[["light"]])
+#  sun001.irrad_spct <- cps2irrad(sun001_mdark.cps_mspct[["light"]])
 #  autoplot(sun001.irrad_spct)
-#  sun001_filter.irrad_spct <- cps2irrad(sun001.cps_mspct[["filter"]])
+#  sun001_filter.irrad_spct <- cps2irrad(sun001_mdark.cps_mspct[["filter"]])
 #  autoplot(sun001_filter.irrad_spct)
 
 ## ---- fig.width=8, fig.asp=0.5, eval = FALSE----------------------------------
 #  sun001.irrad_spct <- smooth_spct(sun001.irrad_spct)
 #  autoplot(sun001.irrad_spct)
+
+## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+autoplot(sun001_recalc.spct)
+
+## ---- fig.width=8, fig.asp=0.5, eval = FALSE----------------------------------
+#  autoplot(smooth_spct(sun001_recalc.spct))
+
+## -----------------------------------------------------------------------------
+str(MAYP11278_ylianttila.mthd)
 
 ## -----------------------------------------------------------------------------
 names(halogen.raw_mspct)
