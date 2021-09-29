@@ -22,7 +22,7 @@ the spectrometer including calibration data.}
 
 \item{verbose}{Logical indicating the level of warnings wanted.}
 
-\item{strict.calib}{Logical indicating the level of warnings wanted.}
+\item{strict.calib}{Logical indicating the level of validity checks.}
 
 \item{...}{Currently ignored.}
 }
@@ -30,13 +30,21 @@ the spectrometer including calibration data.}
 Select from a list of instrument descriptors which one to use based on
 date of measurement.
 }
-\note{
-The default argument for \code{verbose} is for this function
-  \code{TRUE} unless the argument to \code{date} is a date object, as
-  conversion of other objects to a date may fail.
+\details{
+Calibrations for instruments stored in a list and passed as argument
+  to \code{descriptors}, also store the dates between which they are valid.
+  This function walks the list searching for a calibration valid for
+  \code{date}. If no valid calibration is found and \code{strict.calib =
+  FALSE}, the calibration valid closest in time is returned with a warning
+  while if no valid calibration is found and \code{strict.calib = TRUE} an
+  error is triggered.
 
   If a character string is passed as argument to \code{date}, it must be
   in a format suitable for \code{anytime::anydate()}. One needs to be
   careful with months and days of the month when supplying them as numbers,
-  so using months names or their abbreviations may be safer.
+  so using months names or their abbreviations can be safer.
+}
+\note{
+The default argument for \code{verbose} is for this function
+  \code{TRUE} as conversion of other objects to a date may fail.
 }

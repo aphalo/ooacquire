@@ -12,7 +12,7 @@ editor_options:
 -   Move calibration data to separate packages.
 -   Allow file-based computations in the absence of a Java installation.
 
-# ooacquire 0.2.4 (2021-07-xx)
+# ooacquire 0.2.4 (2021-09-xx)
 
 -   Function `acquire_continuous_interactive()` gains two new parameters
     that make it possible to override the defaults.
@@ -24,6 +24,11 @@ editor_options:
     `acq_continuous_interactive()`.
 -   Fix bug in reading of raw data from files possibly caused by changes
     in 'readr'.
+-   Fix bug in `which_descriptor()` that resulted in wrong text in
+    warnings.
+-   Fix bug in `which_descriptor()` that resulted in failure to handle
+    gaps between the validity of calibrations or dates before the
+    earliest calibration.
 -   Expand description of algorithms.
 
 # ooacquire 0.2.3 (2021-03-26)
@@ -91,7 +96,7 @@ editor_options:
 
 -   Test against **OmniDriver 2.56**
 
--   Update for 'readr' \>= 1.3.0 which is now required
+-   Update for 'readr' >= 1.3.0 which is now required
 
 ## Measurement of pulsed light sources (*under development*)
 

@@ -19,6 +19,7 @@ test_that("ooacquire irrad continuous MAYA", {
                                    stray.light.method = NA)
       )
     new.spct <- s_irrad_corrected(old.raw.mspct, correction.method = correction.method)
+
     expect_known_value(new.spct, file = paste("ref", f, sep = "-"), update = TRUE)
   }
 })

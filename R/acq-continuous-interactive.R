@@ -456,13 +456,6 @@ acq_irrad_interactive <-
             ggplot2::theme(legend.position = "bottom")
           print(collection.fig)
 
-          if (save.summaries && qty.out == "irrad") {
-            summary.tb <- spct_summary(mspct = collection.mspct)
-            readr::write_delim(summary.tb,
-                               file =  paste(collection.name, "csv", sep = "."),
-                               delim = readr::locale()$grouping_mark)
-          }
-
           if (save.pdfs) {
             collection.pdf.name <- paste(collection.name, "pdf", sep = ".")
             grDevices::pdf(file = collection.pdf.name, onefile = TRUE,
@@ -471,20 +464,27 @@ acq_irrad_interactive <-
             grDevices::dev.off()
           }
 
+          if (save.summaries && qty.out == "irrad") {
+            summary.tb <- spct_summary(mspct = collection.mspct)
+            if (!is.null(summary.tb) && is.data.frame(summary.tb)) {
+              readr::write_delim(summary.tb,
+                                 file =  paste(collection.name, "csv", sep = "."),
+                                 delim = readr::locale()$grouping_mark)
+              rm(summary.tb) # clean up
+            } else {
+              warning("Computation of collection summaries failed!")
+            }
+          }
+
           irrad.collection.name <- paste(collection.name, "irrad", "mspct", sep = ".")
           assign(irrad.collection.name, collection.mspct)
           assign(raw.collection.name, mget(raw.names))
           save(list = c(irrad.collection.name, raw.collection.name),
                file = collection.file.name)
-
           # Clean up
           rm(collection.fig, collection.title, collection.pdf.name)
-          if (save.summaries && qty.out == "irrad") {
-            rm(summary.tb)
-          }
         } else {
           assign(raw.collection.name, mget(raw.names))
-
           save(list = raw.collection.name, file = collection.file.name)
         }
         message("collection saved to file '",
@@ -1053,10 +1053,17 @@ acq_rfr_tfr_interactive <-
   }
 
 spct_summary <- function(mspct,
-                         unit.out = "energy",
+                         unit.out = getOption("photobiology.radiation.unit",
+                                              default = "energy"),
                          scale.factor = ifelse(unit.out == "photon",
                                                1e6, 1),
-                         type = "plants") {
+                         type = "plant",
+                         digits = 3L) {
+
+  # handle also single spectra
+  if (is.generic_spct(mspct)) {
+    mspct <- generic_mspct(list(mspct), class = class(mspct)[1])
+  }
 
   ratio <- switch(unit.out,
                   photon = photobiology::q_ratio,
@@ -1092,7 +1099,7 @@ spct_summary <- function(mspct,
       photobiology::irrad(mspct,
                           unit.out = unit.out,
                           w.band = photobiologyWavebands::VIS_bands())
-  } else {
+  } else { # total
     summary.tb <-
       photobiology::irrad(mspct,
                           unit.out = unit.out,
@@ -1103,7 +1110,7 @@ spct_summary <- function(mspct,
                                           mspct = mspct)
 
   selector <- unname(sapply(summary.tb, is.numeric))
-  summary.tb[ , selector] <- signif(summary.tb[ , selector], digits = 3L)
+  summary.tb[ , selector] <- signif(summary.tb[ , selector], digits = digits)
 
-  summary
+  summary.tb
 }

@@ -8,13 +8,7 @@
 \description{
 \if{html}{\figure{logo.png}{options: align='right' alt='logo' width='120'}}
 
-Functions to acquire data directly from Ocean Insight, formerly 
-    Ocean Optics, spectrometers,
-    and functions to read similar data files. Functions to convert raw-counts
-    into counts-per-second and physical quantities. Data are saved in objects
-    of classes defined in package 'photobiology'. The instrument settings,
-    instrument description, date-time of acquisition and optionally goecode are
-    stored as attributes.
+Functions to acquire data directly from Ocean Insight, formerly Ocean Optics, spectrometers, and functions to read similar data files. Functions to convert raw-counts into counts-per-second and physical quantities. Data are saved in objects of classes defined in package 'photobiology'. The instrument settings, instrument description, date-time of acquisition and optionally goecode are stored as attributes.
 }
 \details{
 Processing of raw-counts data adquired following different protocols and

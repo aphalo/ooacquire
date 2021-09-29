@@ -114,7 +114,9 @@ s_irrad_corrected.raw_mspct <-
       }
     }
 
-    if (is.na(correction.method[["worker.fun"]])) {
+    if (is.null(correction.method[["worker.fun"]])) {
+      worker.fun <- NULL
+    } else if (is.na(correction.method[["worker.fun"]])) {
       worker.fun <- NULL
     } else if (is.character(correction.method[["worker.fun"]])) {
       worker.fun <- get(correction.method[["worker.fun"]],
@@ -180,17 +182,24 @@ s_irrad_corrected.raw_spct <- function(x,
 #' @param descriptors A named list of descriptors of the characteristics of
 #'   the spectrometer including calibration data.
 #' @param verbose Logical indicating the level of warnings wanted.
-#' @param strict.calib Logical indicating the level of warnings wanted.
+#' @param strict.calib Logical indicating the level of validity checks.
 #' @param ... Currently ignored.
 #'
-#' @note The default argument for \code{verbose} is for this function
-#'   \code{TRUE} unless the argument to \code{date} is a date object, as
-#'   conversion of other objects to a date may fail.
+#' @details Calibrations for instruments stored in a list and passed as argument
+#'   to \code{descriptors}, also store the dates between which they are valid.
+#'   This function walks the list searching for a calibration valid for
+#'   \code{date}. If no valid calibration is found and \code{strict.calib =
+#'   FALSE}, the calibration valid closest in time is returned with a warning
+#'   while if no valid calibration is found and \code{strict.calib = TRUE} an
+#'   error is triggered.
 #'
 #'   If a character string is passed as argument to \code{date}, it must be
 #'   in a format suitable for \code{anytime::anydate()}. One needs to be
 #'   careful with months and days of the month when supplying them as numbers,
-#'   so using months names or their abbreviations may be safer.
+#'   so using months names or their abbreviations can be safer.
+#'
+#' @note The default argument for \code{verbose} is for this function
+#'   \code{TRUE} as conversion of other objects to a date may fail.
 #'
 #' @export
 #'
@@ -204,6 +213,10 @@ which_descriptor <- function(date = lubridate::today(),
     date <- anytime::anydate(date)
   }
 
+  if (date > lubridate::today()) {
+    warning("Looking up calibration for a date in the future!!")
+  }
+
   descriptor <- list()
   for (d in rev(names(descriptors))) {
     if (descriptors[[d]][["inst.calib"]][["start.date"]] < date &
@@ -215,18 +228,46 @@ which_descriptor <- function(date = lubridate::today(),
     }
   }
 
-  if (!length(descriptor) &&
-      (strict.calib ||
-       ! date > descriptors[[length(descriptors)]][["inst.calib"]][["end.date"]])) {
-    if (verbose) {
-      warning("No valid calibration available for ", date)
-    }
-  } else {
-    descriptor <- descriptors[[length(descriptors)]]
-    if (verbose) {
-      warning("Using a calibration ",
-              date - descriptor[["inst.calib"]][["end.date"]],
-              "past validity")
+  if (!length(descriptor)) {
+    past.end <- date > descriptors[[length(descriptors)]][["inst.calib"]][["end.date"]]
+    before.start <- date < descriptors[[1]][["inst.calib"]][["start.date"]]
+    in.gap <- !xor(before.start, past.end)
+    if (strict.calib && any(c(past.end, before.start, in.gap))) {
+      stop("No valid calibration available for ", date)
+    } else {
+      if (past.end) {
+        descriptor <- descriptors[[length(descriptors)]]
+        days.past <- as.numeric(date - descriptor[["inst.calib"]][["end.date"]])
+        message.text <- paste("Using a calibration ",
+                              days.past,
+                              " days past its validity",
+                              sep = "")
+      } else if (before.start) {
+        descriptor <- descriptors[[1L]]
+        days.before <- as.numeric(date - descriptor[["inst.calib"]][["start.date"]])
+        message.text <- paste("Using a calibration ",
+                              abs(days.before),
+                              " days before its validity",
+                              sep = "")
+      } else if (in.gap) {
+        descriptor <- list()
+        for (d in rev(names(descriptors))) {
+          if (descriptors[[d]][["inst.calib"]][["start.date"]] < date &
+              descriptors[[d]][["inst.calib"]][["end.date"]] +
+                 lubridate::years(2) > date) {
+            if (verbose) {
+              message("Descriptor ", d, " selected for ", date)
+            }
+            descriptor <- descriptors[[d]]
+          }
+        }
+        days.past <- as.numeric(date - descriptor[["inst.calib"]][["end.date"]])
+        message.text <- paste("Using a calibration ",
+                              days.past,
+                              " days past its validity, in a time gap",
+                              sep = "")
+      }
+      warning(message.text)
     }
   }
 
