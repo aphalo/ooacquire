@@ -40,26 +40,30 @@ tune_interactive <- function(descriptor,
     interface.mode <- "auto"
   }
   # configure interface for active mode
-  prompt.text1 <- switch(interface.mode,
-                        simple = "RETUNE/range/HDR mult./undo/help/measure (t-/r/h/u/?/m): ",
-                        auto = "RETUNE/tune/margin/range/HDR mult./undo/help/measure (t-/T/M/r/h/u/?/m): ",
-                        manual = "FIXED/range/HDR mult./undo/help/measure (f-/r/h/u/?/m): "
-  )
-  prompt.text2 <- switch(interface.mode,
-                        simple = "retune/range/HDR mult./undo/help/MEASURE (t/r/h/u/?/m-): ",
-                        auto = "retune/tune/margin/range/HDR mult./undo/help/MEASURE (t/T/M/r/h/u/?/m-): ",
-                        manual = "fixed/range/HDR mult./undo/help/MEASURE (f/r/h/u/?/m-): "
-  )
-  valid.input <- switch(interface.mode,
-                        simple = c("t", "r", "h", "u", "?", "m", ""),
-                        auto = c("t", "T", "M", "r", "h", "u", "?", "m", ""),
-                        manual = c("f", "r", "h", "u", "?", "m", "")
-  )
-  default.input <- switch(interface.mode,
-                          simple = c("t", "m"),
-                          auto = c("t", "m"),
-                          manual = c("f", "m")
-  )
+  prompt.text1 <-
+    switch(interface.mode,
+           simple = "RETUNE/range/HDR mult./undo/help/measure (t-/r/h/u/?/m): ",
+           auto = "RETUNE/tune/margin/range/HDR mult./undo/help/measure (t-/T/M/r/h/u/?/m): ",
+           manual = "FIXED/range/HDR mult./undo/help/measure (f-/r/h/u/?/m): "
+    )
+  prompt.text2 <-
+    switch(interface.mode,
+           simple = "retune/range/HDR mult./undo/help/MEASURE (t/r/h/u/?/m-): ",
+           auto = "retune/tune/margin/range/HDR mult./undo/help/MEASURE (t/T/M/r/h/u/?/m-): ",
+           manual = "fixed/range/HDR mult./undo/help/MEASURE (f/r/h/u/?/m-): "
+    )
+  valid.input <-
+    switch(interface.mode,
+           simple = c("t", "r", "h", "u", "?", "m", ""),
+           auto = c("t", "T", "M", "r", "h", "u", "?", "m", ""),
+           manual = c("f", "r", "h", "u", "?", "m", "")
+    )
+  default.input <-
+    switch(interface.mode,
+           simple = c("t", "m"),
+           auto = c("t", "m"),
+           manual = c("f", "m")
+    )
   # set help
   all.help <- c(t = "t = retune. Adjust integration time starting from last value.",
                 T = "T = tune. Adjust integration time starting from default value.",
@@ -87,7 +91,7 @@ tune_interactive <- function(descriptor,
       if (answ %in% valid.input) {
         break()
       }
-      cat("Unrecognized letter: ", answ, ". Please, try again...")
+      cat("Unrecognized letter: '", answ, "'. Please, try again...\n")
     }
     if (answ == "") {
       answ <- ifelse(!tuned, default.input[1], default.input[2])
@@ -102,20 +106,22 @@ tune_interactive <- function(descriptor,
       if (readline("Auto-adjust integration time?, z = abort (-/z):") == "z") {
         next()
       }
-      acq.settings <- tune_acq_settings(descriptor = descriptor, acq.settings = acq.settings)
+      acq.settings <- tune_acq_settings(descriptor = descriptor,
+                                        acq.settings = acq.settings)
       tuned <- TRUE
     } else if (answ == "T") {
       if (readline("Auto-adjust integration time?, z = abort (-/z):") == "z") {
         next()
       }
       acq.settings[["integ.time"]] <- start.int.time * 1e6
-      acq.settings <- tune_acq_settings(descriptor = descriptor, acq.settings = acq.settings)
+      acq.settings <- tune_acq_settings(descriptor = descriptor,
+                                        acq.settings = acq.settings)
       tuned <- TRUE
     } else if (answ == "f") {
       cat("Integration time (seconds): ")
       user.integ.time <- scan(nmax = 4L) * 1e6
       acq.settings <- set_integ_time(acq.settings = acq.settings,
-                                 integ.time = user.integ.time)
+                                     integ.time = user.integ.time)
       tuned <- TRUE
     } else if (answ == "M") {
       margin <- readline(sprintf("Saturation margin = %.2g, new: ",
@@ -125,7 +131,7 @@ tune_interactive <- function(descriptor,
         acq.settings[["target.margin"]] <- margin
         tuned <- FALSE
       } else {
-        print("Value not changed!")
+        cat("Value not changed!\n")
       }
     } else if (answ == "r") {
       cat("Total time range (seconds), 2 numbers: ")
@@ -134,7 +140,7 @@ tune_interactive <- function(descriptor,
         acq.settings[["tot.time.range"]] <- tot.time.range
         tuned <- FALSE
       } else {
-        cat("Value not changed!")
+        cat("Value not changed!\n")
       }
     }  else if (answ == "h") {
       old.hdr.mult.len <- length(acq.settings[["HDR.mult"]])
@@ -156,10 +162,10 @@ tune_interactive <- function(descriptor,
           }
         }
       } else {
-        cat("Bad multipliers ignored. Value not changed! Please, try again...")
+        cat("Bad multipliers ignored. Value not changed! Please, try again...\n")
       }
     } else if (answ == "u") {
-      cat("Restoring previous settings!")
+      cat("Restoring previous settings!\n")
       tuned <- FALSE
       acq.settings <- old.settings
     }
@@ -185,28 +191,47 @@ tune_interactive <- function(descriptor,
 #' @family interactive acquisition utility functions
 #'
 #' @param protocols named list Measuring protocol defifinitions and names.
+#' @param default character Name of the default protocol.
 #'
 #' @return The member vector corresponding to the protocol selected by
 #' the user.
 #'
 #' @export
 #'
-protocol_interactive <- function(protocols) {
+protocol_interactive <- function(protocols,
+                                 default = names(protocols)[[1]]) {
   stopifnot(length(protocols) > 0L)
-  prompt <- paste("Protocols: ",
-                  paste(names(protocols), collapse = ", "),
-                  ": ")
-  repeat{
-    user.input <- readline(prompt = prompt)
-    if (user.input == "") {
-      user.input <- names(protocols)[[1]]
+  if (length(protocols) == 1) {
+    protocol <- protocols[[1]]
+    cat("Will use protocol '",
+        paste(protocol, collapse = " -> "),
+        "' (no choice).\n", sep = "")
+  } else {
+    if (! default %in% names(protocols)) {
+      # if default is invalid fall back to first member of list
+      default <- names(protocols)[[1]]
     }
-    if (user.input %in% names(protocols)) {
-      protocol <- protocols[[user.input[1]]]
-      if (readline(paste("Will use protocol ",
-                         paste(protocol, collapse = " -> "),
-                         " o.k.? (-/n): ", sep = "")) != "n") {
-        break()
+    protocol.names <- names(protocols)
+    protocol.names <- ifelse(protocol.names == default,
+                             paste(protocol.names, "-", sep = ""),
+                             protocol.names)
+    prompt <- paste("Protocols; light, filter, dark (",
+                    paste(protocol.names, collapse = "/"),
+                    "): ", sep = "")
+    repeat{
+      user.input <- tolower(readline(prompt = prompt))
+      if (user.input == "") {
+        user.input <- default
+      }
+      if (user.input %in% names(protocols)) {
+        protocol <- protocols[[user.input[1]]]
+        if (readline(paste("Will use protocol '",
+                           paste(protocol, collapse = " -> "),
+                           "', o.k.? (-/n): ", sep = "")) != "n") {
+          break()
+        }
+      } else {
+        cat("Protocol '", user.input, "' unknown!\n")
       }
     }
   }
@@ -258,9 +283,9 @@ choose_sr_interactive <- function(instruments) {
 
   num.inst <- nrow(instruments)
   if (num.inst >= 1) {
-    print("Connected spectrometers")
+    cat("Found", num.inst, "spectrometer(s)")
   } else {
-    cat("No spectrometers found.")
+    cat("No spectrometers found.\n")
     return(-1L)
   }
 
@@ -277,7 +302,7 @@ choose_sr_interactive <- function(instruments) {
         sr.idx <- sr.idx[1]
         break()
       } else {
-        print("A number between 1 and ", num.inst, " is required.")
+        cat("A number between 1 and ", num.inst, " is required.\n", sep = "")
       }
     }
   } else { # num.inst == 1
@@ -320,7 +345,7 @@ choose_ch_interactive <- function(instruments,
         ch.index <- ch.idx
         break()
       } else {
-        print(paste("A number between 1 and ", num.channels, " is required.", sep = ""))
+        cat("A number between 1 and ", num.channels, " is required.\n", sep = "")
       }
     }
   } else {
@@ -381,7 +406,7 @@ set_seq_interactive <- function(seq.settings = c(step.delay = 0, num.steps = 1))
         seq.settings[["num.steps"]] <- num.steps
       }
     } else if (substr(answ, 1, 1) == "u") {
-      cat("Restoring previous settings!")
+      cat("Restoring previous settings!\n")
       seq.settings <- old.seq.settings
     }
   }
@@ -428,29 +453,34 @@ set_attributes_interactive <- function(user.attrs = list(what.measured = "",
 #' @export
 #'
 set_folder_interactive <- function(folder.name = NULL) {
+  current.folder <- getwd()
   if (is.null(folder.name)) {
-    current.folder <- getwd()
     folder.name <- "."
   }
-  message("Current/default folder: ", folder.name)
 
-  old.folder.name <- folder.name
+  cat("Current folder: '", current.folder, "'.\n")
 
-  folder.name <- readline("Output folder name (name/-): ")
-  if (folder.name == "") {
-    folder.name <- old.folder.name
+  folder.name.prompt <-
+    paste("Output folder (-/./<path to folder>):", folder.name)
+  user.folder.name <- readline(folder.name.prompt)
+  if (!user.folder.name == "") {
+    folder.name <- user.folder.name
   }
   if (!file.exists(folder.name)) {
-    message("Folder does not exist, creating it...")
+    cat("Folder does not exist, creating it...\n")
     # we ask for a different folder name until success
     while (!dir.create(folder.name)) {
-      folder.name <- readline("Output folder name (name/-): ")
-      if (file.exists(folder.name)) {
+      cat("Failure! Unable to create folder: ", folder.name)
+      folder.name <- readline("Output folder (-/./<path to folder>): .")
+      if (folder.name == "") {
+        folder.name  <- "."
+      }
+      if (file.exists(folder.name)) { # we assume that "."  always exists
         break()
       }
     }
   }
-  message("Using folder: '", folder.name, "'.")
+  cat("Saving files to: '", folder.name, "'.\n", sep = "")
 
   folder.name
 }

@@ -3,22 +3,18 @@ require("knitr")
 opts_knit$set(cache = FALSE, root.dir = system.file("extdata", package = "ooacquire"))
 
 ## -----------------------------------------------------------------------------
-library(photobiology)
-library(photobiologyWavebands)
-library(ggspectra)
+# change this to TRUE to run acquisition examples
+# these examples require user interaction to complete!!
+sr.online <- FALSE
+
+## -----------------------------------------------------------------------------
 library(ooacquire)
 
 # print warnings at the time they are triggered
 options(warn = 1)
 
-# change this to TRUE to run acquisition examples
-# these examples require user interaction to complete!!
-sr.online <- FALSE
-
-## ---- eval=sr.online, echo=FALSE, message=FALSE, warning=FALSE----------------
-#  w <- start_session(error.action = warning)
-#  sr.online <- rOmniDriver::number_srs(w) > 0
-#  # is_valid_wrapper(w)
+## ---- eval = FALSE------------------------------------------------------------
+#  acq_continuous_interactive()
 
 ## ---- eval=sr.online----------------------------------------------------------
 #  acq_irrad_interactive(correction.method = ooacquire::MAYP11278_ylianttila.mthd,

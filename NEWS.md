@@ -11,11 +11,19 @@ editor_options:
 -   Document support for OO calibrations and add example scripts.
 -   Move calibration data to separate packages.
 -   Allow file-based computations in the absence of a Java installation.
+-   Update all interactive data acquisition functions to match the
+    updated interface of `acq_continuous_interactive()`.
 
-# ooacquire 0.2.4 (2021-09-xx)
+# ooacquire 0.2.4 (2021-10-xx)
 
--   Function `acquire_continuous_interactive()` gains two new parameters
-    that make it possible to override the defaults.
+-   Function `acquire_continuous_interactive()` gains three new
+    parameters that make it possible to override defaults and gets
+    several small tweaks to the user interface including dynamic default
+    for protocol.
+-   Function `acquire_continuous_interactive()` now sets defaults for
+    user/operator name, session name and folder used for output based on
+    logged-in user's name, current day and time and spectral quantity
+    returned.
 -   Revise the user interaction in `set_folder_interactive()` and add
     check for success of new folder creation.
 -   Support in `acq_raw_mspct()` the acquisition of a timed sequence of
@@ -27,7 +35,7 @@ editor_options:
 -   Fix bug in `which_descriptor()` that resulted in wrong text in
     warnings.
 -   Fix bug in `which_descriptor()` that resulted in failure to handle
-    gaps between the validity of calibrations or dates before the
+    well gaps between the validity of calibrations or dates before the
     earliest calibration.
 -   Expand description of algorithms.
 

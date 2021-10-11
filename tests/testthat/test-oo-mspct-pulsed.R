@@ -21,6 +21,7 @@ test_that("ooacquire fluence", {
                                    stray.light.method = NA)
       )
     new.spct <- s_irrad_corrected(old.raw.mspct, correction.method = correction.method)
+    new.spct <- trimInstrDesc(new.spct) # needed to avoid futile call to .jcall
     expect_known_value(new.spct, file = paste("ref", f, sep = "-"), update = TRUE)
   }
 })

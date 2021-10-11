@@ -16,20 +16,20 @@
 #'
 #'   The default behaviour of the functions can be changed by passing different
 #'   arguments through parameters, but for special use cases it could be best
-#'   for users to define case-specific data acquisition functions from the
-#'   same building blocks.
+#'   for users to define case-specific data acquisition functions from the same
+#'   building blocks.
 #'
 #'   Using these functions only requires an Ocean Optics spectrometer to be
 #'   connected. The connection to the spectrometer and selection of channel,
 #'   when relevant, is done from within these functions.
 #'
-#'   The irradiance calibration will be retrieved from the spectrometer
-#'   memory as a last resource if not supplied in any other way. Given that
-#'   the factors are stored in a format that ignores the entrance optics,
-#'   either the efefctive diffuser are in xxx should be passed to parameter
-#'   \code{area} or a character string with the type of the diffuser passed
-#'   to \code{diff.type}. If no irardiance calibration is available, counts
-#'   per second (cps) or raw counts are the only options available.
+#'   The irradiance calibration will be retrieved from the spectrometer memory
+#'   as a last resource if not supplied in any other way. Given that the factors
+#'   are stored in a format that ignores the entrance optics, either the
+#'   efefctive diffuser are in xxx should be passed to parameter \code{area} or
+#'   a character string with the type of the diffuser passed to
+#'   \code{diff.type}. If no irardiance calibration is available, counts per
+#'   second (cps) or raw counts are the only options available.
 #'
 #' @seealso This function calls functions \code{\link{tune_interactive}},
 #'   \code{\link{protocol_interactive}} and
@@ -45,7 +45,8 @@
 #'   head space to leave.
 #' @param HDR.mult numeric the integration time for each bracketed integration
 #'   as a multiplier of the set or tuned integration time.
-#' @param protocols list of character vectors.
+#' @param protocols named list of character vectors, or a character vector with
+#'   names of at least one member of the default list of protocols.
 #' @param correction.method list The method to use when applying the calibration
 #' @param descriptors list A list of instrument descriptors containing
 #'   calibration data.
@@ -58,23 +59,24 @@
 #' @param qty.out character One of "Tfr" (spectral transmittance as a fraction
 #'   of one), "irrad" (spectral irardiance), "cps" (counts per second), or "raw"
 #'   (raw sensor counts).
-#' @param save.pdfs,save.summaries logical Whether to save plots to PDFs files
-#'   or not, and collection summaries to csv files or not.
-#' @param interface.mode character One of "auto", "simple", "manual",
-#'   "series", "auto-attr", "simple-attr", "manual-attr", and
-#'   "series-attr".
-#' @param folder.name character Default name of the folder.
+#' @param save.pdfs,save.summaries,save.collections logical Whether to save
+#'   plots to PDFs files or not, and collection summaries to csv files or not,
+#'   enable collections user interface or not..
+#' @param interface.mode character One of "auto", "simple", "manual", "series",
+#'   "auto-attr", "simple-attr", "manual-attr", and "series-attr".
+#' @param folder.name,session.name,user.name character Default name of the
+#'   folder used for output, and session and user names.
 #'
 #' @export
 #'
 #' @note The integration time is set automatically so that the peak number of
-#'   counts is close to 1 - \code{target.margin} of maximum range of the
-#'   instrument detector. The minmum \code{tot.time} is achieved by increasing
-#'   the number of scans. The default protocols are usually suitable, if new
-#'   protocols are passed, each character vector must contain strings "light",
-#'   "filter" and "dark", or "sample", "reference", and "dark", depending on
-#'   the function. Plots are produced with functions from
-#'   package 'ggspectra' and respect the default annotations set with function
+#'   counts is close to 1 - \code{target.margin} times the maximum of the range
+#'   of the instrument detector. The minmum \code{tot.time} is achieved by
+#'   increasing the number of scans. The default protocols are usually suitable,
+#'   if new protocols are passed, each character vector must contain strings
+#'   "light", "filter" and "dark", or "sample", "reference", and "dark",
+#'   depending on the function. Plots are produced with functions from package
+#'   'ggspectra' and respect the default annotations set with function
 #'   \code{set_annotations_default()}, default wavebands set with function
 #'   \code{set_w.band_default()}, and irradiance quantities set with
 #'   \code{photon_as_default()}, and \code{energy_as_default()}.
@@ -84,19 +86,34 @@
 #'   the current locale. If needed use \code{readr::set_locale()} to change it
 #'   before calling this function.
 #'
-#' @return These functions return the acquired spectra through "side effects"
-#' as each spectrum is saved, both as raw counts data and calibrated
-#' spectral data in an \code{.rda} file as objects of the classes defined in
-#' package 'photobiology'. Optionally, the plot for each spectrum is saved as
-#' a \code{.pdf} file, and summaries for each collection created, are save to
-#' CSV file. The value returned by the function is that from
-#' closing the connection to the spectrometer.
+#' @note Calibration data needs in most cases to be imported into R and
+#'   parameters entered for the special correction algorithms into a correction
+#'   method descriptor. The corrections are skipped if the needed information is
+#'   missing. If no spectral irradiance calibration is available and attempt is
+#'   made to retrieve it from the spectrometer, but given the format used by
+#'   Ocean Optics/Ocean Insight, in this case the effective \code{area} of the
+#'   cosine diffuser used (or the model name if from Ocean Optics) should be
+#'   supplied by the user.
+#'
+#' @return These functions return the acquired spectra through "side effects" as
+#'   each spectrum is saved, both as raw counts data and optionally as spectral
+#'   irradiance or counts-per-second  spectral data in an \code{.rda} file as
+#'   objects of the classes defined in package 'photobiology'. Optionally, the
+#'   plot for each spectrum is saved as a \code{.pdf} file, as well as summaries
+#'   to a CSV file and joint plots to a \code{.pdf} file for each collection
+#'   created. The value returned by the function is that from closing the
+#'   connection to the spectrometer.
 #'
 #' @examples
+#' # please, see also the example scripts installed with the package
 #'
 #' \dontrun{
 #' # requires an Ocean Insight (former Ocean Optics) spectrometer to be
-#' # connected via USB acquire_interactive()
+#' # connected via USB
+#'
+#' acquire_interactive()
+#' acquire_interactive(qty.out = "cps")
+#'
 #' }
 #'
 acq_irrad_interactive <-
@@ -113,8 +130,16 @@ acq_irrad_interactive <-
            qty.out = "irrad",
            save.pdfs = TRUE,
            save.summaries = TRUE,
+           save.collections = TRUE,
            interface.mode = "auto",
-           folder.name = NULL) {
+           folder.name = paste("acq", qty.out,
+                               lubridate::today(),
+                               sep = "-"),
+           user.name = Sys.info()[["user"]],
+           session.name = paste(user.name,
+                                strftime(lubridate::now(),
+                                         "%Y.%b.%d_%H.%M.%S"),
+                                sep = "_")) {
 
     old.value <- options(warn = 1)
     on.exit(options(old.value), add = TRUE, after = TRUE)
@@ -123,7 +148,7 @@ acq_irrad_interactive <-
     interface.mode <- tolower(interface.mode)
     if (!gsub("-attr$", "", interface.mode) %in%
         c("auto", "simple", "series")) {
-      stop("Invalid argument for 'interface.mode', aborting.")
+      stop("Invalid argument for 'interface.mode', aborting.", call. = FALSE)
     }
 
     # validate qty.out
@@ -131,12 +156,17 @@ acq_irrad_interactive <-
     stopifnot(qty.out %in% c("irrad", "cps", "raw"))
 
     # define measurement protocols
+    default.protocols <- list(l = "light",
+                              ld = c("light", "dark"),
+                              lf = c("light", "filter"),
+                              lfd = c("light", "filter", "dark"))
     if (length(protocols) == 0) {
-      protocols <- list(l = "light",
-                        ld = c("light", "dark"),
-                        lf = c("light", "filter"),
-                        lfd = c("light", "filter", "dark")
-      )
+      protocols <- default.protocols
+    } else if (inherits(protocols, "character")) {
+      protocols <- default.protocols[protocols]
+      if (length(protocols) == 0) {
+        stop("No protocol selected.", call. = FALSE)
+      }
     }
 
     # connect to spectrometer
@@ -149,6 +179,7 @@ acq_irrad_interactive <-
       print("Aborting...")
       end_session(w = w)
       message("Bye!")
+      return(NULL)
     }
     ch.index <- choose_ch_interactive(instruments = instruments,
                                       sr.index = sr.index)
@@ -193,9 +224,22 @@ acq_irrad_interactive <-
                }
         )
 
+      default.protocol <-
+        switch(serial_no,
+               MAYP11278 = "lfd",
+               MAYP112785 = "lfd",
+               MAYP114590 = "ld",
+               FLMS04133 = "ld",
+               FLMS00673 = "ld",
+               FLMS00440 = "ld",
+               FLMS00416 = "ld",
+                           "ld"
+        )
+
     } else {
       descriptor <- which_descriptor(descriptors = descriptors)
       stopifnot(exists("spectrometer.name", descriptor))
+      default.protocol <- "ld"
     }
 
     # needed only for descriptors retrieved from data
@@ -223,18 +267,27 @@ acq_irrad_interactive <-
       }
     }
 
-    # We get metadata from user
-
-    user.session.name <- readline("Session's name: ")
-    session.name <- make.names(user.session.name)
-    if (user.session.name == "") {
-      session.name <- make.names(lubridate::now())
+    # We get metadata from user, offering defaults
+    session.name <- make.names(session.name) # validate argument passed in call
+    session.prompt <- paste("Session's name (-/<string>): ", session.name)
+    user.session.name <- readline(session.prompt)
+    if (! user.session.name == "") {
+      session.name <- make.names(user.session.name)
+      if (user.session.name == "") {
+        session.name <- make.names(lubridate::now())
+      }
+      if (session.name != user.session.name) {
+        message("Using sanitised/generated name: '", session.name, "'.", sep = "")
+      }
     }
-    if (session.name != user.session.name) {
-      message("Using sanitised/generated name: '", session.name, "'.", sep = "")
-    }
 
-    session.label <- paste("Operator: ", readline("Operator's name: "),
+    user.name <- make.names(user.name) # validate argument passed in call
+    user.name.prompt <- paste("Operator's name (-/<string>): ", user.name)
+    user.user.name <- readline(user.name.prompt)
+    if (! user.user.name == "") {
+      user.name <- make.names(user.user.name)
+    }
+    session.label <- paste("Operator: ", user.name,
                            "\nSession: ", session.name,
                            ", instrument s.n.: ", descriptor[["spectrometer.sn"]],
                            sep = "")
@@ -247,9 +300,9 @@ acq_irrad_interactive <-
     oldwd <- setwd(folder.name)
     on.exit(setwd(oldwd), add = TRUE)
     on.exit(message("Folder reset to: ", getwd(), "\nBye!"), add = TRUE)
-    message("Files will be saved to '", folder.name, "'", sep="")
 
-    protocol <- protocol_interactive(protocols = protocols)
+    protocol <- protocol_interactive(protocols = protocols,
+                                     default = default.protocol)
 
     start.int.time <- 0.01 # seconds
 
@@ -409,7 +462,11 @@ acq_irrad_interactive <-
       }
 
       repeat {
-        answer2 <- readline("change protocol/collect+continue/collect+quit/abort/NEXT (p/c/q/a/n-): ")[1]
+        if (save.collections) {
+          answer2 <- readline("change protocol/collect+continue/collect+quit/abort/NEXT (p/c/q/a/n-): ")[1]
+        } else {
+          answer2 <- readline("change protocol/continue/quit/abort/NEXT (p/c/q/a/n-): ")[1]
+        }
         answer2 <- ifelse(answer2 == "", "n", answer2)
         if (answer2 %in% c("n", "p", "c", "q", "a", "z")) {
           break()
@@ -422,83 +479,84 @@ acq_irrad_interactive <-
       } else if (answer2 == "p") {
         protocol <- protocol_interactive(protocols)
       } else if (answer2 %in% c("c", "q")) {
-        message("Source spectra to collect: ",
-                paste(irrad.names, collapse = ", "))
-        message("Raw objects to collect: ",
-                paste(raw.names, collapse = ", "), sep = " ")
-        user.collection.name <- readline("Name of the collection?: ")
-        collection.name <- make.names(paste("collection ",
-                                            user.collection.name, sep = ""))
-        if (user.collection.name == "") {
+        if (save.collections) {
+          message("Source spectra to collect: ",
+                  paste(irrad.names, collapse = ", "))
+          message("Raw objects to collect: ",
+                  paste(raw.names, collapse = ", "), sep = " ")
+          user.collection.name <- readline("Name of the collection?: ")
           collection.name <- make.names(paste("collection ",
-                                              lubridate::now(), sep = ""))
-        }
-        if (collection.name != user.collection.name) {
-          message("Using sanitised/generated name: '",
-                  collection.name, "'.", sep = "")
-        }
-        collection.title <- readline("Title for plot?:")
-        raw.collection.name <- paste(collection.name, "raw", "lst", sep = ".")
-        collection.file.name <- paste(collection.name, "Rda", sep = ".")
+                                              user.collection.name, sep = ""))
+          if (user.collection.name == "") {
+            collection.name <- make.names(paste("collection ",
+                                                lubridate::now(), sep = ""))
+          }
+          if (collection.name != user.collection.name) {
+            message("Using sanitised/generated name: '",
+                    collection.name, "'.", sep = "")
+          }
+          collection.title <- readline("Title for plot?:")
+          raw.collection.name <- paste(collection.name, "raw", "lst", sep = ".")
+          collection.file.name <- paste(collection.name, "Rda", sep = ".")
 
-        if (qty.out != "raw") {
-          collection.mspct <-
-            switch(qty.out,
-                   irrad = photobiology::source_mspct(mget(irrad.names)),
-                   cps =   photobiology::cps_mspct(mget(irrad.names)))
+          if (qty.out != "raw") {
+            collection.mspct <-
+              switch(qty.out,
+                     irrad = photobiology::source_mspct(mget(irrad.names)),
+                     cps =   photobiology::cps_mspct(mget(irrad.names)))
 
-          # plot collection and summaries
-          collection.fig <- ggplot2::autoplot(collection.mspct) +
-            ggplot2::labs(title = collection.title,
-                          subtitle = session.label,
-                          caption = paste("ooacquire",
-                                          utils::packageVersion("ooacquire"))) +
-            ggplot2::theme(legend.position = "bottom")
-          print(collection.fig)
-
-          if (save.pdfs) {
-            collection.pdf.name <- paste(collection.name, "pdf", sep = ".")
-            grDevices::pdf(file = collection.pdf.name, onefile = TRUE,
-                           width = 11, height = 7, paper = "a4r")
+            # plot collection and summaries
+            collection.fig <- ggplot2::autoplot(collection.mspct) +
+              ggplot2::labs(title = collection.title,
+                            subtitle = session.label,
+                            caption = paste("ooacquire",
+                                            utils::packageVersion("ooacquire"))) +
+              ggplot2::theme(legend.position = "bottom")
             print(collection.fig)
-            grDevices::dev.off()
-          }
 
-          if (save.summaries && qty.out == "irrad") {
-            summary.tb <- spct_summary(mspct = collection.mspct)
-            if (!is.null(summary.tb) && is.data.frame(summary.tb)) {
-              readr::write_delim(summary.tb,
-                                 file =  paste(collection.name, "csv", sep = "."),
-                                 delim = readr::locale()$grouping_mark)
-              rm(summary.tb) # clean up
-            } else {
-              warning("Computation of collection summaries failed!")
+            if (save.pdfs) {
+              collection.pdf.name <- paste(collection.name, "pdf", sep = ".")
+              grDevices::pdf(file = collection.pdf.name, onefile = TRUE,
+                             width = 11, height = 7, paper = "a4r")
+              print(collection.fig)
+              grDevices::dev.off()
             }
+
+            if (save.summaries && qty.out == "irrad") {
+              summary.tb <- spct_summary(mspct = collection.mspct)
+              if (!is.null(summary.tb) && is.data.frame(summary.tb)) {
+                readr::write_delim(summary.tb,
+                                   file =  paste(collection.name, "csv", sep = "."),
+                                   delim = readr::locale()$grouping_mark)
+                rm(summary.tb) # clean up
+              } else {
+                warning("Computation of collection summaries failed!")
+              }
+            }
+
+            irrad.collection.name <- paste(collection.name, "irrad", "mspct", sep = ".")
+            assign(irrad.collection.name, collection.mspct)
+            assign(raw.collection.name, mget(raw.names))
+            save(list = c(irrad.collection.name, raw.collection.name),
+                 file = collection.file.name)
+            # Clean up
+            rm(collection.fig, collection.title, collection.pdf.name)
+          } else {
+            assign(raw.collection.name, mget(raw.names))
+            save(list = raw.collection.name, file = collection.file.name)
           }
+          message("collection saved to file '",
+                  collection.file.name, "'.", sep = "")
 
-          irrad.collection.name <- paste(collection.name, "irrad", "mspct", sep = ".")
-          assign(irrad.collection.name, collection.mspct)
-          assign(raw.collection.name, mget(raw.names))
-          save(list = c(irrad.collection.name, raw.collection.name),
-               file = collection.file.name)
-          # Clean up
-          rm(collection.fig, collection.title, collection.pdf.name)
-        } else {
-          assign(raw.collection.name, mget(raw.names))
-          save(list = raw.collection.name, file = collection.file.name)
+          file.names <- c(file.names, collection.file.name)
+
+          # clean up by removing the spectra that have been added to the
+          # collection, and clearing the stored names afterwards
+          rm(list = c(irrad.names))
+          rm(list = c(raw.names))
+          irrad.names <- character()
+          raw.names <- character()
         }
-        message("collection saved to file '",
-                collection.file.name, "'.", sep = "")
-
-        file.names <- c(file.names, collection.file.name)
-
-        # clean up by removing the spectra that have been added to the
-        # collection, and clearing the stored names afterwards
-        rm(list = c(irrad.names))
-        rm(list = c(raw.names))
-        irrad.names <- character()
-        raw.names <- character()
-
         if (answer2 %in% c("q", "a")) {
           break()
         } else {
@@ -515,7 +573,7 @@ acq_irrad_interactive <-
             protocol <- protocol_interactive(protocols)
           }
         }
-       }
+      }
     }
     save(file.names,
          file = paste("files4session-",

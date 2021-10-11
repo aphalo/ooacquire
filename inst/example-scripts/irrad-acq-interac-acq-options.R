@@ -1,9 +1,9 @@
 # Using a spectrometer with a single channel
-# Tested with a Maya 2000 Pro spectrometer
+# Tested with a Maya 2000 Pro spectrometer and a USB2000 spectrometer
 
 library(ooacquire)
 
-# use default settings chosing instrument automatically
+# use default settings choosing instrument automatically
 acq_irrad_interactive()
 
 # use default settings for old Maya

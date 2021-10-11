@@ -20,8 +20,12 @@ acq_irrad_interactive(
   qty.out = "irrad",
   save.pdfs = TRUE,
   save.summaries = TRUE,
+  save.collections = TRUE,
   interface.mode = "auto",
-  folder.name = NULL
+  folder.name = paste("acq", qty.out, lubridate::today(), sep = "-"),
+  user.name = Sys.info()[["user"]],
+  session.name = paste(user.name, strftime(lubridate::now(),
+    "\%Y.\%b.\%d_\%H.\%M.\%S"), sep = "_")
 )
 
 acq_fraction_interactive(
@@ -58,7 +62,8 @@ head space to leave.}
 \item{HDR.mult}{numeric the integration time for each bracketed integration
 as a multiplier of the set or tuned integration time.}
 
-\item{protocols}{list of character vectors.}
+\item{protocols}{named list of character vectors, or a character vector with
+names of at least one member of the default list of protocols.}
 
 \item{correction.method}{list The method to use when applying the calibration}
 
@@ -79,27 +84,29 @@ created on-the-fly.}
 of one), "irrad" (spectral irardiance), "cps" (counts per second), or "raw"
 (raw sensor counts).}
 
-\item{save.pdfs, save.summaries}{logical Whether to save plots to PDFs files
-or not, and collection summaries to csv files or not.}
+\item{save.pdfs, save.summaries, save.collections}{logical Whether to save
+plots to PDFs files or not, and collection summaries to csv files or not,
+enable collections user interface or not..}
 
-\item{interface.mode}{character One of "auto", "simple", "manual",
-"series", "auto-attr", "simple-attr", "manual-attr", and
-"series-attr".}
+\item{interface.mode}{character One of "auto", "simple", "manual", "series",
+"auto-attr", "simple-attr", "manual-attr", and "series-attr".}
 
-\item{folder.name}{character Default name of the folder.}
+\item{folder.name, session.name, user.name}{character Default name of the
+folder used for output, and session and user names.}
 
 \item{ref.value}{numeric or filter_spct/reflector_spct object.}
 
 \item{type}{character Type of transmittance or reflectance measured.}
 }
 \value{
-These functions return the acquired spectra through "side effects"
-as each spectrum is saved, both as raw counts data and calibrated
-spectral data in an \code{.rda} file as objects of the classes defined in
-package 'photobiology'. Optionally, the plot for each spectrum is saved as
-a \code{.pdf} file, and summaries for each collection created, are save to
-CSV file. The value returned by the function is that from
-closing the connection to the spectrometer.
+These functions return the acquired spectra through "side effects" as
+  each spectrum is saved, both as raw counts data and optionally as spectral
+  irradiance or counts-per-second  spectral data in an \code{.rda} file as
+  objects of the classes defined in package 'photobiology'. Optionally, the
+  plot for each spectrum is saved as a \code{.pdf} file, as well as summaries
+  to a CSV file and joint plots to a \code{.pdf} file for each collection
+  created. The value returned by the function is that from closing the
+  connection to the spectrometer.
 }
 \description{
 Functions providing a simple interactive front-end to the functions in the
@@ -119,30 +126,30 @@ These functions can be useful for commonly done measurements but
 
   The default behaviour of the functions can be changed by passing different
   arguments through parameters, but for special use cases it could be best
-  for users to define case-specific data acquisition functions from the
-  same building blocks.
+  for users to define case-specific data acquisition functions from the same
+  building blocks.
 
   Using these functions only requires an Ocean Optics spectrometer to be
   connected. The connection to the spectrometer and selection of channel,
   when relevant, is done from within these functions.
 
-  The irradiance calibration will be retrieved from the spectrometer
-  memory as a last resource if not supplied in any other way. Given that
-  the factors are stored in a format that ignores the entrance optics,
-  either the efefctive diffuser are in xxx should be passed to parameter
-  \code{area} or a character string with the type of the diffuser passed
-  to \code{diff.type}. If no irardiance calibration is available, counts
-  per second (cps) or raw counts are the only options available.
+  The irradiance calibration will be retrieved from the spectrometer memory
+  as a last resource if not supplied in any other way. Given that the factors
+  are stored in a format that ignores the entrance optics, either the
+  efefctive diffuser are in xxx should be passed to parameter \code{area} or
+  a character string with the type of the diffuser passed to
+  \code{diff.type}. If no irardiance calibration is available, counts per
+  second (cps) or raw counts are the only options available.
 }
 \note{
 The integration time is set automatically so that the peak number of
-  counts is close to 1 - \code{target.margin} of maximum range of the
-  instrument detector. The minmum \code{tot.time} is achieved by increasing
-  the number of scans. The default protocols are usually suitable, if new
-  protocols are passed, each character vector must contain strings "light",
-  "filter" and "dark", or "sample", "reference", and "dark", depending on
-  the function. Plots are produced with functions from
-  package 'ggspectra' and respect the default annotations set with function
+  counts is close to 1 - \code{target.margin} times the maximum of the range
+  of the instrument detector. The minmum \code{tot.time} is achieved by
+  increasing the number of scans. The default protocols are usually suitable,
+  if new protocols are passed, each character vector must contain strings
+  "light", "filter" and "dark", or "sample", "reference", and "dark",
+  depending on the function. Plots are produced with functions from package
+  'ggspectra' and respect the default annotations set with function
   \code{set_annotations_default()}, default wavebands set with function
   \code{set_w.band_default()}, and irradiance quantities set with
   \code{photon_as_default()}, and \code{energy_as_default()}.
@@ -151,6 +158,15 @@ The different interface modes are suitable for different types of
   measurements. The field separator in the written CSV file is according to
   the current locale. If needed use \code{readr::set_locale()} to change it
   before calling this function.
+
+Calibration data needs in most cases to be imported into R and
+  parameters entered for the special correction algorithms into a correction
+  method descriptor. The corrections are skipped if the needed information is
+  missing. If no spectral irradiance calibration is available and attempt is
+  made to retrieve it from the spectrometer, but given the format used by
+  Ocean Optics/Ocean Insight, in this case the effective \code{area} of the
+  cosine diffuser used (or the model name if from Ocean Optics) should be
+  supplied by the user.
 
 The calculations for reflectance and transmittance are very similar,
   so we provide a single function capable of handling both. For
@@ -167,10 +183,15 @@ The calculations for reflectance and transmittance are very similar,
   later computations valid.
 }
 \examples{
+# please, see also the example scripts installed with the package
 
 \dontrun{
 # requires an Ocean Insight (former Ocean Optics) spectrometer to be
-# connected via USB acquire_interactive()
+# connected via USB
+
+acquire_interactive()
+acquire_interactive(qty.out = "cps")
+
 }
 
 }

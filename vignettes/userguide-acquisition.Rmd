@@ -15,63 +15,77 @@ vignette: >
 ## Summary
 ***
 * This package supports only Ocean Optics (now Ocean Insight) spectrometers.
-* Allows spectral data acquisition from within an R session in real-time.
+* Allows spectral data acquisition from within an R session in near real-time.
 * Allows conversion of raw-counts data acquired using SpectraSuite or
-OceanView on PCs and the software xxxx running
-on the Raspberry Pi single-board microcomputers from attached spectrometers, 
-and those acquired autonomously with the Jaz spectrometer.
+OceanView on PCs and the software xxxx running on the Raspberry Pi single-board microcomputers. Also supports files acquired autonomously with the Jaz spectrometer.
 * Irradiance, reflectance, transmittance, absorptance and absorbance can be
-derived from row spectra.
-* Measurments of both continuous and pulsed light sources is possible.
+derived from raw spectra.
+* Measurements of both continuous and pulsed light sources is possible.
 * Different measurement protocols, data averaging, integration time
-bracketing, automatic adjustment of integration time can be used and corrections 
-for stray light and slit function can be applied.
+bracketing, automatic adjustment of integration time can be used and corrections for stray light and slit function can be applied.
 ***
 
 ## Introduction
 
-This brief document describes only high level functions for interactive data acquisition. We first show simple examples of their use, assuming that R, the needed R packages, the Java **JDK** and Ocean Optics' free OmniDriver runtime are all installed and working together (see this package's User Guide for details). Of course, to acquire irradiance, a suitable instrument calibration and correction method description should be also available. In the example below we use the as examples calibration included as part of the package. As the serial number stored with the calibration is validated against that retrieved from the instrument, the examples below will work only with our own instrument, rather than with the one you intend to use. In most cases you will need to either import calibration data as provided by OceanOptics or manually add the calibration from other sources.
+This document describes only high level functions for interactive data acquisition. We first show simple examples of their use, assuming that R, the needed R packages, the Java **JDK** and Ocean Optics' free OmniDriver runtime are all installed and working (see this package's README and the README of package 'rOmniDriver' for details).
 
-**NOTE:** This vignette can be built even if a spectrometer is not connected as the code chunks with code that "talks" with the instrument are by default not evaluated.
-l
-## Preliminaries
+In this vignette we provide a tutorial on how to carry out measurements. Please, see the vignette _Algorithms_ for the details on the computations.
+
+### Preliminaries
+
+Independently of the type of measurement or spectrometer, the initial step is to open a connection to the instrument.
 
 ```{r "setup", include=FALSE}
 require("knitr")
 opts_knit$set(cache = FALSE, root.dir = system.file("extdata", package = "ooacquire"))
 ```
 
-We first load the R packages to be used.
+We first load the R package to be used. 
 
 ```{r}
-library(photobiology)
-library(photobiologyWavebands)
-library(ggspectra)
-library(ooacquire)
-
-# print warnings at the time they are triggered
-options(warn = 1)
-
 # change this to TRUE to run acquisition examples
 # these examples require user interaction to complete!!
 sr.online <- FALSE
 ```
 
-For spectral data acquisition the first step is to connect an Ocean Optics spectrometer to a USB port and start a measuring session.
+**NOTE:** This vignette can be built even if a spectrometer is not connected as the code chunks with code that "talks" with the instrument are by default not evaluated.
 
-```{r, eval=sr.online, echo=FALSE, message=FALSE, warning=FALSE}
-w <- start_session(error.action = warning)
-sr.online <- rOmniDriver::number_srs(w) > 0
-# is_valid_wrapper(w)
-```
+## Acquisition of spectral irradiance
 
-Please, see the documentation for the individual functions, and below, for examples of data acquisition, and other vignettes for descriptions of the different algorithms implemented.
+To acquire irradiance, a suitable instrument calibration and correction method description should be also available. Advanced algorithms require a special characterization of spectrometers. If these are not available, a simpler approach, as normally used with other software, is available. If no calibration is available in the format used by this package, an attempt is made to retrieve calibration data from the connected spectrometer.
 
-## Continuous versus pulsed light sources
+In the code chunks below we use calibrations included as part of the package. As the serial number stored with the calibration is validated against that retrieved from the instrument, the examples below will work only with our own instruments, rather than with the ones you may intend to use. In most cases you will need to either import calibration data as provided by Ocean Optics/Ocean Insight or for more complex correction algorithms, manually create R objects with calibration and characterisation data obtained from other sources. Such setup needs to be done only once, and updated when the spectrometer is recalibrated.
 
 When sunlight or radiation emitted by lamps driven by direct or alternating current are measured the integration time can be used as reference to compute fluxes such as energy irradiance or photon irradiance. In the case of many lamps driven by alternating current accurate measurments require us to consider the line frequency (50 Hz in Europe, 60 Hz in USA) because light output will usually vary cyclically at twice these frequencies (100 Hz or 120 Hz) making it necessary to use integration times that are multiples of the durantion of one half cycle of line frequency (10 ms and 8.3333 ms, respectively) or alternatively use long-enough integration times for several cycles to be included in the measurement interval. The same considerations apply to transmittance, reflectance, absorptance measurements using continuous radiation sources.
 
 When measuring radiation from pulsed light sources such as xenon flashes we express the measurements as spectral power or photons per event (pulse or "flash") and the integration time must simply be long enough to encompass a known number of _whole_ pulses. We use the number of pulses to compute fluence rate per pulse or event. The same considerations apply to transmittance, reflectance and absorptance measurements using pulsed radiation sources.
+
+Assuming a calibration is available the minimal steps to measure the emission spectrum of a light source are as follows.
+
+1. Start R and load the package.
+
+```{r}
+library(ooacquire)
+
+# print warnings at the time they are triggered
+options(warn = 1)
+```
+
+2. Connect an Ocean Optics spectrometer to a USB port. 
+
+3. Start an interactive measuring session, here accepting all defaults.
+
+```{r, eval = FALSE}
+acq_continuous_interactive()
+```
+
+4. Follow the prompts to acquire spectra.
+
+Default settings allow flexibility as settings can be interactively set, but this leads to a rather verbose interface. If one knows in advance what settings will use, these can be set when starting the session.
+
+
+
+## Continuous versus pulsed light sources
 
 In the remaining of this vignette we provide examples for measurement of different spectral quantities.
 

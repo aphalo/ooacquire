@@ -4,10 +4,12 @@
 \alias{protocol_interactive}
 \title{Interactively select a measurement protocol}
 \usage{
-protocol_interactive(protocols)
+protocol_interactive(protocols, default = names(protocols)[[1]])
 }
 \arguments{
 \item{protocols}{named list Measuring protocol defifinitions and names.}
+
+\item{default}{character Name of the default protocol.}
 }
 \value{
 The member vector corresponding to the protocol selected by
