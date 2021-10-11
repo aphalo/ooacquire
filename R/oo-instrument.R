@@ -130,16 +130,27 @@ get_oo_descriptor <- function(w,
 #' these array pixels will be discarded.
 #'
 #' @param descriptor list as returned by function \code{get_oo_descriptor}
-#' @param bad.pixs numeric vector of sorted wavelengths values corresponding to each
-#' pixel in the instrument array.
+#' @param spct an object of class \code{generic_spct} or derived.
+#' @param mspct an object of class \code{generic_mspct} or derived.
+#' @param bad.pixs numeric vector of positional indexes corresponding to
+#'   individual pixels in the instrument array, or an object of class
+#'   \code{"instr_desc"} from where to copy the \code{bad.pixs} member.
 #'
-#' @return a copy of the argument passed for \code{oo_descriptor} with the
-#' wavelengths field of the calibration data replaced by the new values.
+#' @note  Following R's syntax the first pixel in the detector array has index
+#'  1.
+#'
+#' @return A copy of the argument passed to \code{descriptor}, \code{spct} or
+#'   \code{mspct} with the descriptor with indexes to bad pixels set to the
+#'   new values.
 #'
 #' @export
 #'
 set_descriptor_bad_pixs <- function(descriptor,
                                     bad.pixs) {
+  # support copy from descriptor to descriptor
+  if (inherits(bad.pixs, "instr_desc")) {
+    bad.pixs <- bad.pixs[["bad.pixs"]]
+  }
   # validate user input
   bad.pixs <- as.integer(bad.pixs)
   bad.pixs <- unique(sort(bad.pixs))
@@ -147,6 +158,34 @@ set_descriptor_bad_pixs <- function(descriptor,
               max(bad.pixs) <= length(descriptor$wavelengths))
   descriptor$bad.pixs <- bad.pixs
   descriptor
+}
+
+#' @rdname set_descriptor_bad_pixs
+#'
+#' @export
+#'
+update_spct_bad_pixs <- function(spct,
+                                 bad.pixs) {
+  descriptor <- photobiology::getInstrDesc(x = spct)
+  if (is.na(descriptor[["spectrometer.name"]]) ||
+      is.na(descriptor[["spectrometer.sn"]])) {
+    warning("Skipping... the spectrum has an invalid or missing descriptor.")
+    return(spct)
+  }
+  descriptor <- set_descriptor_bad_pixs(descriptor = descriptor,
+                                        bad.pixs = bad.pixs)
+  photobiology::setInstrDesc(x = spct, instr.desc = descriptor)
+}
+
+#' @rdname set_descriptor_bad_pixs
+#'
+#' @export
+#'
+update_mspct_bad_pixs <- function(mspct,
+                                  bad.pixs) {
+  photobiology::msmsply(mspct = mspct,
+                        .fun = update_spct_bad_pixs,
+                        bad.pixs = bad.pixs)
 }
 
 #' Replace integration time limits in instrument descriptor

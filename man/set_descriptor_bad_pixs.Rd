@@ -2,21 +2,37 @@
 % Please edit documentation in R/oo-instrument.R
 \name{set_descriptor_bad_pixs}
 \alias{set_descriptor_bad_pixs}
+\alias{update_spct_bad_pixs}
+\alias{update_mspct_bad_pixs}
 \title{Add bad pixel information to an instrument description}
 \usage{
 set_descriptor_bad_pixs(descriptor, bad.pixs)
+
+update_spct_bad_pixs(spct, bad.pixs)
+
+update_mspct_bad_pixs(mspct, bad.pixs)
 }
 \arguments{
 \item{descriptor}{list as returned by function \code{get_oo_descriptor}}
 
-\item{bad.pixs}{numeric vector of sorted wavelengths values corresponding to each
-pixel in the instrument array.}
+\item{bad.pixs}{numeric vector of positional indexes corresponding to
+individual pixels in the instrument array, or an object of class
+\code{"instr_desc"} from where to copy the \code{bad.pixs} member.}
+
+\item{spct}{an object of class \code{generic_spct} or derived.}
+
+\item{mspct}{an object of class \code{generic_mspct} or derived.}
 }
 \value{
-a copy of the argument passed for \code{oo_descriptor} with the
-wavelengths field of the calibration data replaced by the new values.
+A copy of the argument passed to \code{descriptor}, \code{spct} or
+  \code{mspct} with the descriptor with indexes to bad pixels set to the
+  new values.
 }
 \description{
 A integer vector of indexes to bad pixels in the instrument array. Data from
 these array pixels will be discarded.
+}
+\note{
+Following R's syntax the first pixel in the detector array has index
+ 1.
 }
