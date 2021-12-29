@@ -10,3 +10,5 @@
 ^.*\.sh$
 ^tests$
 README.Rmd
+^CITATION\.cff$
+^\.github$
