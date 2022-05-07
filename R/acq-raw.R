@@ -205,7 +205,6 @@ acq_raw_mspct <- function(descriptor,
                           pause.fun = NULL,
                           verbose = TRUE,
                           ...) {
-
   default_pause_fun <- function(acq.what, ...) {
     answ <- readline(paste("Acquire", toupper(acq.what),
                            "scans, z = abort (m-/z):"))[1]

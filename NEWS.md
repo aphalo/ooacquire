@@ -104,7 +104,7 @@ editor_options:
 
 -   Test against **OmniDriver 2.56**
 
--   Update for 'readr' >= 1.3.0 which is now required
+-   Update for 'readr' \>= 1.3.0 which is now required
 
 ## Measurement of pulsed light sources (*under development*)
 
