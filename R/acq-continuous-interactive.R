@@ -270,6 +270,7 @@ acq_irrad_interactive <-
     # We get metadata from user, offering defaults
     session.name <- make.names(session.name) # validate argument passed in call
     session.prompt <- paste("Session's name (-/<string>): ", session.name)
+    utils::flush.console()
     user.session.name <- readline(session.prompt)
     if (! user.session.name == "") {
       session.name <- make.names(user.session.name)
@@ -283,6 +284,7 @@ acq_irrad_interactive <-
 
     user.name <- make.names(user.name) # validate argument passed in call
     user.name.prompt <- paste("Operator's name (-/<string>): ", user.name)
+    utils::flush.console()
     user.user.name <- readline(user.name.prompt)
     if (! user.user.name == "") {
       user.name <- make.names(user.user.name)
@@ -324,9 +326,11 @@ acq_irrad_interactive <-
 
     repeat { # with same settings
       repeat{
+        utils::flush.console()
         user.obj.name <- readline("Give a name to the spectrum: ")
         obj.name <- make.names(user.obj.name)
         if (obj.name != user.obj.name) {
+          utils::flush.console()
           answ <- readline(paste("Use sanitised name:", obj.name, " (y-/n) :"))
           if (answ == "n") {
             obj.name <- ""
@@ -406,6 +410,7 @@ acq_irrad_interactive <-
             valid.answers <- c("p", "e", "w", "d", "s")
           }
           repeat {
+            utils::flush.console()
             answer <- readline(plot.prompt)[1]
             answer <- ifelse(answer == "", "s", answer)
             if (answer %in% valid.answers) {
@@ -419,6 +424,7 @@ acq_irrad_interactive <-
                  e = {options(photobiology.radiation.unit = "energy"); next()},
                  w = {
                    repeat {
+                     utils::flush.console()
                      answer1 <-
                        tolower(
                          readline("Wavebands: UV+PAR/plants/visible/total/DEFAULT (u/p/v/t/d-): ")
@@ -462,6 +468,7 @@ acq_irrad_interactive <-
       }
 
       repeat {
+        utils::flush.console()
         if (save.collections) {
           answer2 <- readline("change protocol/collect+continue/collect+quit/abort/NEXT (p/c/q/a/n-): ")[1]
         } else {
@@ -495,6 +502,7 @@ acq_irrad_interactive <-
             message("Using sanitised/generated name: '",
                     collection.name, "'.", sep = "")
           }
+          utils::flush.console()
           collection.title <- readline("Title for plot?:")
           raw.collection.name <- paste(collection.name, "raw", "lst", sep = ".")
           collection.file.name <- paste(collection.name, "Rda", sep = ".")
@@ -705,6 +713,7 @@ acq_fraction_interactive <-
 
     # We get metadata from user
 
+    utils::flush.console()
     user.session.name <- readline("Session's name: ")
     session.name <- make.names(user.session.name)
     if (user.session.name == "") {
@@ -714,6 +723,7 @@ acq_fraction_interactive <-
       message("Using sanitised/generated name: '", session.name, "'.", sep = "")
     }
 
+    utils::flush.console()
     session.label <- paste("Operator: ", readline("Operator's name: "),
                            "\nSession: ", session.name,
                            ", instrument s.n.: ", descriptor[["spectrometer.sn"]],
@@ -803,6 +813,7 @@ acq_fraction_interactive <-
                           caption = paste("ooacquire", utils::packageVersion("ooacquire"))) +
             ggplot2::theme_bw()
           print(fig)
+          utils::flush.console()
           answer <- readline("Change wavebands/discard/save and continue (/w/d/-): ")
           switch(substr(answer, 1, 1),
                  # p = {options(photobiology.radiation.unit = "photon"); next()},
@@ -835,6 +846,7 @@ acq_fraction_interactive <-
         grDevices::dev.off()
       }
 
+      utils::flush.console()
       user.input <- readline("Next, change protocol, quit (-/p/q): ")
 
       if (user.input == "") {
@@ -914,10 +926,12 @@ acq_rfr_tfr_interactive <-
     stopifnot(length(rfr.descriptor[["wavelengths"]]) == rfr.descriptor[["num.pixs"]])
     stopifnot(length(tfr.descriptor[["wavelengths"]]) == tfr.descriptor[["num.pixs"]])
 
+    utils::flush.console()
     session.label <- paste("operator: ", readline("Operator's name: "),
                            ", instrument s.n.: ", rfr.descriptor[["spectrometer.sn"]],
                            sep = "")
 
+    utils::flush.console()
     folder.name <- readline("Enter folder name (use '/' instead of '\'): ")
     if (length(folder.name == 0)) {
       folder.name <- "."
@@ -954,6 +968,7 @@ acq_rfr_tfr_interactive <-
 
     repeat {
       repeat{
+        utils::flush.console()
         obj.name <- readline("Give a name to the spectrum: ")
         if (length(obj.name) > 0 && !exists(obj.name)) break()
         cat("A valid and unique name is required, please try again...\n")
@@ -1063,6 +1078,7 @@ acq_rfr_tfr_interactive <-
 
           print(ggspectra::multiplot(fig1, fig2))
 
+          utils::flush.console()
           answer <- readline("Change wavebands/discard/save and continue (/w/d/-): ")
           switch(answer,
                  # p = {options(photobiology.radiation.unit = "photon"); next()},
@@ -1095,6 +1111,7 @@ acq_rfr_tfr_interactive <-
         grDevices::dev.off()
       }
 
+      utils::flush.console()
       user.input <- readline("NEXT/change protocol/quit (n-/p/q): ")
 
       if (user.input[1] == "") {

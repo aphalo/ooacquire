@@ -24,8 +24,8 @@ acq_irrad_interactive(
   interface.mode = "auto",
   folder.name = paste("acq", qty.out, lubridate::today(), sep = "-"),
   user.name = Sys.info()[["user"]],
-  session.name = paste(user.name, strftime(lubridate::now(),
-    "\%Y.\%b.\%d_\%H.\%M.\%S"), sep = "_")
+  session.name = paste(user.name, strftime(lubridate::now(), "\%Y.\%b.\%d_\%H.\%M.\%S"),
+    sep = "_")
 )
 
 acq_fraction_interactive(

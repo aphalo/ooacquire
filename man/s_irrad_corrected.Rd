@@ -76,15 +76,15 @@ Convert raw counts data into spectral irradiance or fluence
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{default}: Default for generic function.
+\item \code{s_irrad_corrected(default)}: Default for generic function.
 
-\item \code{list}: Default for generic function.
+\item \code{s_irrad_corrected(list)}: Default for generic function.
 
-\item \code{raw_mspct}: Default for generic function.
+\item \code{s_irrad_corrected(raw_mspct)}: Default for generic function.
 
-\item \code{raw_spct}: Default for generic function.
+\item \code{s_irrad_corrected(raw_spct)}: Default for generic function.
+
 }}
-
 \note{
 Currently \code{s_irrad_corrected.list} allows processing of files
   written by OceanOptics' SpectraSuite software, from protocols with

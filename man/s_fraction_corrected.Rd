@@ -78,13 +78,13 @@ Convert raw counts data into spectral transmittance or spectral reflectance.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{default}: Default for generic function.
+\item \code{s_fraction_corrected(default)}: Default for generic function.
 
-\item \code{list}: Default for generic function.
+\item \code{s_fraction_corrected(list)}: Default for generic function.
 
-\item \code{raw_mspct}: Default for generic function.
+\item \code{s_fraction_corrected(raw_mspct)}: Default for generic function.
+
 }}
-
 \note{
 Currently \code{s_fraction_corrected.list} allows processing of files
   written by OceanOptics' SpectraSuite software, from protocols with

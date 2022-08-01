@@ -16,6 +16,12 @@ and *Java* need both to be installed before data acquisition is
 possible. The runtime itself and its documentation can be downloaded at
 <https://www.oceaninsight.com/support/software-downloads/>.
 
+## Warning!
+
+Under MS-Windows with RStudio, package ‘RJava’ is not compatible with R
+(==4.2.0). It crashes and consequently ‘ooacquire’ cannot be loaded.
+Only known solution to this bug is to use R (\<=4.1.3) or R (\>=4.2.1).
+
 ## Details
 
 Package **‘ooacquire’** provides high level functions for spectral data
@@ -165,9 +171,14 @@ supporting only the use of hardware sold by this company
 
 ## Documentation
 
-HTML documentation is available at
+HTML documentation for this package is available at
 (<https://docs.r4photobiology.info/ooacquire/>), including a *User
 Guide* and a description of the algorithms.
+
+The API documentation for the *OmniDriver SDP* is available from Ocean
+Insight
+[on-line](https://www.oceaninsight.com/globalassets/catalog-blocks-and-images/software-downloads-installers/javadocs-api/omnidriver/index.html "API")
+from Ocean Insight.
 
 News about updates are regularly posted at
 (<https://www.r4photobiology.info/>).
@@ -188,8 +199,8 @@ citation("ooacquire")
 #> 
 #> To cite package 'ooacquire' in publications use:
 #> 
-#>   Pedro J. Aphalo and Lasse Ylianttila (2021). ooacquire: Acquire Data
-#>   from OO Spectrometers. https://docs.r4photobiology.info/ooacquire/,
+#>   Aphalo P, Ylianttila L (2022). _ooacquire: Acquire Data from OO
+#>   Spectrometers_. https://docs.r4photobiology.info/ooacquire/,
 #>   https://github.com/aphalo/ooacquire.
 #> 
 #> A BibTeX entry for LaTeX users is
@@ -197,7 +208,7 @@ citation("ooacquire")
 #>   @Manual{,
 #>     title = {ooacquire: Acquire Data from OO Spectrometers},
 #>     author = {Pedro J. Aphalo and Lasse Ylianttila},
-#>     year = {2021},
+#>     year = {2022},
 #>     note = {https://docs.r4photobiology.info/ooacquire/,
 #> https://github.com/aphalo/ooacquire},
 #>   }
@@ -205,7 +216,7 @@ citation("ooacquire")
 
 ## License
 
-© 2016-2021 Pedro J. Aphalo (<pedro.aphalo@helsinki.fi>) for the code.
+© 2016-2022 Pedro J. Aphalo (<pedro.aphalo@helsinki.fi>) for the code.
 Lasse Ylianttila developed the majority of the algorithms used. Released
 under the GPL, version 2 or greater. This software carries no warranty
 of any kind.

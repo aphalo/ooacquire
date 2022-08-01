@@ -31,13 +31,13 @@ for acquisition.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{default}: Default method
+\item \code{raw2cps(default)}: Default method
 
-\item \code{raw_spct}: Method for spectral data expressed as raw instrument counts.
+\item \code{raw2cps(raw_spct)}: Method for spectral data expressed as raw instrument counts.
 
-\item \code{raw_mspct}: Method for collections of raw-counts spectra
+\item \code{raw2cps(raw_mspct)}: Method for collections of raw-counts spectra
+
 }}
-
 \note{
 In the case of objects of class "raw_spct" the columns with names
 starting with "counts" are processed and renamed to columns with names

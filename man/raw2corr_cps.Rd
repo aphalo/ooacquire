@@ -38,13 +38,13 @@ splice the different spectra.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{default}: Default method
+\item \code{raw2corr_cps(default)}: Default method
 
-\item \code{raw_spct}: raw_spct method
+\item \code{raw2corr_cps(raw_spct)}: raw_spct method
 
-\item \code{raw_mspct}: raw_spct method
+\item \code{raw2corr_cps(raw_mspct)}: raw_spct method
+
 }}
-
 \seealso{
 Other functions for conversion of raw-counts data: 
 \code{\link{raw2cps}()},

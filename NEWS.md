@@ -14,7 +14,7 @@ editor_options:
 -   Update all interactive data acquisition functions to match the
     updated interface of `acq_continuous_interactive()`.
 
-# ooacquire 0.2.4 (2021-10-xx)
+# ooacquire 0.2.4 (2022-06-24)
 
 -   Function `acquire_continuous_interactive()` gains three new
     parameters that make it possible to override defaults and gets
@@ -38,6 +38,7 @@ editor_options:
     well gaps between the validity of calibrations or dates before the
     earliest calibration.
 -   Expand description of algorithms.
+-   Test with OmniDriver 2.56 and 2.68.
 
 # ooacquire 0.2.3 (2021-03-26)
 

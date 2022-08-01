@@ -48,20 +48,20 @@ a user supplied operator or function to them.
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{default}: Default method
+\item \code{ref_correction(default)}: Default method
 
-\item \code{numeric}: Numeric method
+\item \code{ref_correction(numeric)}: Numeric method
 
-\item \code{raw_spct}: Method for spectral data expressed as raw
+\item \code{ref_correction(raw_spct)}: Method for spectral data expressed as raw
 instrument counts.
 
-\item \code{cps_spct}: Method for spectral data expressed as
+\item \code{ref_correction(cps_spct)}: Method for spectral data expressed as
 counts per second.
 
-\item \code{cps_mspct}: Method for collections of spectral data objects
+\item \code{ref_correction(cps_mspct)}: Method for collections of spectral data objects
 containing data expressed as counts per second.
-}}
 
+}}
 \note{
 In the case of objects of class "raw_spct" the columns with names
 starting with "counts" are processed. All other columns are left unchanded.
