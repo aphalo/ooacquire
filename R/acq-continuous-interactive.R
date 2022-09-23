@@ -71,7 +71,7 @@
 #'
 #' @note The integration time is set automatically so that the peak number of
 #'   counts is close to 1 - \code{target.margin} times the maximum of the range
-#'   of the instrument detector. The minmum \code{tot.time} is achieved by
+#'   of the instrument detector. The minimum \code{tot.time} is achieved by
 #'   increasing the number of scans. The default protocols are usually suitable,
 #'   if new protocols are passed, each character vector must contain strings
 #'   "light", "filter" and "dark", or "sample", "reference", and "dark",
@@ -1149,8 +1149,7 @@ spct_summary <- function(mspct,
     plant.wb <- switch(type,
                        PAR = c(photobiologyWavebands::UV_bands("CIE"),
                                list(photobiologyWavebands::PAR())),
-                       plant = c(photobiologyWavebands::UV_bands("CIE"),
-                                 photobiologyWavebands::Plant_bands()))
+                       plant = c(photobiologyWavebands::Plant_bands()))
     irrad.tb <-
       photobiology::irrad(mspct,
                           unit.out = unit.out,
@@ -1173,16 +1172,18 @@ spct_summary <- function(mspct,
     summary.tb <-
       photobiology::irrad(mspct,
                           unit.out = unit.out,
-                          w.band = photobiologyWavebands::VIS_bands())
+                          w.band = photobiologyWavebands::VIS_bands(),
+                          attr2tb = c("when.measured"))
   } else { # total
     summary.tb <-
       photobiology::irrad(mspct,
                           unit.out = unit.out,
-                          w.band = NULL)
+                          w.band = NULL,
+                          attr2tb = c("when.measured"))
   }
 
-  summary.tb <- photobiology::add_attr2tb(tb = summary.tb,
-                                          mspct = mspct)
+  # summary.tb <- photobiology::add_attr2tb(tb = summary.tb,
+  #                                         mspct = mspct)
 
   selector <- unname(sapply(summary.tb, is.numeric))
   summary.tb[ , selector] <- signif(summary.tb[ , selector], digits = digits)
