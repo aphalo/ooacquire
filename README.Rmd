@@ -40,19 +40,27 @@ Only known solution to this bug is to use R (\<=4.1.3) or R (\>=4.2.1).
 ## Details
 
 Package **'ooacquire'** provides high level functions for spectral data
-acquisition built using lower level functions from package
-**'rOmniDriver'** as a base. Acquisition is very flexible with respect
-to measuring protocols. It caters for all steps involved in the
-acquisition of spectral data from connecting to the instrument(s) and
-retrieving information from non-volatile memory, setting and adjusting
-acquisition parameters, acquiring raw counts and converting them into
-counts per second. It supports bracketing of the integration time for
-high dynamic range (HDR) protocols, both with respect to data
-acquisition and merging/splicing of spectra. It also supports protocols
-in which the total measuring time is kept constant by adjusting in
-coordination integration time and number of scans averaged. It works
-seamlessly together with package **photobiology** on which it also
-depends.
+acquisition built using lower level functions from package **'rOmniDriver'** as
+a base. It also provides functions for reading "raw" (= detector) counts data
+from files and for computing physical quantities from detector counts. If
+package **'rOmniDriver'** is not available, **'ooacquire'** will enter its
+**off-line** mode in which all functions that communicate with the spectrometer
+are disabled or trigger an error, while other functions will be usable in their
+usual way. Thanks to the **off-line** mode, raw data previously acquired with
+this package or with software from Ocean Insight can be processed without the
+need to install packages **'rOmniDriver'** and **'rJava'** or the **OmniDriver**
+drivers from Ocean Insight.
+
+Acquisition is very flexible with respect to measuring protocols. It caters for
+all steps involved in the acquisition of spectral data from connecting to the
+instrument(s) and retrieving information from non-volatile memory, setting and
+adjusting acquisition parameters, acquiring raw counts and converting them into
+counts per second. It supports bracketing of the integration time for high
+dynamic range (HDR) protocols, both with respect to data acquisition and
+merging/splicing of spectra. It also supports protocols in which the total
+measuring time is kept constant by adjusting in coordination integration time
+and number of scans averaged. It works seamlessly together with package
+**photobiology** on which it also depends.
 
 In addition to directly acquiring RAW counts data, raw-counts data can
 be read from files with automatic decoding of the corresponding

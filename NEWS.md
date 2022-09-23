@@ -14,6 +14,16 @@ editor_options:
 -   Update all interactive data acquisition functions to match the
     updated interface of `acq_continuous_interactive()`.
 
+# ooacquire 0.2.5 (2022-09-xx)
+
+-   Implement an **off-line** mode in which data acquisition is disabled but
+    computations still possible. The **off-line** mode is automatically
+    entered if package 'rOmniDriver' is not installed or if its initialization
+    fails. This change removes the need to install Java, drivers from Ocean 
+    Insight and R packages 'rOmniDriver' and 'rJava' when data to be processed
+    have been acquired using another computer or with software from Ocean 
+    Insight. 
+
 # ooacquire 0.2.4 (2022-06-24)
 
 -   Function `acquire_continuous_interactive()` gains three new

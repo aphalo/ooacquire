@@ -287,6 +287,10 @@ set_num_exposures <- function(acq.settings,
 tune_acq_settings <- function(descriptor,
                               acq.settings,
                               verbose = TRUE) {
+  if (getOption("ooacquire.offline", TRUE)) {
+    warning("Package 'rOmniDriver' required to access spectrometer. Tuning skipped.")
+    return(acq.settings)
+  }
   # old objects are missing this field, so we set it to retain old behaviour
   if (!exists("num.exposures", acq.settings)) {
     acq.settings$num.exposures <- -1L

@@ -17,6 +17,10 @@
 #' @export
 #'
 start_session <- function(error.action = stop) {
+  if (getOption("ooacquire.offline", TRUE)) {
+    error.action("Off-line: data acquisition session not started.")
+    return()
+  }
   w <- rOmniDriver::init_srs()
   message("Omni Driver version: ", rOmniDriver::get_api_version(w))
   message("rOmniDriver package version: ", utils::packageVersion("rOmniDriver"))
@@ -24,7 +28,7 @@ start_session <- function(error.action = stop) {
 
   # num.srs <- 1
   if (num.srs < 0) {
-    message_text <-
+    message_text <- "possible driver error."
     error.action("Error starting session: ", message_text)
   } else if (num.srs == 0) {
     warning("No SR found")

@@ -227,9 +227,14 @@ set_descriptor_integ_time <- function(descriptor,
   }
   if (!is.na(max.integ.time)) {
     if (!force.change) {
-      stopifnot(max.integ.time <=
-                  rOmniDriver::get_maximum_integration_time(
-                    descriptor$w, descriptor$sr.index))
+      if (getOption("ooacquire.offline", TRUE)) {
+        warning("Off-line: maximum integration time validation skipped.")
+        return(raw_spct())
+      } else {
+        stopifnot(max.integ.time <=
+                    rOmniDriver::get_maximum_integration_time(
+                      descriptor$w, descriptor$sr.index))
+      }
     }
     descriptor$max.integ.time <- max.integ.time
   }
@@ -348,6 +353,9 @@ set_descriptor_irrad_mult <- function(descriptor,
 #' @return a list
 #'
 get_oo_settings <- function(descriptor) {
+  if (getOption("ooacquire.offline", TRUE)) {
+    stop("Off-line: spectrometer settings unavailable.")
+  }
   w <- descriptor$w
   sr.index <- descriptor$sr.index
   ch.index <- descriptor$sr.index

@@ -36,6 +36,10 @@ acq_raw_spct <- function(descriptor,
                          where.measured = data.frame(lon = NA_real_, lat = NA_real_),
                          set.all = TRUE,
                          verbose = TRUE) {
+  if (getOption("ooacquire.offline", TRUE)) {
+    warning("Package 'rOmniDriver' required to access spectrometer. Data acquisition skipped.")
+    return(raw_spct())
+  }
   x <- acq.settings
   x$integ.time <- as.integer(x$integ.time) # integer microseconds
 
@@ -205,6 +209,10 @@ acq_raw_mspct <- function(descriptor,
                           pause.fun = NULL,
                           verbose = TRUE,
                           ...) {
+  if (getOption("ooacquire.offline", TRUE)) {
+    warning("Package 'rOmniDriver' required to access spectrometer. Data acquisition skipped.")
+    return(raw_mspct())
+  }
   default_pause_fun <- function(acq.what, ...) {
     utils::flush.console()
     answ <- readline(paste("Acquire", toupper(acq.what),
