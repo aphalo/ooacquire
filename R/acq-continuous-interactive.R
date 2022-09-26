@@ -144,10 +144,9 @@ acq_irrad_interactive <-
     old.value <- options(warn = 1)
     on.exit(options(old.value), add = TRUE, after = TRUE)
 
-    if (getOption("ooacquire.offline", TRUE)) {
-      warning("ooacquire off-line: data acquisition not possible")
-      message("Aborting...")
-      return(FALSE)
+    if (getOption("ooacquire.offline", FALSE)) {
+      warning("ooacquire off-line: Aborting...")
+      return()
     }
 
     # validate interface mode
