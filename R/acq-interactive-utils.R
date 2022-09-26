@@ -251,6 +251,7 @@ protocol_interactive <- function(protocols,
 #' @export
 #'
 list_srs_interactive <- function(w) {
+  if (is.null(w)) return(list())
   while (rOmniDriver::number_srs(w) < 1L) {
     answ <- readline("Connect spectrometer to USB port. <enter> = try again, z = abort (-/z):")
     if (answ[1] %in% c("z", "Z")) {

@@ -144,7 +144,7 @@ These functions can be useful for commonly done measurements but
 \note{
 The integration time is set automatically so that the peak number of
   counts is close to 1 - \code{target.margin} times the maximum of the range
-  of the instrument detector. The minmum \code{tot.time} is achieved by
+  of the instrument detector. The minimum \code{tot.time} is achieved by
   increasing the number of scans. The default protocols are usually suitable,
   if new protocols are passed, each character vector must contain strings
   "light", "filter" and "dark", or "sample", "reference", and "dark",

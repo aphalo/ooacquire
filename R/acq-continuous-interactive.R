@@ -144,6 +144,12 @@ acq_irrad_interactive <-
     old.value <- options(warn = 1)
     on.exit(options(old.value), add = TRUE, after = TRUE)
 
+    if (getOption("ooacquire.offline", TRUE)) {
+      warning("ooacquire off-line: data acquisition not possible")
+      message("Aborting...")
+      return(FALSE)
+    }
+
     # validate interface mode
     interface.mode <- tolower(interface.mode)
     if (!gsub("-attr$", "", interface.mode) %in%
@@ -631,6 +637,12 @@ acq_fraction_interactive <-
 
     old.value <- options(warn = 1)
     on.exit(options(old.value), add = TRUE, after = TRUE)
+
+    if (getOption("ooacquire.offline", TRUE)) {
+      warning("ooacquire off-line: data acquisition not possible")
+      message("Aborting...")
+      return(FALSE)
+    }
 
     dyn.range <- 1e3
 
