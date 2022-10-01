@@ -10,11 +10,10 @@ editor_options:
 -   Finish writing algorithms vignette.
 -   Document support for OO calibrations and add example scripts.
 -   Move calibration data to separate packages.
--   Allow file-based computations in the absence of a Java installation.
 -   Update all interactive data acquisition functions to match the
     updated interface of `acq_continuous_interactive()`.
 
-# ooacquire 0.2.5 (2022-09-xx)
+# ooacquire 0.2.5 (2022-09-30)
 
 -   Implement an **off-line** mode in which data acquisition is disabled but
     computations still possible. The **off-line** mode is automatically
@@ -23,6 +22,8 @@ editor_options:
     Insight and R packages 'rOmniDriver' and 'rJava' when data to be processed
     have been acquired using another computer or with software from Ocean 
     Insight. 
+-   Fix bug in the generation of the .CSV file with summaries from collections 
+    of spectra.
 
 # ooacquire 0.2.4 (2022-06-24)
 
