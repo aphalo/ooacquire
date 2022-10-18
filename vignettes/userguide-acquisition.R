@@ -14,7 +14,7 @@ library(ooacquire)
 options(warn = 1)
 
 ## ---- eval = FALSE------------------------------------------------------------
-#  acq_continuous_interactive()
+#  acq_irrad_interactive()
 
 ## ---- eval=sr.online----------------------------------------------------------
 #  acq_irrad_interactive(correction.method = ooacquire::MAYP11278_ylianttila.mthd,

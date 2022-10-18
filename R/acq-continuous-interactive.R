@@ -111,8 +111,8 @@
 #' # requires an Ocean Insight (former Ocean Optics) spectrometer to be
 #' # connected via USB
 #'
-#' acquire_interactive()
-#' acquire_interactive(qty.out = "cps")
+#' acq_irrad_interactive()
+#' acq_irrad_interactive(qty.out = "cps")
 #'
 #' }
 #'

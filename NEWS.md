@@ -4,7 +4,7 @@ editor_options:
     wrap: 72
 ---
 
-## TODO
+# TODO
 
 -   Add more test cases (e.g. for OceanView files).
 -   Finish writing algorithms vignette.
@@ -12,6 +12,12 @@ editor_options:
 -   Move calibration data to separate packages.
 -   Update all interactive data acquisition functions to match the
     updated interface of `acq_continuous_interactive()`.
+
+# ooacquire 0.2.6 (2022-10-18)
+
+-   Track changes in 'photobiology >= 0.10.14.
+-   Fix for deprecated functions in 'dplyr' >= 1.0.0.
+-   DOES NOT WORK with OmniDriver 2.70, please use older versions.
 
 # ooacquire 0.2.5 (2022-09-30)
 
