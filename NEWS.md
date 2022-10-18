@@ -17,7 +17,10 @@ editor_options:
 
 -   Track changes in 'photobiology >= 0.10.14.
 -   Fix for deprecated functions in 'dplyr' >= 1.0.0.
--   DOES NOT WORK with OmniDriver 2.70, please use older versions.
+-   Revise UI of `acq_irrad_interactive()` to avoid accidental overwrite of
+    data files, and really do not save any data for discarded spectra.
+-   Tested working with OmniDriver 2.56.
+-   DOES NOT WORK yet with OmniDriver 2.70, please use older versions.
 
 # ooacquire 0.2.5 (2022-09-30)
 

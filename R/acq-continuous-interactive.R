@@ -341,8 +341,20 @@ acq_irrad_interactive <-
             obj.name <- ""
           }
         }
-        if (length(obj.name) > 0 && obj.name != "" &&
-            !exists(obj.name)) break()
+        if (length(obj.name) > 0 && obj.name != "") {
+          # we make names
+          irrad.name <- paste(obj.name, "spct", sep = ".")
+          raw.name <- paste(obj.name, "raw_mspct", sep = ".")
+          file.name <- paste(obj.name, "spct.Rda", sep = ".")
+          if ((irrad.name %in% irrad.names) || file.exists(file.name)) {
+            if (readline(paste("Overwrite existing: '", irrad.name, ". (y-/n) :"))[1] == "y") {
+              irrad.names <- setdiff(irrad.name, irrad.names)
+              break()
+            }
+          } else {
+            break()
+          }
+        }
         print("A valid and unique name is required. Please try again...")
       }
 
@@ -368,11 +380,6 @@ acq_irrad_interactive <-
       if (length(raw.mspct) == 0) {
         next()
       }
-      # we make and keep names only if an spectrum was acquired
-      raw.name <- paste(obj.name, "raw_mspct", sep = ".")
-      raw.names <- c(raw.names, raw.name)
-      file.name <- paste(obj.name, "spct.Rda", sep = ".")
-      file.names <- c(file.names, file.name)
 
       if (qty.out != "raw") {
         irrad.spct <- s_irrad_corrected(x = raw.mspct,
@@ -388,14 +395,6 @@ acq_irrad_interactive <-
         if (length(user.attrs$comment.text) > 0) {
           comment(irrad.spct) <- paste(comment(irrad.spct), user.attrs$comment.text, sep = "\n")
         }
-
-        irrad.name <- paste(obj.name, "spct", sep = ".")
-        irrad.names <- c(irrad.names, irrad.name)
-
-        assign(raw.name, raw.mspct)
-        assign(irrad.name, irrad.spct)
-
-        save(list = c(raw.name, irrad.name), file = file.name)
 
         repeat {
           fig <- ggplot2::autoplot(irrad.spct, annotations = c("-", "title*")) +
@@ -458,6 +457,17 @@ acq_irrad_interactive <-
                  next()},
                  d = break()
           )
+
+          # moved from above so that saving is skipped for discarded spectra
+          raw.names <- c(raw.names, raw.name)
+          file.names <- c(file.names, file.name)
+          irrad.names <- c(irrad.names, irrad.name)
+
+          assign(raw.name, raw.mspct)
+          assign(irrad.name, irrad.spct)
+
+          save(list = c(raw.name, irrad.name), file = file.name)
+
           if (save.pdfs) {
             pdf.name <- paste(obj.name, "spct.pdf", sep = ".")
             grDevices::pdf(file = pdf.name, width = 8, height = 6)
@@ -468,6 +478,10 @@ acq_irrad_interactive <-
         }
 
       } else {
+        # moved from above so that saving is skipped for discarded spectra
+        raw.names <- c(raw.names, raw.name)
+        file.names <- c(file.names, file.name)
+
         assign(raw.name, raw.mspct)
         save(list = c(raw.name), file = file.name)
       }
@@ -477,10 +491,13 @@ acq_irrad_interactive <-
         if (save.collections) {
           answer2 <- readline("change protocol/collect+continue/collect+quit/abort/NEXT (p/c/q/a/n-): ")[1]
         } else {
-          answer2 <- readline("change protocol/continue/quit/abort/NEXT (p/c/q/a/n-): ")[1]
+          answer2 <- readline("change protocol/continue/quit/NEXT (p/c/q/n-): ")[1]
         }
         answer2 <- ifelse(answer2 == "", "n", answer2)
-        if (answer2 %in% c("n", "p", "c", "q", "a", "z")) {
+        if (answer2 %in% c("n", "p", "c", "q", "a")) {
+          if (answer2 == "a") {
+            save.collections <- FALSE
+          }
           break()
         } else {
           print("Answer not recognized. Please try again...")
@@ -490,7 +507,7 @@ acq_irrad_interactive <-
         next()
       } else if (answer2 == "p") {
         protocol <- protocol_interactive(protocols)
-      } else if (answer2 %in% c("c", "q")) {
+      } else if (answer2 %in% c("c", "q", "a")) {
         if (save.collections) {
           message("Source spectra to collect: ",
                   paste(irrad.names, collapse = ", "))
