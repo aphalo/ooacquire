@@ -3,9 +3,8 @@ library("knitr")
 opts_knit$set(cache = FALSE, root.dir = system.file("extdata", package = "ooacquire"))
 sr.online <- FALSE
 
-## ---- eval=FALSE--------------------------------------------------------------
-#  folderpath <- system.file("extdata", package="ooacquire")
-#  oldwd <- setwd(folderpath)
+## ---- eval=TRUE---------------------------------------------------------------
+folderpath <- system.file("extdata", package="ooacquire")
 
 ## -----------------------------------------------------------------------------
 library(photobiology)
@@ -14,7 +13,7 @@ library(ggspectra)
 library(ooacquire)
 
 ## -----------------------------------------------------------------------------
-file_names <- list(light = "irrad-files/light-short.txt")
+file_names <- list(light = paste(folderpath, "irrad-files/light-short.txt", sep = "/"))
 
 ## -----------------------------------------------------------------------------
 one_file.spct <- 
@@ -48,11 +47,11 @@ getInstrDesc(one_file.spct)
 getInstrSettings(one_file.spct)
 
 ## -----------------------------------------------------------------------------
-file_names <- list(light = c("irrad-files/light-short.txt",
-                             "irrad-files/light-long.txt"),
-                   filter = "irrad-files/flt-long.txt",
-                   dark = c("irrad-files/dark-short.txt",
-                            "irrad-files/dark-long.txt"))
+file_names <- list(light = paste(folderpath, c("irrad-files/light-short.txt",
+                             "irrad-files/light-long.txt"), sep = "/"),
+                   filter = paste(folderpath, "irrad-files/flt-long.txt", sep = "/"),
+                   dark = paste(folderpath, c("irrad-files/dark-short.txt",
+                            "irrad-files/dark-long.txt"), sep = "/"))
 
 ## -----------------------------------------------------------------------------
 five_files.spct <- 
@@ -90,16 +89,16 @@ getInstrSettings(five_files.spct)
 (q_irrad(one_file.spct) / q_irrad(five_files.spct) - 1) * 100
 
 ## -----------------------------------------------------------------------------
-kable(
+knitr::kable(
   t((q_irrad(one_file.spct, c(UV_bands(), VIS_bands())) / 
      q_irrad(five_files.spct, c(UV_bands(), VIS_bands())) - 1) * 100),
   digits = 2
 )
 
 ## -----------------------------------------------------------------------------
-file_names <- list(light = "irrad-files/light_MAYP112785.txt",
-#                    filter = "irrad-files/filter_MAYP112785.txt",
-                    dark = "irrad-files/dark_MAYP112785.txt")
+file_names <- list(light = paste(folderpath, "irrad-files/light_MAYP112785.txt", sep = "/"),
+#                    filter = paste(folderpath, "irrad-files/filter_MAYP112785.txt", sep = "/"),
+                    dark = paste(folderpath, "irrad-files/dark_MAYP112785.txt", sep = "/"))
 
 ## -----------------------------------------------------------------------------
 ov_files.raw_mspct <- 

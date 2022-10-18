@@ -69,6 +69,7 @@ raw2cps.raw_spct <- function(x,
       z <- setCpsSpct(z, time.unit = "second")
     }
   }
+  colnames(z)[-1] <- cps.cols # needed for 'photobiology' >= 0.10.14
   descriptor <- getInstrDesc(x)
   setInstrDesc(z, descriptor)
   if (length(acq_settings[["rel.signal"]]) == 0L || is.na(acq_settings[["rel.signal"]])) {

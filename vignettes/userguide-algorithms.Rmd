@@ -362,18 +362,8 @@ In the last plot above we can see that the correction has resulted in slightly n
 At this point we have "clean" RAW counts data. The **sixth step** is to convert these raw counts into counts per second. As the integration time for each spectrum is stored together with the RAW count data, the function call is simple. After this step, the data acquired using different integration times are expressed in the same units of counts-per-second (cps or $n\,s^{-1}$). We take advantage of this to plot using different colours the data from the two different "bracketed" integration times. Blue corresponds to the shorter and near-optimal integration time (`cps_1` computed starting from `counts_1`), and red to the longer one (`cps_2` computed starting from `counts_2`). Here we over-plot the two separate spectra.
 
 ```{r, fig.width=8, fig.asp=0.5}
-sun001.cps_mspct <- cps_mspct()
-for (m in names(sun001.raw_mspct)) {
-  sun001.cps_mspct[[m]] <-
-    raw2cps(sun001.raw_mspct[[m]])
-  print(
-    ggplot(sun001.cps_mspct[[m]], aes(x = w.length)) +
-      ylim(NA, 5e5) +
-      geom_line(aes(y = cps_1), color = "blue") +
-      geom_line(aes(y = cps_2), color = "red") +
-      ggtitle(m)
-  )
-}
+sun001.cps_mspct <- raw2cps(sun001.raw_mspct)
+autoplot(sun001.cps_mspct, facets = TRUE)
 ```
 
 The **seventh step** splicing the three pairs of "bracketed" *light*, *filter* and *dark* counts-per-second spectra into three combined spectra.
@@ -382,8 +372,8 @@ The **seventh step** splicing the three pairs of "bracketed" *light*, *filter* a
 for (m in names(sun001.cps_mspct)) {
   sun001.cps_mspct[[m]] <-
     merge_cps(sun001.cps_mspct[[m]])
-  print(autoplot(sun001.cps_mspct[[m]], ylim = c(NA, 5e5)) + ggtitle(m))
 }
+autoplot(sun001.cps_mspct)
 ```
 
 In the **eighth step** we subtract the dark signal from the *light* and *filter* measurements. This reduces the remaining noise. The filter used has a rather sharp cut-in very close to 400 nm, and blocks UV radiation from entering the spectrometer, so the UV signal remaining after subtracting the dark measurement is the result of light of wavelengths longer than 400 nm "wrongly" striking the UV pixels in the array, i.e., stray light.

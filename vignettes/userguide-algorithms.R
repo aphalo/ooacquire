@@ -146,25 +146,15 @@ for (m in names(sun001.raw_mspct)) {
 autoplot(sun001.raw_mspct, facets = 1)
 
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
-sun001.cps_mspct <- cps_mspct()
-for (m in names(sun001.raw_mspct)) {
-  sun001.cps_mspct[[m]] <-
-    raw2cps(sun001.raw_mspct[[m]])
-  print(
-    ggplot(sun001.cps_mspct[[m]], aes(x = w.length)) +
-      ylim(NA, 5e5) +
-      geom_line(aes(y = cps_1), color = "blue") +
-      geom_line(aes(y = cps_2), color = "red") +
-      ggtitle(m)
-  )
-}
+sun001.cps_mspct <- raw2cps(sun001.raw_mspct)
+autoplot(sun001.cps_mspct, facets = TRUE)
 
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
 for (m in names(sun001.cps_mspct)) {
   sun001.cps_mspct[[m]] <-
     merge_cps(sun001.cps_mspct[[m]])
-  print(autoplot(sun001.cps_mspct[[m]], ylim = c(NA, 5e5)) + ggtitle(m))
 }
+autoplot(sun001.cps_mspct)
 
 ## ---- fig.width=8, fig.asp=0.5------------------------------------------------
 sun001_mdark.cps_mspct <- cps_mspct()

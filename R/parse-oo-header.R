@@ -40,7 +40,7 @@ set_oo_ssdata_settings <- function(x,
   lines <- stringr::str_split(file.header, "\n")[[1]]
 
   if (grepl("SpectraSuite", lines[1])) {
-    my.gr <- tibble::tibble(
+    my.gr <- data.frame(
       feature = c("dark.corr", "lin.corr", "stray.corr", "boxcar",
                   "integ.time", "scans", "sn"),
       pattern = c("Correct for Electrical Dark",
@@ -54,17 +54,17 @@ set_oo_ssdata_settings <- function(x,
     position  <- c(-1, -1, -1, 3, 4, 3, -1)
     names(position) <- my.gr[["feature"]]
   } else { # we assume OceanView file
-    my.gr <- dplyr::data_frame_(list(
-      feature = ~c("dark.corr", "lin.corr", "stray.corr", "boxcar",
+    my.gr <- data.frame(
+      feature = c("dark.corr", "lin.corr", "stray.corr", "boxcar",
                    "integ.time", "scans", "sn"),
-      pattern = ~c("Electric dark correction enabled:",
+      pattern = c("Electric dark correction enabled:",
                    "Nonlinearity correction enabled:",
                    NA_character_,
                    "Boxcar width:",
                    "Integration Time",
                    "Scans to average:",
                    "Spectrometer:")
-    ))
+    )
     position  <- c(-1, -1, -1, 3, 4, 4, -1)
     names(position) <- my.gr[["feature"]]
   }
@@ -186,9 +186,9 @@ set_oo_ssdata_descriptor <- function(x,
 }
 
 oo.minimum.gr <-
-  dplyr::data_frame_(list(feature = ~c("spectrometer.name", "spectrometer.sn"),
-                     pattern = ~c("Spectrometers: |Spectrometer: ",
-                                  "Spectrometers: |Spectrometer: ")))
+  data.frame(feature = c("spectrometer.name", "spectrometer.sn"),
+             pattern = c("Spectrometers: |Spectrometer: ",
+                         "Spectrometers: |Spectrometer: "))
 
 #' Parse a file header to locate metadata items
 #'

@@ -152,9 +152,8 @@ All examples in vignettes use data and files included in the package. Data files
 
 _To reproduce any of the examples which use files as data input, it is best to make a local copy of the whole `"extdata"` folder._ The files used in examples are organized into sub-folders, but all example code assumes that its in being run with `"extdata"` or a copy of it as the current _working_ folder. The chunk below sets the working directory to point to the exdata folder in the installed package.
 
-```{r, eval=FALSE}
+```{r, eval=TRUE}
 folderpath <- system.file("extdata", package="ooacquire")
-oldwd <- setwd(folderpath)
 ```
 
 ## Measurement of spectral irradiance
@@ -195,7 +194,7 @@ We set a list of file names to be read, with members named according
 to their role in the measuring protocol.
 
 ```{r}
-file_names <- list(light = "irrad-files/light-short.txt")
+file_names <- list(light = paste(folderpath, "irrad-files/light-short.txt", sep = "/"))
 ```
 
 We subsequently compute the spectral irradiance.
@@ -247,11 +246,11 @@ At the other extreme, we can use bracketing, a dark measurement, plus a measurem
 We go exactly through the same steps as before, the only difference is the list of file names passed as argument to parameter `x`. 
 
 ```{r}
-file_names <- list(light = c("irrad-files/light-short.txt",
-                             "irrad-files/light-long.txt"),
-                   filter = "irrad-files/flt-long.txt",
-                   dark = c("irrad-files/dark-short.txt",
-                            "irrad-files/dark-long.txt"))
+file_names <- list(light = paste(folderpath, c("irrad-files/light-short.txt",
+                             "irrad-files/light-long.txt"), sep = "/"),
+                   filter = paste(folderpath, "irrad-files/flt-long.txt", sep = "/"),
+                   dark = paste(folderpath, c("irrad-files/dark-short.txt",
+                            "irrad-files/dark-long.txt"), sep = "/"))
 ```
 
 ```{r}
@@ -306,7 +305,7 @@ These data are all from the same set of measurements, as one can apply the calcu
 Differences expressed as percentage for different wavelength ranges. 
 
 ```{r}
-kable(
+knitr::kable(
   t((q_irrad(one_file.spct, c(UV_bands(), VIS_bands())) / 
      q_irrad(five_files.spct, c(UV_bands(), VIS_bands())) - 1) * 100),
   digits = 2
@@ -319,9 +318,9 @@ Files output by SpectraSuite and OceanView have different header format, but the
 The filter measurement is not used as it is not suitable for the source spectrum measured, and would be ignored with a warning.
 
 ```{r}
-file_names <- list(light = "irrad-files/light_MAYP112785.txt",
-#                    filter = "irrad-files/filter_MAYP112785.txt",
-                    dark = "irrad-files/dark_MAYP112785.txt")
+file_names <- list(light = paste(folderpath, "irrad-files/light_MAYP112785.txt", sep = "/"),
+#                    filter = paste(folderpath, "irrad-files/filter_MAYP112785.txt", sep = "/"),
+                    dark = paste(folderpath, "irrad-files/dark_MAYP112785.txt", sep = "/"))
 ```
 
 In this case we use a different descriptor definition only because the files acquired with SpectraSuite and OceanView originated from different instruments.
