@@ -1,8 +1,8 @@
 Package: ooacquire
 Type: Package
 Title: Acquire Data from OO Spectrometers
-Version: 0.2.6-1
-Date: 2022-10-18
+Version: 0.2.7
+Date: 2023-03-22
 Authors@R:
    c(
     person("Pedro J.", "Aphalo", email = "pedro.aphalo@helsinki.fi", role = c("aut", "trl", "cre")),
@@ -25,6 +25,7 @@ Depends:
 Imports:
     grDevices,
     utils,
+    methods,
     tibble (>= 3.1.0),
     ggplot2 (>= 3.3.2),
     caTools (>= 1.18.2),
@@ -48,6 +49,6 @@ LinkingTo: Rcpp
 URL: https://docs.r4photobiology.info/ooacquire/,
     https://github.com/aphalo/ooacquire
 BugReports: https://github.com/aphalo/ooacquire/issues
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Encoding: UTF-8
 VignetteBuilder: knitr

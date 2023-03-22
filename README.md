@@ -209,7 +209,7 @@ citation("ooacquire")
 #> 
 #> To cite package 'ooacquire' in publications use:
 #> 
-#>   Aphalo P, Ylianttila L (2022). _ooacquire: Acquire Data from OO
+#>   Aphalo P, Ylianttila L (2023). _ooacquire: Acquire Data from OO
 #>   Spectrometers_. https://docs.r4photobiology.info/ooacquire/,
 #>   https://github.com/aphalo/ooacquire.
 #> 
@@ -218,7 +218,7 @@ citation("ooacquire")
 #>   @Manual{,
 #>     title = {ooacquire: Acquire Data from OO Spectrometers},
 #>     author = {Pedro J. Aphalo and Lasse Ylianttila},
-#>     year = {2022},
+#>     year = {2023},
 #>     note = {https://docs.r4photobiology.info/ooacquire/,
 #> https://github.com/aphalo/ooacquire},
 #>   }
@@ -226,7 +226,7 @@ citation("ooacquire")
 
 ## License
 
-© 2016-2022 Pedro J. Aphalo (<pedro.aphalo@helsinki.fi>) for the code.
+© 2016-2023 Pedro J. Aphalo (<pedro.aphalo@helsinki.fi>) for the code.
 Lasse Ylianttila developed the majority of the algorithms used. Released
 under the GPL, version 2 or greater. This software carries no warranty
 of any kind.

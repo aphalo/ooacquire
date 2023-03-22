@@ -12,20 +12,27 @@ editor_options:
 -   Move calibration data to separate packages.
 -   Update all interactive data acquisition functions to match the
     updated interface of `acq_continuous_interactive()`.
+    
+# ooacquire 0.2.7 (2023-03-22)
+    
+-   DOES NOT WORK with OmniDriver 2.70.
+-   Tested working with OmniDriver 2.71.
+-   Fix very minor bugs.
+-   Tolerate missing values returned by functions removed from recent
+    versions of OmniDriver.
 
 # ooacquire 0.2.6 (2022-10-18)
 
--   Track changes in 'photobiology >= 0.10.14.
+-   Track changes in 'photobiology' >= 0.10.14.
 -   Fix for deprecated functions in 'dplyr' >= 1.0.0.
 -   Revise UI of `acq_irrad_interactive()` to avoid accidental overwrite of
     data files, and really do not save any data for discarded spectra.
--   Tested working with OmniDriver 2.56.
--   DOES NOT WORK yet with OmniDriver 2.70, please use older versions.
+-   Tested working with OmniDriver 2.56. Fails with OmniDriver 2.70. 
 
 # ooacquire 0.2.5 (2022-09-30)
 
 -   Implement an **off-line** mode in which data acquisition is disabled but
-    computations still possible. The **off-line** mode is automatically
+    computations are still possible. The **off-line** mode is automatically
     entered if package 'rOmniDriver' is not installed or if its initialization
     fails. This change removes the need to install Java, drivers from Ocean 
     Insight and R packages 'rOmniDriver' and 'rJava' when data to be processed
