@@ -13,13 +13,13 @@ editor_options:
 -   Update all interactive data acquisition functions to match the
     updated interface of `acq_continuous_interactive()`.
     
-# ooacquire 0.2.7 (2023-03-22)
+# ooacquire 0.2.7 (2023-03-25)
     
--   DOES NOT WORK with OmniDriver 2.70.
--   Tested working with OmniDriver 2.71.
--   Fix very minor bugs.
+-   Tested working with OmniDriver 2.71 and 2.56, under current R 4.2.3 and 
+    coming R 4.3.0.
 -   Tolerate missing values returned by functions removed from recent
     versions of OmniDriver.
+-   Fix bugs that prevented automatic acquisition of time series of spectra.
 
 # ooacquire 0.2.6 (2022-10-18)
 

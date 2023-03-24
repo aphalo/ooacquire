@@ -120,17 +120,30 @@ acq_raw_spct <- function(descriptor,
     }
 
     if (verbose) message(paste("Measurement ", i, "..."))
+
+    # light source, e,g,, flash trigger
     if (num.exposures[i] > 0L  && !is.null(f.trigger.pulses)) {
       f.trigger.pulses(num.exposures[i])
     }
 
-    counts <- rOmniDriver::get_spectrum(y$w, y$sr.index, y$ch.index)
-    if (rOmniDriver::is_spectrum_valid(y$w, y$sr.index, y$ch.index) || x$force.valid)
-    {
-      z[[counts.name]] <- counts
-    } else {
-      z[[counts.name]] <- rep(NA_real_, length(z$w.length))
+    repeat {
+      i <- 0L
+      counts <- rOmniDriver::get_spectrum(y$w, y$sr.index, y$ch.index)
+      if (!all(counts == 0) && rOmniDriver::is_spectrum_valid(y$w, y$sr.index, y$ch.index)) {
+        # the USB2000 occasionally returns zero counts (timing problem?)
+        break()
+      } else if (i > 2L) {
+        counts <- rep_len(NA_real_, length(counts))
+        break()
+      }
+      i <- i + 1L
     }
+    if (!rOmniDriver::is_spectrum_valid(y$w, y$sr.index, y$ch.index) && !x$force.valid)
+    {
+      counts <- rep_len(NA_real_, length(counts))
+    }
+
+    z[[counts.name]] <- counts
 
   }
 
@@ -230,10 +243,14 @@ acq_raw_mspct <- function(descriptor,
                         length.out = seq.settings[["num.steps"]]))
   }
 
+  if (verbose) {
+    message("'steps' = ", paste(steps, collapse = ", "), " (seconds)")
+  }
+
   previous.protocol <- "none"
   z <- z.names <- list()
   idx <- 0
-  start.time <- lubridate::now()
+  start.time <- lubridate::now("UTC")
 
   for (p in protocol) {
     if (p != previous.protocol) {
@@ -248,13 +265,22 @@ acq_raw_mspct <- function(descriptor,
       f.current <- NULL
     }
     if (p == "light") {
-      times <- lubridate::now() + seconds(steps)
+      times <- lubridate::now("UTC") + seconds(steps)
     } else {
-      times <- lubridate::now()
+      times <- lubridate::now("UTC")
     }
+
+    if (verbose) {
+      message("'times' = ", paste(times, collapse = "\n          "))
+    }
+
     for (i in seq_along(times)) {
-      while (lubridate::now() < times[[i]]) {
-        Sys.sleep(min(0, as.numeric(times[[i]] - lubridate::now(), "seconds")))
+      repeat {
+        seconds.to.wait <- lubridate::seconds(times[[i]] - lubridate::now("UTC"))
+        if (seconds.to.wait <= 0) {
+          break()
+        }
+        Sys.sleep(seconds.to.wait)
       }
       idx <- idx + 1
       z.names[[idx]] <- paste(p, as.character(i), sep = ".")
@@ -278,7 +304,7 @@ acq_raw_mspct <- function(descriptor,
   if (length(z) == length(protocol)) {
     names(z) <- protocol
   } else {
-    stopifnot(length(z) == length(protocol) + length(times) - 1)
+    stopifnot(length(z) == length(protocol) + length(steps) - 1)
     names(z) <- unlist(z.names)
   }
   z

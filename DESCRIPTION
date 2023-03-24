@@ -2,15 +2,14 @@ Package: ooacquire
 Type: Package
 Title: Acquire Data from OO Spectrometers
 Version: 0.2.7
-Date: 2023-03-22
+Date: 2023-03-25
 Authors@R:
    c(
     person("Pedro J.", "Aphalo", email = "pedro.aphalo@helsinki.fi", role = c("aut", "trl", "cre")),
     person("Lasse", "Ylianttila", role = c("aut")),
     person("Titta K.", "Kotilainen", role = "ctb")
     )
-Description: Functions to acquire data directly from Ocean Insight, formerly 
-    Ocean Optics, spectrometers,
+Description: Functions to acquire data directly from Ocean Optics spectrometers,
     and functions to read similar data files. Functions to convert raw-counts
     into counts-per-second and physical quantities. Data are saved in objects
     of classes defined in package 'photobiology'. The instrument settings,
