@@ -390,7 +390,13 @@ acq_irrad_interactive <-
       }
 
       if (qty.out != "raw") {
+        # for series measurements we can have multiple "light" raw spectra
+        spct.names <-
+          list(light = grep("^light", names(raw.mspct), value = TRUE),
+               filter = "filter",
+               dark = "dark")
         irrad.spct <- s_irrad_corrected(x = raw.mspct,
+                                        spct.names = spct.names,
                                         correction.method = correction.method,
                                         return.cps = qty.out == "cps")
 
