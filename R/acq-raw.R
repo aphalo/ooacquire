@@ -247,7 +247,7 @@ acq_raw_mspct <- function(descriptor,
     steps <- steps + seq.settings[["initial.delay"]]
   }
 
-  if (verbose) {
+  if (verbose && length(steps) > 1L) {
     message("'steps' = ", paste(steps, collapse = ", "), " (seconds)")
   }
 
@@ -274,7 +274,7 @@ acq_raw_mspct <- function(descriptor,
       times <- lubridate::now("UTC")
     }
 
-    if (verbose) {
+    if (verbose && length(times) > 1L) {
       message("'times' = ", paste(times, collapse = "\n          "))
     }
 
@@ -283,7 +283,7 @@ acq_raw_mspct <- function(descriptor,
         # we could subtract a lag correction dependent on host and spectrometer
         seconds.to.wait <- lubridate::seconds(times[[i]] - lubridate::now("UTC"))
         if (seconds.to.wait <= 0) {
-          if (verbose) {
+          if (verbose && length(times) > 1L) {
             message("Delayed ", signif(seconds.to.wait, 2), " s.")
           }
           break()

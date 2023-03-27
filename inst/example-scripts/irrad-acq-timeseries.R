@@ -6,7 +6,7 @@ library(ooacquire)
 photon_as_default()
 
 acq_irrad_interactive(interface.mode = "series",
-                      folder.name = "./series",
+                      folder.name = "./inst-not/series",
                       tot.time.range = 5,
                       qty.out = "raw",
                       HDR.mult = 1,
@@ -15,8 +15,6 @@ acq_irrad_interactive(interface.mode = "series",
                                           num.steps = 10))
 
 acq_irrad_interactive(interface.mode = "auto",
-                      folder.name = ".",
+                      folder.name = "./inst-not/single",
                       tot.time.range = 5,
-                      HDR.mult = 1)
-
-acq_irrad_interactive(folder.name = "kkkk")
+                      HDR.mult = c(1, 10))
