@@ -8,7 +8,7 @@ acq_raw_mspct(
   descriptor,
   acq.settings,
   f.trigger.pulses = f.trigger.message,
-  seq.settings = list(step.delay = 0, num.steps = 1L),
+  seq.settings = list(initial.delay = 0, step.delay = 0, num.steps = 1L),
   protocol = c("light", "filter", "dark"),
   user.label = "",
   where.measured = data.frame(lon = NA_real_, lat = NA_real_),

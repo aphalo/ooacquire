@@ -138,6 +138,7 @@ This function calls functions \code{\link{tune_interactive}},
 \code{\link{protocol_interactive}}  and \code{\link{set_attributes_interactive}}.
 
 Other interactive acquisition functions: 
+\code{\link{acq_fraction_interactive}()},
 \code{\link{acq_irrad_interactive}()}
 }
 \concept{interactive acquisition functions}

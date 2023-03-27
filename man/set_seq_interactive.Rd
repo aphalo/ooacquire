@@ -4,7 +4,9 @@
 \alias{set_seq_interactive}
 \title{Interactively set sequential measurements}
 \usage{
-set_seq_interactive(seq.settings = list(step.delay = 0, num.steps = 1))
+set_seq_interactive(
+  seq.settings = list(initial.delay = 0, step.delay = 0, num.steps = 1)
+)
 }
 \arguments{
 \item{seq.settings}{numeric Definition of time steps for a sequence of repeated
