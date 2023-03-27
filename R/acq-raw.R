@@ -214,7 +214,9 @@ acq_raw_spct <- function(descriptor,
 acq_raw_mspct <- function(descriptor,
                           acq.settings,
                           f.trigger.pulses = f.trigger.message,
-                          seq.settings = list(step.delay = 0, num.steps = 1L),
+                          seq.settings = list(initial.delay = 0,
+                                              step.delay = 0,
+                                              num.steps = 1L),
                           protocol = c("light", "filter", "dark"),
                           user.label = "",
                           where.measured = data.frame(lon = NA_real_, lat = NA_real_),
@@ -239,8 +241,10 @@ acq_raw_mspct <- function(descriptor,
   if (length(seq.settings[["step.delay"]]) == seq.settings[["num.steps"]]) {
     steps <- seq.settings[["step.delay"]]
   } else {
-    steps <- cumsum(rep(seq.settings[["step.delay"]],
-                        length.out = seq.settings[["num.steps"]]))
+    steps <- c(0,
+               cumsum(rep(seq.settings[["step.delay"]],
+                        length.out = seq.settings[["num.steps"]] - 1L)))
+    steps <- steps + seq.settings[["initial.delay"]]
   }
 
   if (verbose) {
@@ -276,8 +280,12 @@ acq_raw_mspct <- function(descriptor,
 
     for (i in seq_along(times)) {
       repeat {
+        # we could subtract a lag correction dependent on host and spectrometer
         seconds.to.wait <- lubridate::seconds(times[[i]] - lubridate::now("UTC"))
         if (seconds.to.wait <= 0) {
+          if (verbose) {
+            message("Delayed ", signif(seconds.to.wait, 2), " s.")
+          }
           break()
         }
         Sys.sleep(seconds.to.wait)

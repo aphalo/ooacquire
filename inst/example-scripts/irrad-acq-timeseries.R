@@ -10,7 +10,9 @@ acq_irrad_interactive(interface.mode = "series",
                       tot.time.range = 5,
                       qty.out = "raw",
                       HDR.mult = 1,
-                      seq.settings = list(step.delay = 1, num.steps = 5))
+                      seq.settings = list(initial.delay = 0,
+                                          step.delay = 10,
+                                          num.steps = 10))
 
 acq_irrad_interactive(interface.mode = "auto",
                       folder.name = ".",

@@ -321,7 +321,11 @@ acq_irrad_interactive <-
                              HDR.mult = HDR.mult)
 
     if (is.null(seq.settings)) {
-      seq.settings <- list(step.delay = 0, num.steps = 1L)
+      seq.settings <- list(initial.delay = 0.1, step.delay = 0, num.steps = 1L)
+    } else if (!setequal(names(seq.settings),
+                         c("initial.delay", "step.delay", "num.steps"))) {
+      warning("Missing or wrong member names in 'seq.settings': ignoring!")
+      seq.settings <- list(initial.delay = 0.1, step.delay = 0, num.steps = 1L)
     }
 
     # initialize lists to collect names from current session

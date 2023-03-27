@@ -378,15 +378,28 @@ choose_ch_interactive <- function(instruments,
 #'
 #' @export
 #'
-set_seq_interactive <- function(seq.settings = list(step.delay = 0, num.steps = 1)) {
+set_seq_interactive <- function(seq.settings = list(initial.delay = 0, step.delay = 0, num.steps = 1)) {
   old.seq.settings <- seq.settings
   repeat{
-    cat("Ready to set sequence parameters?\n")
-    answ <- readline("s = step size, n = step number, u = undo (s/n/u/-): ")
+    prompt.string <-
+           sprintf("Series: w = %.3g s wait; s = %.3g s step; n = %i times; u undo (w/s/n/u/-): ",
+                   seq.settings[["initial.delay"]],
+                   seq.settings[["step.delay"]],
+                   seq.settings[["num.steps"]])
+    answ <- readline(prompt  = prompt.string)
     if (answ == "") {
       break()
     }
-    if (substr(answ, 1, 1) == "s") {
+    if (substr(answ, 1, 1) == "w") {
+      step <- readline(sprintf("Wait = %.3g seconds, new: ",
+                               seq.settings[["initial.delay"]]))
+      step <- try(as.numeric(step))
+      if (!is.na(step)) {
+        seq.settings[["initial.delay"]] <- step
+      } else {
+        print("Value not changed!")
+      }
+    } else if (substr(answ, 1, 1) == "s") {
       step <- readline(sprintf("Step = %.3g seconds, new: ",
                                seq.settings[["step.delay"]]))
       step <- try(as.numeric(step))

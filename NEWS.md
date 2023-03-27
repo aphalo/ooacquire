@@ -16,10 +16,12 @@ editor_options:
 # ooacquire 0.2.7 (2023-03-25)
     
 -   Tested working with OmniDriver 2.71 and 2.56, under current R 4.2.3 and 
-    coming R 4.3.0.
+    coming R 4.3.0. (API change in OmniDriver 2.71 removed access to optical
+    bench descriptor in firmware!!)
 -   Tolerate missing values returned by functions removed from recent
     versions of OmniDriver.
 -   Fix bugs that prevented automatic acquisition of time series of spectra.
+    Now working for `"raw"` and `"cps"` output.
 
 # ooacquire 0.2.6 (2022-10-18)
 
