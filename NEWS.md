@@ -12,10 +12,10 @@ editor_options:
 -   Move calibration data to separate packages.
 -   Update all interactive data acquisition functions to match the
     updated interface of `acq_irrad_interactive()`.
--   Consider replacing OmniDriver by Seabreeze open source driver or a 
+-   Consider replacing OmniDriver by SeaBreeze open source driver or a 
     derivative.
     
-# ooacquire 0.2.7 (2023-04-01)
+# ooacquire 0.3.0 (2023-04-01)
     
 -   Tested working with OmniDriver 2.71 and 2.56, under current R 4.2.3 and 
     coming R 4.3.0. (Maya and Flame recognized by 2.71 and 2.56. USB2000

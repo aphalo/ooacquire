@@ -1,7 +1,7 @@
 Package: ooacquire
 Type: Package
 Title: Acquire Data from OO Spectrometers
-Version: 0.2.7
+Version: 0.3.0
 Date: 2023-04-01
 Authors@R:
    c(
