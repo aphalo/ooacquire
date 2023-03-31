@@ -94,64 +94,86 @@ s_irrad_corrected.raw_mspct <-
            verbose = getOption("photobiology.verbose", default = FALSE),
            ...) {
 
-    check_spct_prev_state <- disable_check_spct()
-    on.exit(set_check_spct(check_spct_prev_state), add = TRUE)
-
-    check_sn_match(x, correction.method, missmatch.action = stop)
-
-    if (length(setdiff(names(x), spct.names)) > 0L) {
-      stop("Bad member names in 'spct.names': ", names(spct.names))
-    }
-
-    if (length(x[[ spct.names["light"] ]]) == 0) {
-      if (verbose) {
-        warning("'raw_spct' object for 'light' scans missing")
+    if (length(spct.names[["light"]]) > 1L) {
+      # if we have a series we use recursion
+      corrected.mspct <- source_mspct()
+      for (i in seq_along(spct.names[["light"]])) {
+        temp.spct.names <- spct.names
+        temp.spct.names[["light"]] <- spct.names[["light"]][i]
+        corrected.mspct[[spct.names[["light"]][i]]] <-
+          s_irrad_corrected(x,
+                            spct.names = temp.spct.names,
+                            correction.method = correction.method,
+                            return.cps = return.cps,
+                            verbose = verbose,
+                            ...)
       }
-      if (return.cps) {
-        return(cps_spct())
+      # convert collection into spectrum in long form
+      corrected.spct <- rbinspct(corrected.mspct)
+
+    } else {
+
+      check_spct_prev_state <- disable_check_spct()
+      on.exit(set_check_spct(check_spct_prev_state), add = TRUE)
+
+      check_sn_match(x, correction.method, missmatch.action = stop)
+
+      if (length(setdiff(names(x), spct.names)) > 0L) {
+        stop("Bad member names in 'spct.names': ", names(spct.names))
+      }
+
+      if (length(x[[ spct.names["light"] ]]) == 0) {
+        if (verbose) {
+          warning("'raw_spct' object for 'light' scans missing")
+        }
+        if (return.cps) {
+          return(cps_spct())
+        } else {
+          return(source_spct())
+        }
+      }
+
+      if (is.null(correction.method[["worker.fun"]])) {
+        worker.fun <- NULL
+      } else if (is.na(correction.method[["worker.fun"]])) {
+        worker.fun <- NULL
+      } else if (is.character(correction.method[["worker.fun"]])) {
+        worker.fun <- get(correction.method[["worker.fun"]],
+                          mode = "function",
+                          envir = as.environment("package:ooacquire"))
       } else {
-        return(source_spct())
+        worker.fun <- correction.method[["worker.fun"]]
+      }
+
+      stopifnot(is.null(worker.fun) || is.function(worker.fun))
+
+      corrected.spct <-
+        uvb_corrections(x = x,
+                        spct.names = spct.names,
+                        stray.light.method = correction.method[["stray.light.method"]],
+                        stray.light.wl = correction.method[["stray.light.wl"]],
+                        flt.dark.wl = correction.method[["flt.dark.wl"]],
+                        flt.ref.wl = correction.method[["flt.ref.wl"]],
+                        flt.Tfr = correction.method[["flt.Tfr"]],
+                        inst.dark.pixs = correction.method[["inst.dark.pixs"]],
+                        worker.fun = worker.fun,
+                        trim = correction.method[["trim"]],
+                        verbose = verbose)
+
+      if (return.cps) {
+        corrected.spct <- check_spct(corrected.spct)
+      } else {
+        descriptor <- getInstrDesc(corrected.spct)
+        if (any(is.na(descriptor$inst.calib$irrad.mult)) ||
+            length(descriptor$inst.calib$irrad.mult) !=
+            length(descriptor$wavelengths)) {
+          stop("The 'instrument descriptor' lacks valid irradiance calibration data!")
+        }
+        corrected.spct <- check_spct(photobiology::cps2irrad(corrected.spct, ...))
       }
     }
 
-    if (is.null(correction.method[["worker.fun"]])) {
-      worker.fun <- NULL
-    } else if (is.na(correction.method[["worker.fun"]])) {
-      worker.fun <- NULL
-    } else if (is.character(correction.method[["worker.fun"]])) {
-      worker.fun <- get(correction.method[["worker.fun"]],
-                        mode = "function",
-                        envir = as.environment("package:ooacquire"))
-    } else {
-      worker.fun <- correction.method[["worker.fun"]]
-    }
-
-    stopifnot(is.null(worker.fun) || is.function(worker.fun))
-
-    corrected.spct <-
-      uvb_corrections(x = x,
-                      spct.names = spct.names,
-                      stray.light.method = correction.method[["stray.light.method"]],
-                      stray.light.wl = correction.method[["stray.light.wl"]],
-                      flt.dark.wl = correction.method[["flt.dark.wl"]],
-                      flt.ref.wl = correction.method[["flt.ref.wl"]],
-                      flt.Tfr = correction.method[["flt.Tfr"]],
-                      inst.dark.pixs = correction.method[["inst.dark.pixs"]],
-                      worker.fun = worker.fun,
-                      trim = correction.method[["trim"]],
-                      verbose = verbose)
-
-    if (return.cps) {
-      check_spct(corrected.spct)
-    } else {
-      descriptor <- getInstrDesc(corrected.spct)
-      if (any(is.na(descriptor$inst.calib$irrad.mult)) ||
-          length(descriptor$inst.calib$irrad.mult) !=
-          length(descriptor$wavelengths)) {
-        stop("The 'instrument descriptor' lacks valid irradiance calibration data!")
-      }
-      check_spct(photobiology::cps2irrad(corrected.spct, ...))
-    }
+    corrected.spct
   }
 
 #' @describeIn s_irrad_corrected Default for generic function.
