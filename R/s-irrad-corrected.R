@@ -94,14 +94,23 @@ s_irrad_corrected.raw_mspct <-
            verbose = getOption("photobiology.verbose", default = FALSE),
            ...) {
 
-    if (length(spct.names[["light"]]) > 1L) {
-      # if we have a series we use recursion
-      corrected.mspct <- source_mspct()
+    # remove unused name mappings (dependent on protocol)
+    if ("dark" %in% names(spct.names) && !spct.names[["dark"]] %in% names(x)) {
+      spct.names <- spct.names[names(spct.names) != "dark"]
+    }
+    if ("filter" %in% names(spct.names) && !spct.names[["filter"]] %in% names(x)) {
+      spct.names <- spct.names[names(spct.names) != "filter"]
+    }
+
+    if (is.list(spct.names) && length(spct.names[["light"]]) > 1L) {
+      # if we have a series we use recursion for each spectrum
+      corrected.mspct <- list() # a list is enough
       for (i in seq_along(spct.names[["light"]])) {
         temp.spct.names <- spct.names
         temp.spct.names[["light"]] <- spct.names[["light"]][i]
+        temp.spct.names <- unlist(temp.spct.names, use.names = TRUE) # convert list into vector
         corrected.mspct[[spct.names[["light"]][i]]] <-
-          s_irrad_corrected(x,
+          s_irrad_corrected(x[unname(temp.spct.names)], # extraction needed because of tests
                             spct.names = temp.spct.names,
                             correction.method = correction.method,
                             return.cps = return.cps,
@@ -109,7 +118,7 @@ s_irrad_corrected.raw_mspct <-
                             ...)
       }
       # convert collection into spectrum in long form
-      corrected.spct <- rbinspct(corrected.mspct)
+      corrected.spct <- rbindspct(corrected.mspct)
 
     } else {
 
@@ -122,7 +131,7 @@ s_irrad_corrected.raw_mspct <-
         stop("Bad member names in 'spct.names': ", names(spct.names))
       }
 
-      if (length(x[[ spct.names["light"] ]]) == 0) {
+      if (length(x[[ spct.names[["light"]] ]]) == 0) {
         if (verbose) {
           warning("'raw_spct' object for 'light' scans missing")
         }

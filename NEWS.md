@@ -21,7 +21,8 @@ editor_options:
 -   Tolerate missing values returned by functions removed from recent
     versions of OmniDriver.
 -   Fix bugs that prevented automatic acquisition of time series of spectra.
-    Now working for `"raw"` and `"cps"` output.
+    Now working for `"raw"`, `"cps"` and "irrad" output, no summaries for
+    series yet.
 
 # ooacquire 0.2.6 (2022-10-18)
 

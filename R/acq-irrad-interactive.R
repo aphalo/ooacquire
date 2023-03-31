@@ -168,7 +168,9 @@ acq_irrad_interactive <-
     default.protocols <- list(l = "light",
                               ld = c("light", "dark"),
                               lf = c("light", "filter"),
-                              lfd = c("light", "filter", "dark"))
+                              lfd = c("light", "filter", "dark"),
+                              dl = rev(c("light", "dark")),
+                              dfl = rev(c("light", "filter", "dark")))
     if (length(protocols) == 0) {
       protocols <- default.protocols
     } else if (inherits(protocols, "character")) {
@@ -566,7 +568,8 @@ acq_irrad_interactive <-
               grDevices::dev.off()
             }
 
-            if (save.summaries && qty.out == "irrad") {
+            # current summary code fails for spectra in long form as from "series"!!
+            if (interface.mode != "series" && save.summaries && qty.out == "irrad") {
               summary.tb <- spct_summary(mspct = collection.mspct)
               if (!is.null(summary.tb) && is.data.frame(summary.tb)) {
                 readr::write_delim(summary.tb,
