@@ -19,3 +19,4 @@ acq_irrad_interactive(interface.mode = "auto",
                       folder.name = "./inst-not/single",
                       tot.time.range = 5,
                       HDR.mult = c(1, 10))
+

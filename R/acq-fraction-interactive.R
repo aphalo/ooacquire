@@ -234,7 +234,7 @@ acq_fraction_interactive <-
     user.session.name <- readline("Session's name: ")
     session.name <- make.names(user.session.name)
     if (user.session.name == "") {
-      session.name <- make.names(lubridate::now())
+      session.name <- make.names(lubridate::now(tzone = "UTC"))
     }
     if (session.name != user.session.name) {
       message("Using sanitised/generated name: '", session.name, "'.", sep = "")

@@ -74,7 +74,7 @@ s_irrad_corrected.list <- function(x,
                       ...)
 
   setWhatMeasured(corrected.spct, comment.txt)
-  comment(corrected.spct) <- paste("Processed on ", lubridate::today(),
+  comment(corrected.spct) <- paste("Processed on ", lubridate::today(tzone = "UTC"),
                                    "\nwith 's_irrad_corrected()' from 'ooacquire' ver. ",
                                    utils::packageVersion("ooacquire"),
                                    "\n\nfrom files:\n", comment.txt, sep = "")
@@ -234,7 +234,7 @@ s_irrad_corrected.raw_spct <- function(x,
 #'
 #' @export
 #'
-which_descriptor <- function(date = lubridate::today(),
+which_descriptor <- function(date = lubridate::today(tzone = "UTC"),
                              descriptors = ooacquire::MAYP11278_descriptors,
                              verbose = getOption("photobiology.verbose", TRUE),
                              strict.calib = getOption("photobiology.strict.calib", FALSE),
@@ -244,7 +244,7 @@ which_descriptor <- function(date = lubridate::today(),
     date <- anytime::anydate(date)
   }
 
-  if (date > lubridate::today()) {
+  if (date > lubridate::today(tzone = "UTC")) {
     warning("Looking up calibration for a date in the future!!")
   }
 

@@ -86,7 +86,7 @@ s_fraction_corrected.list <- function(x,
                                         ...)
 
   setWhatMeasured(fraction.spct, comment.txt)
-  comment(fraction.spct) <- paste("Processed on ", lubridate::today(),
+  comment(fraction.spct) <- paste("Processed on ", lubridate::today(tzone = "UTC"),
                                    "\nwith 's_fraction_corrected()' from 'ooacquire' ver. ",
                                    utils::packageVersion("ooacquire"),
                                    "\n\nfrom files:\n", comment.txt, sep = "")

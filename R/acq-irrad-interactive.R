@@ -137,11 +137,11 @@ acq_irrad_interactive <-
            save.collections = TRUE,
            interface.mode = "auto",
            folder.name = paste("acq", qty.out,
-                               lubridate::today(),
+                               lubridate::today(tzone = "UTC"),
                                sep = "-"),
            user.name = Sys.info()[["user"]],
            session.name = paste(user.name,
-                                strftime(lubridate::now(),
+                                strftime(lubridate::now(tzone = "UTC"),
                                          "%Y.%b.%d_%H.%M.%S"),
                                 sep = "_")) {
 
@@ -286,7 +286,7 @@ acq_irrad_interactive <-
     if (! user.session.name == "") {
       session.name <- make.names(user.session.name)
       if (user.session.name == "") {
-        session.name <- make.names(lubridate::now())
+        session.name <- make.names(lubridate::now(tzone = "UTC"))
       }
       if (session.name != user.session.name) {
         message("Using sanitised/generated name: '", session.name, "'.", sep = "")
@@ -534,7 +534,7 @@ acq_irrad_interactive <-
                                               user.collection.name, sep = ""))
           if (user.collection.name == "") {
             collection.name <- make.names(paste("collection ",
-                                                lubridate::now(), sep = ""))
+                                                lubridate::now(tzone = "UTC"), sep = ""))
           }
           if (collection.name != user.collection.name) {
             message("Using sanitised/generated name: '",

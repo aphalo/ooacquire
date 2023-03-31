@@ -57,17 +57,17 @@ acq_raw_spct <- function(descriptor,
   y <- descriptor
 
   z <- tibble::tibble(w.length = y$wavelengths)
-  start.time <- lubridate::now()
+  start.time <- lubridate::now(tzone = "UTC")
 
   if (set.all) {
     # set according to acq.settings
-    # correction for electrical dark (in instrument using ocluded pixels in array)
+    # correction for electrical dark (in instrument using occluded pixels in array)
     rOmniDriver::set_correct_for_electrical_dark(descriptor$w,
                                                  x$corr.elect.dark,
                                                  descriptor$sr.index,
                                                  descriptor$ch.index)
 
-    # correction for sensor non-linearuty (in instrument)
+    # correction for sensor non-linearity (in instrument)
     rOmniDriver::set_correct_for_detector_nonlinearity(descriptor$w,
                                                        x$corr.sensor.nl,
                                                        descriptor$sr.index,
@@ -119,25 +119,30 @@ acq_raw_spct <- function(descriptor,
       x$num.scans[i] <- actual.num.scans
     }
 
-    if (verbose) message(paste("Measurement ", i, "..."))
+    if (verbose) message("Measurement x", acq.settings$HDR.mult[i], " ... ", appendLF = FALSE)
 
     # light source, e,g,, flash trigger
     if (num.exposures[i] > 0L  && !is.null(f.trigger.pulses)) {
       f.trigger.pulses(num.exposures[i])
     }
 
+    # the USB2000 occasionally returns zero counts (timing problem?)
+    # or data could be corrupted, in which case we retry
+    j <- 0L
+    max.attempts <- 3L
     repeat {
-      i <- 0L
+      j <- j + 1L
       counts <- rOmniDriver::get_spectrum(y$w, y$sr.index, y$ch.index)
       if (!all(counts == 0) && rOmniDriver::is_spectrum_valid(y$w, y$sr.index, y$ch.index)) {
-        # the USB2000 occasionally returns zero counts (timing problem?)
+        if (verbose) message("ready.")
         break()
-      } else if (i > 2L) {
+      } else if (j > max.attempts) {
         counts <- rep_len(NA_real_, length(counts))
+        if (verbose) message("failed in ", j, " attempts.")
         break()
       }
-      i <- i + 1L
     }
+
     if (!rOmniDriver::is_spectrum_valid(y$w, y$sr.index, y$ch.index) && !x$force.valid)
     {
       counts <- rep_len(NA_real_, length(counts))
@@ -254,7 +259,7 @@ acq_raw_mspct <- function(descriptor,
   previous.protocol <- "none"
   z <- z.names <- list()
   idx <- 0
-  start.time <- lubridate::now("UTC")
+  start.time <- lubridate::now(tzone = "UTC")
 
   for (p in protocol) {
     if (p != previous.protocol) {
@@ -269,30 +274,30 @@ acq_raw_mspct <- function(descriptor,
       f.current <- NULL
     }
     if (p == "light") {
-      times <- lubridate::now("UTC") + seconds(steps)
+      times <- lubridate::now(tzone = "UTC") + seconds(steps)
     } else {
-      times <- lubridate::now("UTC")
+      times <- lubridate::now(tzone = "UTC")
     }
 
     if (verbose && length(times) > 1L) {
-      message("'times' = ", paste(times, collapse = "\n          "))
+      message("Series from ", times[1], " to ", times[length(times)], " taking ", length(times), " measurements")
     }
 
+    delays <- numeric(length(times))
     for (i in seq_along(times)) {
       repeat {
         # we could subtract a lag correction dependent on host and spectrometer
-        seconds.to.wait <- lubridate::seconds(times[[i]] - lubridate::now("UTC"))
-        if (seconds.to.wait <= 0) {
-          if (verbose && length(times) > 1L) {
-            message("Delayed ", signif(seconds.to.wait, 2), " s.")
-          }
+        seconds.to.wait <- lubridate::seconds(times[[i]] - lubridate::now(tzone = "UTC"))
+        if (seconds.to.wait <= 0.001) {
+          delays[i] <- round(seconds.to.wait * -1e3, 0)
+
           break()
         }
         Sys.sleep(seconds.to.wait)
       }
       idx <- idx + 1
       z.names[[idx]] <- paste(p, as.character(i), sep = ".")
-      acq.time <- lubridate::now()
+      acq.time <- lubridate::now(tzone = "UTC")
       z[[idx]] <- acq_raw_spct(descriptor = descriptor,
                                acq.settings = acq.settings,
                                f.trigger.pulses = f.current,
@@ -306,7 +311,14 @@ acq_raw_mspct <- function(descriptor,
       trimInstrDesc(z[[idx]], c("-", "w"))
     }
   }
-  end.time <- lubridate::now()
+  end.time <- lubridate::now(tzone = "UTC")
+  if (length(times) > 1L && verbose) {
+    message("Delays (min, median, max): ",
+            paste(c(min(delays), median(delays), max(delays)),
+                  collapse = ", "),
+            " (ms)")
+    message("Start: ", start.time, ", end: ", end.time, ", ellapsed: ", signif(seconds(end.time - start.time), 4), " s.")
+  }
   z <- photobiology::as.raw_mspct(z)
 
   if (length(z) == length(protocol)) {

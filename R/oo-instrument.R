@@ -73,8 +73,8 @@ get_oo_descriptor <- function(w,
         z$irrad.mult <- oo_calib2irrad_mult(oo.calib,
                                             area = area,
                                             diff.type = diff.type)
-        z$start.date <- lubridate::today() - lubridate::days(1)
-        z$end.date <- lubridate::today() + lubridate::days(30)
+        z$start.date <- lubridate::today(tzone = "UTC") - lubridate::days(1)
+        z$end.date <- lubridate::today(tzone = "UTC") + lubridate::days(30)
       }
     } else {
       z$irrad.mult <- rep(NA_real_, length(w.lengths))
@@ -91,7 +91,7 @@ get_oo_descriptor <- function(w,
                                             sr.index = sr.index,
                                             ch.index = ch.index)
   list(
-    time = lubridate::now(),
+    time = lubridate::now(tzone = "UTC"),
     w = w,
     sr.index = sr.index,
     ch.index = ch.index,
@@ -328,8 +328,8 @@ set_descriptor_nl <- function(descriptor,
 set_descriptor_irrad_mult <- function(descriptor,
                                       irrad.mult,
                                       wl.range = NULL,
-                                      start.date = lubridate::today() - lubridate::days(1),
-                                      end.date = lubridate::today() + lubridate::days(1))
+                                      start.date = lubridate::today(tzone = "UTC") - lubridate::days(1),
+                                      end.date = lubridate::today(tzone = "UTC") + lubridate::days(1))
 {
   stopifnot(is.numeric(irrad.mult) && length(irrad.mult) == 1 ||
               length(irrad.mult) == length(descriptor$wavelengths))
@@ -363,7 +363,7 @@ get_oo_settings <- function(descriptor) {
   sr.index <- descriptor$sr.index
   ch.index <- descriptor$sr.index
   list(
-    time = lubridate::now(),
+    time = lubridate::now(tzone = "UTC"),
     w = w,
     sr.index = sr.index,
     ch.index = ch.index,
