@@ -11,18 +11,23 @@ editor_options:
 -   Document support for OO calibrations and add example scripts.
 -   Move calibration data to separate packages.
 -   Update all interactive data acquisition functions to match the
-    updated interface of `acq_continuous_interactive()`.
+    updated interface of `acq_irrad_interactive()`.
+-   Consider replacing OmniDriver by Seabreeze open source driver or a 
+    derivative.
     
-# ooacquire 0.2.7 (2023-03-25)
+# ooacquire 0.2.7 (2023-04-01)
     
 -   Tested working with OmniDriver 2.71 and 2.56, under current R 4.2.3 and 
-    coming R 4.3.0. (API change in OmniDriver 2.71 removed access to optical
-    bench descriptor in firmware!!)
+    coming R 4.3.0. (Maya and Flame recognized by 2.71 and 2.56. USB2000
+    supported in 2.56 but not in 2.70 or 2.71.)
 -   Tolerate missing values returned by functions removed from recent
-    versions of OmniDriver.
--   Fix bugs that prevented automatic acquisition of time series of spectra.
-    Now working for `"raw"`, `"cps"` and "irrad" output, no summaries for
-    series yet.
+    versions of OmniDriver. (API changes in OmniDriver 2.71 and 2.70!)
+-   Automatic acquisition of time series of spectra: implementation functional.
+-   New `interface.mode` `"full"` combines "manual" and "auto".
+-   Several messages updated to better accomodate time series acquisition.
+-   Add to default protocols "dl" and "dfl", better suited to measurement of
+    time series.
+-   Fix bugs related to dates and times caused by changes in 'lubridate'.
 
 # ooacquire 0.2.6 (2022-10-18)
 

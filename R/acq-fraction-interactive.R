@@ -78,18 +78,12 @@
 #' @param type character Type of transmittance or reflectance measured.
 #' @param stray.light.method character Used only when the correction method is
 #'   created on-the-fly.
-#' @param seq.settings named list with numeric members \code{"step.delay"} and
-#'   \code{"num.steps"}.
 #' @param qty.out character One of "Tfr" (spectral transmittance as a fraction
 #'   of one), "irrad" (spectral irardiance), "cps" (counts per second), or "raw"
 #'   (raw sensor counts).
-#' @param save.pdfs,save.summaries,save.collections logical Whether to save
+#' @param save.pdfs logical Whether to save
 #'   plots to PDFs files or not, and collection summaries to csv files or not,
 #'   enable collections user interface or not..
-#' @param interface.mode character One of "auto", "simple", "manual", "series",
-#'   "auto-attr", "simple-attr", "manual-attr", and "series-attr".
-#' @param folder.name,session.name,user.name character Default name of the
-#'   folder used for output, and session and user names.
 #'
 #' @export
 #'

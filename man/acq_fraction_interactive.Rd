@@ -58,18 +58,9 @@ of one), "irrad" (spectral irardiance), "cps" (counts per second), or "raw"
 \item{stray.light.method}{character Used only when the correction method is
 created on-the-fly.}
 
-\item{save.pdfs, save.summaries, save.collections}{logical Whether to save
+\item{save.pdfs}{logical Whether to save
 plots to PDFs files or not, and collection summaries to csv files or not,
 enable collections user interface or not..}
-
-\item{seq.settings}{named list with numeric members \code{"step.delay"} and
-\code{"num.steps"}.}
-
-\item{interface.mode}{character One of "auto", "simple", "manual", "series",
-"auto-attr", "simple-attr", "manual-attr", and "series-attr".}
-
-\item{folder.name, session.name, user.name}{character Default name of the
-folder used for output, and session and user names.}
 }
 \value{
 These functions return the acquired spectra through "side effects" as

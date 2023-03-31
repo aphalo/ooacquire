@@ -78,8 +78,9 @@
 #' @param save.pdfs,save.summaries,save.collections logical Whether to save
 #'   plots to PDFs files or not, and collection summaries to csv files or not,
 #'   enable collections user interface or not..
-#' @param interface.mode character One of "auto", "simple", "manual", "series",
-#'   "auto-attr", "simple-attr", "manual-attr", and "series-attr".
+#' @param interface.mode character One of "auto", "simple", "manual", "full",
+#'   "series", "auto-attr", "simple-attr", "manual-attr", "full-atr", and
+#'   "series-attr".
 #' @param folder.name,session.name,user.name character Default name of the
 #'   folder used for output, and session and user names.
 #'
@@ -156,7 +157,7 @@ acq_irrad_interactive <-
     # validate interface mode
     interface.mode <- tolower(interface.mode)
     if (!gsub("-attr$", "", interface.mode) %in%
-        c("auto", "simple", "series")) {
+        c("auto", "simple", "manual", "full", "series")) {
       stop("Invalid argument for 'interface.mode', aborting.", call. = FALSE)
     }
 
@@ -182,13 +183,12 @@ acq_irrad_interactive <-
 
     # connect to spectrometer
     w <- start_session()
-    on.exit(end_session(w))
+    on.exit(end_session(w)) # ensure session is always closed!
 
     instruments <- list_srs_interactive(w = w)
     sr.index <- choose_sr_interactive(instruments = instruments)
     if (sr.index < 0L) {
       print("Aborting...")
-      end_session(w = w)
       message("Bye!")
       return(NULL)
     }
@@ -378,7 +378,10 @@ acq_irrad_interactive <-
                                    interface.mode = interface.mode)
 
       if (grepl("series", interface.mode)) {
-        seq.settings <- set_seq_interactive(seq.settings)
+        seq.settings <-
+          set_seq_interactive(seq.settings = seq.settings,
+                              measurement.duration =
+                                max(settings$tot.time.range) * length(settings$HDR.mult) * 1e-6) # ms -> s
       }
 
       raw.mspct <- acq_raw_mspct(descriptor = descriptor,
@@ -475,6 +478,7 @@ acq_irrad_interactive <-
           )
 
           # moved from above so that saving is skipped for discarded spectra
+          # one could use a temporary file for maximum safety...
           raw.names <- c(raw.names, raw.name)
           file.names <- c(file.names, file.name)
           irrad.names <- c(irrad.names, irrad.name)
@@ -541,7 +545,7 @@ acq_irrad_interactive <-
                     collection.name, "'.", sep = "")
           }
           utils::flush.console()
-          collection.title <- readline("Title for plot?:")
+          collection.title <- readline("Title for plot? :")
           raw.collection.name <- paste(collection.name, "raw", "lst", sep = ".")
           collection.file.name <- paste(collection.name, "Rda", sep = ".")
 
@@ -631,5 +635,5 @@ acq_irrad_interactive <-
             paste(file.names, collapse = ",\n"), ".", sep = "")
 
     message("Ending...")
-    end_session(w)
+
   }

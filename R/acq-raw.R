@@ -179,7 +179,7 @@ acq_raw_spct <- function(descriptor,
 #'   argument passed to \code{protocol}.
 #'
 #'   Two types of light sources can be measured, for continuous-emission light
-#'   sources, the integration time can a later steps used to compute irradiance.
+#'   sources, the integration time can at later steps used to compute irradiance.
 #'   In the case of flashes, the duration of the exposure is unknown and
 #'   irradiance cannot be computed, while spectral energy per flash can be
 #'   computed if the number of flashes is known. The argument to
@@ -189,6 +189,23 @@ acq_raw_spct <- function(descriptor,
 #'   request the operator to trigger the flash or change the light conditions
 #'   according to the names of the steps in the argument to \code{protocol}.
 #'
+#'   For sequences of light measurements using single "dark" and "filter"
+#'   measurements the interpretation of "step.delay" can vary. If shorter than
+#'   the number of steps, the values are interpreted as the time increment in
+#'   seconds between the start of successive measurements. If the length is
+#'   the same as "num.steps", and the values are monotonically increasing,
+#'   they are interpreted as time offsets from the start of the sequence.
+#'
+#' @note Obviously the duration of the time steps must be longer than the time
+#'   that a measurment takes. This time can be significantly more than the sum
+#'   of integration times, as there is considerable overhead in both the
+#'   OmniDriver Java code, in USB communication, in the spectrometer
+#'   itself and in R.
+#'
+#'   No multitasking is used or supported, so R waits for the spectrometer to
+#'   answer. The operating system and other programs are not blocked, but the
+#'   current R instance is.
+#'
 #' @family raw-counts-spectra acquisition functions
 #'
 #' @param descriptor list as returned by function \code{get_oo_descriptor()}.
@@ -197,8 +214,8 @@ acq_raw_spct <- function(descriptor,
 #' @param f.trigger.pulses function Function to be called to trigger light
 #'   pulse(s). Should accept as its only argument the number of pulses, and
 #'   return \code{TRUE} on sucess and \code{FALSE} on failure.
-#' @param seq.settings list with members "step" numeric value in seconds,
-#'   "num.steps" integer.
+#' @param seq.settings list with members "initial.delay", "step,delay" numeric
+#'   values in seconds, "num.steps" integer.
 #' @param protocol vector of character strings.
 #' @param user.label character string to set as label.
 #' @param where.measured data.frame with at least columns "lon" and "lat"
@@ -243,14 +260,20 @@ acq_raw_mspct <- function(descriptor,
     pause.fun <- default_pause_fun
   }
 
-  if (length(seq.settings[["step.delay"]]) == seq.settings[["num.steps"]]) {
+  if (seq.settings[["num.steps"]] == 1L) {
+    steps <- 0
+  } else if (length(seq.settings[["step.delay"]]) == seq.settings[["num.steps"]] &&
+             !is.unsorted(seq.settings[["step.delay"]], strictly = TRUE)) {
+    # use vector of time offsets as is
     steps <- seq.settings[["step.delay"]]
   } else {
+    # build vector of offsets with regular pattern of steps
     steps <- c(0,
-               cumsum(rep(seq.settings[["step.delay"]],
-                        length.out = seq.settings[["num.steps"]] - 1L)))
-    steps <- steps + seq.settings[["initial.delay"]]
+               cumsum(rep_len(seq.settings[["step.delay"]],
+                              length.out = seq.settings[["num.steps"]] - 1L)))
   }
+  # add initial delay
+  steps <- steps + seq.settings[["initial.delay"]]
 
   if (verbose && length(steps) > 1L) {
     message("'steps' = ", paste(steps, collapse = ", "), " (seconds)")
@@ -314,7 +337,7 @@ acq_raw_mspct <- function(descriptor,
   end.time <- lubridate::now(tzone = "UTC")
   if (length(times) > 1L && verbose) {
     message("Delays (min, median, max): ",
-            paste(c(min(delays), median(delays), max(delays)),
+            paste(c(min(delays), stats::median(delays), max(delays)),
                   collapse = ", "),
             " (ms)")
     message("Start: ", start.time, ", end: ", end.time, ", ellapsed: ", signif(seconds(end.time - start.time), 4), " s.")

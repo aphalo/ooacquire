@@ -20,10 +20,10 @@ acq_irrad_interactive(
   save.summaries = TRUE,
   save.collections = TRUE,
   interface.mode = "auto",
-  folder.name = paste("acq", qty.out, lubridate::today(), sep = "-"),
+  folder.name = paste("acq", qty.out, lubridate::today(tzone = "UTC"), sep = "-"),
   user.name = Sys.info()[["user"]],
-  session.name = paste(user.name, strftime(lubridate::now(), "\%Y.\%b.\%d_\%H.\%M.\%S"),
-    sep = "_")
+  session.name = paste(user.name, strftime(lubridate::now(tzone = "UTC"),
+    "\%Y.\%b.\%d_\%H.\%M.\%S"), sep = "_")
 )
 }
 \arguments{
@@ -62,8 +62,9 @@ of one), "irrad" (spectral irardiance), "cps" (counts per second), or "raw"
 plots to PDFs files or not, and collection summaries to csv files or not,
 enable collections user interface or not..}
 
-\item{interface.mode}{character One of "auto", "simple", "manual", "series",
-"auto-attr", "simple-attr", "manual-attr", and "series-attr".}
+\item{interface.mode}{character One of "auto", "simple", "manual", "full",
+"series", "auto-attr", "simple-attr", "manual-attr", "full-atr", and
+"series-attr".}
 
 \item{folder.name, session.name, user.name}{character Default name of the
 folder used for output, and session and user names.}

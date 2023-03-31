@@ -27,8 +27,8 @@ or \code{retune_acq_settings()} or \code{acq_settings()}.}
 pulse(s). Should accept as its only argument the number of pulses, and
 return \code{TRUE} on sucess and \code{FALSE} on failure.}
 
-\item{seq.settings}{list with members "step" numeric value in seconds,
-"num.steps" integer.}
+\item{seq.settings}{list with members "initial.delay", "step,delay" numeric
+values in seconds, "num.steps" integer.}
 
 \item{protocol}{vector of character strings.}
 
@@ -60,7 +60,7 @@ Function \code{acq_raw_mspct} acquires directly from a spectrometer
   argument passed to \code{protocol}.
 
   Two types of light sources can be measured, for continuous-emission light
-  sources, the integration time can a later steps used to compute irradiance.
+  sources, the integration time can at later steps used to compute irradiance.
   In the case of flashes, the duration of the exposure is unknown and
   irradiance cannot be computed, while spectral energy per flash can be
   computed if the number of flashes is known. The argument to
@@ -69,6 +69,24 @@ Function \code{acq_raw_mspct} acquires directly from a spectrometer
   Two parameters accept functions as arguments, and default to functions that
   request the operator to trigger the flash or change the light conditions
   according to the names of the steps in the argument to \code{protocol}.
+
+  For sequences of light measurements using single "dark" and "filter"
+  measurements the interpretation of "step.delay" can vary. If shorter than
+  the number of steps, the values are interpreted as the time increment in
+  seconds between the start of successive measurements. If the length is
+  the same as "num.steps", and the values are monotonically increasing,
+  they are interpreted as time offsets from the start of the sequence.
+}
+\note{
+Obviously the duration of the time steps must be longer than the time
+  that a measurment takes. This time can be significantly more than the sum
+  of integration times, as there is considerable overhead in both the
+  OmniDriver Java code, in USB communication, in the spectrometer
+  itself and in R.
+
+  No multitasking is used or supported, so R waits for the spectrometer to
+  answer. The operating system and other programs are not blocked, but the
+  current R instance is.
 }
 \seealso{
 \code{\link{acq_raw_spct}} which is used to acquire each member

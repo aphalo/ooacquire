@@ -5,13 +5,16 @@
 \title{Interactively set sequential measurements}
 \usage{
 set_seq_interactive(
-  seq.settings = list(initial.delay = 0, step.delay = 0, num.steps = 1)
+  seq.settings = list(initial.delay = 0, step.delay = 0, num.steps = 1),
+  measurement.duration = 0
 )
 }
 \arguments{
-\item{seq.settings}{numeric Definition of time steps for a sequence of repeated
-measurements. Named vector with member names \code{"step"}, and
-\code{"steps"}.}
+\item{seq.settings}{numeric Definition of time steps for a sequence of
+repeated measurements. Named vector with member names
+\code{"initial.delay"}, \code{"step.delay"}, and \code{"num.steps"}.}
+
+\item{measurement.duration}{numeric Duration of one measurement event (s).}
 }
 \value{
 A named numeric vector of length two.
@@ -23,11 +26,12 @@ series.
 \details{
 Function \code{seq.settings()} allows users to enter values needed
 to define a sequence of spectral acquisitions. These are the delay or time
-step between succesive acquisitions and the number of acquisitions in the
-series.
+step between successive acquisitions and the number of acquisitions in the
+series. The \code{measurement.time} determines the minimum length for
+\code{"step"}.
 
 A sequence of measurements are expected to share a single reference or
-dark scan, and be done in rapid sequence.
+dark scan, and be done in "rapid" sequence.
 }
 \seealso{
 Other interactive acquisition utility functions: 

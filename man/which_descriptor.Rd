@@ -5,7 +5,7 @@
 \title{Select which instrument descriptor to use}
 \usage{
 which_descriptor(
-  date = lubridate::today(),
+  date = lubridate::today(tzone = "UTC"),
   descriptors = ooacquire::MAYP11278_descriptors,
   verbose = getOption("photobiology.verbose", TRUE),
   strict.calib = getOption("photobiology.strict.calib", FALSE),

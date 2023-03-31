@@ -36,38 +36,42 @@ tune_interactive <- function(descriptor,
                              acq.settings,
                              start.int.time = 0.1,
                              interface.mode = "auto") {
-  if (!interface.mode %in% c("simple", "auto", "manual")) {
-    interface.mode <- "auto"
+  if (!interface.mode %in% c("simple", "auto", "manual", "full")) {
+    interface.mode <- "auto" # gets used for "series"
   }
   # configure interface for active mode
   prompt.text1 <-
     switch(interface.mode,
            simple = "RETUNE/range/HDR mult./undo/help/measure (t-/r/h/u/?/m): ",
-           auto = "RETUNE/tune/margin/range/HDR mult./undo/help/measure (t-/T/M/r/h/u/?/m): ",
-           manual = "FIXED/range/HDR mult./undo/help/measure (f-/r/h/u/?/m): "
+           auto = "RETUNE/tune/saturation/range/HDR mult./undo/help/measure (t-/T/s/r/h/u/?/m): ",
+           manual = "FIXED/range/HDR mult./undo/help/measure (f-/r/h/u/?/m): ",
+           full = "FIXED/retune/tune/saturation/range/HDR mult./undo/help/measure (f-/t/T/s/r/h/u/?/m): "
     )
   prompt.text2 <-
     switch(interface.mode,
            simple = "retune/range/HDR mult./undo/help/MEASURE (t/r/h/u/?/m-): ",
-           auto = "retune/tune/margin/range/HDR mult./undo/help/MEASURE (t/T/M/r/h/u/?/m-): ",
-           manual = "fixed/range/HDR mult./undo/help/MEASURE (f/r/h/u/?/m-): "
+           auto = "retune/tune/saturation/range/HDR mult./undo/help/MEASURE (t/T/s/r/h/u/?/m-): ",
+           manual = "fixed/range/HDR mult./undo/help/MEASURE (f/r/h/u/?/m-): ",
+           full = "fixed/retune/tune/saturation/range/HDR mult./undo/help/MEASURE (f/t/T/s/r/h/u/?/m-): "
     )
   valid.input <-
     switch(interface.mode,
            simple = c("t", "r", "h", "u", "?", "m", ""),
-           auto = c("t", "T", "M", "r", "h", "u", "?", "m", ""),
-           manual = c("f", "r", "h", "u", "?", "m", "")
+           auto = c("t", "T", "s", "r", "h", "u", "?", "m", ""),
+           manual = c("f", "r", "h", "u", "?", "m", ""),
+           full = c("f", "t", "T", "s", "r", "h", "u", "?", "m", "")
     )
   default.input <-
     switch(interface.mode,
            simple = c("t", "m"),
            auto = c("t", "m"),
-           manual = c("f", "m")
+           manual = c("f", "m"),
+           full = c("f", "m")
     )
   # set help
   all.help <- c(t = "t = retune. Adjust integration time starting from last value.",
                 T = "T = tune. Adjust integration time starting from default value.",
-                M = "M = safety margin. Tuned integration time is maximum * (100 - margin).",
+                M = "s = saturation margin. Tuned integration time is maximum * (100 - margin).",
                 r = "r = range. Total measurement time in seconds, as a single value or a range.",
                 h = "h = HDR mult. High dynamic range or bracketing, as multipliers for target integration time.",
                 f = "f = fixed. User-suplied \"base\" integration time in seconds.",
@@ -123,7 +127,7 @@ tune_interactive <- function(descriptor,
       acq.settings <- set_integ_time(acq.settings = acq.settings,
                                      integ.time = user.integ.time)
       tuned <- TRUE
-    } else if (answ == "M") {
+    } else if (answ == "s") {
       margin <- readline(sprintf("Saturation margin = %.2g, new: ",
                                  acq.settings[["target.margin"]]))
       margin <- try(as.numeric(margin))
@@ -360,17 +364,19 @@ choose_ch_interactive <- function(instruments,
 #' Enter settings defining a sequence of spectra to be measured as a time
 #' series.
 #'
-#' @param seq.settings numeric Definition of time steps for a sequence of repeated
-#'   measurements. Named vector with member names \code{"step"}, and
-#'   \code{"steps"}.
+#' @param seq.settings numeric Definition of time steps for a sequence of
+#'   repeated measurements. Named vector with member names
+#'   \code{"initial.delay"}, \code{"step.delay"}, and \code{"num.steps"}.
+#' @param measurement.duration numeric Duration of one measurement event (s).
 #'
 #' @details Function \code{seq.settings()} allows users to enter values needed
 #' to define a sequence of spectral acquisitions. These are the delay or time
-#' step between succesive acquisitions and the number of acquisitions in the
-#' series.
+#' step between successive acquisitions and the number of acquisitions in the
+#' series. The \code{measurement.time} determines the minimum length for
+#' \code{"step"}.
 #'
 #' A sequence of measurements are expected to share a single reference or
-#' dark scan, and be done in rapid sequence.
+#' dark scan, and be done in "rapid" sequence.
 #'
 #' @family interactive acquisition utility functions
 #'
@@ -378,9 +384,15 @@ choose_ch_interactive <- function(instruments,
 #'
 #' @export
 #'
-set_seq_interactive <- function(seq.settings = list(initial.delay = 0, step.delay = 0, num.steps = 1)) {
+set_seq_interactive <- function(seq.settings = list(initial.delay = 0, step.delay = 0, num.steps = 1),
+                                measurement.duration = 0) {
   old.seq.settings <- seq.settings
+
   repeat{
+    if (seq.settings$step.delay < measurement.duration) {
+      seq.settings$step.delay <- measurement.duration
+      message("'step.delay' too short! Reset to ", seq.settings$step.delay, " s.")
+    }
     prompt.string <-
            sprintf("Series: w = %.3g s wait; s = %.3g s step; n = %i times; u undo (w/s/n/u/-): ",
                    seq.settings[["initial.delay"]],

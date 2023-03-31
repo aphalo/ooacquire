@@ -336,13 +336,18 @@ tune_acq_settings <- function(descriptor,
     if (verbose) {
       message("Integration time (ms): ", format(integ.time  * 1e-3))
     }
-    rOmniDriver::set_integration_time(descriptor$w,
-                                      integ.time,
-                                      descriptor$sr.index,
-                                      descriptor$ch.index)
-    raw.counts <- rOmniDriver::get_spectrum(descriptor$w,
-                                            descriptor$sr.index,
-                                            descriptor$ch.index)
+    repeat {
+      rOmniDriver::set_integration_time(descriptor$w,
+                                        integ.time,
+                                        descriptor$sr.index,
+                                        descriptor$ch.index)
+      raw.counts <- rOmniDriver::get_spectrum(descriptor$w,
+                                              descriptor$sr.index,
+                                              descriptor$ch.index)
+      if (!all(raw.counts == 0)) break()
+      message("Failure: retrying!")
+      Sys.sleep(0.1) # seconds
+    }
     dark.counts <- nl.fun(min(raw.counts[x$pix.selector]))
     max.counts <- nl.fun(max(raw.counts[x$pix.selector]))
     while (max.counts > target.max.counts)
@@ -386,8 +391,13 @@ tune_acq_settings <- function(descriptor,
     if (integ.time < x$min.integ.time) {
       integ.time = x$min.integ.time
       if (verbose) {
-        warning("Clipping cannot be avoided! Using (ms): ",
-                format(integ.time * 1e-3))
+        if (max(raw.counts[x$pix.selector]) >= descriptor$max.counts ) {
+          warning("Clipping cannot be avoided! Using (ms): ",
+                  format(integ.time * 1e-3))
+        } else {
+          warning("Low headroom, clipping likely! Using (ms): ",
+                  format(integ.time * 1e-3))
+        }
       }
       break()
     }

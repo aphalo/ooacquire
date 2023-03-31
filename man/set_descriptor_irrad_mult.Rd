@@ -8,8 +8,8 @@ set_descriptor_irrad_mult(
   descriptor,
   irrad.mult,
   wl.range = NULL,
-  start.date = lubridate::today() - lubridate::days(1),
-  end.date = lubridate::today() + lubridate::days(1)
+  start.date = lubridate::today(tzone = "UTC") - lubridate::days(1),
+  end.date = lubridate::today(tzone = "UTC") + lubridate::days(1)
 )
 }
 \arguments{
