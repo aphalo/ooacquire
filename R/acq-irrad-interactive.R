@@ -244,7 +244,7 @@ acq_irrad_interactive <-
                FLMS00673 = "ld",
                FLMS00440 = "ld",
                FLMS00416 = "ld",
-                           "ld"
+               "ld"
         )
 
     } else {
@@ -270,7 +270,7 @@ acq_irrad_interactive <-
     stopifnot(length(descriptor[["wavelengths"]]) == descriptor[["num.pixs"]])
     # We check for valid calibration multipliers
     if (length(descriptor[["inst.calib"]][["irrad.mult"]]) != descriptor[["num.pixs"]] ||
-      anyNA(descriptor[["inst.calib"]][["irrad.mult"]])) {
+        anyNA(descriptor[["inst.calib"]][["irrad.mult"]])) {
       if (qty.out == "irrad") {
         warning("Bad calibration data, returning counts-per-second.",
                 call. = FALSE)
@@ -459,21 +459,21 @@ acq_irrad_interactive <-
                        print("Answer not recognized. Please try again...")
                      }
                    }
-                 switch(answer1,
-                        u = options(photobiology.plot.bands =
-                                      c(photobiologyWavebands::UV_bands(),
-                                        list(photobiologyWavebands::PAR()))),
-                        p = options(photobiology.plot.bands =
-                                      photobiologyWavebands::Plant_bands()),
-                        v = options(photobiology.plot.bands =
-                                      photobiologyWavebands::VIS_bands()),
-                        t = options(photobiology.plot.bands =
-                                      list(photobiology::new_waveband(
-                                        photobiology::wl_min(irrad.spct),
-                                        photobiology::wl_max(irrad.spct),
-                                        wb.name = "Total"))),
-                        options(photobiology.plot.bands = NULL))
-                 next()},
+                   switch(answer1,
+                          u = options(photobiology.plot.bands =
+                                        c(photobiologyWavebands::UV_bands(),
+                                          list(photobiologyWavebands::PAR()))),
+                          p = options(photobiology.plot.bands =
+                                        photobiologyWavebands::Plant_bands()),
+                          v = options(photobiology.plot.bands =
+                                        photobiologyWavebands::VIS_bands()),
+                          t = options(photobiology.plot.bands =
+                                        list(photobiology::new_waveband(
+                                          photobiology::wl_min(irrad.spct),
+                                          photobiology::wl_max(irrad.spct),
+                                          wb.name = "Total"))),
+                          options(photobiology.plot.bands = NULL))
+                   next()},
                  d = break()
           )
 
@@ -546,8 +546,8 @@ acq_irrad_interactive <-
           }
           utils::flush.console()
           collection.title <- readline("Title for plot? :")
-          raw.collection.name <- paste(collection.name, "raw", "lst", sep = ".")
           collection.file.name <- paste(collection.name, "Rda", sep = ".")
+          collection.objects <- character()
 
           if (qty.out != "raw") {
             collection.mspct <-
@@ -563,6 +563,7 @@ acq_irrad_interactive <-
                                             utils::packageVersion("ooacquire"))) +
               ggplot2::theme(legend.position = "bottom")
             print(collection.fig)
+            rm(collection.title)
 
             if (save.pdfs) {
               collection.pdf.name <- paste(collection.name, "pdf", sep = ".")
@@ -570,58 +571,75 @@ acq_irrad_interactive <-
                              width = 11, height = 7, paper = "a4r")
               print(collection.fig)
               grDevices::dev.off()
+              rm(collection.pdf.name)
             }
+            rm(collection.fig)
 
-            # current summary code fails for spectra in long form as from "series"!!
-            if (interface.mode != "series" && save.summaries && qty.out == "irrad") {
-              summary.tb <- spct_summary(mspct = collection.mspct)
-              if (!is.null(summary.tb) && is.data.frame(summary.tb)) {
-                readr::write_delim(summary.tb,
-                                   file =  paste(collection.name, "csv", sep = "."),
-                                   delim = readr::locale()$grouping_mark)
-                rm(summary.tb) # clean up
+            if (save.summaries) {
+              contents.collection.name <-
+                paste(collection.name, "contents.tb", sep = ".")
+              assign(contents.collection.name, summary(collection.mspct))
+              collection.objects <- c(collection.objects, contents.collection.name)
+              if (qty.out == "irrad") {
+                summary.tb <- spct_summary(mspct = collection.mspct)
+                if (!is.null(summary.tb) && is.data.frame(summary.tb)) {
+                  readr::write_delim(summary.tb,
+                                     file =  paste(collection.name, "csv", sep = "."),
+                                     delim = readr::locale()$grouping_mark)
+                  summary.collection.name <- paste(collection.name, "summary.tb", sep = ".")
+                  assign(summary.collection.name, summary.tb)
+                  collection.objects <- c(collection.objects, summary.collection.name)
+                } else {
+                  message("Computation of summaries failed!")
+                }
+              }
+              irrad.collection.name <- paste(collection.name, qty.out, "mspct", sep = ".")
+              assign(irrad.collection.name, collection.mspct)
+              collection.objects <- c(collection.objects, irrad.collection.name)
+            }
+            raw.collection.name <- paste(collection.name, "raw", "lst", sep = ".")
+            assign(raw.collection.name, mget(raw.names))
+            collection.objects <- c(collection.objects, raw.collection.name)
+            repeat {
+              save(list = collection.objects, file = collection.file.name, precheck = TRUE)
+              if (file.exists(collection.file.name)) {
+                message("Collection objects saved to file '",
+                        collection.file.name, "'.", sep = "")
+                file.names <- c(file.names, collection.file.name)
+                rm(list = collection.objects)
+                # clean up by removing the spectra that have been added to the
+                # collection, and clearing the stored names afterwards
+                rm(list = c(irrad.names))
+                rm(list = c(raw.names))
+                irrad.names <- character()
+                raw.names <- character()
               } else {
-                warning("Computation of collection summaries failed!")
+                message("Saving of the collection to file failed!")
+                if (answer2 == "q") {
+                  repeat {
+                    answer2 <- readline("quit anyway/continue (q/c-): ")
+                    if (answer2 %in% c("", " ")) answer2 <- "c"
+                    if (answer2 %in% c("q", "c")) break()
+                  }
+                }
               }
             }
-
-            irrad.collection.name <- paste(collection.name, "irrad", "mspct", sep = ".")
-            assign(irrad.collection.name, collection.mspct)
-            assign(raw.collection.name, mget(raw.names))
-            save(list = c(irrad.collection.name, raw.collection.name),
-                 file = collection.file.name)
-            # Clean up
-            rm(collection.fig, collection.title, collection.pdf.name)
+          }
+          if (answer2 %in% c("q", "a")) {
+            break()
           } else {
-            assign(raw.collection.name, mget(raw.names))
-            save(list = raw.collection.name, file = collection.file.name)
-          }
-          message("collection saved to file '",
-                  collection.file.name, "'.", sep = "")
-
-          file.names <- c(file.names, collection.file.name)
-
-          # clean up by removing the spectra that have been added to the
-          # collection, and clearing the stored names afterwards
-          rm(list = c(irrad.names))
-          rm(list = c(raw.names))
-          irrad.names <- character()
-          raw.names <- character()
-        }
-        if (answer2 %in% c("q", "a")) {
-          break()
-        } else {
-          repeat {
-            answer3 <- readline("change protocol/NEXT (p/n-): ")[1]
-            answer3 <- ifelse(answer3 == "", "n", answer3)
-            if (answer3 %in% c("n", "p")) {
-              break()
-            } else {
-              print("Answer not recognized, please try again...")
+            repeat {
+              answer3 <- readline("change protocol/NEXT (p/n-): ")[1]
+              answer3 <- ifelse(answer3 == "", "n", answer3)
+              if (answer3 %in% c("n", "p")) {
+                break()
+              } else {
+                print("Answer not recognized, please try again...")
+              }
             }
-          }
-          if (answer3 == "p") {
-            protocol <- protocol_interactive(protocols)
+            if (answer3 == "p") {
+              protocol <- protocol_interactive(protocols)
+            }
           }
         }
       }
@@ -637,3 +655,72 @@ acq_irrad_interactive <-
     message("Ending...")
 
   }
+
+spct_summary <- function(mspct,
+                         unit.out = getOption("photobiology.radiation.unit",
+                                              default = "energy"),
+                         scale.factor = ifelse(unit.out == "photon",
+                                               1e6, 1),
+                         type = "plant",
+                         digits = 3L) {
+
+  # handle also single spectra
+  if (is.generic_spct(mspct)) {
+    mspct <- generic_mspct(list(mspct), class = class(mspct)[1])
+  } else {
+    # expand spct objects in long form (from time series) into multiple
+    # individual members
+    mspct <- subset2mspct(mspct)
+  }
+
+  ratio <- switch(unit.out,
+                  photon = photobiology::q_ratio,
+                  quantum = photobiology::q_ratio,
+                  energy = photobiology::e_ratio)
+
+  if (type %in% c("plant", "PAR")) {
+    plant.wb <- switch(type,
+                       PAR = c(photobiologyWavebands::UV_bands("CIE"),
+                               list(photobiologyWavebands::PAR())),
+                       plant = c(photobiologyWavebands::Plant_bands()))
+    irrad.tb <-
+      photobiology::irrad(mspct,
+                          unit.out = unit.out,
+                          scale.factor = scale.factor,
+                          w.band = plant.wb)
+    uv_ratios.tb <-
+      ratio(mspct,
+            w.band.num = photobiologyWavebands::UV_bands(),
+            w.band.denom = photobiologyWavebands::PAR())
+    vis_ratios.tb <-
+      ratio(mspct,
+            w.band.num = list(blue = photobiologyWavebands::Blue("Sellaro"),
+                              red = photobiologyWavebands::Red("Smith10")),
+            w.band.denom = list(green = photobiologyWavebands::Green("Sellaro"),
+                                "far-red" = photobiologyWavebands::Far_red("Smith10")),
+            attr2tb = c("when.measured"))
+    summary.tb <- dplyr::full_join(irrad.tb, uv_ratios.tb)
+    summary.tb <- dplyr::full_join(summary.tb, vis_ratios.tb)
+  } else if (type == "VIS") {
+    summary.tb <-
+      photobiology::irrad(mspct,
+                          unit.out = unit.out,
+                          w.band = photobiologyWavebands::VIS_bands(),
+                          attr2tb = c("when.measured"))
+  } else { # total
+    summary.tb <-
+      photobiology::irrad(mspct,
+                          unit.out = unit.out,
+                          w.band = NULL,
+                          attr2tb = c("when.measured"))
+  }
+
+  # summary.tb <- photobiology::add_attr2tb(tb = summary.tb,
+  #                                         mspct = mspct)
+
+  selector <- unname(sapply(summary.tb, is.numeric))
+  summary.tb[ , selector] <- signif(summary.tb[ , selector], digits = digits)
+
+  summary.tb
+}
+
