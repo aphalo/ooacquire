@@ -297,7 +297,10 @@ acq_raw_mspct <- function(descriptor,
       f.current <- NULL
     }
     if (p == "light") {
-      times <- lubridate::now(tzone = "UTC") + seconds(steps)
+      times <-
+        lubridate::ceiling_date(lubridate::now(tzone = "UTC"),
+                                unit = seq.settings[["start.boundary"]]) +
+        seconds(steps)
     } else {
       times <- lubridate::now(tzone = "UTC")
     }
@@ -319,7 +322,12 @@ acq_raw_mspct <- function(descriptor,
         Sys.sleep(seconds.to.wait)
       }
       idx <- idx + 1
-      z.names[[idx]] <- paste(p, as.character(i), sep = ".")
+      z.names[[idx]] <-
+        paste(p,
+              formatC(i,
+                      width = trunc(log10(length(times) + 0.1) + 1),
+                      format = "d", flag = "0"),
+              sep = ".")
       acq.time <- lubridate::now(tzone = "UTC")
       z[[idx]] <- acq_raw_spct(descriptor = descriptor,
                                acq.settings = acq.settings,
@@ -336,11 +344,14 @@ acq_raw_mspct <- function(descriptor,
   }
   end.time <- lubridate::now(tzone = "UTC")
   if (length(times) > 1L && verbose) {
-    message("Delays (min, median, max): ",
+    message("Series: delays (min, median, max): ",
             paste(c(min(delays), stats::median(delays), max(delays)),
                   collapse = ", "),
             " (ms)")
-    message("Start: ", start.time, ", end: ", end.time, ", ellapsed: ", signif(seconds(end.time - start.time), 4), " s.")
+    message("Start: ", start.time,
+            ", end: ", end.time, ", ellapsed: ", format(end.time - start.time, digits = 4),
+            "\nfirst step: ", when_measured(z[[1]]),
+            ", last step: ", when_measured(z[[length(z)]]))
   }
   z <- photobiology::as.raw_mspct(z)
 

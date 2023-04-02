@@ -68,8 +68,8 @@
 #'   calibration data.
 #' @param stray.light.method character Used only when the correction method is
 #'   created on-the-fly.
-#' @param seq.settings named list with numeric members \code{"step.delay"} and
-#'   \code{"num.steps"}.
+#' @param seq.settings named list with numeric members \code{start.boundary},
+#'   \code{initial.delay}, \code{"step.delay"} and \code{"num.steps"}.
 #' @param area numeric Passed to \code{o_calib2irrad_mult()}.
 #' @param diff.type character Passed to \code{o_calib2irrad_mult()}.
 #' @param qty.out character One of "Tfr" (spectral transmittance as a fraction
@@ -327,11 +327,17 @@ acq_irrad_interactive <-
                              HDR.mult = HDR.mult)
 
     if (is.null(seq.settings)) {
-      seq.settings <- list(initial.delay = 0.1, step.delay = 0, num.steps = 1L)
+      seq.settings <- list(start.boundary = "second",
+                           initial.delay = 0.1,
+                           step.delay = 0,
+                           num.steps = 1L)
     } else if (!setequal(names(seq.settings),
-                         c("initial.delay", "step.delay", "num.steps"))) {
+                         c("start.boundary", "initial.delay", "step.delay", "num.steps"))) {
       warning("Missing or wrong member names in 'seq.settings': ignoring!")
-      seq.settings <- list(initial.delay = 0.1, step.delay = 0, num.steps = 1L)
+      seq.settings <- list(start.boundary,
+                           initial.delay = 0.1,
+                           step.delay = 0,
+                           num.steps = 1L)
     }
 
     # initialize lists to collect names from current session
@@ -529,7 +535,7 @@ acq_irrad_interactive <-
         protocol <- protocol_interactive(protocols)
       } else if (answer2 %in% c("c", "q", "a")) {
         if (save.collections) {
-          message("Source spectra to collect: ",
+          message("Corrected ", qty.out, "spectra to collect: ",
                   paste(irrad.names, collapse = ", "))
           message("Raw objects to collect: ",
                   paste(raw.names, collapse = ", "), sep = " ")
@@ -605,14 +611,18 @@ acq_irrad_interactive <-
               if (file.exists(collection.file.name)) {
                 message("Collection objects saved to file '",
                         collection.file.name, "'.", sep = "")
+                # save file name to report at end of sessions
                 file.names <- c(file.names, collection.file.name)
+                # remove saved objects and the list with their names
                 rm(list = collection.objects)
+                rm(collection.objects)
                 # clean up by removing the spectra that have been added to the
-                # collection, and clearing the stored names afterwards
+                # saved collection and reset the list of names for next collection
                 rm(list = c(irrad.names))
                 rm(list = c(raw.names))
                 irrad.names <- character()
                 raw.names <- character()
+                break()
               } else {
                 message("Saving of the collection to file failed!")
                 if (answer2 == "q") {

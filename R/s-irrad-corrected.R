@@ -105,11 +105,12 @@ s_irrad_corrected.raw_mspct <-
     if (is.list(spct.names) && length(spct.names[["light"]]) > 1L) {
       # if we have a series we use recursion for each spectrum
       corrected.mspct <- list() # a list is enough
+      new.names <- gsub("^light", "time", spct.names[["light"]])
       for (i in seq_along(spct.names[["light"]])) {
         temp.spct.names <- spct.names
         temp.spct.names[["light"]] <- spct.names[["light"]][i]
         temp.spct.names <- unlist(temp.spct.names, use.names = TRUE) # convert list into vector
-        corrected.mspct[[spct.names[["light"]][i]]] <-
+        corrected.mspct[[new.names[i]]] <-
           s_irrad_corrected(x[unname(temp.spct.names)], # extraction needed because of tests
                             spct.names = temp.spct.names,
                             correction.method = correction.method,

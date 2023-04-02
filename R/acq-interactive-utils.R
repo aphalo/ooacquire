@@ -107,14 +107,19 @@ tune_interactive <- function(descriptor,
     if (answ == "?") {
       cat(help.text)
     } else if (answ == "t") {
-      if (readline("Auto-adjust integration time?, z = abort (-/z):") == "z") {
+      answ.t <- readline("Auto-adjust integration time?, a = adjust, c = current, z = abort (a-/c/z): ")
+      if (answ.t %in% c("z", "c")) {
+        if (answ.t == "c") {
+          tuned <- TRUE
+        }
         next()
-      }
+      } else if (answ.t %in% c("a", "")) {
       acq.settings <- tune_acq_settings(descriptor = descriptor,
                                         acq.settings = acq.settings)
       tuned <- TRUE
+      }
     } else if (answ == "T") {
-      if (readline("Auto-adjust integration time?, z = abort (-/z):") == "z") {
+      if (readline("Auto-adjust integration time?, z = abort (-/z): ") == "z") {
         next()
       }
       acq.settings[["integ.time"]] <- start.int.time * 1e6
@@ -384,8 +389,20 @@ choose_ch_interactive <- function(instruments,
 #'
 #' @export
 #'
-set_seq_interactive <- function(seq.settings = list(initial.delay = 0, step.delay = 0, num.steps = 1),
+set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
+                                                    initial.delay = 0,
+                                                    step.delay = 0,
+                                                    num.steps = 1),
                                 measurement.duration = 0) {
+
+  if (!setequal(names(seq.settings),
+      c("start.boundary", "initial.delay", "step.delay", "num.steps"))) {
+    warning("Resetting invalid 'seq.settings' to defaults.")
+    seq.settings <- list(start.boundary = "second",
+                         initial.delay = 0,
+                         step.delay = 0,
+                         num.steps = 1)
+  }
   old.seq.settings <- seq.settings
 
   repeat{
@@ -394,8 +411,9 @@ set_seq_interactive <- function(seq.settings = list(initial.delay = 0, step.dela
       message("'step.delay' too short! Reset to ", seq.settings$step.delay, " s.")
     }
     prompt.string <-
-           sprintf("Series: w = %.3g s wait; s = %.3g s step; n = %i times; u undo (w/s/n/u/-): ",
+           sprintf("Series: w = %.3g s wait and next round b = %s; s = %.3g s step; n = %i times; u undo (b/w/s/n/u/-): ",
                    seq.settings[["initial.delay"]],
+                   seq.settings[["start.boundary"]],
                    seq.settings[["step.delay"]],
                    seq.settings[["num.steps"]])
     answ <- readline(prompt  = prompt.string)
@@ -408,6 +426,14 @@ set_seq_interactive <- function(seq.settings = list(initial.delay = 0, step.dela
       step <- try(as.numeric(step))
       if (!is.na(step)) {
         seq.settings[["initial.delay"]] <- step
+      } else {
+        print("Value not changed!")
+      }
+    } else if (substr(answ, 1, 1) == "b") {
+      time.unit <- readline(sprintf("Start at next %s, new: ",
+                                    seq.settings[["start.boundary"]]))
+      if (time.unit %in% c("second", "minute", "hour")) {
+        seq.settings[["start.boundary"]] <- time.unit
       } else {
         print("Value not changed!")
       }
