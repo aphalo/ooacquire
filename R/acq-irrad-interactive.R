@@ -334,7 +334,7 @@ acq_irrad_interactive <-
     } else if (!setequal(names(seq.settings),
                          c("start.boundary", "initial.delay", "step.delay", "num.steps"))) {
       warning("Missing or wrong member names in 'seq.settings': ignoring!")
-      seq.settings <- list(start.boundary,
+      seq.settings <- list(start.boundary = "second",
                            initial.delay = 0.1,
                            step.delay = 0,
                            num.steps = 1L)

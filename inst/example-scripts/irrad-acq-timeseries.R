@@ -12,7 +12,7 @@ acq_irrad_interactive(interface.mode = "series",
                       qty.out = "cps",
                       HDR.mult = 1,
                       seq.settings = list(start.boundary = "second",
-                                          initial.delay = 10,
+                                          initial.delay = 0,
                                           step.delay = 10,
                                           num.steps = 5))
 

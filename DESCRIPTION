@@ -19,8 +19,8 @@ License: GPL (>= 2)
 Depends:
     R (>= 4.2.0),
     lubridate (>= 1.9.0),
-    photobiology (>= 0.10.14),
-    ggspectra (>= 0.3.10)
+    photobiology (>= 0.10.16),
+    ggspectra (>= 0.3.11)
 Imports:
     grDevices,
     utils,

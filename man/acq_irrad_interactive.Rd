@@ -47,8 +47,8 @@ calibration data.}
 \item{stray.light.method}{character Used only when the correction method is
 created on-the-fly.}
 
-\item{seq.settings}{named list with numeric members \code{"step.delay"} and
-\code{"num.steps"}.}
+\item{seq.settings}{named list with numeric members \code{start.boundary},
+\code{initial.delay}, \code{"step.delay"} and \code{"num.steps"}.}
 
 \item{area}{numeric Passed to \code{o_calib2irrad_mult()}.}
 

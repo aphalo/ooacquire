@@ -28,6 +28,7 @@ editor_options:
 -   Add to default protocols "dl" and "dfl", better suited to measurement of
     time series.
 -   Fix bugs related to dates and times caused by changes in 'lubridate'.
+-   Versions of packages imported from are updated.
 
 # ooacquire 0.2.6 (2022-10-18)
 
