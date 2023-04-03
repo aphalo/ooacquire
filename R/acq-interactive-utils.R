@@ -247,10 +247,10 @@ protocol_interactive <- function(protocols,
   protocol
 }
 
-#' Get list of conencted instruments
+#' Get list of connected instruments
 #'
 #' Get list of spectrometers requesting user to connect one or abort if none
-#' fould.
+#' found.
 #'
 #' @param w handle to Omni Driver, used to test if an spectrometer is still
 #'   connected.
