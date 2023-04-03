@@ -379,3 +379,32 @@ get_oo_settings <- function(descriptor) {
   )
 }
 
+#' Add or replace entrance optics data to descriptor
+#'
+#' Replace or add a description of the fibre and diffuser or other entrance
+#' optics to the instrument descriptor.
+#'
+#' @param descriptor list as returned by function \code{get_oo_descriptor}
+#' @param make,model,geometry,serial.number character.
+#' @param area numeric (\eqn{m^2}).
+#'
+#' @return a copy of the argument passed for \code{oo_descriptor} with the
+#' \code{entrance.optics} field of the calibration data adde or replace
+#' by the new list.
+#'
+#' @export
+#'
+set_descriptor_entrance_optics <- function(descriptor,
+                                           make = NA_character_,
+                                           model = NA_character_,
+                                           geometry = NA_character_,
+                                           serial.number = NA_character_,
+                                           area = NA_real_) {
+  descriptor[["entrance.optics"]] <- list(make = make,
+                                          model = model,
+                                          geometry = geometry,
+                                          serial.number = serial.number,
+                                          area = area)
+  descriptor
+}
+

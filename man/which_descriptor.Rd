@@ -5,10 +5,11 @@
 \title{Select which instrument descriptor to use}
 \usage{
 which_descriptor(
-  date = lubridate::today(tzone = "UTC"),
+  date = lubridate::now(tzone = "UTC"),
   descriptors = ooacquire::MAYP11278_descriptors,
   verbose = getOption("photobiology.verbose", TRUE),
   strict.calib = getOption("photobiology.strict.calib", FALSE),
+  entrance.optics = NULL,
   ...
 )
 }
@@ -23,6 +24,10 @@ the spectrometer including calibration data.}
 \item{verbose}{Logical indicating the level of warnings wanted.}
 
 \item{strict.calib}{Logical indicating the level of validity checks.}
+
+\item{entrance.optics}{character The name or geometry of the diffuser or
+entrance optics to select. Only required when there are calibration with
+multiple entrance optics for the same spectrometer.}
 
 \item{...}{Currently ignored.}
 }

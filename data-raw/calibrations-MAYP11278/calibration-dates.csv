@@ -1,9 +1,11 @@
-## Calibration dates
-inst.sn,   name,      calib.date, start.date, end.date,   coeffs.file
-MAYP11278, cal_2012a, 2012-03-16, 2012-03-16, 2013-02-14, cal-coeffs-2012a.xlsx
-MAYP11278, cal_2013a, 2013-02-14, 2013-02-14, 2014-03-12, cal-coeffs-2013a.xlsx
-MAYP11278, cal_2014a, 2014-03-12, 2014-03-12, 2014-10-14, cal-coeffs-2014a.xlsx
-MAYP11278, cal_2014b, 2014-10-14, 2014-10-14, 2016-02-25, cal-coeffs-2014b.xlsx
-MAYP11278, cal_2016a, 2016-02-25, 2016-02-25, 2018-03-31, cal-coeffs-2016a.xlsx
-MAYP11278, cal_2019a, 2019-04-12, 2018-04-01, 2021-04-12, cal-coeffs-2019a.xlsx
-MAYP11278, cal_2021a, 2021-03-25, 2021-03-25, 2023-03-25, cal-coeffs-2021a.xlsx
+## Calibration dates names and files
+inst.sn,   diffuser,  name,      calib.date, start.date, end.date,   coeffs.file,              diffuser.file
+MAYP11278, DH7cosine, cal_2012a, 2012-03-16, 2012-03-16, 2013-02-14, cal-coeffs-2012a.xlsx,    d7-h-2011.rds
+MAYP11278, DH7cosine, cal_2013a, 2013-02-14, 2013-02-14, 2014-03-12, cal-coeffs-2013a.xlsx,    d7-h-2011.rds
+MAYP11278, DH7cosine, cal_2014a, 2014-03-12, 2014-03-12, 2014-10-14, cal-coeffs-2014a.xlsx,    d7-h-2011.rds
+MAYP11278, DH7cosine, cal_2014b, 2014-10-14, 2014-10-14, 2016-02-25, cal-coeffs-2014b.xlsx,    d7-h-2011.rds
+MAYP11278, DH7cosine, cal_2016a, 2016-02-25, 2016-02-25, 2018-03-31, cal-coeffs-2016a.xlsx,    d7-h-2011.rds
+MAYP11278, DH7cosine, cal_2019a, 2019-04-12, 2018-04-01, 2021-04-12, cal-coeffs-2019a.xlsx,    d7-h-2011.rds
+MAYP11278, DH7cosine, cal_2021a, 2021-03-25, 2021-03-25, 2023-03-25, cal-coeffs-2021a.xlsx,    d7-h-2011.rds
+MAYP11278, DH7cosine, cal_2023a, 2023-03-25, 2023-01-01, 2024-03-25, cal-coeffs-2023a.xlsx,    d7-h-2011.rds
+MAYP11278, DH7dome,   cal_2023dome, 2023-03-25, 2023-01-01, 2024-03-25, cal-coeffs-2023dome.xlsx, d7-d-2021.rds

@@ -2,7 +2,7 @@
 % Please edit documentation in R/acq-interactive-utils.R
 \name{list_srs_interactive}
 \alias{list_srs_interactive}
-\title{Get list of conencted instruments}
+\title{Get list of connected instruments}
 \usage{
 list_srs_interactive(w)
 }
@@ -12,7 +12,7 @@ connected.}
 }
 \description{
 Get list of spectrometers requesting user to connect one or abort if none
-fould.
+found.
 }
 \seealso{
 Other interactive acquisition utility functions: 

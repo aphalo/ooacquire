@@ -76,7 +76,10 @@ files <- list.files("data-raw/calibrations-MAYP11278",
                     full.names = TRUE)
 
 MAYP11278_calib_dates.df <-
-  read_csv("data-raw/calibrations-MAYP11278/calibration-dates.csv", col_types = "ccDDDc", skip = 1)
+  read_csv("data-raw/calibrations-MAYP11278/calibration-dates.csv",
+           col_types = "cccTTTcc",
+           skip = 1,
+           locale = locale(tz = "UTC"))
 
 # create a new descriptor for each calibration file
 descriptors <- list()
@@ -97,6 +100,11 @@ for (f in files) {
                               wl.range = c(251, 899),
                               start.date = MAYP11278_calib_dates.df[["start.date"]][date.row],
                               end.date = MAYP11278_calib_dates.df[["end.date"]][date.row])
+
+  diffuser.filename <- paste("data-raw/calibrations-MAYP11278/",
+                             MAYP11278_calib_dates.df[["diffuser.file"]][date.row],
+                             sep = "")
+  descriptor.tmp$entrance.optics <- readRDS(diffuser.filename)
 
   descriptor.tmp <- descriptors[[name.f]] <- descriptor.tmp
 }

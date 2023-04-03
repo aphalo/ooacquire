@@ -215,6 +215,9 @@ s_irrad_corrected.raw_spct <- function(x,
 #'   the spectrometer including calibration data.
 #' @param verbose Logical indicating the level of warnings wanted.
 #' @param strict.calib Logical indicating the level of validity checks.
+#' @param entrance.optics character The name or geometry of the diffuser or
+#'   entrance optics to select. Only required when there are calibration with
+#'   multiple entrance optics for the same spectrometer.
 #' @param ... Currently ignored.
 #'
 #' @details Calibrations for instruments stored in a list and passed as argument
@@ -235,24 +238,28 @@ s_irrad_corrected.raw_spct <- function(x,
 #'
 #' @export
 #'
-which_descriptor <- function(date = lubridate::today(tzone = "UTC"),
+which_descriptor <- function(date = lubridate::now(tzone = "UTC"),
                              descriptors = ooacquire::MAYP11278_descriptors,
                              verbose = getOption("photobiology.verbose", TRUE),
                              strict.calib = getOption("photobiology.strict.calib", FALSE),
+                             entrance.optics = NULL,
                              ...) {
 
-  if (!lubridate::is.Date(date)) {
+  if (!lubridate::is.instant(date)) {
     date <- anytime::anydate(date)
   }
 
-  if (date > lubridate::today(tzone = "UTC")) {
+  if (date > lubridate::now(tzone = "UTC") + days(1)) {
     warning("Looking up calibration for a date in the future!!")
   }
 
   descriptor <- list()
   for (d in rev(names(descriptors))) {
     if (descriptors[[d]][["inst.calib"]][["start.date"]] < date &
-        descriptors[[d]][["inst.calib"]][["end.date"]] > date) {
+        descriptors[[d]][["inst.calib"]][["end.date"]] > date &
+        (is.null(entrance.optics) ||
+         entrance.optics == descriptors[[d]][["entrance.optics"]][["model"]] ||
+         entrance.optics == descriptors[[d]][["entrance.optics"]][["geometry"]])) {
       if (verbose) {
         message("Descriptor ", d, " selected for ", date)
       }

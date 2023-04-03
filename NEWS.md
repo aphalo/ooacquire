@@ -15,6 +15,12 @@ editor_options:
 -   Consider replacing OmniDriver by SeaBreeze open source driver or a 
     derivative.
     
+# ooacquire 0.3.1 (2023-04-04)
+
+-   Add new calibrations for MAYP11278 with cosine and hemispherical diffusers.
+-   Add support for multiple descriptors per instrument and optional include
+    a description of the entrance optics in the descriptor.
+    
 # ooacquire 0.3.0 (2023-04-01)
     
 -   Tested working with OmniDriver 2.71 and 2.56, under current R 4.2.3 and 

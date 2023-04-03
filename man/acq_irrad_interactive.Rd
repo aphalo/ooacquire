@@ -11,6 +11,7 @@ acq_irrad_interactive(
   protocols = NULL,
   correction.method = NA,
   descriptors = NA,
+  entrance.optics = NULL,
   stray.light.method = "none",
   seq.settings = NULL,
   area = NULL,
@@ -43,6 +44,9 @@ names of at least one member of the default list of protocols.}
 
 \item{descriptors}{list A list of instrument descriptors containing
 calibration data.}
+
+\item{entrance.optics}{character, name or geometry of diffuser, needed only
+if there is more than one for the same instrument.}
 
 \item{stray.light.method}{character Used only when the correction method is
 created on-the-fly.}

@@ -66,6 +66,8 @@
 #' @param correction.method list The method to use when applying the calibration
 #' @param descriptors list A list of instrument descriptors containing
 #'   calibration data.
+#' @param entrance.optics character, name or geometry of diffuser, needed only
+#'   if there is more than one for the same instrument.
 #' @param stray.light.method character Used only when the correction method is
 #'   created on-the-fly.
 #' @param seq.settings named list with numeric members \code{start.boundary},
@@ -128,6 +130,7 @@ acq_irrad_interactive <-
            protocols = NULL,
            correction.method = NA,
            descriptors = NA,
+           entrance.optics = NULL,
            stray.light.method = "none",
            seq.settings = NULL,
            area = NULL,
@@ -203,7 +206,8 @@ acq_irrad_interactive <-
     if (anyNA(c(descriptors[[1]], correction.method[[1]]))) {
       descriptor <-
         switch(serial_no,
-               MAYP11278 = which_descriptor(descriptors = ooacquire::MAYP11278_descriptors),
+               MAYP11278 = which_descriptor(descriptors = ooacquire::MAYP11278_descriptors,
+                                            entrance.optics = entrance.optics),
                MAYP112785 = which_descriptor(descriptors = ooacquire::MAYP112785_descriptors),
                MAYP114590 = which_descriptor(descriptors = ooacquire::MAYP114590_descriptors),
                FLMS04133 = which_descriptor(descriptors = ooacquire::FLMS04133_descriptors),
