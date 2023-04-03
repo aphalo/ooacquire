@@ -261,7 +261,7 @@ acq_raw_mspct <- function(descriptor,
   }
 
   if (seq.settings[["num.steps"]] == 1L) {
-    steps <- 0
+    steps <- 0 # (seconds) or no delay
   } else if (length(seq.settings[["step.delay"]]) == seq.settings[["num.steps"]] &&
              !is.unsorted(seq.settings[["step.delay"]], strictly = TRUE)) {
     # use vector of time offsets as is
@@ -311,12 +311,14 @@ acq_raw_mspct <- function(descriptor,
 
     delays <- numeric(length(times))
     for (i in seq_along(times)) {
+      if (verbose && length(times) > 1L) {
+        message("Time step ", i)
+      }
       repeat {
         # we could subtract a lag correction dependent on host and spectrometer
         seconds.to.wait <- lubridate::seconds(times[[i]] - lubridate::now(tzone = "UTC"))
         if (seconds.to.wait <= 0.001) {
           delays[i] <- round(seconds.to.wait * -1e3, 0)
-
           break()
         }
         Sys.sleep(seconds.to.wait)

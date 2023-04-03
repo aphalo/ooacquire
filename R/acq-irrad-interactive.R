@@ -515,14 +515,15 @@ acq_irrad_interactive <-
       repeat {
         utils::flush.console()
         if (save.collections) {
-          answer2 <- readline("change protocol/collect+continue/collect+quit/abort/NEXT (p/c/q/a/n-): ")[1]
+          answer2 <- readline("change protocol/collect+continue/collect+quit/discard+quit/NEXT (p/c/q/z/n-): ")[1]
         } else {
           answer2 <- readline("change protocol/continue/quit/NEXT (p/c/q/n-): ")[1]
         }
         answer2 <- ifelse(answer2 == "", "n", answer2)
-        if (answer2 %in% c("n", "p", "c", "q", "a")) {
-          if (answer2 == "a") {
+        if (answer2 %in% c("n", "p", "c", "q", "z")) {
+          if (answer2 == "z") {
             save.collections <- FALSE
+            answer2 <- "q"
           }
           break()
         } else {
@@ -533,7 +534,7 @@ acq_irrad_interactive <-
         next()
       } else if (answer2 == "p") {
         protocol <- protocol_interactive(protocols)
-      } else if (answer2 %in% c("c", "q", "a")) {
+      } else if (answer2 %in% c("c", "q")) {
         if (save.collections) {
           message("Corrected ", qty.out, "spectra to collect: ",
                   paste(irrad.names, collapse = ", "))
@@ -635,21 +636,23 @@ acq_irrad_interactive <-
               }
             }
           }
-          if (answer2 %in% c("q", "a")) {
+        }
+        if (answer2 == "q") {
+          break()
+        } else {
+          repeat {
+            answer3 <- readline("change protocol/quit session/NEXT (p/q/n-): ")[1]
+            answer3 <- ifelse(answer3 == "", "n", answer3)
+            if (answer3 %in% c("n", "p", "q")) {
+              break()
+            } else {
+              print("Answer not recognized, please try again...")
+            }
+          }
+          if (answer3 == "p") {
+            protocol <- protocol_interactive(protocols)
+          } else if (answer3 == "q") {
             break()
-          } else {
-            repeat {
-              answer3 <- readline("change protocol/NEXT (p/n-): ")[1]
-              answer3 <- ifelse(answer3 == "", "n", answer3)
-              if (answer3 %in% c("n", "p")) {
-                break()
-              } else {
-                print("Answer not recognized, please try again...")
-              }
-            }
-            if (answer3 == "p") {
-              protocol <- protocol_interactive(protocols)
-            }
           }
         }
       }
@@ -677,9 +680,8 @@ spct_summary <- function(mspct,
   # handle also single spectra
   if (is.generic_spct(mspct)) {
     mspct <- generic_mspct(list(mspct), class = class(mspct)[1])
-  } else {
-    # expand spct objects in long form (from time series) into multiple
-    # individual members
+  }
+  if (any(unname(sapply(mspct, getMultipleWl)) > 1)) {
     mspct <- subset2mspct(mspct)
   }
 
