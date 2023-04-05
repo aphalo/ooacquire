@@ -15,12 +15,23 @@ editor_options:
 -   Consider replacing OmniDriver by SeaBreeze open source driver or a 
     derivative.
     
-# ooacquire 0.3.1 (2023-04-04)
+# ooacquire 0.3.1 (2023-04-05)
 
 -   Add new calibrations for MAYP11278 with cosine and hemispherical diffusers.
 -   Add support for multiple descriptors per instrument and optional include
     a description of the entrance optics in the descriptor.
-    
+-   Add a slot to to calibration field in the descriptor to store the _name_
+    or identifier of the calibration to allow traceability.
+-   Photsyntheticaly active radiation can be defined as a range of wavelengths
+    (PhR) or as an effective or weighted quantitiy (PAR, as defined by McCree).
+    When expressed as photons they are identical, but when expressed as energy 
+    they differ and the difference depends on the shape of the light spectrum.
+    Previously, PhR as energy was incorrectly labelled PAR, as it frequently is.
+    In 'photobiologyWavebands' (0.5.1), this has been corrected. This version
+    uses the correct labeling in plots and quantities and makes it possible to
+    choose between PAR and PhR, with PhR as default, so that the numbers
+    returned remain the same, but are correctly labeled.
+
 # ooacquire 0.3.0 (2023-04-01)
     
 -   Tested working with OmniDriver 2.71 and 2.56, under current R 4.2.3 and 
@@ -30,10 +41,12 @@ editor_options:
     versions of OmniDriver. (API changes in OmniDriver 2.71 and 2.70!)
 -   Automatic acquisition of time series of spectra: implementation functional.
 -   New `interface.mode` `"full"` combines "manual" and "auto".
--   Several messages updated to better accomodate time series acquisition.
+-   Several messages updated to better accommodate time series acquisition.
 -   Add to default protocols "dl" and "dfl", better suited to measurement of
     time series.
 -   Fix bugs related to dates and times caused by changes in 'lubridate'.
+-   Function `s_irrad_corrected()` updated to work with multiple "light"
+    measurements as created by measurement of time series.
 -   Versions of packages imported from are updated.
 
 # ooacquire 0.2.6 (2022-10-18)

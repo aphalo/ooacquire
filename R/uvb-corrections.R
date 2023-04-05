@@ -87,8 +87,8 @@ uvb_corrections <-
     }
 
     if (is.character(worker.fun)) {
-      worker.fun = get(worker.fun,
-                       mode = "function")
+      worker.fun <- get(worker.fun,
+                        mode = "function")
     }
 
     if (length(setdiff(c("light", "filter", "dark"), spct.names)) == 0) {

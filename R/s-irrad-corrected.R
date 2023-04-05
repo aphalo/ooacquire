@@ -102,7 +102,15 @@ s_irrad_corrected.raw_mspct <-
       spct.names <- spct.names[names(spct.names) != "filter"]
     }
 
-    if (is.list(spct.names) && length(spct.names[["light"]]) > 1L) {
+    if (is.list(spct.names) && (
+      length(spct.names[["light"]]) > 1L || spct.names[["light"]] == "*")) {
+      # "*" is a placeholder for all other spectra
+      if (spct.names[["light"]] == "*") {
+        spct.names <- as.list(spct.names)
+        all.spct.names <- names(x)
+        spct.names[["light"]] <-
+          setdiff(all.spct.names, c(spct.names[["dark"]], spct.names[["filter"]]))
+      }
       # if we have a series we use recursion for each spectrum
       corrected.mspct <- list() # a list is enough
       new.names <- gsub("^light", "time", spct.names[["light"]])

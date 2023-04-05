@@ -75,6 +75,7 @@ get_oo_descriptor <- function(w,
                                             diff.type = diff.type)
         z$start.date <- lubridate::today(tzone = "UTC") - lubridate::days(1)
         z$end.date <- lubridate::today(tzone = "UTC") + lubridate::days(30)
+        z$cal.source <- "from spectrometer"
       }
     } else {
       z$irrad.mult <- rep(NA_real_, length(w.lengths))

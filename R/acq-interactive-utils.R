@@ -513,7 +513,7 @@ set_folder_interactive <- function(folder.name = NULL) {
   cat("Current folder: '", current.folder, "'.\n")
 
   folder.name.prompt <-
-    paste("Output folder (-/./<path to folder>):", folder.name)
+    paste("Output folder (\"", folder.name, "\"-/./<path to folder>): ", sep = "")
   user.folder.name <- readline(folder.name.prompt)
   if (!user.folder.name == "") {
     folder.name <- user.folder.name
@@ -523,7 +523,7 @@ set_folder_interactive <- function(folder.name = NULL) {
     # we ask for a different folder name until success
     while (!dir.create(folder.name)) {
       cat("Failure! Unable to create folder: ", folder.name)
-      folder.name <- readline("Output folder (-/./<path to folder>): .")
+      folder.name <- readline("Output folder (.-/<path to folder>): ")
       if (folder.name == "") {
         folder.name  <- "."
       }

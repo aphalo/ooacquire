@@ -284,13 +284,13 @@ acq_irrad_interactive <-
 
     # We get metadata from user, offering defaults
     session.name <- make.names(session.name) # validate argument passed in call
-    session.prompt <- paste("Session's name (-/<string>): ", session.name)
+    session.prompt <- paste("Session's name (\"", session.name, "\"-/<string>): ", sep = "")
     utils::flush.console()
     user.session.name <- readline(session.prompt)
     if (! user.session.name == "") {
       session.name <- make.names(user.session.name)
       if (user.session.name == "") {
-        session.name <- make.names(lubridate::now(tzone = "UTC"))
+        session.name <- make.names(format(lubridate::now(tzone = "UTC")))
       }
       if (session.name != user.session.name) {
         message("Using sanitised/generated name: '", session.name, "'.", sep = "")
@@ -298,12 +298,13 @@ acq_irrad_interactive <-
     }
 
     user.name <- make.names(user.name) # validate argument passed in call
-    user.name.prompt <- paste("Operator's name (-/<string>): ", user.name)
+    user.name.prompt <- paste("Operator's name (\"", user.name, "\"-/<string>): ", sep = "")
     utils::flush.console()
     user.user.name <- readline(user.name.prompt)
     if (! user.user.name == "") {
       user.name <- make.names(user.user.name)
     }
+    message("Using \"", user.name, "\" as operator's name", sep = "")
     session.label <- paste("Operator: ", user.name,
                            "\nSession: ", session.name,
                            ", instrument s.n.: ", descriptor[["spectrometer.sn"]],
@@ -460,10 +461,10 @@ acq_irrad_interactive <-
                      utils::flush.console()
                      answer1 <-
                        tolower(
-                         readline("Wavebands: UV+PAR/plants/visible/total/DEFAULT (u/p/v/t/d-): ")
+                         readline("Wavebands: UV+PhR/UV+PAR/plants/visible/total/DEFAULT (u/a/p/v/t/d-): ")
                        )[1]
                      answer1 <- ifelse(answer1 == "", "d", answer1)
-                     if (answer1 %in% c("u", "p", "v", "t", "d")) {
+                     if (answer1 %in% c("u", "a", "p", "v", "t", "d")) {
                        break()
                      } else {
                        print("Answer not recognized. Please try again...")
@@ -471,6 +472,9 @@ acq_irrad_interactive <-
                    }
                    switch(answer1,
                           u = options(photobiology.plot.bands =
+                                        c(photobiologyWavebands::UV_bands(),
+                                          list(photobiologyWavebands::PhR()))),
+                          a = options(photobiology.plot.bands =
                                         c(photobiologyWavebands::UV_bands(),
                                           list(photobiologyWavebands::PAR()))),
                           p = options(photobiology.plot.bands =
