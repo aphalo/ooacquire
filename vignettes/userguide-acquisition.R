@@ -14,7 +14,7 @@ library(ooacquire)
 options(warn = 1)
 
 ## ---- eval = FALSE------------------------------------------------------------
-#  acq_irrad_interactive()
+#  acq_irrad_interactive(interface.mode = "simple")
 
 ## ---- eval=sr.online----------------------------------------------------------
 #  acq_irrad_interactive(correction.method = ooacquire::MAYP11278_ylianttila.mthd,
@@ -22,10 +22,11 @@ options(warn = 1)
 #                        interface.mode = "simple")
 
 ## ---- eval=sr.online----------------------------------------------------------
+#  acq_irrad_interactive(interface.mode = "simple")
+
+## ---- eval=sr.online----------------------------------------------------------
 #  acq_irrad_interactive(HDR.mult = 1,
-#                        tot.time.range = c(0, Inf),
-#                        correction.method = ooacquire::MAYP11278_ylianttila.mthd,
-#                        descriptors = ooacquire::MAYP11278_descriptors)
+#                        tot.time.range = c(0, Inf))
 
 ## ---- eval=sr.online----------------------------------------------------------
 #  acq_irrad_interactive(HDR.mult = c(short = 1, long = 10), # the default
@@ -34,21 +35,33 @@ options(warn = 1)
 #                        descriptors = ooacquire::MAYP11278_descriptors)
 
 ## ---- eval=sr.online----------------------------------------------------------
-#  acq_irrad_interactive(HDR.mult = c(1, 10),  # the default
-#                        tot.time.range = 10,
-#                        correction.method = ooacquire::MAYP11278_ylianttila.mthd,
-#                        descriptors = ooacquire::MAYP11278_descriptors)
+#  acq_irrad_interactive(HDR.mult = c(1, 10),
+#                        tot.time.range = 10)
 
 ## ---- eval=sr.online----------------------------------------------------------
 #  acq_irrad_interactive(HDR.mult = c(1, 10),
-#                        tot.time.range = c(10, 20),
-#                        correction.method = ooacquire::MAYP11278_ylianttila.mthd,
-#                        descriptors = ooacquire::MAYP11278_descriptors)
+#                        tot.time.range = c(10, 20))
 
 ## ---- eval=sr.online----------------------------------------------------------
-#  acq_irrad_interactive(target.margin = 0.25,
-#                        correction.method = ooacquire::MAYP11278_ylianttila.mthd,
-#                        descriptors = ooacquire::MAYP11278_descriptors)
+#  acq_irrad_interactive(target.margin = 0.25)
+
+## ---- eval=sr.online----------------------------------------------------------
+#  acq_irrad_interactive(interface.mode = "series",
+#                        seq.settings = list(start.boundary = "minute",
+#                                            initial.delay = 0, # seconds
+#                                            step.delay = 60, # seconds
+#                                            num.steps = 60))
+
+## ---- eval=sr.online----------------------------------------------------------
+#  acq_irrad_interactive(interface.mode = "series",
+#                        tot.time.range = c(5, 10),
+#                        target.margin = 0.1,
+#                        qty.out = "irrad",
+#                        HDR.mult = c(0.3, 1, 3, 10),
+#                        seq.settings = list(start.boundary = "minute",
+#                                            initial.delay = 0,
+#                                            step.delay = 60,
+#                                            num.steps = 60))
 
 ## ---- eval=sr.online----------------------------------------------------------
 #  acq_fluence_interactive(correction.method = ooacquire::MAYP11278_ylianttila.mthd,
