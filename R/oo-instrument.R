@@ -319,6 +319,8 @@ set_descriptor_nl <- function(descriptor,
 #' @param wl.range numeric Range of wavelengths for which the calibration is
 #'   valid.
 #' @param start.date,end.date range of dates when calibration is valid.
+#' @param cal.source character Identifier or source of the calibration data,
+#'   used for traceability.
 #'
 #' @return A copy of the argument passed for \code{oo_descriptor} with the
 #'   irrad.mult field of the calibration data replaced by the new values.
@@ -329,7 +331,8 @@ set_descriptor_irrad_mult <- function(descriptor,
                                       irrad.mult,
                                       wl.range = NULL,
                                       start.date = lubridate::today(tzone = "UTC") - lubridate::days(1),
-                                      end.date = lubridate::today(tzone = "UTC") + lubridate::days(1))
+                                      end.date = lubridate::today(tzone = "UTC") + lubridate::days(1),
+                                      cal.source = "unknown")
 {
   stopifnot(is.numeric(irrad.mult) && length(irrad.mult) == 1 ||
               length(irrad.mult) == length(descriptor$wavelengths))
@@ -342,6 +345,7 @@ set_descriptor_irrad_mult <- function(descriptor,
   }
   descriptor[["inst.calib"]][["start.date"]] <- start.date
   descriptor[["inst.calib"]][["end.date"]] <- end.date
+  descriptor[["inst.calib"]][["cal.source"]] <- cal.source
   descriptor
 }
 

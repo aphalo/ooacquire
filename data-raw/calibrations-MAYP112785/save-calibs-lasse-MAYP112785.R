@@ -97,7 +97,8 @@ for (f in files) {
                               irrad.mult = tmp[["irrad.mult"]] * 1e4,
                               wl.range = c(251, 899),
                               start.date = MAYP112785_calib_dates.df[["start.date"]][date.row],
-                              end.date = MAYP112785_calib_dates.df[["end.date"]][date.row])
+                              end.date = MAYP112785_calib_dates.df[["end.date"]][date.row],
+                              cal.source = MAYP11278_calib_dates.df[["name"]][date.row])
 
     descriptors[[name.f]] <- descriptor.tmp
 }

@@ -9,7 +9,8 @@ set_descriptor_irrad_mult(
   irrad.mult,
   wl.range = NULL,
   start.date = lubridate::today(tzone = "UTC") - lubridate::days(1),
-  end.date = lubridate::today(tzone = "UTC") + lubridate::days(1)
+  end.date = lubridate::today(tzone = "UTC") + lubridate::days(1),
+  cal.source = "unknown"
 )
 }
 \arguments{
@@ -22,6 +23,9 @@ or of length one.}
 valid.}
 
 \item{start.date, end.date}{range of dates when calibration is valid.}
+
+\item{cal.source}{character Identifier or source of the calibration data,
+used for traceability.}
 }
 \value{
 A copy of the argument passed for \code{oo_descriptor} with the
