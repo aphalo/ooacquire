@@ -41,6 +41,7 @@ reference:
     - set_descriptor_nl
     - set_descriptor_irrad_mult
     - set_descriptor_integ_time
+    - set_descriptor_entrance_optics
     - get_oo_settings
     - acq_settings
     - tune_acq_settings
