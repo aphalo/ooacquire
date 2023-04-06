@@ -281,7 +281,7 @@ acq_raw_mspct <- function(descriptor,
 
   previous.protocol <- "none"
   z <- z.names <- list()
-  idx <- 0
+  idx <- 0 # spectrum index into collection (across protocol steps)
   start.time <- lubridate::now(tzone = "UTC")
 
   for (p in protocol) {
@@ -329,18 +329,12 @@ acq_raw_mspct <- function(descriptor,
         Sys.sleep(seconds.to.wait)
       }
       idx <- idx + 1
-      acq.time <- lubridate::now(tzone = "UTC")
+
       z[[idx]] <- acq_raw_spct(descriptor = descriptor,
                                acq.settings = acq.settings,
                                f.trigger.pulses = f.current,
-                               what.measured = paste(p, ": ", user.label, sep = ""),
+                               what.measured = paste(z.names[[i]], ": ", user.label, sep = ""),
                                where.measured = where.measured)
-      # next 3 statements shouldn't be needed. CHECK!
-      photobiology::setWhenMeasured(z[[idx]], acq.time)
-      photobiology::setWhereMeasured(z[[idx]], where.measured)
-      photobiology::setWhatMeasured(z[[idx]], paste(p, ":", user.label))
-      # remove dependency of object on rJava
-      trimInstrDesc(z[[idx]], c("-", "w"))
     }
   }
   end.time <- lubridate::now(tzone = "UTC")

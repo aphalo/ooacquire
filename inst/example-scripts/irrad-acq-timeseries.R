@@ -10,7 +10,7 @@ photon_as_default()
 # one hour of measurements every minute
 # Before starting make sure spectrometer temperature is stable!!
 
-acq_irrad_interactive(interface.mode = "series",
+acq_irrad_interactive(interface.mode = "series-attr",
                       folder.name = "./inst-not/series",
                       tot.time.range = c(5, 10),
                       target.margin = .1,
@@ -23,7 +23,7 @@ acq_irrad_interactive(interface.mode = "series",
                       entrance.optics = "cosine")
 
 # equivalent defaults for single time point acquisition
-acq_irrad_interactive(interface.mode = "full",
+acq_irrad_interactive(interface.mode = "auto",
                       folder.name = "./inst-not/single",
                       tot.time.range = c(5, 10),
                       target.margin = .1,
