@@ -301,15 +301,20 @@ acq_raw_mspct <- function(descriptor,
         lubridate::ceiling_date(lubridate::now(tzone = "UTC"),
                                 unit = seq.settings[["start.boundary"]]) +
         seconds(steps)
+      z.names <- paste(p,
+                       format_idx(seq_along(times)),
+                       sep = ".")
     } else {
       times <- lubridate::now(tzone = "UTC")
+      z.names <- p
     }
 
     if (verbose && length(times) > 1L) {
-      message("Series from ", times[1], " to ", times[length(times)], " taking ", length(times), " measurements")
+      message("Series from ", times[1], " to ", times[length(times)],
+              " taking ", length(times), " measurements")
     }
 
-    delays <- numeric(length(times))
+    delays <- numeric(length(times)) # delays compared to scheduled time
     for (i in seq_along(times)) {
       if (verbose && length(times) > 1L) {
         message("Time step ", i)
@@ -324,12 +329,6 @@ acq_raw_mspct <- function(descriptor,
         Sys.sleep(seconds.to.wait)
       }
       idx <- idx + 1
-      z.names[[idx]] <-
-        paste(p,
-              formatC(i,
-                      width = trunc(log10(length(times) + 0.1) + 1),
-                      format = "d", flag = "0"),
-              sep = ".")
       acq.time <- lubridate::now(tzone = "UTC")
       z[[idx]] <- acq_raw_spct(descriptor = descriptor,
                                acq.settings = acq.settings,

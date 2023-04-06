@@ -212,7 +212,7 @@ set_integ_time <- function(acq.settings,
 #'
 #' Set the number of exposures and HDR.multipliers in the instrument settings
 #' data structure. This value is by default missing, indicating a protocol in
-#' which one assumes contant illumination during an integration. If the light
+#' which one assumes constant illumination during an integration. If the light
 #' exposure is shorter than the integration time, we need to express the results
 #' per exposure, and consequently calculations done based on the number of
 #' exposure events during each integration. This is the case, for example, when

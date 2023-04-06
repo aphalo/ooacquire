@@ -30,3 +30,4 @@ acq_irrad_interactive(interface.mode = "full",
                       qty.out = "irrad",
                       HDR.mult = c(0.3, 1, 3, 10),
                       entrance.optics = "cosine")
+

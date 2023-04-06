@@ -93,6 +93,7 @@ Obviously the duration of the time steps must be longer than the time
 spectrum.
 
 Other raw-counts-spectra acquisition functions: 
-\code{\link{acq_raw_spct}()}
+\code{\link{acq_raw_spct}()},
+\code{\link{hs_acq_raw_spct}()}
 }
 \concept{raw-counts-spectra acquisition functions}

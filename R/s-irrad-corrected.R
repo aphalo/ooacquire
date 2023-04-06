@@ -103,9 +103,9 @@ s_irrad_corrected.raw_mspct <-
     }
 
     if (is.list(spct.names) && (
-      length(spct.names[["light"]]) > 1L || spct.names[["light"]] == "*")) {
+      length(spct.names[["light"]]) > 1L || spct.names[["light"]][1] == "*")) {
       # "*" is a placeholder for all other spectra
-      if (spct.names[["light"]] == "*") {
+      if (spct.names[["light"]][1] == "*") {
         spct.names <- as.list(spct.names)
         all.spct.names <- names(x)
         spct.names[["light"]] <-
