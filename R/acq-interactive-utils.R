@@ -406,7 +406,8 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
   old.seq.settings <- seq.settings
 
   repeat{
-    if (seq.settings$step.delay < measurement.duration) {
+    if (seq.settings$step.delay < measurement.duration &&
+        seq.settings$step.delay != 0) {
       seq.settings$step.delay <- measurement.duration
       message("'step.delay' too short! Reset to ", seq.settings$step.delay, " s.")
     }

@@ -57,7 +57,6 @@ acq_raw_spct <- function(descriptor,
   y <- descriptor
 
   z <- tibble::tibble(w.length = y$wavelengths)
-  start.time <- lubridate::now(tzone = "UTC")
 
   if (set.all) {
     # set according to acq.settings
@@ -90,6 +89,8 @@ acq_raw_spct <- function(descriptor,
                                   descriptor$sr.index,
                                   descriptor$ch.index)
    }
+
+  start.time <- lubridate::now(tzone = "UTC")
 
   for (i in 1:num.readings) {
     if (num.readings > 1) {
@@ -237,6 +238,7 @@ acq_raw_mspct <- function(descriptor,
                           acq.settings,
                           f.trigger.pulses = f.trigger.message,
                           seq.settings = list(initial.delay = 0,
+                                              start.boundary = "second",
                                               step.delay = 0,
                                               num.steps = 1L),
                           protocol = c("light", "filter", "dark"),
@@ -275,15 +277,18 @@ acq_raw_mspct <- function(descriptor,
   # add initial delay
   steps <- steps + seq.settings[["initial.delay"]]
 
-  if (verbose && length(steps) > 1L) {
-    message("'steps' = ", paste(steps, collapse = ", "), " (seconds)")
-  }
-
   previous.protocol <- "none"
-  z <- z.names <- list()
-  idx <- 0 # spectrum index into collection (across protocol steps)
-  start.time <- lubridate::now(tzone = "UTC")
 
+  high.speed <-
+    seq.settings[["step.delay"]] == 0 &&
+    seq.settings[["num.steps"]] > 1L &&
+    length(acq.settings[["integ.time"]]) == 1L # no HDR bracketing
+
+  z <- list()
+  z.names <- character()
+  idx <- 0 # spectrum index into collection (across protocol steps)
+
+  start.time <- lubridate::now(tzone = "UTC")
   for (p in protocol) {
     if (p != previous.protocol) {
       previous.protocol <- p
@@ -301,60 +306,78 @@ acq_raw_mspct <- function(descriptor,
         lubridate::ceiling_date(lubridate::now(tzone = "UTC"),
                                 unit = seq.settings[["start.boundary"]]) +
         seconds(steps)
-      z.names <- paste(p,
+      z.names <- c(z.names,
+                   paste(p,
                        format_idx(seq_along(times)),
-                       sep = ".")
+                       sep = "."))
     } else {
       times <- lubridate::now(tzone = "UTC")
-      z.names <- p
+      z.names <- c(z.names, p)
     }
 
     if (verbose && length(times) > 1L) {
-      message("Series from ", times[1], " to ", times[length(times)],
+      message("Measuring series from ", times[1], " to ", times[length(times)],
               " taking ", length(times), " measurements")
     }
 
-    delays <- numeric(length(times)) # delays compared to scheduled time
-    for (i in seq_along(times)) {
-      if (verbose && length(times) > 1L) {
-        message("Time step ", i)
-      }
-      repeat {
-        # we could subtract a lag correction dependent on host and spectrometer
-        seconds.to.wait <- lubridate::seconds(times[[i]] - lubridate::now(tzone = "UTC"))
-        if (seconds.to.wait <= 0.001) {
-          delays[i] <- round(seconds.to.wait * -1e3, 0)
-          break()
-        }
-        Sys.sleep(seconds.to.wait)
-      }
-      idx <- idx + 1
+    messages.enabled <-
+      verbose && length(times) > 1L && all(seq.settings[["step.delay"]] > 0.5)
 
-      z[[idx]] <- acq_raw_spct(descriptor = descriptor,
-                               acq.settings = acq.settings,
-                               f.trigger.pulses = f.current,
-                               what.measured = paste(z.names[[i]], ": ", user.label, sep = ""),
-                               where.measured = where.measured)
+    if (high.speed && p == "light") {
+      z <- c(z,
+             hs_acq_raw_mspct(descriptor = descriptor,
+                              acq.settings = acq.settings,
+                              num.spectra = length(times),
+                              f.trigger.pulses = f.current,
+                              what.measured = paste(p, " HS: ", user.label, sep = ""),
+                              where.measured = where.measured,
+                              verbose = messages.enabled,
+                              return.list = TRUE))
+    } else {
+       for (i in seq_along(times)) {
+        if (messages.enabled) {
+          message("Time step ", i)
+        }
+        repeat {
+          # we could subtract a lag correction dependent on host and spectrometer
+          seconds.to.wait <- lubridate::seconds(times[[i]] - lubridate::now(tzone = "UTC"))
+          if (seconds.to.wait <= 0.0005) {
+            break()
+          }
+          Sys.sleep(seconds.to.wait)
+        }
+        idx <- idx + 1
+
+        z[[idx]] <- acq_raw_spct(descriptor = descriptor,
+                                 acq.settings = acq.settings,
+                                 f.trigger.pulses = f.current,
+                                 what.measured = paste(z.names[[i]], ": ", user.label, sep = ""),
+                                 where.measured = where.measured,
+                                 verbose = messages.enabled)
+      }
     }
   }
   end.time <- lubridate::now(tzone = "UTC")
-  if (length(times) > 1L && verbose) {
-    message("Series: delays (min, median, max): ",
-            paste(c(min(delays), stats::median(delays), max(delays)),
-                  collapse = ", "),
-            " (ms)")
-    message("Start: ", start.time,
-            ", end: ", end.time, ", ellapsed: ", format(end.time - start.time, digits = 4),
-            "\nfirst step: ", when_measured(z[[1]]),
-            ", last step: ", when_measured(z[[length(z)]]))
-  }
+
+  stopifnot(length(z) == length(z.names), !anyNA(z.names))
+  names(z) <- z.names
+
   z <- photobiology::as.raw_mspct(z)
 
-  if (length(z) == length(protocol)) {
-    names(z) <- protocol
-  } else {
-    stopifnot(length(z) == length(protocol) + length(steps) - 1)
-    names(z) <- unlist(z.names)
+  if (verbose && (length(times) > 1L || high.speed)) {
+    light.spectra.idx <- grepl("^light", names(z))
+    actual.times <-
+      unlist(photobiology::when_measured(z[light.spectra.idx])[["when.measured"]], use.names = FALSE)
+    actual.steps <- round(diff(actual.times), 3) # rounded to millisecond
+    message("Realized series of ",
+            length(actual.times),
+            " from ", actual.times[1], " to ",
+            actual.times[length(actual.times)])
+    message("with ", length(actual.steps), " time intervals (min, median, max): ",
+            paste(format(c(min(actual.steps), stats::median(actual.steps), max(actual.steps))),
+                  collapse = ", "))
+    message("Total ellapsed time ", format(end.time - start.time, digits = 4),
+            "; from ", start.time, " to ", end.time)
   }
   z
 }

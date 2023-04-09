@@ -1,4 +1,4 @@
-#' Measure spectra at high speed
+#' quire spectra at high speed
 #'
 #' Take one set of spectra using the same instruments settings at high speed
 #' using the special OmniDriver API functions. No HDR bracketing is possible,
@@ -17,6 +17,8 @@
 #'   compatible with value returned by \code{ggmap::geocode()}.
 #' @param set.all logical resend or not all instrument settings.
 #' @param verbose logical to enable or disable warnings.
+#' @param return.list logical Return a \code{list} instead of a \code{raw_mspct}
+#'   object.
 #'
 #' @family raw-counts-spectra acquisition functions
 #'
@@ -24,7 +26,7 @@
 #'
 #' @return A \code{raw_mspct} containing one \code{raw_spct} object with one
 #'   column \code{w.length} and one column \code{counts} for each spectrum. The
-#'   number of columns with raw counts is is always one and integration time
+#'   number of columns with raw counts is always one and integration time
 #'   bracketing or HDR values in \code{acq.settings} are ignored except for the
 #'   smallest value.
 #'
@@ -32,15 +34,16 @@
 #'   spectra according to a user defined protocol see \code{\link{acq_raw_spct}}
 #'   and \code{\link{acq_raw_mspct}}.
 #'
-hs_acq_raw_spct <- function(descriptor,
-                            acq.settings,
-                            num.spectra = 100L,
-                            base.name = "light",
-                            f.trigger.pulses = f.trigger.message,
-                            what.measured = NA,
-                            where.measured = data.frame(lon = NA_real_, lat = NA_real_),
-                            set.all = TRUE,
-                            verbose = TRUE) {
+hs_acq_raw_mspct <- function(descriptor,
+                             acq.settings,
+                             num.spectra = 100L,
+                             base.name = NULL,
+                             f.trigger.pulses = f.trigger.message,
+                             what.measured = NA,
+                             where.measured = data.frame(lon = NA_real_, lat = NA_real_),
+                             set.all = TRUE,
+                             verbose = TRUE,
+                             return.list = FALSE) {
   if (getOption("ooacquire.offline", TRUE)) {
     warning("Package 'rOmniDriver' required to access spectrometer. Data acquisition skipped.")
     return(raw_spct())
@@ -58,7 +61,6 @@ hs_acq_raw_spct <- function(descriptor,
   y <- descriptor
 
   z <- tibble::tibble(w.length = y$wavelengths)
-  start.time <- lubridate::now(tzone = "UTC")
 
   if (set.all) {
     # set according to acq.settings
@@ -94,33 +96,34 @@ hs_acq_raw_spct <- function(descriptor,
 
   # acquire a batch of spectra
 
-  rOmniDriver::set_integration_time(y$w, x$integ.time[i], y$sr.index, y$ch.index)
+  stopifnot(length(x$integ.time) == 1) # HDR bracketing is not possible
+
+  rOmniDriver::set_integration_time(y$w, x$integ.time, y$sr.index, y$ch.index)
   actual.integ.time <- rOmniDriver::get_integration_time(y$w, y$sr.index, y$ch.index)
   # We need to
-  if (as.integer(x$integ.time[i]) - actual.integ.time > x$integ.time[i] * 1e-5) {
+  if (as.integer(x$integ.time) - actual.integ.time > x$integ.time * 1e-5) {
     # We guard against failure to set integration time
-    # It should never happen as we check validity value requested
+    # It should never happen as we check validity of value requested
     warning("The spectrometer has overridden the integration time!")
   }
   # could improve precision in case of rounding errors
-  x$integ.time[i] <- actual.integ.time
+  x$integ.time <- actual.integ.time
 
-  rOmniDriver::set_scans_to_avg(y$w, 1L, y$sr.index, y$ch.index)
+  rOmniDriver::set_scans_to_avg(y$w, x$num.scans, y$sr.index, y$ch.index)
   actual.num.scans <- rOmniDriver::get_scans_to_avg(y$w, y$sr.index, y$ch.index)
-  # We need to
-  if (x$num.scans[i] != actual.num.scans) {
-    # We guard against failure to set integration time
-    # It should never happen as we check validity value requested
-    warning("The spectrometer has overridden the number of scans!")
-    x$num.scans[i] <- actual.num.scans
+  if (as.integer(x$num.scans) - actual.num.scans) {
+    # We guard against failure to set number of scans
+    # It should never happen as we check validity of value requested
+    warning("The spectrometer has overridden the number of scans to average!")
   }
 
-  # setup memoery buffer
+  # setup memory buffer
   rOmniDriver::highSpdAcq_allocate_buffer(y$w, y$sr.index, num.spectra)
 
   if (verbose) message("Scans 1 to ", num.spectra, " ... ", appendLF = FALSE)
 
   # start acquisition
+  start.time <- lubridate::now(tzone = "UTC")
   rOmniDriver::highSpdAcq_start_acquisition(y$w, y$sr.index)
 
   # retrieve actual number of spectra acquired
@@ -132,31 +135,41 @@ hs_acq_raw_spct <- function(descriptor,
     num.spectra <- actual.num.spectra
   }
 
-  # vectorized assembly of names for individual spectra
-  obj.names <- paste(base.name, format_idx(1:num.spectra), sep = ".")
   # retrieve the spectra and time stamps one by one
   zz <- list()
+  # OmniDriver uses indexes starting at zero
+  first.time.stamp <- rOmniDriver::highSpdAcq_get_time_stamp(y$w, 0L)
   for (i in 1:num.spectra) {
-    counts <- rOmniDriver::highSpdAcq_get_spectrum(i)
-    acq.time <- rOmniDriver::highSpdAcq_get_time_stamp(i)
-    z <- tibble::tibble(w.length = y$wavelengths,
-                        counts = counts)
+    z[["counts"]] <- rOmniDriver::highSpdAcq_get_spectrum(y$w, i - 1L)
+    this.timestamp <- rOmniDriver::highSpdAcq_get_time_stamp(y$w, i - 1L)
+    # we need to compute the difference in seconds or milliseconds using API functions
+    delta.time <- rOmniDriver::get_seconds_time_delta(first.time.stamp, this.timestamp)
+    this.acq.time <- start.time + lubridate::seconds(delta.time)
     z <- as.raw_spct(z)
     attr(z, "linearized") <- x$corr.sensor.nl
     photobiology::setInstrDesc(z, y)
-    # we remove the Java wrapper so that RJava is not required to read the data
+    # we remove the Java wrapper so that RJava is not required when reading the data
     photobiology::trimInstrDesc(z, c("-", "w"))
     photobiology::setInstrSettings(z, x)
-    photobiology::setWhenMeasured(z, acq.time)
+    photobiology::setWhenMeasured(z, this.acq.time)
     photobiology::setWhereMeasured(z, where.measured)
     photobiology::setWhatMeasured(z, what.measured)
     if (!is.raw_spct(z)) {
-      warning("Acquired spectrum '", obj.names[i], "' is invalid, discarding it.")
-      next()
+      warning("Acquired spectrum '", i, "' is invalid.")
+      zz[[i]] <- raw_spct() # empty object
     } else {
-      zz[[obj.names[i]]] <- z
+      zz[[i]] <- z
     }
   }
-  # convert list into raw_mspct object
-  as.raw_mspct(zz)
+
+  if (!is.null(base.name)) {
+    # vectorized assembly of names for individual spectra
+    names(zz) <- paste(base.name, format_idx(1:num.spectra), sep = ".")
+  }
+
+  if (return.list) {
+    zz
+  } else {
+    photobiology::as.raw_mspct(zz)
+  }
 }

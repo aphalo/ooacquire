@@ -8,7 +8,8 @@ acq_raw_mspct(
   descriptor,
   acq.settings,
   f.trigger.pulses = f.trigger.message,
-  seq.settings = list(initial.delay = 0, step.delay = 0, num.steps = 1L),
+  seq.settings = list(initial.delay = 0, start.boundary = "second", step.delay = 0,
+    num.steps = 1L),
   protocol = c("light", "filter", "dark"),
   user.label = "",
   where.measured = data.frame(lon = NA_real_, lat = NA_real_),
@@ -94,6 +95,6 @@ spectrum.
 
 Other raw-counts-spectra acquisition functions: 
 \code{\link{acq_raw_spct}()},
-\code{\link{hs_acq_raw_spct}()}
+\code{\link{hs_acq_raw_mspct}()}
 }
 \concept{raw-counts-spectra acquisition functions}

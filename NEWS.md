@@ -17,6 +17,8 @@ editor_options:
     
 # ooacquire 0.3.1 (2023-04-05)
 
+-   Implement high speed acquisition of time series using special API functions
+    through new wrappers in 'rOmniDriver' (>= 0.1.18).
 -   Add new calibrations for MAYP11278 with cosine and hemispherical diffusers.
 -   Add support for multiple descriptors per instrument and optional include
     a description of the entrance optics in the descriptor.

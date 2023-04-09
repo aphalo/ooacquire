@@ -188,6 +188,10 @@ acq_irrad_interactive <-
     w <- start_session()
     on.exit(end_session(w)) # ensure session is always closed!
 
+    if (interface.mode == "series") {
+      rOmniDriver::init_highres_time_api() # additional API from OmniDriver distribution
+    }
+
     instruments <- list_srs_interactive(w = w)
     sr.index <- choose_sr_interactive(instruments = instruments)
     if (sr.index < 0L) {
@@ -430,7 +434,7 @@ acq_irrad_interactive <-
         repeat {
           fig <- ggplot2::autoplot(irrad.spct, annotations = c("-", "title*")) +
             ggplot2::labs(title = obj.name,
-                          subtitle = paste(photobiology::getWhenMeasured(irrad.spct), " UTC, ",
+                          subtitle = paste(photobiology::when_measured(irrad.spct), " UTC, ",
                                            session.label, sep = ""),
                           caption = paste("ooacquire",
                                           utils::packageVersion("ooacquire"))) +

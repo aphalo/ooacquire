@@ -51,6 +51,6 @@ spectra according to a user defined protocol.
 
 Other raw-counts-spectra acquisition functions: 
 \code{\link{acq_raw_mspct}()},
-\code{\link{hs_acq_raw_spct}()}
+\code{\link{hs_acq_raw_mspct}()}
 }
 \concept{raw-counts-spectra acquisition functions}
