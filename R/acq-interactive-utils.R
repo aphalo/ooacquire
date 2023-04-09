@@ -406,7 +406,8 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
   old.seq.settings <- seq.settings
 
   repeat{
-    if (seq.settings$step.delay < measurement.duration) {
+    if (seq.settings$step.delay < measurement.duration &&
+        seq.settings$step.delay != 0) {
       seq.settings$step.delay <- measurement.duration
       message("'step.delay' too short! Reset to ", seq.settings$step.delay, " s.")
     }
@@ -563,4 +564,19 @@ f.trigger.message <- function(n = 1L) {
     cat("Trigger the flash", n, "times!!")
   }
   return(TRUE)
+}
+
+#' Format index with enough leading zeros
+#'
+#' @param idx integer vector Numbers to convert into character strings with
+#'   enough leading zeros to accommodate \code{max.idx}.
+#' @param max.idx integer vector of length one.
+#'
+format_idx <- function(idx, max.idx = NULL) {
+  if (is.null(max.idx)) {
+    max.idx <- max(idx)
+  }
+  formatC(idx,
+          width = trunc(log10(max.idx[1L] + 0.1) + 1),
+          format = "d", flag = "0")
 }

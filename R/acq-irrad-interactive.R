@@ -188,6 +188,10 @@ acq_irrad_interactive <-
     w <- start_session()
     on.exit(end_session(w)) # ensure session is always closed!
 
+    if (interface.mode == "series") {
+      rOmniDriver::init_highres_time_api() # additional API from OmniDriver distribution
+    }
+
     instruments <- list_srs_interactive(w = w)
     sr.index <- choose_sr_interactive(instruments = instruments)
     if (sr.index < 0L) {
@@ -368,8 +372,9 @@ acq_irrad_interactive <-
           raw.name <- paste(obj.name, "raw_mspct", sep = ".")
           file.name <- paste(obj.name, "spct.Rda", sep = ".")
           if ((irrad.name %in% irrad.names) || file.exists(file.name)) {
-            if (readline(paste("Overwrite existing: '", irrad.name, ". (y-/n) :"))[1] == "y") {
-              irrad.names <- setdiff(irrad.name, irrad.names)
+            if (readline(paste("Overwrite existing: '", irrad.name, ". (y/n-) :"))[1] == "y") {
+              irrad.names <- setdiff(irrad.names, irrad.name)
+              raw.names <- setdiff(raw.names, raw.name)
               break()
             }
           } else {
@@ -429,7 +434,7 @@ acq_irrad_interactive <-
         repeat {
           fig <- ggplot2::autoplot(irrad.spct, annotations = c("-", "title*")) +
             ggplot2::labs(title = obj.name,
-                          subtitle = paste(photobiology::getWhenMeasured(irrad.spct), " UTC, ",
+                          subtitle = paste(photobiology::when_measured(irrad.spct), " UTC, ",
                                            session.label, sep = ""),
                           caption = paste("ooacquire",
                                           utils::packageVersion("ooacquire"))) +
@@ -544,7 +549,7 @@ acq_irrad_interactive <-
         protocol <- protocol_interactive(protocols)
       } else if (answer2 %in% c("c", "q")) {
         if (save.collections) {
-          message("Corrected ", qty.out, "spectra to collect: ",
+          message("Corrected ", qty.out, " spectra to collect: ",
                   paste(irrad.names, collapse = ", "))
           message("Raw objects to collect: ",
                   paste(raw.names, collapse = ", "), sep = " ")

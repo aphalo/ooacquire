@@ -26,7 +26,6 @@ start_session <- function(error.action = stop) {
   message("rOmniDriver package version: ", utils::packageVersion("rOmniDriver"))
   num.srs <- rOmniDriver::number_srs(w)
 
-  # num.srs <- 1
   if (num.srs < 0) {
     message_text <- "possible driver error."
     error.action("Error starting session: ", message_text)
