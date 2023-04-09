@@ -13,16 +13,15 @@ library(ooacquire)
 # print warnings at the time they are triggered
 options(warn = 1)
 
-## ---- eval = FALSE------------------------------------------------------------
+## ---- eval = sr.online--------------------------------------------------------
 #  acq_irrad_interactive(interface.mode = "simple")
 
 ## ---- eval=sr.online----------------------------------------------------------
 #  acq_irrad_interactive(correction.method = ooacquire::MAYP11278_ylianttila.mthd,
-#                        descriptors = ooacquire::MAYP11278_descriptors,
-#                        interface.mode = "simple")
+#                        descriptors = ooacquire::MAYP11278_descriptors)
 
 ## ---- eval=sr.online----------------------------------------------------------
-#  acq_irrad_interactive(interface.mode = "simple")
+#  acq_irrad_interactive()
 
 ## ---- eval=sr.online----------------------------------------------------------
 #  acq_irrad_interactive(HDR.mult = 1,
