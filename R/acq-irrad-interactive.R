@@ -288,7 +288,7 @@ acq_irrad_interactive <-
 
     # We get metadata from user, offering defaults
     session.name <- make.names(session.name) # validate argument passed in call
-    session.prompt <- paste("Session's name (\"", session.name, "\"-/<string>): ", sep = "")
+    session.prompt <- paste("Session's name (<string>/\"", session.name, "\"-): ", sep = "")
     utils::flush.console()
     user.session.name <- readline(session.prompt)
     if (! user.session.name == "") {
@@ -302,7 +302,7 @@ acq_irrad_interactive <-
     }
 
     user.name <- make.names(user.name) # validate argument passed in call
-    user.name.prompt <- paste("Operator's name (\"", user.name, "\"-/<string>): ", sep = "")
+    user.name.prompt <- paste("Operator's name (<string>/\"", user.name, "\"-): ", sep = "")
     utils::flush.console()
     user.user.name <- readline(user.name.prompt)
     if (! user.user.name == "") {
@@ -314,8 +314,15 @@ acq_irrad_interactive <-
                            ", instrument s.n.: ", descriptor[["spectrometer.sn"]],
                            sep = "")
 
-    user.attrs <- list(what.measured = "",
-                       comment.text = "")
+    user.attrs <-
+      list(what.measured = "",
+           comment.text = "",
+           how.measured = paste("Acquired with array spectrometer ", descriptor[["spectrometer.name"]],
+                                " using R packages 'ooacquire' version ", utils::packageVersion("ooacquire"),
+                                " in interface mode \"", interface.mode,
+                                "\" and 'rOmniDriver ", utils::packageVersion("rOmniDriver"),
+                                " and OmniDriver version ", rOmniDriver::get_api_version(w),
+                                sep = ""))
 
     folder.name <- set_folder_interactive(folder.name)
 
@@ -421,6 +428,8 @@ acq_irrad_interactive <-
                                         correction.method = correction.method,
                                         return.cps = qty.out == "cps")
 
+        photobiology::setHowMeasured(irrad.spct, user.attrs$how.measured)
+
         if (length(user.attrs$what.measured) > 0) {
           photobiology::setWhatMeasured(irrad.spct, user.attrs$what.measured)
         } else {
@@ -428,16 +437,21 @@ acq_irrad_interactive <-
         }
 
         if (length(user.attrs$comment.text) > 0) {
-          comment(irrad.spct) <- paste(comment(irrad.spct), user.attrs$comment.text, sep = "\n")
+          comment(irrad.spct) <-
+            paste(comment(irrad.spct), user.attrs$comment.text, sep = "\n")
         }
 
         repeat {
-          fig <- ggplot2::autoplot(irrad.spct, annotations = c("-", "title*")) +
-            ggplot2::labs(title = obj.name,
-                          subtitle = paste(photobiology::when_measured(irrad.spct), " UTC, ",
-                                           session.label, sep = ""),
-                          caption = paste("ooacquire",
-                                          utils::packageVersion("ooacquire"))) +
+          fig <- ggplot2::autoplot(irrad.spct,
+                                   annotations =
+                                     list(c("-", "colour.guide"),
+                                          c("+", "title:what:when:how"))) +
+            # ggplot2::labs(title = obj.name,
+            #               subtitle = format(photobiology::when_measured(irrad.spct),
+            #                                       tz = "",
+            #                                       usetz = TRUE),
+            #               caption = paste("ooacquire",
+            #                               utils::packageVersion("ooacquire"))) +
             ggplot2::theme_bw()
           print(fig)
 
@@ -576,11 +590,16 @@ acq_irrad_interactive <-
                      cps =   photobiology::cps_mspct(mget(irrad.names)))
 
             # plot collection and summaries
-            collection.fig <- ggplot2::autoplot(collection.mspct) +
+            collection.fig <- ggplot2::autoplot(collection.mspct,
+                                                annotations =
+                                                  c("-", "peaks", "colour.guide", "summaries")) +
               ggplot2::labs(title = collection.title,
                             subtitle = session.label,
-                            caption = paste("ooacquire",
-                                            utils::packageVersion("ooacquire"))) +
+                            caption = paste("Acquired with array spectrometer ", descriptor[["spectrometer.name"]],
+                                            " using R packages 'ooacquire' version ", utils::packageVersion("ooacquire"),
+                                            "\" and 'rOmniDriver ", utils::packageVersion("rOmniDriver"),
+                                            " and OmniDriver version ", rOmniDriver::get_api_version(w),
+                                            sep = "")) +
               ggplot2::theme(legend.position = "bottom")
             print(collection.fig)
             rm(collection.title)

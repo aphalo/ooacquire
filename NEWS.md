@@ -20,10 +20,13 @@ editor_options:
 -   Implement high speed acquisition of time series using special API functions
     through new wrappers in 'rOmniDriver' (>= 0.1.18).
 -   Add new calibrations for MAYP11278 with cosine and hemispherical diffusers.
--   Add support for multiple descriptors per instrument and optional include
-    a description of the entrance optics in the descriptor.
+-   Add support for multiple descriptors per instrument and optionally include
+    a description of the entrance optics in the instrument descriptor.
 -   Add a slot to to calibration field in the descriptor to store the _name_
     or identifier of the calibration to allow traceability.
+-   Add "how.measured" attribute to acquired spectra.
+-   Update code used for plot title, subtitle and caption. Date times were
+    no longer formatted correctly.
 -   Photsyntheticaly active radiation can be defined as a range of wavelengths
     (PhR) or as an effective or weighted quantitiy (PAR, as defined by McCree).
     When expressed as photons they are identical, but when expressed as energy 

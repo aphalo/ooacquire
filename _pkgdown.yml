@@ -47,7 +47,12 @@ reference:
     - tune_acq_settings
     - acq_raw_spct
     - acq_raw_mspct
+    - hs_acq_raw_mspct
     - check_sn_match
+
+  - subtitle: Utility functions
+    contents:
+    - format_idx
 
   - title: Data import from text files
   - subtitle: Read data
@@ -59,6 +64,7 @@ reference:
     - read_oo_pidata
     - read_oo_caldata
     - read_files2mspct
+
   - subtitle: Utility functions
     desc: Utility functions for reading raw-counts and metadata from output files from **OceanView**, **SpectraSuite**, Raspberry Pi software and the inbuilt-firmware of the Jaz modular spectrometer.
     contents:
@@ -76,6 +82,7 @@ reference:
     - s_irrad_corrected
     - s_fraction_corrected
     - which_descriptor
+
   - subtitle: Low level functions and methods.
     desc: Individual functions implementing different steps in the conversion of raw-counts data.
     contents:
@@ -92,6 +99,7 @@ reference:
     - merge_cps
     - new_correction_method
     - skip_bad_pixs
+
   - subtitle: Computation of calibration coefficients
     desc: Compute a calibration coefficients.
     contents:
@@ -108,6 +116,7 @@ reference:
     - sun001.raw_mspct
     - halogen.raw_mspct
     - xenon_flash.raw_mspct
+
   - subtitle: Calibration data
     desc: Examples of individual instrument calibrations as used by the functions in this package, serving only as examples. Not all listed methods are currently implemented.
     contents:
