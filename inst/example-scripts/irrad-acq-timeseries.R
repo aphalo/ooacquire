@@ -44,9 +44,9 @@ acq_irrad_interactive(interface.mode = "auto",
                       entrance.optics = "cosine")
 
 # high speed measurements as fast as possible
-acq_irrad_interactive(interface.mode = "series-attr",
+acq_irrad_interactive(interface.mode = "series",
                       folder.name = "./inst-not/series",
-                      tot.time.range = c(0, Inf),
+                      tot.time.range = c(0.2, Inf),
                       target.margin = .2,
                       qty.out = "irrad",
                       HDR.mult = 1L,

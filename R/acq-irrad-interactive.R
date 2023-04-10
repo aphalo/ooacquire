@@ -317,11 +317,13 @@ acq_irrad_interactive <-
     user.attrs <-
       list(what.measured = "",
            comment.text = "",
-           how.measured = paste("Acquired with array spectrometer ", descriptor[["spectrometer.name"]],
-                                " using R packages 'ooacquire' version ", utils::packageVersion("ooacquire"),
-                                " in interface mode \"", interface.mode,
-                                "\" and 'rOmniDriver ", utils::packageVersion("rOmniDriver"),
-                                " and OmniDriver version ", rOmniDriver::get_api_version(w),
+           how.measured = paste("Acquired with ", descriptor[["spectrometer.name"]],
+                                " (", descriptor[["spectrometer.sn"]],
+                                "), R (", paste(R.version[["major"]], R.version[["minor"]], sep = "."),
+                                "), 'ooacquire' (", utils::packageVersion("ooacquire"),
+                                ") in mode \"", interface.mode,
+                                "\",\n 'rOmniDriver' (", utils::packageVersion("rOmniDriver"),
+                                ") and OmniDriver (", rOmniDriver::get_api_version(w), ").",
                                 sep = ""))
 
     folder.name <- set_folder_interactive(folder.name)
@@ -430,28 +432,28 @@ acq_irrad_interactive <-
 
         photobiology::setHowMeasured(irrad.spct, user.attrs$how.measured)
 
-        if (length(user.attrs$what.measured) > 0) {
-          photobiology::setWhatMeasured(irrad.spct, user.attrs$what.measured)
-        } else {
+        if (user.attrs$what.measured == "") {
           photobiology::setWhatMeasured(irrad.spct, obj.name)
+        } else {
+          photobiology::setWhatMeasured(irrad.spct, user.attrs$what.measured)
         }
 
-        if (length(user.attrs$comment.text) > 0) {
+        if (user.attrs$comment.text != "") {
           comment(irrad.spct) <-
             paste(comment(irrad.spct), user.attrs$comment.text, sep = "\n")
         }
 
         repeat {
           fig <- ggplot2::autoplot(irrad.spct,
-                                   annotations =
-                                     list(c("-", "colour.guide"),
-                                          c("+", "title:what:when:how"))) +
-            # ggplot2::labs(title = obj.name,
-            #               subtitle = format(photobiology::when_measured(irrad.spct),
-            #                                       tz = "",
-            #                                       usetz = TRUE),
-            #               caption = paste("ooacquire",
-            #                               utils::packageVersion("ooacquire"))) +
+                                   annotations = c("-", "colour.guide"),
+                                   geom = ifelse(getMultipleWl(irrad.spct) == 1,
+                                                 "spct", "line")) +
+            ggplot2::labs(title = paste(what_measured(irrad.spct)[[1L]],
+                                        " (n = ", getMultipleWl(irrad.spct), ")",
+                                        sep = ""),
+                          subtitle = when_measured(irrad.spct)[[1L]],
+                          caption = how_measured(irrad.spct)[[1L]]) +
+            ggplot2::theme(legend.position = "bottom") +
             ggplot2::theme_bw()
           print(fig)
 
@@ -579,7 +581,10 @@ acq_irrad_interactive <-
                     collection.name, "'.", sep = "")
           }
           utils::flush.console()
-          collection.title <- readline("Title for plot? :")
+          collection.title <- readline("Title for plot?: ")
+          if (collection.title == "") {
+            collection.title <- collection.name
+          }
           collection.file.name <- paste(collection.name, "Rda", sep = ".")
           collection.objects <- character()
 
@@ -590,16 +595,21 @@ acq_irrad_interactive <-
                      cps =   photobiology::cps_mspct(mget(irrad.names)))
 
             # plot collection and summaries
-            collection.fig <- ggplot2::autoplot(collection.mspct,
-                                                annotations =
-                                                  c("-", "peaks", "colour.guide", "summaries")) +
-              ggplot2::labs(title = collection.title,
+            if (length(collection.mspct) > 200) {
+              plot.data = "median"
+            } else {
+              plot.data = "as.is"
+            }
+            collection.fig <-
+              ggplot2::autoplot(collection.mspct,
+                                annotations =
+                                  c("-", "peaks", "colour.guide", "summaries"),
+                                plot.data = plot.data) +
+              ggplot2::labs(title = paste(collection.title, " (n = ",
+                                          length(collection.mspct), ")",
+                                          sep = ""),
                             subtitle = session.label,
-                            caption = paste("Acquired with array spectrometer ", descriptor[["spectrometer.name"]],
-                                            " using R packages 'ooacquire' version ", utils::packageVersion("ooacquire"),
-                                            "\" and 'rOmniDriver ", utils::packageVersion("rOmniDriver"),
-                                            " and OmniDriver version ", rOmniDriver::get_api_version(w),
-                                            sep = "")) +
+                            caption = how_measured(collection.mspct[[1L]])) +
               ggplot2::theme(legend.position = "bottom")
             print(collection.fig)
             rm(collection.title)
