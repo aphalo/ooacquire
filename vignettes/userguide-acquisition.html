@@ -12,7 +12,7 @@
 
 <meta name="author" content="Pedro J. Aphalo" />
 
-<meta name="date" content="2023-04-09" />
+<meta name="date" content="2023-04-10" />
 
 <title>Acquisition of Spectra</title>
 
@@ -339,9 +339,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 <h1 class="title toc-ignore">Acquisition of Spectra</h1>
-<h3 class="subtitle"><code>ooacquire</code> 0.3.0.9000</h3>
+<h3 class="subtitle"><code>ooacquire</code> 0.3.0.9001</h3>
 <h4 class="author">Pedro J. Aphalo</h4>
-<h4 class="date">2023-04-09</h4>
+<h4 class="date">2023-04-10</h4>
 
 
 <div id="TOC">
@@ -792,10 +792,11 @@ many light spectra for each “dark” reference measurement. Interface mode
 <code>&quot;series&quot;</code> introduced in version 0.3.0 of ‘ooacquire’ and
 enhanced in version 0.3.1 targets this type of measurements.</p>
 <p>For measuring a time series, we pass
-<code>interface.mode = &quot;series&quot;</code>. We can set the default
-parameters for the series through arguments. The following example sets
-the default for a series with measuring events triggered at the start of
-each minute, with 60 s time step between successive <code>&quot;light&quot;</code>
+<code>interface.mode = &quot;series&quot;</code> in the call to
+<code>acq_irrad_interactive()</code>. We can set the default parameters
+for the series through arguments. The following example sets the default
+for a series with measuring events triggered at the start of each
+minute, with 60 s time step between successive <code>&quot;light&quot;</code>
 spectra and 60 spectra, for a total time expanse of 1 h. We also set the
 initial delay to zero, so that once we start the light measurement event
 by pressing enter, the acquisition of the time series starts at the
@@ -881,7 +882,10 @@ but when dealing with fast time series this can be inadequate. If
 <code>step.delay = 0</code> is used, the time for the first spectrum is
 set when the retrieval into the memory buffer is started, but the times
 for the later spectra are set based on time differences computed from
-time stamps retrieved from OmniDriver.</p>
+time stamps retrieved from OmniDriver. The theoretical time resolution
+is better than a microsecond for objects of R’s class
+<code>POSIXct</code> is better than 1 microsecond, and this class is
+used in package ‘photobiology’ to record acquisition times.</p>
 <hr />
 <p><strong>Measurement of series of spectra with single dark and filter
 measurements makes it imperative that the functioning of the

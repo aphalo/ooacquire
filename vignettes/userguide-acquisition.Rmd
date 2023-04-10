@@ -463,13 +463,14 @@ reference measurement. Interface mode `"series"` introduced in version
 0.3.0 of 'ooacquire' and enhanced in version 0.3.1 targets this type of
 measurements.
 
-For measuring a time series, we pass `interface.mode = "series"`. We can
-set the default parameters for the series through arguments. The following
-example sets the default for a series with measuring events triggered at the
-start of each minute, with 60 s time step between successive `"light"` spectra
-and 60 spectra, for a total time expanse of 1 h. We also set the initial delay
-to zero, so that once we start the light measurement event by pressing enter, the
-acquisition of the time series starts at the beginning of the next minute.
+For measuring a time series, we pass `interface.mode = "series"` in the call to
+`acq_irrad_interactive()`. We can set the default parameters for the series
+through arguments. The following example sets the default for a series with
+measuring events triggered at the start of each minute, with 60 s time step
+between successive `"light"` spectra and 60 spectra, for a total time expanse of
+1 h. We also set the initial delay to zero, so that once we start the light
+measurement event by pressing enter, the acquisition of the time series starts
+at the beginning of the next minute.
 
 ```{r, eval=sr.online}
 acq_irrad_interactive(interface.mode = "series",
@@ -554,7 +555,10 @@ individual measurements and series with time steps of several seconds, but when
 dealing with fast time series this can be inadequate. If `step.delay = 0` is used,
 the time for the first spectrum is set when the retrieval into the memory
 buffer is started, but the times for the later spectra are set based on time
-differences computed from time stamps retrieved from OmniDriver.
+differences computed from time stamps retrieved from OmniDriver. The theoretical
+time resolution is better than a microsecond for objects of R's class `POSIXct`
+is better than 1 microsecond, and this class is used in package 'photobiology'
+to record acquisition times.
 
 ***
 
