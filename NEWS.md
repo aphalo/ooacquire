@@ -15,14 +15,17 @@ editor_options:
 -   Consider replacing OmniDriver by SeaBreeze open source driver or a 
     derivative.
     
-# ooacquire 0.3.1 (2023-04-05)
+# ooacquire 0.3.1 (2023-04-11)
 
 -   Implement high speed acquisition of time series using special API functions
     through new wrappers in 'rOmniDriver' (>= 0.1.18).
 -   Add new calibrations for MAYP11278 with cosine and hemispherical diffusers.
+-   Add new calibration for MAYP112785 with cosine diffuser.
+-   Calibration data missing in 'ooacquire' for NIR region even when available, 
+    fixed. For a couple of calibrations the UV end was slightly truncated.
 -   Add support for multiple descriptors per instrument and optionally include
     a description of the entrance optics in the instrument descriptor.
--   Add a slot to to calibration field in the descriptor to store the _name_
+-   Add a slot to the calibration field in the descriptor to store the _source_
     or identifier of the calibration to allow traceability.
 -   Add "how.measured" attribute to acquired spectra.
 -   Update code used for plot title, subtitle and caption. Date times were
@@ -36,12 +39,15 @@ editor_options:
     uses the correct labeling in plots and quantities and makes it possible to
     choose between PAR and PhR, with PhR as default, so that the numbers
     returned remain the same, but are correctly labeled.
+-   Tested working with OmniDriver 2.71, 2.56 and 2.46, under current R 4.2.3 
+    and coming R 4.3.0.
 
 # ooacquire 0.3.0 (2023-04-01)
     
 -   Tested working with OmniDriver 2.71 and 2.56, under current R 4.2.3 and 
     coming R 4.3.0. (Maya and Flame recognized by 2.71 and 2.56. USB2000
-    supported in 2.56 but not in 2.70 or 2.71.)
+    supported in 2.56 but not in 2.71. USB2000 requires update to firmware 2.41
+    for recent MS-Windows to recognize it.)
 -   Tolerate missing values returned by functions removed from recent
     versions of OmniDriver. (API changes in OmniDriver 2.71 and 2.70!)
 -   Automatic acquisition of time series of spectra: implementation functional.

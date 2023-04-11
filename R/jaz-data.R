@@ -1,8 +1,8 @@
 
-#' Dates for which the different descriptors contain valid calibrations.
+#' Dates for which specific calibrations are valid.
 #'
-#' This is a data frame with data needed to process raw data acquired on different
-#' dates.
+#' Data frame with data used to match raw spectral data to different
+#' calibrations based on the date data was acquired.
 #'
 #' @docType data
 #' @keywords datasets
@@ -159,4 +159,3 @@
 #' @family objects containg instrument-specific data
 #'
 "JAZA3098_ch2_none.mthd"
-

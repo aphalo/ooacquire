@@ -77,7 +77,8 @@ files <- list.files("data-raw/calibrations-MAYP112785",
                     full.names = TRUE)
 
 MAYP112785_calib_dates.df <-
-  read_csv("data-raw/calibrations-MAYP112785/calibration-dates.csv", col_types = "ccDDDc", skip = 1)
+  read_csv("data-raw/calibrations-MAYP112785/calibration-dates.csv",
+           col_types = "cccTTTcc", skip = 1)
 
 # create a new descriptor for each calibration file
 descriptors <- list()
@@ -92,15 +93,23 @@ for (f in files) {
   descriptor.tmp <-
     set_descriptor_wl(descriptor = descriptor.tmp,
                       wl = tmp[["w.length"]])
+  cal.wl.range <-  tmp[["w.length"]][range(which(tmp[["irrad.mult"]] != 0L))]
+  cal.wl.range <-  c(ceiling(cal.wl.range[1]), floor(cal.wl.range[2]))
+  cal.wl.range[1] <- max(cal.wl.range[1], 250)
   descriptor.tmp <-
     set_descriptor_irrad_mult(descriptor = descriptor.tmp,
                               irrad.mult = tmp[["irrad.mult"]] * 1e4,
-                              wl.range = c(251, 899),
+                              wl.range = cal.wl.range,
                               start.date = MAYP112785_calib_dates.df[["start.date"]][date.row],
                               end.date = MAYP112785_calib_dates.df[["end.date"]][date.row],
-                              cal.source = MAYP11278_calib_dates.df[["name"]][date.row])
+                              cal.source = MAYP112785_calib_dates.df[["name"]][date.row])
 
-    descriptors[[name.f]] <- descriptor.tmp
+  diffuser.filename <- paste("data-raw/calibrations-MAYP11278/",
+                             MAYP112785_calib_dates.df[["diffuser.file"]][date.row],
+                             sep = "")
+  descriptor.tmp$entrance.optics <- readRDS(diffuser.filename)
+
+  descriptors[[name.f]] <- descriptor.tmp
 }
 
 print(names(descriptors))

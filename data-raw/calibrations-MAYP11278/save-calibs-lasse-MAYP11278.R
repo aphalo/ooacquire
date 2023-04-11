@@ -94,10 +94,13 @@ for (f in files) {
   descriptor.tmp <-
     set_descriptor_wl(descriptor = descriptor.tmp,
                       wl = tmp[["w.length"]])
+  cal.wl.range <-  tmp[["w.length"]][range(which(tmp[["irrad.mult"]] != 0L))]
+  cal.wl.range <-  c(ceiling(cal.wl.range[1]), floor(cal.wl.range[2]))
+  cal.wl.range[1] <- max(cal.wl.range[1], 250)
   descriptor.tmp <-
     set_descriptor_irrad_mult(descriptor = descriptor.tmp,
                               irrad.mult = tmp[["irrad.mult"]] * 1e4,
-                              wl.range = c(251, 899),
+                              wl.range = cal.wl.range,
                               start.date = MAYP11278_calib_dates.df[["start.date"]][date.row],
                               end.date = MAYP11278_calib_dates.df[["end.date"]][date.row],
                               cal.source = MAYP11278_calib_dates.df[["name"]][date.row])
@@ -107,7 +110,7 @@ for (f in files) {
                              sep = "")
   descriptor.tmp$entrance.optics <- readRDS(diffuser.filename)
 
-  descriptor.tmp <- descriptors[[name.f]] <- descriptor.tmp
+  descriptors[[name.f]] <- descriptor.tmp
 }
 
 print(names(descriptors))

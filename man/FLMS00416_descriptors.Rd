@@ -12,7 +12,7 @@ FLMS00416_descriptors
 }
 \description{
 This a list of instrument descriptors, each one containing the calibration
-data needed to read raw data acquired on different dates.
+data needed to convert raw data acquired on different dates.
 }
 \seealso{
 Other objects containg instrument-specific data: 
@@ -51,24 +51,7 @@ Other objects containg instrument-specific data:
 \code{\link{JAZA3098_ch2_none.mthd}},
 \code{\link{JAZA3098_ch2_simple.mthd}},
 \code{\link{JAZA3098_ch2_sun.mthd}},
-\code{\link{JAZA3098_ch2_ylianttila.mthd}},
-\code{\link{MAYP112785_calib_dates.df}},
-\code{\link{MAYP112785_descriptors}},
-\code{\link{MAYP112785_simple.mthd}},
-\code{\link{MAYP112785_sun.mthd}},
-\code{\link{MAYP112785_ylianttila.mthd}},
-\code{\link{MAYP11278_calib_dates.df}},
-\code{\link{MAYP11278_descriptors}},
-\code{\link{MAYP11278_simple.mthd}},
-\code{\link{MAYP11278_sun.mthd}},
-\code{\link{MAYP11278_ylianttila.mthd}},
-\code{\link{MAYP114590_cal.spct}},
-\code{\link{MAYP114590_calib_dates.df}},
-\code{\link{MAYP114590_descriptors}},
-\code{\link{MAYP114590_none.mthd}},
-\code{\link{MAYP114590_simple.mthd}},
-\code{\link{MAYP114590_sun.mthd}},
-\code{\link{MAYP114590_ylianttila.mthd}}
+\code{\link{JAZA3098_ch2_ylianttila.mthd}}
 }
 \concept{objects containg instrument-specific data}
 \keyword{datasets}

@@ -72,10 +72,13 @@ for (f in files) {
   descriptor.tmp <-
     set_descriptor_wl(descriptor = descriptor.tmp,
                       wl = tmp[["w.length"]])
+  cal.wl.range <-  tmp[["w.length"]][range(which(tmp[["irrad.mult"]] != 0L))]
+  cal.wl.range <-  c(ceiling(cal.wl.range[1]), floor(cal.wl.range[2]))
+  cal.wl.range[1] <- max(cal.wl.range[1], 240)
   descriptor.tmp <-
     set_descriptor_irrad_mult(descriptor = descriptor.tmp,
                               irrad.mult = tmp[["irrad.mult"]],
-                              wl.range = c(230, 850),
+                              wl.range = cal.wl.range,
                               start.date = MAYP114590_calib_dates.df[["start.date"]][date.row],
                               end.date = MAYP114590_calib_dates.df[["end.date"]][date.row],
                               cal.source = MAYP11278_calib_dates.df[["name"]][date.row])

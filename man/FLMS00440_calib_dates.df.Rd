@@ -3,7 +3,7 @@
 \docType{data}
 \name{FLMS00440_calib_dates.df}
 \alias{FLMS00440_calib_dates.df}
-\title{Dates for which the different descriptors conatin valid calibrations.}
+\title{Dates for which specific calibrations are valid.}
 \format{
 A list.
 }
@@ -11,7 +11,7 @@ A list.
 FLMS00440_calib_dates.df
 }
 \description{
-This a data frame with data needed to process raw data acquired on different
-dates.
+Data frame with data used to match raw spectral data to different
+calibrations based on the date data was acquired.
 }
 \keyword{datasets}

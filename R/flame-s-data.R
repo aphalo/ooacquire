@@ -3,7 +3,7 @@
 #' Instrument descriptors for a Flame S spectrometer
 #'
 #' This a list of instrument descriptors, each one containing the calibration
-#' data needed to read raw data acquired on different dates.
+#' data needed to convert raw data acquired on different dates.
 #'
 #' @docType data
 #' @keywords datasets
@@ -26,10 +26,10 @@
 #'
 "FLMS00416_cal.spct"
 
-#' Dates for which the different descriptors conatin valid calibrations.
+#' Dates for which specific calibrations are valid.
 #'
-#' This a data frame with data needed to process raw data acquired on different
-#' dates.
+#' Data frame with data used to match raw spectral data to different
+#' calibrations based on the date data was acquired.
 #'
 #' @docType data
 #' @keywords datasets
@@ -130,10 +130,10 @@
 #'
 "FLMS00440_cal.spct"
 
-#' Dates for which the different descriptors conatin valid calibrations.
+#' Dates for which specific calibrations are valid.
 #'
-#' This a data frame with data needed to process raw data acquired on different
-#' dates.
+#' Data frame with data used to match raw spectral data to different
+#' calibrations based on the date data was acquired.
 #'
 #' @docType data
 #' @keywords datasets
@@ -231,10 +231,10 @@
 #'
 "FLMS00673_cal.spct"
 
-#' Dates for which the different descriptors conatin valid calibrations.
+#' Dates for which specific calibrations are valid.
 #'
-#' This a data frame with data needed to process raw data acquired on different
-#' dates.
+#' Data frame with data used to match raw spectral data to different
+#' calibrations based on the date data was acquired.
 #'
 #' @docType data
 #' @keywords datasets
@@ -334,10 +334,10 @@
 #'
 "FLMS04133_cal.spct"
 
-#' Dates for which the different descriptors conatin valid calibrations.
+#' Dates for which specific calibrations are valid.
 #'
-#' This a data frame with data needed to process raw data acquired on different
-#' dates.
+#' Data frame with data used to match raw spectral data to different
+#' calibrations based on the date data was acquired.
 #'
 #' @docType data
 #' @keywords datasets

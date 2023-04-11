@@ -11,49 +11,12 @@ A list.
 MAYP114590_none.mthd
 }
 \description{
-This a list with data needed to process raw data in the example files. It
-contains constants and functions defining the method developed by Lasse
-Ylianttila.
+List with data needed to process raw data in the example files. It
+contains constants and functions defining a method implementing only
+minimal corrections for stray light and no correction for the slit function.
 }
 \seealso{
-Other objects containg instrument-specific data: 
-\code{\link{FLMS00416_cal.spct}},
-\code{\link{FLMS00416_calib_dates.df}},
-\code{\link{FLMS00416_descriptors}},
-\code{\link{FLMS00416_none.mthd}},
-\code{\link{FLMS00416_simple.mthd}},
-\code{\link{FLMS00416_sun.mthd}},
-\code{\link{FLMS00416_ylianttila.mthd}},
-\code{\link{FLMS00440_cal.spct}},
-\code{\link{FLMS00440_descriptors}},
-\code{\link{FLMS00440_none.mthd}},
-\code{\link{FLMS00440_simple.mthd}},
-\code{\link{FLMS00440_sun.mthd}},
-\code{\link{FLMS00440_ylianttila.mthd}},
-\code{\link{FLMS00673_cal.spct}},
-\code{\link{FLMS00673_calib_dates.df}},
-\code{\link{FLMS00673_descriptors}},
-\code{\link{FLMS00673_none.mthd}},
-\code{\link{FLMS00673_simple.mthd}},
-\code{\link{FLMS00673_sun.mthd}},
-\code{\link{FLMS00673_ylianttila.mthd}},
-\code{\link{FLMS04133_cal.spct}},
-\code{\link{FLMS04133_calib_dates.df}},
-\code{\link{FLMS04133_descriptors}},
-\code{\link{FLMS04133_none.mthd}},
-\code{\link{FLMS04133_simple.mthd}},
-\code{\link{FLMS04133_sun.mthd}},
-\code{\link{FLMS04133_ylianttila.mthd}},
-\code{\link{JAZA3098_calib_dates.df}},
-\code{\link{JAZA3098_ch1_descriptors}},
-\code{\link{JAZA3098_ch1_simple.mthd}},
-\code{\link{JAZA3098_ch1_sun.mthd}},
-\code{\link{JAZA3098_ch1_ylianttila.mthd}},
-\code{\link{JAZA3098_ch2_descriptors}},
-\code{\link{JAZA3098_ch2_none.mthd}},
-\code{\link{JAZA3098_ch2_simple.mthd}},
-\code{\link{JAZA3098_ch2_sun.mthd}},
-\code{\link{JAZA3098_ch2_ylianttila.mthd}},
+Other objects containing instrument-specific data: 
 \code{\link{MAYP112785_calib_dates.df}},
 \code{\link{MAYP112785_descriptors}},
 \code{\link{MAYP112785_simple.mthd}},
@@ -71,5 +34,5 @@ Other objects containg instrument-specific data:
 \code{\link{MAYP114590_sun.mthd}},
 \code{\link{MAYP114590_ylianttila.mthd}}
 }
-\concept{objects containg instrument-specific data}
+\concept{objects containing instrument-specific data}
 \keyword{datasets}
