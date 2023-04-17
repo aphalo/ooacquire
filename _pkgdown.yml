@@ -50,10 +50,6 @@ reference:
     - hs_acq_raw_mspct
     - check_sn_match
 
-  - subtitle: Utility functions
-    contents:
-    - format_idx
-
   - title: Data import from text files
   - subtitle: Read data
     desc: Functions for reading raw-counts and metadata from output files from **OceanView**, **SpectraSuite**, Raspberry Pi software and the inbuilt-firmware of the Jaz modular spectrometer.
@@ -68,10 +64,12 @@ reference:
   - subtitle: Utility functions
     desc: Utility functions for reading raw-counts and metadata from output files from **OceanView**, **SpectraSuite**, Raspberry Pi software and the inbuilt-firmware of the Jaz modular spectrometer.
     contents:
+    - irrad_summary_table
     - map_oofile_header_rows
     - oofile_data_rows
     - set_oo_ssdata_settings
     - set_oo_ssdata_descriptor
+    - format_idx
 
   - title: Conversion of raw-counts into physical quantities
   - subtitle: High level functions and methods.

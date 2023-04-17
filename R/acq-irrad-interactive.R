@@ -630,7 +630,8 @@ acq_irrad_interactive <-
               assign(contents.collection.name, summary(collection.mspct))
               collection.objects <- c(collection.objects, contents.collection.name)
               if (qty.out == "irrad") {
-                summary.tb <- mspct_summary(mspct = collection.mspct)
+                summary.tb <-
+                  irrad_summary_table(mspct = collection.mspct)
                 if (!is.null(summary.tb) && is.data.frame(summary.tb)) {
                   readr::write_delim(summary.tb,
                                      file =  paste(collection.name, "csv", sep = "."),
@@ -721,25 +722,37 @@ acq_irrad_interactive <-
 #'    irradiance for one or more sources.
 #' @param unit.out character One of "photon" or "energy".
 #' @param scale.factor numeric A multiplicative factor used to rescale data.
+#' @param attr2tb character Vector with one or more of "when.measured",
+#'    "what.measured", "where.measured", "how.measured" and "comment".
 #' @param summary.type character One of "plant", "PAR" or "VIS".
 #' @param digits integer The number of significant digits in the output.
 #'
 #' @details This function packages different functions from pacakge 'photobiology'
 #'    and returns a typical set of summaries for different purposes.
 #'
-#' @return A dataframe or tibble with one row per spectrum and one column per
+#' @return A tibble with one row per spectrum and one column per
 #'    summary quantity and attribute and a column with the names of the spectra.
 #'
 #' @export
 #'
+#' @seealso See the documentation for functions
+#'   \code{\link[photobiology]{irrad}},
+#'   \code{\link[photobiology]{q_ratio}}, \code{\link[photobiology]{e_ratio}},
+#'   \code{\link[photobiology]{add_attr2tb}},
+#'   \code{\link[photobiologyInOut]{spct_CRI}},
+#'   \code{\link[photobiologyInOut]{spct_CCT}}
+#'   and \code{\link[base]{signif}} which are called to build
+#'   the summary table.
 #'
-mspct_summary <- function(mspct,
-                          unit.out = getOption("photobiology.radiation.unit",
-                                               default = "energy"),
-                          scale.factor = ifelse(unit.out == "photon",
-                                                1e6, 1),
-                          type = "plant",
-                          digits = 3L) {
+irrad_summary_table <-
+  function(mspct,
+           unit.out = getOption("photobiology.radiation.unit",
+                                default = "energy"),
+           scale.factor = ifelse(unit.out == "photon",
+                                 1e6, 1),
+           attr2tb = "when.measured",
+           type = "plant",
+           digits = 3L) {
 
   # handle also single spectra
   if (is.generic_spct(mspct)) {
@@ -772,29 +785,35 @@ mspct_summary <- function(mspct,
     vis_ratios.tb <-
       ratio(mspct,
             w.band.num = list(blue = photobiologyWavebands::Blue("Sellaro"),
-                              red = photobiologyWavebands::Red("Smith10")),
+                              red = photobiologyWavebands::Red("Smith20")),
             w.band.denom = list(green = photobiologyWavebands::Green("Sellaro"),
-                                "far-red" = photobiologyWavebands::Far_red("Smith10")),
-            attr2tb = c("when.measured"))
+                                "far-red" = photobiologyWavebands::Far_red("Smith20")),
+            attr2tb = attr2tb)
     summary.tb <- dplyr::full_join(irrad.tb, uv_ratios.tb)
     summary.tb <- dplyr::full_join(summary.tb, vis_ratios.tb)
   } else if (type == "VIS") {
     summary.tb <-
       photobiology::irrad(mspct,
                           unit.out = unit.out,
+                          scale.factor = scale.factor,
                           w.band = photobiologyWavebands::VIS_bands(),
-                          attr2tb = c("when.measured"))
-    summary.tb[["CRI"]]
+                          attr2tb = attr2tb)
+    summary.tb[["CRI"]] <- sapply(mspct,
+                                  photobiologyInOut::spct_CRI,
+                                  tol = 0.0054,
+                                  named = FALSE)
+    summary.tb[["CCT"]] <- sapply(mspct,
+                                  photobiologyInOut::spct_CCT,
+                                  strict = TRUE,
+                                  named = FALSE)
   } else { # total
     summary.tb <-
       photobiology::irrad(mspct,
                           unit.out = unit.out,
+                          scale.factor = scale.factor,
                           w.band = NULL,
-                          attr2tb = c("when.measured"))
+                          attr2tb = attr2tb)
   }
-
-  # summary.tb <- photobiology::add_attr2tb(tb = summary.tb,
-  #                                         mspct = mspct)
 
   selector <- unname(sapply(summary.tb, is.numeric))
   summary.tb[ , selector] <- signif(summary.tb[ , selector], digits = digits)
