@@ -15,6 +15,10 @@ editor_options:
 -   Consider replacing OmniDriver by SeaBreeze open source driver or a 
     derivative.
     
+# ooacquire 0.3.2 (2023-04-xx)
+
+-   Export `mspct_summary()`, previously, an internal function.
+
 # ooacquire 0.3.1 (2023-04-11)
 
 -   Implement high speed acquisition of time series using special API functions

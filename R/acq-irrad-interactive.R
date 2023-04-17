@@ -630,7 +630,7 @@ acq_irrad_interactive <-
               assign(contents.collection.name, summary(collection.mspct))
               collection.objects <- c(collection.objects, contents.collection.name)
               if (qty.out == "irrad") {
-                summary.tb <- spct_summary(mspct = collection.mspct)
+                summary.tb <- mspct_summary(mspct = collection.mspct)
                 if (!is.null(summary.tb) && is.data.frame(summary.tb)) {
                   readr::write_delim(summary.tb,
                                      file =  paste(collection.name, "csv", sep = "."),
@@ -711,13 +711,35 @@ acq_irrad_interactive <-
 
   }
 
-spct_summary <- function(mspct,
-                         unit.out = getOption("photobiology.radiation.unit",
-                                              default = "energy"),
-                         scale.factor = ifelse(unit.out == "photon",
-                                               1e6, 1),
-                         type = "plant",
-                         digits = 3L) {
+
+#' Summarize spectral irradiance
+#'
+#' Compute waveband irradiances and rattios between waveband irradiances of
+#' interest to plants' and visual responses to light.
+#'
+#' @param mscpt A source_mspct, or a source_spct object containing spectral
+#'    irradiance for one or more sources.
+#' @param unit.out character One of "photon" or "energy".
+#' @param scale.factor numeric A multiplicative factor used to rescale data.
+#' @param summary.type character One of "plant", "PAR" or "VIS".
+#' @param digits integer The number of significant digits in the output.
+#'
+#' @details This function packages different functions from pacakge 'photobiology'
+#'    and returns a typical set of summaries for different purposes.
+#'
+#' @return A dataframe or tibble with one row per spectrum and one column per
+#'    summary quantity and attribute and a column with the names of the spectra.
+#'
+#' @export
+#'
+#'
+mspct_summary <- function(mspct,
+                          unit.out = getOption("photobiology.radiation.unit",
+                                               default = "energy"),
+                          scale.factor = ifelse(unit.out == "photon",
+                                                1e6, 1),
+                          type = "plant",
+                          digits = 3L) {
 
   # handle also single spectra
   if (is.generic_spct(mspct)) {
@@ -736,7 +758,8 @@ spct_summary <- function(mspct,
     plant.wb <- switch(type,
                        PAR = c(photobiologyWavebands::UV_bands("CIE"),
                                list(photobiologyWavebands::PAR())),
-                       plant = c(photobiologyWavebands::Plant_bands()))
+                       plant = c(photobiologyWavebands::Plant_bands(),
+                                 list(photobiologyWavebands::PAR())))
     irrad.tb <-
       photobiology::irrad(mspct,
                           unit.out = unit.out,
@@ -761,6 +784,7 @@ spct_summary <- function(mspct,
                           unit.out = unit.out,
                           w.band = photobiologyWavebands::VIS_bands(),
                           attr2tb = c("when.measured"))
+    summary.tb[["CRI"]]
   } else { # total
     summary.tb <-
       photobiology::irrad(mspct,
