@@ -124,6 +124,11 @@ an old version of *OmniDriver* instead of the current one._
 
 ## Installation of the released version
 
+_The 'ooacquire' package should be installed only after the system requirements
+are met by installing drivers and software required at the operating system
+level. Please, read carefully the whole installation instructions before
+attempting to install this package._
+
 The package is not hosted in CRAN, but instead at a private "CRAN-like" 
 repository. In recent versions of R an option can be set to make this 
 repository visible to R, before installing this package and 'rOmniDriver'
@@ -134,10 +139,12 @@ repos <- getOption("repos", default = list())
 repos[["r4photobiology"]] <- "https://r.r4photobiology.info"
 options(repos = repos)
 ```
-Installation of Java and OmniDriver should be done first.
 
-1.  **Java JDK** (Java development kit). _The Java run-time is not
-    enough!_
+Installation of Java/Temurin and OmniDriver should be done first.
+
+1.  **Temurin 8 OpenJDK** or **Java 8 JDK** (Java Open development kit). 
+    _The Java run-time is not enough!_ Temurin OpenJDK is free in contrast 
+    to Oracle's Java 8 JDK.
 2.  **rOmniDriver run-time** from Ocean Optics which is a free download.
     It is the same installer as for the non-free SDP, but if run-time is
     selected during installation no key/password are asked for.
@@ -157,6 +164,7 @@ below.
 ```{r, eval=FALSE}
 update.packages()
 ```
+
 **Steps 1 and 2 are described in the README file of 'rOmniDriver',
 which can be found in its [on-line
 documentation](https://docs.r4photobiology.info/rOmniDriver/)
@@ -175,8 +183,8 @@ Rtools.
 Assuming that R and the build tools are installed the following steps
 should be done in sequence:
 
-1.  Install the **Java JDK** (Java development kit). _The Java run-time is not
-    enough!_
+1.  Install the **Java 8 OpenJDK** (Java Open development kit). _The Java run-time is not
+    enough!_ Temurin's OpenJDK is free in contrast to Oracle's Java 8 JDK.
 2.  Install the **rOmniDriver run-time** from Ocean Optics which is a free 
     download. It is the same installer as for the non-free SDP, but if run-time 
     is selected during installation no key/password are asked for.
