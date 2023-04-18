@@ -6,11 +6,24 @@
 ## Purpose
 
 Package **‘ooacquire’** makes it possible to control, modify settings
-and acquire spectral data directly from within R. It also supports the
-conversion of raw-counts data into physical quantities. It supports most
-types of spectrometers available from former *Ocean Optics*, now *Ocean
-Insight* (<https://www.oceaninsight.com/>). The free runtime of the
-[*OmniDriver
+and acquire spectral data directly from within R. It can be also used
+off-line to read raw-counts data from files saved by Ocean Insight’s
+software and hardware. In both cases it implements the conversion of
+raw-counts data into physical quantities, with different protocols to
+improve the dynamic range and corrections to reduce stray-light and
+other sources of noise.
+
+In sunlight, array spectrometers due to their single monochromator have
+a noise floor of three orders of magnitude, which makes it impossible to
+measure the UV-B band. With special characterization of the
+spectrometer, one of the procedures implemented improve the noise floor
+by at least one order of magnitude. With care, this allows reliable
+measurement of the spectral irradiance of sunlight at ground level
+including UV, VIS and NIR regions.
+
+Package **‘ooacquire’** supports most types of *Ocean Optics*
+spectrometers from former *Ocean Optics*, now *Ocean Insight*
+(<https://www.oceaninsight.com/>). The free runtime of the [*OmniDriver
 SDP*](https://www.oceaninsight.com/products/software/drivers/omnidriver-and-spam/)
 and *Java* need both to be installed before data acquisition is
 possible. The runtime itself and its documentation can be downloaded at
@@ -31,11 +44,13 @@ acquisition built using lower level functions from package
 quantities from detector counts. If package **‘rOmniDriver’** is not
 available, **‘ooacquire’** will enter its **off-line** mode in which all
 functions that communicate with the spectrometer are disabled or trigger
-an error, while other functions will be usable in their usual way.
-Thanks to the **off-line** mode, raw data previously acquired with this
-package or with software from Ocean Insight can be processed without the
-need to install packages **‘rOmniDriver’** and **‘rJava’** or the
-**OmniDriver** drivers from Ocean Insight.
+an error, while other functions will be usable. Thanks to the
+**off-line** mode, raw data previously acquired with this package or
+with software from Ocean Insight can be processed without the need to
+install packages **‘rOmniDriver’** and **‘rJava’** or the **OmniDriver**
+drivers from Ocean Insight. Ocean Insight’s **SPAM** library is not used
+as all computations are done in function defined in this package using
+**R** and **C++**.
 
 Acquisition is very flexible with respect to measuring protocols. It
 caters for all steps involved in the acquisition of spectral data from
@@ -65,58 +80,112 @@ quantities of interest such as spectral irradiance, spectral
 transmittance, spectral reflectance, spectral absorptance and spectral
 absorbance.
 
-Our package’s functions related to direct data acquisition use the free
-*OmniDriver* run-time which in turn requires *Java*. There is no other
-set up needed, just plug your spectrometer to an USB port. The first
-time you connect an instrument the operating system will install the
-drivers as they are made available by the *OmniDriver* installation.
+Functions in **‘ooacquire’** related to data acquisition use the free
+*OmniDriver* run-time which in turn requires *Java*. Once these are
+installed, there is no other set up needed, just plug a spectrometer to
+an USB port. The first time you connect an instrument the operating
+system will install the drivers as they are made available by the
+*OmniDriver* installation.
 
 Direct acquisition has been tested with our *Maya2000Pro*, *Flame* and
 *Jaz* instruments under MS-windows 7 and MS-Windows 10, but can be
 expected also to work with any other modern spectrometer from Ocean
-Optics, and under OS X, and Linux. Package **‘ooacquire’** manages
-acquisition settings semi-automatically storing all the settings needed
-for acquisition into a single data object. Functions for automatic
-tuning of integration time are also provided. Settings used for
-acquisition of spectra and a descriptor of the instrument are stored at
-the time of acquisition as attributes of the object where the raw counts
-are stored. These metadata are preserved through all processing steps.
+Optics, and under OS X, and Linux in addition to MS-Windows. Package
+**‘ooacquire’** manages acquisition settings semi-automatically storing
+all the settings needed for acquisition into a single data object.
+Functions for automatic tuning of integration time are also provided.
+Settings used for acquisition of spectra and a descriptor of the
+instrument are stored at the time of acquisition as attributes of the
+object where the raw counts are stored. These metadata are preserved
+through all processing steps. Most of these metadata are also available
+in the header of data files created with software from Ocean Insight.
+When raw-counts data are read from files, these metadata are read and
+saved to the objects together with the data. The aim is to make
+traceabilty of the origin of the data automatic.
 
 ## Technical aspects
 
 Package **‘rOmniDriver’** makes available in R the API functions from
 the *OmniDriver SDP* by wrapping the Java calls in R functions of the
 same name and doing argument type conversions when needed. *OmniDriver*
-allows to change settings and acquire spectra using any Ocean Optics
-USB-connected spectrometer.
+allows to change settings and acquire spectra using most Ocean Optics
+USB-connected spectrometer. *As support from some older devices has been
+discontinued in recent versions of *OmniDriver*, to use, for example,
+the formerly very popular USB2000 spectrometer, it is necessary to
+install an old version of *OmniDriver* instead of the current one.*
 
-## Installation
+## Installation of the released version
 
-At the moment installation needs to be done from the Git repository at
-GitHub. For this we can use ‘remotes’ and as the package’s is coded
-mainly in R but with one function in C++ the build chain for R packages
-needs to be installed. In MS-Windows this is achieved by installing
-Rtools.
+The package is not hosted in CRAN, but instead at a private “CRAN-like”
+repository. In recent versions of R an option can be set to make this
+repository visible to R, before installing this package and
+‘rOmniDriver’ as usual.
 
-Assuming that R and the build tools are installed the following software
-should be installed in sequence:
+``` r
+repos <- getOption("repos", default = list())
+repos[["r4photobiology"]] <- "https://r.r4photobiology.info"
+options(repos = repos)
+```
 
-1.  **Java JDK** (Java development kit). The Java run-time is not
-    enough.
+Installation of Java and OmniDriver should be done first.
+
+1.  **Java JDK** (Java development kit). *The Java run-time is not
+    enough!*
 2.  **rOmniDriver run-time** from Ocean Optics which is a free download.
     It is the same installer as for the non-free SDP, but if run-time is
     selected during installation no key/password are asked for.
-3.  Install the **R packages** ‘photobiology’ and ‘ggspectra’ plus the
-    ‘tidyverse’, all available from CRAN.
+3.  Install ‘ooacquire’ after setting the `repos` option, which ensures
+    dependencies will be installed automatically. Once the option is set
+    installation is as for packages hosted at CRAN. Using the menu entry
+    in RStudio or RGui or the code below.
+
+``` r
+install.packages("ooacquire")
+```
+
+As long as the `repos` option is set as described above, updates can be
+done as for packages hosted at CRAN. Using the menu entry in RStudio or
+RGui or the code below.
+
+``` r
+update.packages()
+```
+
+**Steps 1 and 2 are described in the README file of ‘rOmniDriver’, which
+can be found in its [on-line
+documentation](https://docs.r4photobiology.info/rOmniDriver/) site. Make
+sure to read it, follow step by step the installation, testing success
+after each step making sure all the required software is properly
+installed before attempting to install ‘ooacquire’.**
+
+## Installation of the under development version
+
+The latest, possibly buggy, development version can be installed from
+the Git repository at GitHub. For this we can use package ‘remotes’. As
+package’s ‘ooacquire’ although coded mainly in R but includes one
+function in C++, the build chain for R packages needs to be installed.
+In MS-Windows this is achieved by installing Rtools.
+
+Assuming that R and the build tools are installed the following steps
+should be done in sequence:
+
+1.  Install the **Java JDK** (Java development kit). *The Java run-time
+    is not enough!*
+2.  Install the **rOmniDriver run-time** from Ocean Optics which is a
+    free download. It is the same installer as for the non-free SDP, but
+    if run-time is selected during installation no key/password are
+    asked for.
+3.  Install the **R packages** ‘photobiology’, ‘photobiologyInOut’,
+    ‘ggspectra’ plus the ‘tidyverse’, all available from CRAN.
 4.  Install ‘rOmniDriver’ from GitHub.
 5.  Install ‘ooacquire’ from GitHub.
 
 **Steps 1, 2, 3 and 4 are described in the README file of ‘rOmniDriver’,
 which can be found in its [on-line
-documentation](https://docs.r4photobiology.info/rOmniDriver/ "README")
-site. Make sure to read it, follow step by step the installation,
-testing success after each step making sure all the required software is
-properly installed before attempting to install ‘ooacquire’.**
+documentation](https://docs.r4photobiology.info/rOmniDriver/) site. Make
+sure to read it, follow step by step the installation, testing success
+after each step making sure all the required software is properly
+installed before attempting to install ‘ooacquire’.**
 
 Installation of the current version from GitHub:
 

@@ -363,7 +363,9 @@ acq_irrad_interactive <-
     raw.names <- character()
     file.names <- character()
 
-    repeat { # with same settings
+    reuse.old.refs <- FALSE # none yet available
+
+    repeat { # main loop for UI
       repeat{
         utils::flush.console()
         user.obj.name <- readline("Give a name to the spectrum: ")
@@ -397,26 +399,53 @@ acq_irrad_interactive <-
         user.attrs <- set_attributes_interactive(user.attrs)
       }
 
-      settings <- tune_interactive(descriptor = descriptor,
-                                   acq.settings = settings,
-                                   start.int.time = start.int.time,
-                                   interface.mode = interface.mode)
+      if (!reuse.old.refs) {
+        # using previous dark and filter spectra is possible only with
+        # same settings
+        settings <- tune_interactive(descriptor = descriptor,
+                                     acq.settings = settings,
+                                     start.int.time = start.int.time,
+                                     interface.mode = interface.mode)
+      }
 
       if (grepl("series", interface.mode)) {
         seq.settings <-
           set_seq_interactive(seq.settings = seq.settings,
                               measurement.duration =
-                                max(settings$tot.time.range) * length(settings$HDR.mult) * 1e-6) # ms -> s
+                                max(settings$tot.time.range) *
+                                length(settings$HDR.mult) * 1e-6) # ms -> s
       }
 
-      raw.mspct <- acq_raw_mspct(descriptor = descriptor,
-                                 acq.settings = settings,
-                                 seq.settings = seq.settings,
-                                 protocol = protocol,
-                                 user.label = obj.name)
+      if (reuse.old.refs) {
+        raw.mspct <- acq_raw_mspct(descriptor = descriptor,
+                                   acq.settings = settings,
+                                   seq.settings = seq.settings,
+                                   protocol = "light",
+                                   user.label = obj.name)
+      } else {
+        raw.mspct <- acq_raw_mspct(descriptor = descriptor,
+                                   acq.settings = settings,
+                                   seq.settings = seq.settings,
+                                   protocol = protocol,
+                                   user.label = obj.name)
+      }
 
       if (length(raw.mspct) == 0) {
+        # failed data acquisition
         next()
+      }
+
+      if (reuse.old.refs) {
+        # we add old refs to new light data
+        raw.mspct <- c(old.refs.mpsct, raw.mspct)
+      } else {
+        # we save old references for possible reuse
+        refs.selector <- grep("dark|filter", protocol, value = TRUE)
+        if (length(refs.selector)) {
+          old.refs.mpsct <- raw.mspct[refs.selector]
+        } else {
+          old.refs.mpsct <- raw_mspct()
+        }
       }
 
       if (qty.out != "raw") {
@@ -425,6 +454,7 @@ acq_irrad_interactive <-
           list(light = grep("^light", names(raw.mspct), value = TRUE),
                filter = "filter",
                dark = "dark")
+
         irrad.spct <- s_irrad_corrected(x = raw.mspct,
                                         spct.names = spct.names,
                                         correction.method = correction.method,
@@ -544,181 +574,186 @@ acq_irrad_interactive <-
       repeat {
         utils::flush.console()
         if (save.collections) {
-          answer2 <- readline("change protocol/collect+continue/collect+quit/discard+quit/NEXT (p/c/q/z/n-): ")[1]
+          valid.answers <- c("c", "q", "z", "r", "n")
+          answer2 <-
+            readline("collect+continue/collect+quit/discard+quit/repeat/NEXT (c/q/z/r/n-): ")[1]
         } else {
-          answer2 <- readline("change protocol/continue/quit/NEXT (p/c/q/n-): ")[1]
+          valid.answers <- c("q", "r", "n")
+          answer2 <-
+            readline("quit/repeat/NEXT (q/r/n-): ")[1]
         }
         answer2 <- ifelse(answer2 == "", "n", answer2)
-        if (answer2 %in% c("n", "p", "c", "q", "z")) {
-          if (answer2 == "z") {
-            save.collections <- FALSE
-            answer2 <- "q"
-          }
+        if (answer2 %in% valid.answers) {
           break()
         } else {
           print("Answer not recognized. Please try again...")
         }
       }
-      if (answer2 == "") {
-        next()
-      } else if (answer2 == "p") {
-        protocol <- protocol_interactive(protocols)
-      } else if (answer2 %in% c("c", "q")) {
-        if (save.collections) {
-          message("Corrected ", qty.out, " spectra to collect: ",
-                  paste(irrad.names, collapse = ", "))
-          message("Raw objects to collect: ",
-                  paste(raw.names, collapse = ", "), sep = " ")
-          user.collection.name <- readline("Name of the collection?: ")
+
+      if (answer2 == "r") {
+        reuse.old.refs <- TRUE
+        answer2 <- "n"
+      } else {
+        reuse.old.refs <- FALSE
+      }
+
+      if (save.collections && answer2 %in% c("c", "q")) {
+        message("Corrected ", qty.out, " spectra to collect: ",
+                paste(irrad.names, collapse = ", "))
+        message("Raw objects to collect: ",
+                paste(raw.names, collapse = ", "), sep = " ")
+        user.collection.name <- readline("Name of the collection?: ")
+        collection.name <- make.names(paste("collection ",
+                                            user.collection.name, sep = ""))
+        if (user.collection.name == "") {
           collection.name <- make.names(paste("collection ",
-                                              user.collection.name, sep = ""))
-          if (user.collection.name == "") {
-            collection.name <- make.names(paste("collection ",
-                                                lubridate::now(tzone = "UTC"), sep = ""))
-          }
-          if (collection.name != user.collection.name) {
-            message("Using sanitised/generated name: '",
-                    collection.name, "'.", sep = "")
-          }
-          utils::flush.console()
-          collection.title <- readline("Title for plot?: ")
-          if (collection.title == "") {
-            collection.title <- collection.name
-          }
-          collection.file.name <- paste(collection.name, "Rda", sep = ".")
-          collection.objects <- character()
-
-          if (qty.out != "raw") {
-            collection.mspct <-
-              switch(qty.out,
-                     irrad = photobiology::source_mspct(mget(irrad.names)),
-                     cps =   photobiology::cps_mspct(mget(irrad.names)))
-
-            # plot collection and summaries
-            if (length(collection.mspct) > 200) {
-              plot.data = "median"
-            } else {
-              plot.data = "as.is"
-            }
-            collection.fig <-
-              ggplot2::autoplot(collection.mspct,
-                                annotations =
-                                  c("-", "peaks", "colour.guide", "summaries"),
-                                plot.data = plot.data) +
-              ggplot2::labs(title = paste(collection.title, " (n = ",
-                                          length(collection.mspct), ")",
-                                          sep = ""),
-                            subtitle = session.label,
-                            caption = how_measured(collection.mspct[[1L]])) +
-              ggplot2::theme(legend.position = "bottom")
-            print(collection.fig)
-            rm(collection.title)
-
-            if (save.pdfs) {
-              collection.pdf.name <- paste(collection.name, "pdf", sep = ".")
-              grDevices::pdf(file = collection.pdf.name, onefile = TRUE,
-                             width = 11, height = 7, paper = "a4r")
-              print(collection.fig)
-              grDevices::dev.off()
-              rm(collection.pdf.name)
-            }
-            rm(collection.fig)
-
-            if (save.summaries) {
-              contents.collection.name <-
-                paste(collection.name, "contents.tb", sep = ".")
-              assign(contents.collection.name, summary(collection.mspct))
-              collection.objects <- c(collection.objects, contents.collection.name)
-              if (qty.out == "irrad") {
-                summary.tb <-
-                  irrad_summary_table(mspct = collection.mspct)
-                if (!is.null(summary.tb) && is.data.frame(summary.tb)) {
-                  readr::write_delim(summary.tb,
-                                     file =  paste(collection.name, "csv", sep = "."),
-                                     delim = readr::locale()$grouping_mark)
-                  summary.collection.name <- paste(collection.name, "summary.tb", sep = ".")
-                  assign(summary.collection.name, summary.tb)
-                  collection.objects <- c(collection.objects, summary.collection.name)
-                } else {
-                  message("Computation of summaries failed!")
-                }
-              }
-              irrad.collection.name <- paste(collection.name, qty.out, "mspct", sep = ".")
-              assign(irrad.collection.name, collection.mspct)
-              collection.objects <- c(collection.objects, irrad.collection.name)
-            }
-            raw.collection.name <- paste(collection.name, "raw", "lst", sep = ".")
-            assign(raw.collection.name, mget(raw.names))
-            collection.objects <- c(collection.objects, raw.collection.name)
-            repeat {
-              save(list = collection.objects, file = collection.file.name, precheck = TRUE)
-              if (file.exists(collection.file.name)) {
-                message("Collection objects saved to file '",
-                        collection.file.name, "'.", sep = "")
-                # save file name to report at end of sessions
-                file.names <- c(file.names, collection.file.name)
-                # remove saved objects and the list with their names
-                rm(list = collection.objects)
-                rm(collection.objects)
-                # clean up by removing the spectra that have been added to the
-                # saved collection and reset the list of names for next collection
-                rm(list = c(irrad.names))
-                rm(list = c(raw.names))
-                irrad.names <- character()
-                raw.names <- character()
-                break()
-              } else {
-                message("Saving of the collection to file failed!")
-                if (answer2 == "q") {
-                  repeat {
-                    answer2 <- readline("quit anyway/continue (q/c-): ")
-                    if (answer2 %in% c("", " ")) answer2 <- "c"
-                    if (answer2 %in% c("q", "c")) break()
-                  }
-                }
-              }
-            }
-          }
+                                              lubridate::now(tzone = "UTC"), sep = ""))
         }
-        if (answer2 == "q") {
-          break()
-        } else {
+        if (collection.name != user.collection.name) {
+          message("Using sanitised/generated name: '",
+                  collection.name, "'.", sep = "")
+        }
+        utils::flush.console()
+        collection.title <- readline("Title for plot?: ")
+        if (collection.title == "") {
+          collection.title <- collection.name
+        }
+        collection.file.name <- paste(collection.name, "Rda", sep = ".")
+        collection.objects <- character()
+
+        if (qty.out != "raw") {
+          collection.mspct <-
+            switch(qty.out,
+                   irrad = photobiology::source_mspct(mget(irrad.names)),
+                   cps =   photobiology::cps_mspct(mget(irrad.names)))
+
+          # plot collection and summaries
+          if (length(collection.mspct) > 200) {
+            plot.data = "median"
+          } else {
+            plot.data = "as.is"
+          }
+          collection.fig <-
+            ggplot2::autoplot(collection.mspct,
+                              annotations =
+                                c("-", "peaks", "colour.guide", "summaries"),
+                              plot.data = plot.data) +
+            ggplot2::labs(title = paste(collection.title, " (n = ",
+                                        length(collection.mspct), ")",
+                                        sep = ""),
+                          subtitle = session.label,
+                          caption = how_measured(collection.mspct[[1L]])) +
+            ggplot2::theme(legend.position = "bottom")
+          print(collection.fig)
+          rm(collection.title)
+
+          if (save.pdfs) {
+            collection.pdf.name <- paste(collection.name, "pdf", sep = ".")
+            grDevices::pdf(file = collection.pdf.name, onefile = TRUE,
+                           width = 11, height = 7, paper = "a4r")
+            print(collection.fig)
+            grDevices::dev.off()
+            rm(collection.pdf.name)
+          }
+          rm(collection.fig)
+
+          if (save.summaries) {
+            contents.collection.name <-
+              paste(collection.name, "contents.tb", sep = ".")
+            assign(contents.collection.name, summary(collection.mspct))
+            collection.objects <- c(collection.objects, contents.collection.name)
+            if (qty.out == "irrad") {
+              summary.tb <-
+                irrad_summary_table(mspct = collection.mspct)
+              if (!is.null(summary.tb) && is.data.frame(summary.tb)) {
+                readr::write_delim(summary.tb,
+                                   file =  paste(collection.name, "csv", sep = "."),
+                                   delim = readr::locale()$grouping_mark)
+                summary.collection.name <- paste(collection.name, "summary.tb", sep = ".")
+                assign(summary.collection.name, summary.tb)
+                collection.objects <- c(collection.objects, summary.collection.name)
+              } else {
+                message("Computation of summaries failed!")
+              }
+            }
+            irrad.collection.name <- paste(collection.name, qty.out, "mspct", sep = ".")
+            assign(irrad.collection.name, collection.mspct)
+            collection.objects <- c(collection.objects, irrad.collection.name)
+          }
+          raw.collection.name <- paste(collection.name, "raw", "lst", sep = ".")
+          assign(raw.collection.name, mget(raw.names))
+          collection.objects <- c(collection.objects, raw.collection.name)
           repeat {
-            answer3 <- readline("change protocol/quit session/NEXT (p/q/n-): ")[1]
-            answer3 <- ifelse(answer3 == "", "n", answer3)
-            if (answer3 %in% c("n", "p", "q")) {
+            save(list = collection.objects, file = collection.file.name, precheck = TRUE)
+            if (file.exists(collection.file.name)) {
+              message("Collection objects saved to file '",
+                      collection.file.name, "'.", sep = "")
+              # save file name to report at end of sessions
+              file.names <- c(file.names, collection.file.name)
+              # remove saved objects and the list with their names
+              rm(list = collection.objects)
+              rm(collection.objects)
+              # clean up by removing the spectra that have been added to the
+              # saved collection and reset the list of names for next collection
+              rm(list = c(irrad.names))
+              rm(list = c(raw.names))
+              irrad.names <- character()
+              raw.names <- character()
               break()
             } else {
-              print("Answer not recognized, please try again...")
+              message("Saving of the collection to file failed!")
+              if (answer2 == "q") {
+                repeat {
+                  answer2 <- readline("quit anyway/next (q/n-): ")
+                  if (answer2 %in% c("", " ")) answer2 <- "n"
+                  if (answer2 %in% c("q", "n")) break()
+                }
+              }
             }
-          }
-          if (answer3 == "p") {
-            protocol <- protocol_interactive(protocols)
-          } else if (answer3 == "q") {
-            break()
           }
         }
       }
-    }
+
+      if (answer2 %in% c("q", "z")) {
+        break()
+      } else if (!reuse.old.refs) {
+         repeat {
+          answer3 <- readline("Change protocol/quit session/MEASURE NEXT (p/q/n-): ")[1]
+          answer3 <- ifelse(answer3 == "", "n", answer3)
+          if (answer3 %in% c("n", "p", "q")) {
+            break()
+          } else {
+            print("Answer not recognized, please try again...")
+          }
+        }
+        if (answer3 == "p") {
+          protocol <- protocol_interactive(protocols)
+        } else if (answer3 == "q") {
+          break()
+        }
+      }
+
+    } # end of main UI loop
+
     save(file.names,
          file = paste("files4session-",
                       make.names(session.name),
                       ".Rda", sep = ""))
 
-    message("Data files created during session:\n",
+    message("Data files saved during session:\n",
+            "to ", getwd(), "\n",
             paste(file.names, collapse = ",\n"), ".", sep = "")
 
-    message("Ending...")
+    message("Ending data acquisition...")
 
   }
-
 
 #' Summarize spectral irradiance
 #'
 #' Compute waveband irradiances and rattios between waveband irradiances of
 #' interest to plants' and visual responses to light.
 #'
-#' @param mscpt A source_mspct, or a source_spct object containing spectral
+#' @param mspct A source_mspct, or a source_spct object containing spectral
 #'    irradiance for one or more sources.
 #' @param unit.out character One of "photon" or "energy".
 #' @param scale.factor numeric A multiplicative factor used to rescale data.
@@ -744,6 +779,14 @@ acq_irrad_interactive <-
 #'   and \code{\link[base]{signif}} which are called to build
 #'   the summary table.
 #'
+#' @examples
+#'
+#' irrad_summary_table(sun.spct)
+#' irrad_summary_table(sun.spct, attr2tb = c("what.measured", "where.measured"))
+#' irrad_summary_table(sun.spct, summary.type = "plant", unit.out = "photon")
+#' irrad_summary_table(sun.spct, summary.type = "PAR", unit.out = "photon")
+#' irrad_summary_table(sun.spct, summary.type = "VIS", unit.out = "energy")
+#'
 irrad_summary_table <-
   function(mspct,
            unit.out = getOption("photobiology.radiation.unit",
@@ -751,7 +794,7 @@ irrad_summary_table <-
            scale.factor = ifelse(unit.out == "photon",
                                  1e6, 1),
            attr2tb = "when.measured",
-           type = "plant",
+           summary.type = "plant",
            digits = 3L) {
 
   # handle also single spectra
@@ -767,8 +810,8 @@ irrad_summary_table <-
                   quantum = photobiology::q_ratio,
                   energy = photobiology::e_ratio)
 
-  if (type %in% c("plant", "PAR")) {
-    plant.wb <- switch(type,
+  if (summary.type %in% c("plant", "PAR")) {
+    plant.wb <- switch(summary.type,
                        PAR = c(photobiologyWavebands::UV_bands("CIE"),
                                list(photobiologyWavebands::PAR())),
                        plant = c(photobiologyWavebands::Plant_bands(),
@@ -789,9 +832,9 @@ irrad_summary_table <-
             w.band.denom = list(green = photobiologyWavebands::Green("Sellaro"),
                                 "far-red" = photobiologyWavebands::Far_red("Smith20")),
             attr2tb = attr2tb)
-    summary.tb <- dplyr::full_join(irrad.tb, uv_ratios.tb)
-    summary.tb <- dplyr::full_join(summary.tb, vis_ratios.tb)
-  } else if (type == "VIS") {
+    summary.tb <- dplyr::full_join(irrad.tb, uv_ratios.tb, by = "spct.idx")
+    summary.tb <- dplyr::full_join(summary.tb, vis_ratios.tb, by = "spct.idx")
+  } else if (summary.type == "VIS") {
     summary.tb <-
       photobiology::irrad(mspct,
                           unit.out = unit.out,

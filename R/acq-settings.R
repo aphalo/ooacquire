@@ -307,7 +307,7 @@ tune_acq_settings <- function(descriptor,
   rOmniDriver::set_correct_for_electrical_dark(descriptor$w, x$corr.elect.dark,
                                                descriptor$sr.index,
                                                descriptor$ch.index)
-  # correction for sensor non-linearuty (in instrument)
+  # correction for sensor non-linearity (in instrument)
   rOmniDriver::set_correct_for_detector_nonlinearity(descriptor$w,
                                                      x$corr.sensor.nl,
                                                      descriptor$sr.index,

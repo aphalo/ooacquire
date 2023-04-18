@@ -9,11 +9,14 @@ irrad_summary_table(
   unit.out = getOption("photobiology.radiation.unit", default = "energy"),
   scale.factor = ifelse(unit.out == "photon", 1e+06, 1),
   attr2tb = "when.measured",
-  type = "plant",
+  summary.type = "plant",
   digits = 3L
 )
 }
 \arguments{
+\item{mspct}{A source_mspct, or a source_spct object containing spectral
+irradiance for one or more sources.}
+
 \item{unit.out}{character One of "photon" or "energy".}
 
 \item{scale.factor}{numeric A multiplicative factor used to rescale data.}
@@ -21,12 +24,9 @@ irrad_summary_table(
 \item{attr2tb}{character Vector with one or more of "when.measured",
 "what.measured", "where.measured", "how.measured" and "comment".}
 
-\item{digits}{integer The number of significant digits in the output.}
-
-\item{mscpt}{A source_mspct, or a source_spct object containing spectral
-irradiance for one or more sources.}
-
 \item{summary.type}{character One of "plant", "PAR" or "VIS".}
+
+\item{digits}{integer The number of significant digits in the output.}
 }
 \value{
 A tibble with one row per spectrum and one column per
@@ -39,6 +39,15 @@ interest to plants' and visual responses to light.
 \details{
 This function packages different functions from pacakge 'photobiology'
    and returns a typical set of summaries for different purposes.
+}
+\examples{
+
+irrad_summary_table(sun.spct)
+irrad_summary_table(sun.spct, attr2tb = c("what.measured", "where.measured"))
+irrad_summary_table(sun.spct, summary.type = "plant", unit.out = "photon")
+irrad_summary_table(sun.spct, summary.type = "PAR", unit.out = "photon")
+irrad_summary_table(sun.spct, summary.type = "VIS", unit.out = "energy")
+
 }
 \seealso{
 See the documentation for functions

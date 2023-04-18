@@ -71,7 +71,7 @@ tune_interactive <- function(descriptor,
   # set help
   all.help <- c(t = "t = retune. Adjust integration time starting from last value.",
                 T = "T = tune. Adjust integration time starting from default value.",
-                M = "s = saturation margin. Tuned integration time is maximum * (100 - margin).",
+                s = "s = saturation margin. Tuned integration time is maximum * (1 - margin).",
                 r = "r = range. Total measurement time in seconds, as a single value or a range.",
                 h = "h = HDR mult. High dynamic range or bracketing, as multipliers for target integration time.",
                 f = "f = fixed. User-suplied \"base\" integration time in seconds.",

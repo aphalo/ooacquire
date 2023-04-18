@@ -56,4 +56,13 @@ acq_irrad_interactive(interface.mode = "series",
                                           num.steps = 100),
                       entrance.optics = "cosine")
 
+# equivalent defaults for single time point acquisition
+acq_irrad_interactive(interface.mode = "auto",
+                      folder.name = "./inst-not/single",
+                      tot.time.range = c(0.2, Inf),
+                      target.margin = .2,
+                      qty.out = "irrad",
+                      HDR.mult = 1L,
+                      entrance.optics = "cosine")
+
 

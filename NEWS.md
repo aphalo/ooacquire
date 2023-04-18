@@ -4,20 +4,13 @@ editor_options:
     wrap: 72
 ---
 
-# TODO
-
--   Add more test cases (e.g. for OceanView files).
--   Finish writing algorithms vignette.
--   Document support for OO calibrations and add example scripts.
--   Move calibration data to separate packages.
--   Update all interactive data acquisition functions to match the
-    updated interface of `acq_irrad_interactive()`.
--   Consider replacing OmniDriver by SeaBreeze open source driver or a 
-    derivative.
-    
 # ooacquire 0.3.2 (2023-04-xx)
 
--   Export `mspct_summary()`, previously, an internal function.
+-   Export `irrad_summary_table()`, previously, an internal function. Also 
+    enhance this function.
+-   Update `acq_irrad_interactive()` adding menu option to repeat last
+    measurement using same protocol, integration settings and "dark" and
+    "filter" reference spectra.
 
 # ooacquire 0.3.1 (2023-04-11)
 
