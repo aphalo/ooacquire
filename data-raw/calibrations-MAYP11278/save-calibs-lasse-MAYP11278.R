@@ -97,6 +97,7 @@ for (f in files) {
   cal.wl.range <-  tmp[["w.length"]][range(which(tmp[["irrad.mult"]] != 0L))]
   cal.wl.range <-  c(ceiling(cal.wl.range[1]), floor(cal.wl.range[2]))
   cal.wl.range[1] <- max(cal.wl.range[1], 250)
+  cal.wl.range[2] <- min(cal.wl.range[2], 1050)
   descriptor.tmp <-
     set_descriptor_irrad_mult(descriptor = descriptor.tmp,
                               irrad.mult = tmp[["irrad.mult"]] * 1e4,
