@@ -315,9 +315,14 @@ acq_raw_mspct <- function(descriptor,
       z.names <- c(z.names, p)
     }
 
-    if (verbose && length(times) > 1L) {
-      message("Measuring series from ", times[1], " to ", times[length(times)],
-              " taking ", length(times), " measurements")
+    if (verbose) {
+      if (high.speed) {
+        message("Measuring series as fast as possible starting at ", times[1],
+                " taking ", length(times), " measurements")
+      } else if (length(times) > 1L) {
+        message("Measuring series from ", times[1], " to ", times[length(times)],
+                " taking ", length(times), " measurements")
+      }
     }
 
     messages.enabled <-
