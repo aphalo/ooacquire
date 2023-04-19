@@ -188,10 +188,6 @@ acq_irrad_interactive <-
     w <- start_session()
     on.exit(end_session(w)) # ensure session is always closed!
 
-    if (interface.mode == "series") {
-      rOmniDriver::init_highres_time_api() # additional API from OmniDriver distribution
-    }
-
     instruments <- list_srs_interactive(w = w)
     sr.index <- choose_sr_interactive(instruments = instruments)
     if (sr.index < 0L) {

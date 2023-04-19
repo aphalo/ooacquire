@@ -1,7 +1,7 @@
 Package: ooacquire
 Type: Package
 Title: Acquire Data from OO Spectrometers
-Version: 0.3.1.9001
+Version: 0.3.2
 Date: 2023-04-19
 Authors@R:
    c(
@@ -39,7 +39,7 @@ Imports:
     readr (>= 2.1.4),
     magrittr (>= 2.0.3)
 Suggests:
-    rOmniDriver (>= 0.1.17),
+    rOmniDriver (>= 0.1.19),
     knitr (>= 1.39),
     rmarkdown (>= 2.14),
     testthat (>= 3.1.4)

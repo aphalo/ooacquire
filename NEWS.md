@@ -11,6 +11,8 @@ editor_options:
 -   Update `acq_irrad_interactive()` adding menu option to repeat last
     measurement using same protocol, integration settings and "dark" and
     "filter" reference spectra.
+-   Fix intermitent failure to initialize high-resolution-time API used for
+    high speed time series acquisition of spectra.
 
 # ooacquire 0.3.1 (2023-04-11)
 
