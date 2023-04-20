@@ -325,10 +325,8 @@ acq_raw_mspct <- function(descriptor,
       }
     }
 
-    messages.enabled <-
-      verbose && length(times) > 1L && all(seq.settings[["step.delay"]] > 0.5)
-
     if (high.speed && p == "light") {
+      # acquire multiple spectra as fast as possible
       z <- c(z,
              hs_acq_raw_mspct(descriptor = descriptor,
                               acq.settings = acq.settings,
@@ -336,11 +334,18 @@ acq_raw_mspct <- function(descriptor,
                               f.trigger.pulses = f.current,
                               what.measured = paste(p, " HS: ", user.label, sep = ""),
                               where.measured = where.measured,
-                              verbose = messages.enabled,
+                              verbose = FALSE, # avoid delays
                               return.list = TRUE))
     } else {
-       for (i in seq_along(times)) {
-        if (messages.enabled) {
+      messages.enabled <-
+        verbose && (p %in% c("dark", "filter") ||
+                      length(times) == 1L ||
+                      length(times) > 1L && all(seq.settings[["step.delay"]] > 0.5)
+                    )
+
+      # acquire multiple spectra one by one at target times
+      for (i in seq_along(times)) {
+        if (messages.enabled && length(times) > 1L) {
           message("Time step ", i)
         }
         repeat {
@@ -353,12 +358,13 @@ acq_raw_mspct <- function(descriptor,
         }
         idx <- idx + 1
 
-        z[[idx]] <- acq_raw_spct(descriptor = descriptor,
-                                 acq.settings = acq.settings,
-                                 f.trigger.pulses = f.current,
-                                 what.measured = paste(z.names[[i]], ": ", user.label, sep = ""),
-                                 where.measured = where.measured,
-                                 verbose = messages.enabled)
+        z[[idx]] <-
+          acq_raw_spct(descriptor = descriptor,
+                       acq.settings = acq.settings,
+                       f.trigger.pulses = f.current,
+                       what.measured = paste(z.names[[i]], ": ", user.label, sep = ""),
+                       where.measured = where.measured,
+                       verbose = messages.enabled)
       }
     }
   }

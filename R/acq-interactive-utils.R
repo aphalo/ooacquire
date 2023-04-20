@@ -412,13 +412,13 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
       message("'step.delay' too short! Reset to ", seq.settings$step.delay, " s.")
     }
     prompt.string <-
-           sprintf("Series: w = %.3g s wait and next round b = %s; s = %.3g s step; n = %i times; u undo (b/w/s/n/u/-): ",
+           sprintf("Series: wait = %.3g s, boundary = %s, step = %.3g s, reps = %i, undo (w/b/s/r/u/m-): ",
                    seq.settings[["initial.delay"]],
                    seq.settings[["start.boundary"]],
                    seq.settings[["step.delay"]],
                    seq.settings[["num.steps"]])
     answ <- readline(prompt  = prompt.string)
-    if (answ == "") {
+    if (answ %in% c("", "m")) {
       break()
     }
     if (substr(answ, 1, 1) == "w") {
@@ -447,14 +447,14 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
       } else {
         print("Value not changed!")
       }
-    } else if (substr(answ, 1, 1) == "n") {
-      num.steps <- readline(sprintf("Number of steps = %i, new: ",
+    } else if (substr(answ, 1, 1) == "r") {
+      num.steps <- readline(sprintf("Repeats = %i spectra, new: ",
                                     seq.settings[["num.steps"]]))
       num.steps <- try(as.integer(num.steps))
       if (is.na(num.steps)) {
-        print("Number of steps must be a positive integer. Value not changed!")
+        print("Number of spectra must be a positive integer. Value not changed!")
       } else if (num.steps < 1L || num.steps > 10000L) {
-        warning("Number of steps must be in range 1..10000. Value not changed!")
+        warning("Number of spectra must be in range 1..10000. Value not changed!")
       } else {
         seq.settings[["num.steps"]] <- num.steps
       }

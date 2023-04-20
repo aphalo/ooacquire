@@ -17,6 +17,7 @@ acq_irrad_interactive(
   area = NULL,
   diff.type = NULL,
   qty.out = "irrad",
+  summary.type = "plant",
   save.pdfs = TRUE,
   save.summaries = TRUE,
   save.collections = TRUE,
@@ -61,6 +62,8 @@ created on-the-fly.}
 \item{qty.out}{character One of "Tfr" (spectral transmittance as a fraction
 of one), "irrad" (spectral irardiance), "cps" (counts per second), or "raw"
 (raw sensor counts).}
+
+\item{summary.type}{character One of "plant", "PAR" or "VIS".}
 
 \item{save.pdfs, save.summaries, save.collections}{logical Whether to save
 plots to PDFs files or not, and collection summaries to csv files or not,

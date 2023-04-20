@@ -77,6 +77,7 @@
 #' @param qty.out character One of "Tfr" (spectral transmittance as a fraction
 #'   of one), "irrad" (spectral irardiance), "cps" (counts per second), or "raw"
 #'   (raw sensor counts).
+#' @param summary.type character One of "plant", "PAR" or "VIS".
 #' @param save.pdfs,save.summaries,save.collections logical Whether to save
 #'   plots to PDFs files or not, and collection summaries to csv files or not,
 #'   enable collections user interface or not..
@@ -136,6 +137,7 @@ acq_irrad_interactive <-
            area = NULL,
            diff.type = NULL,
            qty.out = "irrad",
+           summary.type = "plant",
            save.pdfs = TRUE,
            save.summaries = TRUE,
            save.collections = TRUE,
@@ -487,7 +489,7 @@ acq_irrad_interactive <-
             plot.prompt <- "Plot: wavebands/discard/SAVE+NEXT (w/d/s-): "
             valid.answers <-  c("w", "d", "s")
           } else {
-            plot.prompt <- "Plot: photons/energy/wavebands/discard/SAVE+NEXT (p/e/w/d/s-): "
+            plot.prompt <- "photons/energy/wavebands/discard/SAVE+NEXT (p/e/w/d/s-): "
             valid.answers <- c("p", "e", "w", "d", "s")
           }
           repeat {
@@ -508,7 +510,7 @@ acq_irrad_interactive <-
                      utils::flush.console()
                      answer1 <-
                        tolower(
-                         readline("Wavebands: UV+PhR/UV+PAR/plants/visible/total/DEFAULT (u/a/p/v/t/d-): ")
+                         readline("Bands: UV+PhR/UV+PAR/plants/VIS/TOT/DEFAULT (u/a/p/v/t/d-): ")
                        )[1]
                      answer1 <- ifelse(answer1 == "", "d", answer1)
                      if (answer1 %in% c("u", "a", "p", "v", "t", "d")) {
@@ -572,7 +574,7 @@ acq_irrad_interactive <-
         if (save.collections) {
           valid.answers <- c("c", "q", "z", "r", "n")
           answer2 <-
-            readline("collect+continue/collect+quit/discard+quit/repeat/NEXT (c/q/z/r/n-): ")[1]
+            readline("collect+quit/collect+next/quit/repeat/NEXT (q/c/z/r/n-): ")[1]
         } else {
           valid.answers <- c("q", "r", "n")
           answer2 <-
@@ -609,7 +611,6 @@ acq_irrad_interactive <-
           message("Using sanitised/generated name: '",
                   collection.name, "'.", sep = "")
         }
-        utils::flush.console()
         collection.title <- readline("Title for plot?: ")
         if (collection.title == "") {
           collection.title <- collection.name
@@ -659,6 +660,22 @@ acq_irrad_interactive <-
             assign(contents.collection.name, summary(collection.mspct))
             collection.objects <- c(collection.objects, contents.collection.name)
             if (qty.out == "irrad") {
+              last.summary.type <- summary.type
+              repeat{
+                valid.answers <- c("plant", "PAR", "VIS")
+                summary.type <- readline(paste("Change summary type from \"",
+                                               last.summary.type, "\"? (", "): ",
+                                         paste(valid.answers, collapse = "/", sep = ""),
+                                         sep = ""))[1]
+                if (summary.type == "") {
+                  summary.type <- last.summary.type
+                }
+                if (answer2 %in% valid.answers) {
+                  break()
+                } else {
+                  print("Answer not recognized. Please try again...")
+                }
+              }
               summary.tb <-
                 irrad_summary_table(mspct = collection.mspct)
               if (!is.null(summary.tb) && is.data.frame(summary.tb)) {
@@ -714,9 +731,9 @@ acq_irrad_interactive <-
         break()
       } else if (!reuse.old.refs) {
          repeat {
-          answer3 <- readline("Change protocol/quit session/MEASURE NEXT (p/q/n-): ")[1]
+          answer3 <- readline("Change protocol/MEASURE NEXT (p/n-): ")[1]
           answer3 <- ifelse(answer3 == "", "n", answer3)
-          if (answer3 %in% c("n", "p", "q")) {
+          if (answer3 %in% c("n", "p")) {
             break()
           } else {
             print("Answer not recognized, please try again...")
@@ -724,8 +741,6 @@ acq_irrad_interactive <-
         }
         if (answer3 == "p") {
           protocol <- protocol_interactive(protocols)
-        } else if (answer3 == "q") {
-          break()
         }
       }
 
