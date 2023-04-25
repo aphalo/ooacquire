@@ -4,14 +4,20 @@ editor_options:
     wrap: 72
 ---
 
-# ooacquire 0.3.2 (2023-04-xx)
+# ooacquire 0.3.2-1 (2023-04-25)
+
+-   Tweaked menu texts and made it possible to select among types of collection
+    summaries.
+    
+# ooacquire 0.3.2 (2023-04-19)
 
 -   Export `irrad_summary_table()`, previously, an internal function. Also 
     enhance this function.
+-   Enhance support for different types of summaries in `irrad_summary_table()`.
 -   Update `acq_irrad_interactive()` adding menu option to repeat last
     measurement using same protocol, integration settings and "dark" and
     "filter" reference spectra.
--   Fix intermitent failure to initialize high-resolution-time API used for
+-   Fix intermittent failure to initialize high-resolution-time API used for
     high speed time series acquisition of spectra.
 
 # ooacquire 0.3.1 (2023-04-11)
