@@ -666,11 +666,11 @@ acq_irrad_interactive <-
                 summary.type <- readline(paste("Change summary type from \"",
                                                last.summary.type, "\"? (", "): ",
                                          paste(valid.answers, collapse = "/", sep = ""),
-                                         sep = ""))[1]
+                                         ": ", sep = ""))[1]
                 if (summary.type == "") {
                   summary.type <- last.summary.type
                 }
-                if (answer2 %in% valid.answers) {
+                if (summary.type %in% valid.answers) {
                   break()
                 } else {
                   print("Answer not recognized. Please try again...")
