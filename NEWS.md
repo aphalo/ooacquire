@@ -4,10 +4,12 @@ editor_options:
     wrap: 72
 ---
 
-# ooacquire 0.3.2-1 (2023-04-25)
+# ooacquire 0.3.2-1 (2023-04-27)
 
 -   Tweaked menu texts and made it possible to select among types of collection
     summaries.
+-   Moved UI for saving of collections to its own menu separate from that for
+    quit/repeat/NEXT.
     
 # ooacquire 0.3.2 (2023-04-19)
 

@@ -569,17 +569,151 @@ acq_irrad_interactive <-
         save(list = c(raw.name), file = file.name)
       }
 
-      repeat {
-        utils::flush.console()
-        if (save.collections) {
-          valid.answers <- c("c", "q", "z", "r", "n")
-          answer2 <-
-            readline("collect+quit/collect+next/quit/repeat/NEXT (q/c/z/r/n-): ")[1]
-        } else {
-          valid.answers <- c("q", "r", "n")
-          answer2 <-
-            readline("quit/repeat/NEXT (q/r/n-): ")[1]
+      if (save.collections) {
+        repeat {
+          answer.collect <-
+            readline("collect and summarize? yes/NO (y/n-): ")[1]
+          if (answer.collect %in% c("n", "")) {
+            collect.and.save <- FALSE
+            break()
+          } else if (answer.collect == "y") {
+            collect.and.save <- TRUE
+            break()
+          } else {
+            print("Answer not recognized. Please try again...")
+          }
         }
+
+        if (collect.and.save) {
+          message("Corrected ", qty.out, " spectra to collect: ",
+                  paste(irrad.names, collapse = ", "))
+          message("Raw objects to collect: ",
+                  paste(raw.names, collapse = ", "), sep = " ")
+          user.collection.name <- readline("Name of the collection?: ")
+          collection.name <- make.names(paste("collection ",
+                                              user.collection.name, sep = ""))
+          if (user.collection.name == "") {
+            collection.name <- make.names(paste("collection ",
+                                                lubridate::now(tzone = "UTC"), sep = ""))
+          }
+          if (collection.name != user.collection.name) {
+            message("Using sanitised/generated name: '",
+                    collection.name, "'.", sep = "")
+          }
+          collection.title <- readline("Title for plot?: ")
+          if (collection.title == "") {
+            collection.title <- collection.name
+          }
+          collection.file.name <- paste(collection.name, "Rda", sep = ".")
+          collection.objects <- character()
+
+          if (qty.out != "raw") {
+            collection.mspct <-
+              switch(qty.out,
+                     irrad = photobiology::source_mspct(mget(irrad.names)),
+                     cps =   photobiology::cps_mspct(mget(irrad.names)))
+
+            # plot collection and summaries
+            if (length(collection.mspct) > 200) {
+              plot.data = "median"
+            } else {
+              plot.data = "as.is"
+            }
+            collection.fig <-
+              ggplot2::autoplot(collection.mspct,
+                                annotations =
+                                  c("-", "peaks", "colour.guide", "summaries"),
+                                plot.data = plot.data) +
+              ggplot2::labs(title = paste(collection.title, " (n = ",
+                                          length(collection.mspct), ")",
+                                          sep = ""),
+                            subtitle = session.label,
+                            caption = how_measured(collection.mspct[[1L]])) +
+              ggplot2::theme(legend.position = "bottom")
+            print(collection.fig)
+            rm(collection.title)
+
+            if (save.pdfs) {
+              collection.pdf.name <- paste(collection.name, "pdf", sep = ".")
+              grDevices::pdf(file = collection.pdf.name, onefile = TRUE,
+                             width = 11, height = 7, paper = "a4r")
+              print(collection.fig)
+              grDevices::dev.off()
+              rm(collection.pdf.name)
+            }
+            rm(collection.fig)
+
+            if (save.summaries) {
+              contents.collection.name <-
+                paste(collection.name, "contents.tb", sep = ".")
+              assign(contents.collection.name, summary(collection.mspct))
+              collection.objects <- c(collection.objects, contents.collection.name)
+              if (qty.out == "irrad") {
+                last.summary.type <- summary.type
+                repeat{
+                  valid.answers <- c("plant", "PAR", "VIS")
+                  summary.type <- readline(paste("Change summary type from \"",
+                                                 last.summary.type, "\"? (", "): ",
+                                                 paste(valid.answers, collapse = "/", sep = ""),
+                                                 ": ", sep = ""))[1]
+                  if (summary.type == "") {
+                    summary.type <- last.summary.type
+                  }
+                  if (summary.type %in% valid.answers) {
+                    break()
+                  } else {
+                    print("Answer not recognized. Please try again...")
+                  }
+                }
+                summary.tb <-
+                  irrad_summary_table(mspct = collection.mspct)
+                if (!is.null(summary.tb) && is.data.frame(summary.tb)) {
+                  readr::write_delim(summary.tb,
+                                     file =  paste(collection.name, "csv", sep = "."),
+                                     delim = readr::locale()$grouping_mark)
+                  summary.collection.name <- paste(collection.name, "summary.tb", sep = ".")
+                  assign(summary.collection.name, summary.tb)
+                  collection.objects <- c(collection.objects, summary.collection.name)
+                } else {
+                  message("Computation of summaries failed!")
+                }
+              }
+              irrad.collection.name <- paste(collection.name, qty.out, "mspct", sep = ".")
+              assign(irrad.collection.name, collection.mspct)
+              collection.objects <- c(collection.objects, irrad.collection.name)
+            }
+            raw.collection.name <- paste(collection.name, "raw", "lst", sep = ".")
+            assign(raw.collection.name, mget(raw.names))
+            collection.objects <- c(collection.objects, raw.collection.name)
+            repeat {
+              save(list = collection.objects, file = collection.file.name, precheck = TRUE)
+              if (file.exists(collection.file.name)) {
+                message("Collection objects saved to file '",
+                        collection.file.name, "'.", sep = "")
+                # save file name to report at end of sessions
+                file.names <- c(file.names, collection.file.name)
+                # remove saved objects and the list with their names
+                rm(list = collection.objects)
+                rm(collection.objects)
+                # clean up by removing the spectra that have been added to the
+                # saved collection and reset the list of names for next collection
+                rm(list = c(irrad.names))
+                rm(list = c(raw.names))
+                irrad.names <- character()
+                raw.names <- character()
+                break()
+              } else {
+                message("Saving of the collection to file failed!")
+              }
+            }
+          }
+        }
+      }
+
+      repeat {
+        valid.answers <- c("q", "r", "n")
+        answer2 <-
+          readline("Measure again? quit/repeat/NEXT (q/r/n-): ")[1]
         answer2 <- ifelse(answer2 == "", "n", answer2)
         if (answer2 %in% valid.answers) {
           break()
@@ -595,139 +729,7 @@ acq_irrad_interactive <-
         reuse.old.refs <- FALSE
       }
 
-      if (save.collections && answer2 %in% c("c", "q")) {
-        message("Corrected ", qty.out, " spectra to collect: ",
-                paste(irrad.names, collapse = ", "))
-        message("Raw objects to collect: ",
-                paste(raw.names, collapse = ", "), sep = " ")
-        user.collection.name <- readline("Name of the collection?: ")
-        collection.name <- make.names(paste("collection ",
-                                            user.collection.name, sep = ""))
-        if (user.collection.name == "") {
-          collection.name <- make.names(paste("collection ",
-                                              lubridate::now(tzone = "UTC"), sep = ""))
-        }
-        if (collection.name != user.collection.name) {
-          message("Using sanitised/generated name: '",
-                  collection.name, "'.", sep = "")
-        }
-        collection.title <- readline("Title for plot?: ")
-        if (collection.title == "") {
-          collection.title <- collection.name
-        }
-        collection.file.name <- paste(collection.name, "Rda", sep = ".")
-        collection.objects <- character()
-
-        if (qty.out != "raw") {
-          collection.mspct <-
-            switch(qty.out,
-                   irrad = photobiology::source_mspct(mget(irrad.names)),
-                   cps =   photobiology::cps_mspct(mget(irrad.names)))
-
-          # plot collection and summaries
-          if (length(collection.mspct) > 200) {
-            plot.data = "median"
-          } else {
-            plot.data = "as.is"
-          }
-          collection.fig <-
-            ggplot2::autoplot(collection.mspct,
-                              annotations =
-                                c("-", "peaks", "colour.guide", "summaries"),
-                              plot.data = plot.data) +
-            ggplot2::labs(title = paste(collection.title, " (n = ",
-                                        length(collection.mspct), ")",
-                                        sep = ""),
-                          subtitle = session.label,
-                          caption = how_measured(collection.mspct[[1L]])) +
-            ggplot2::theme(legend.position = "bottom")
-          print(collection.fig)
-          rm(collection.title)
-
-          if (save.pdfs) {
-            collection.pdf.name <- paste(collection.name, "pdf", sep = ".")
-            grDevices::pdf(file = collection.pdf.name, onefile = TRUE,
-                           width = 11, height = 7, paper = "a4r")
-            print(collection.fig)
-            grDevices::dev.off()
-            rm(collection.pdf.name)
-          }
-          rm(collection.fig)
-
-          if (save.summaries) {
-            contents.collection.name <-
-              paste(collection.name, "contents.tb", sep = ".")
-            assign(contents.collection.name, summary(collection.mspct))
-            collection.objects <- c(collection.objects, contents.collection.name)
-            if (qty.out == "irrad") {
-              last.summary.type <- summary.type
-              repeat{
-                valid.answers <- c("plant", "PAR", "VIS")
-                summary.type <- readline(paste("Change summary type from \"",
-                                               last.summary.type, "\"? (", "): ",
-                                         paste(valid.answers, collapse = "/", sep = ""),
-                                         ": ", sep = ""))[1]
-                if (summary.type == "") {
-                  summary.type <- last.summary.type
-                }
-                if (summary.type %in% valid.answers) {
-                  break()
-                } else {
-                  print("Answer not recognized. Please try again...")
-                }
-              }
-              summary.tb <-
-                irrad_summary_table(mspct = collection.mspct)
-              if (!is.null(summary.tb) && is.data.frame(summary.tb)) {
-                readr::write_delim(summary.tb,
-                                   file =  paste(collection.name, "csv", sep = "."),
-                                   delim = readr::locale()$grouping_mark)
-                summary.collection.name <- paste(collection.name, "summary.tb", sep = ".")
-                assign(summary.collection.name, summary.tb)
-                collection.objects <- c(collection.objects, summary.collection.name)
-              } else {
-                message("Computation of summaries failed!")
-              }
-            }
-            irrad.collection.name <- paste(collection.name, qty.out, "mspct", sep = ".")
-            assign(irrad.collection.name, collection.mspct)
-            collection.objects <- c(collection.objects, irrad.collection.name)
-          }
-          raw.collection.name <- paste(collection.name, "raw", "lst", sep = ".")
-          assign(raw.collection.name, mget(raw.names))
-          collection.objects <- c(collection.objects, raw.collection.name)
-          repeat {
-            save(list = collection.objects, file = collection.file.name, precheck = TRUE)
-            if (file.exists(collection.file.name)) {
-              message("Collection objects saved to file '",
-                      collection.file.name, "'.", sep = "")
-              # save file name to report at end of sessions
-              file.names <- c(file.names, collection.file.name)
-              # remove saved objects and the list with their names
-              rm(list = collection.objects)
-              rm(collection.objects)
-              # clean up by removing the spectra that have been added to the
-              # saved collection and reset the list of names for next collection
-              rm(list = c(irrad.names))
-              rm(list = c(raw.names))
-              irrad.names <- character()
-              raw.names <- character()
-              break()
-            } else {
-              message("Saving of the collection to file failed!")
-              if (answer2 == "q") {
-                repeat {
-                  answer2 <- readline("quit anyway/next (q/n-): ")
-                  if (answer2 %in% c("", " ")) answer2 <- "n"
-                  if (answer2 %in% c("q", "n")) break()
-                }
-              }
-            }
-          }
-        }
-      }
-
-      if (answer2 %in% c("q", "z")) {
+      if (answer2 == "q") {
         break()
       } else if (!reuse.old.refs) {
          repeat {
