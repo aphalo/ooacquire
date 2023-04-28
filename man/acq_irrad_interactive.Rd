@@ -20,7 +20,7 @@ acq_irrad_interactive(
   summary.type = "plant",
   save.pdfs = TRUE,
   save.summaries = TRUE,
-  save.collections = TRUE,
+  save.collections = interface.mode != "simple",
   interface.mode = "auto",
   folder.name = paste("acq", qty.out, lubridate::today(tzone = "UTC"), sep = "-"),
   user.name = Sys.info()[["user"]],

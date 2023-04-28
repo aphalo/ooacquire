@@ -1,5 +1,6 @@
 library(photobiology)
 library(photobiologyInOut)
+library(ggpp)
 library(ggspectra)
 library(lubridate)
 library(photobiologyFilters)
@@ -63,8 +64,25 @@ PC_filters.mspt <- normalize(filter_mspct(list(dome = pc_dome.spct, disk = pc_di
 
 autoplot(PC_filters.mspt)
 
-autoplot(c(PC_filters.mspt,
-           normalize(filters.mspct["Foiltek_Clear_PC"], norm = 1050)))
+p0 <-
+  autoplot(c(PC_filters.mspt,
+             normalize(filters.mspct["Foiltek_Clear_PC"], norm = 1050)))
 
-autoplot(c(PC_filters.mspt["dome"],
-           normalize(filters.mspct["Foiltek_Clear_PC"], norm = 1050)))
+p0.insert <- p +
+  labs(x = "", y = "") +
+  theme(legend.position = "none") +
+  coord_cartesian(xlim = c(370, 430))
+
+p1 <- p0 + annotate(geom = "plot", y = 0, x = 1050, label = p0.insert, vp.width = 0.5, vp.height = 0.5)
+
+p2 <-
+  autoplot(c(PC_filters.mspt["dome"],
+             normalize(filters.mspct["Foiltek_Clear_PC"], norm = 1050)))
+
+p2.insert <- p2 +
+  labs(x = "", y = "") +
+  theme(legend.position = "none") +
+  coord_cartesian(xlim = c(370, 430))
+
+p2 <- p2 + annotate(geom = "plot", y = 0, x = 1050, label = p2.insert, vp.width = 0.5, vp.height = 0.5)
+

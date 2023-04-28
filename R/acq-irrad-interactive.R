@@ -140,7 +140,7 @@ acq_irrad_interactive <-
            summary.type = "plant",
            save.pdfs = TRUE,
            save.summaries = TRUE,
-           save.collections = TRUE,
+           save.collections = interface.mode != "simple",
            interface.mode = "auto",
            folder.name = paste("acq", qty.out,
                                lubridate::today(tzone = "UTC"),
@@ -569,10 +569,10 @@ acq_irrad_interactive <-
         save(list = c(raw.name), file = file.name)
       }
 
-      if (save.collections) {
+      if (save.collections || save.summaries) {
         repeat {
           answer.collect <-
-            readline("collect and summarize? yes/NO (y/n-): ")[1]
+            readline("collect and/or summarize? yes/NO (y/n-): ")[1]
           if (answer.collect %in% c("n", "")) {
             collect.and.save <- FALSE
             break()
@@ -678,32 +678,36 @@ acq_irrad_interactive <-
                   message("Computation of summaries failed!")
                 }
               }
+            }
+
+            if (save.collections) {
               irrad.collection.name <- paste(collection.name, qty.out, "mspct", sep = ".")
               assign(irrad.collection.name, collection.mspct)
               collection.objects <- c(collection.objects, irrad.collection.name)
-            }
-            raw.collection.name <- paste(collection.name, "raw", "lst", sep = ".")
-            assign(raw.collection.name, mget(raw.names))
-            collection.objects <- c(collection.objects, raw.collection.name)
-            repeat {
-              save(list = collection.objects, file = collection.file.name, precheck = TRUE)
-              if (file.exists(collection.file.name)) {
-                message("Collection objects saved to file '",
-                        collection.file.name, "'.", sep = "")
-                # save file name to report at end of sessions
-                file.names <- c(file.names, collection.file.name)
-                # remove saved objects and the list with their names
-                rm(list = collection.objects)
-                rm(collection.objects)
-                # clean up by removing the spectra that have been added to the
-                # saved collection and reset the list of names for next collection
-                rm(list = c(irrad.names))
-                rm(list = c(raw.names))
-                irrad.names <- character()
-                raw.names <- character()
-                break()
-              } else {
-                message("Saving of the collection to file failed!")
+
+              raw.collection.name <- paste(collection.name, "raw", "lst", sep = ".")
+              assign(raw.collection.name, mget(raw.names))
+              collection.objects <- c(collection.objects, raw.collection.name)
+              repeat {
+                save(list = collection.objects, file = collection.file.name, precheck = TRUE)
+                if (file.exists(collection.file.name)) {
+                  message("Collection objects saved to file '",
+                          collection.file.name, "'.", sep = "")
+                  # save file name to report at end of sessions
+                  file.names <- c(file.names, collection.file.name)
+                  # remove saved objects and the list with their names
+                  rm(list = collection.objects)
+                  rm(collection.objects)
+                  # clean up by removing the spectra that have been added to the
+                  # saved collection and reset the list of names for next collection
+                  rm(list = c(irrad.names))
+                  rm(list = c(raw.names))
+                  irrad.names <- character()
+                  raw.names <- character()
+                  break()
+                } else {
+                  message("Saving of the collection to file failed!")
+                }
               }
             }
           }
