@@ -120,11 +120,13 @@ hs_acq_raw_mspct <- function(descriptor,
   # setup memory buffer
   rOmniDriver::highSpdAcq_allocate_buffer(y$w, y$sr.index, num.spectra)
 
-  if (verbose) message("Scans 1 to ", num.spectra, " ... ", appendLF = FALSE)
+  if (verbose) message("Acquiring ", num.spectra, " spectra ... ", appendLF = FALSE)
 
   # start acquisition
   start.time <- lubridate::now(tzone = "UTC")
   rOmniDriver::highSpdAcq_start_acquisition(y$w, y$sr.index)
+
+  if (verbose) message("ready.")
 
   # retrieve actual number of spectra acquired
   actual.num.spectra <-

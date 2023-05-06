@@ -4,6 +4,12 @@ editor_options:
     wrap: 72
 ---
 
+# ooacquire 0.3.3 (2023-05-05)
+
+-   Improved estimate of measurement duration, and display message.
+-   When possible, if series step delay is too short, set it to zero, and
+    otherwise to the estimated duration.
+    
 # ooacquire 0.3.2-1 (2023-04-27)
 
 -   Tweaked menu texts and made it possible to select among types of collection

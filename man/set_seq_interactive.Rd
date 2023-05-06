@@ -7,7 +7,8 @@
 set_seq_interactive(
   seq.settings = list(start.boundary = "second", initial.delay = 0, step.delay = 0,
     num.steps = 1),
-  measurement.duration = 0
+  measurement.duration = 0,
+  minimum.step.delay = measurement.duration
 )
 }
 \arguments{
@@ -16,6 +17,8 @@ repeated measurements. Named vector with member names
 \code{"initial.delay"}, \code{"step.delay"}, and \code{"num.steps"}.}
 
 \item{measurement.duration}{numeric Duration of one measurement event (s).}
+
+\item{minimum.step.delay}{numeric Minimum duration of \code{"step.delay"} (s).}
 }
 \value{
 A named numeric vector of length two.

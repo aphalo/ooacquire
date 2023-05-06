@@ -245,7 +245,7 @@ acq_irrad_interactive <-
         switch(serial_no,
                MAYP11278 = "lfd",
                MAYP112785 = "lfd",
-               MAYP114590 = "ld",
+               MAYP114590 = "lfd",
                FLMS04133 = "ld",
                FLMS00673 = "ld",
                FLMS00440 = "ld",
@@ -266,6 +266,18 @@ acq_irrad_interactive <-
 
     if (length(descriptor) < 10 || length(correction.method) < 5) {
       stop("No spectrometer data found")
+    }
+
+    if (interface.mode != "series") {
+      acq.overhead <- NA_real_ # safeguard as it should not be used
+    } else if (grepl("^MAY", serial_no)) {
+      acq.overhead <- 1e-3 # 1 ms
+    } else if (grepl("^FLM", serial_no)) {
+      acq.overhead <- 1e-3 # 1 ms
+    } else if (grepl("^USB", serial_no)) {
+      acq.overhead <- 20e-3 # 20 ms slow
+    } else {
+      acq.overhead <- 50e-3 # 50 ms, just in case
     }
 
     # We still check serial numbers, really needed only for user supplied descriptors
@@ -407,11 +419,20 @@ acq_irrad_interactive <-
       }
 
       if (grepl("series", interface.mode)) {
+
+        maximum.measurement.durantion <-
+          ((max(settings$tot.time.range) + acq.overhead) * # with HDR one setting
+             length(settings$HDR.mult)) + # number of HDR settings
+          0.75 * mean(settings$in.time) # estimate of worse case overhead due to free-running
+
+        message("Estimated duration of one measurement with overhead: ", signif(maximum.measurement.durantion, 3), " s.")
+
         seq.settings <-
           set_seq_interactive(seq.settings = seq.settings,
-                              measurement.duration =
-                                max(settings$tot.time.range) *
-                                length(settings$HDR.mult) * 1e-6) # ms -> s
+                              measurement.duration = maximum.measurement.durantion,
+                              minimum.step.delay = ifelse(length(settings$HDR.mult) == 1L,
+                                                          0,
+                                                          maximum.measurement.durantion))
       }
 
       if (reuse.old.refs) {
@@ -717,7 +738,7 @@ acq_irrad_interactive <-
       repeat {
         valid.answers <- c("q", "r", "n")
         answer2 <-
-          readline("Measure again? quit/repeat/NEXT (q/r/n-): ")[1]
+          readline("quit/repeat/NEXT (q/r/n-): ")[1]
         answer2 <- ifelse(answer2 == "", "n", answer2)
         if (answer2 %in% valid.answers) {
           break()
@@ -734,18 +755,18 @@ acq_irrad_interactive <-
       }
 
       if (answer2 == "q") {
-        break()
+        break() # out of UI main loop
       } else if (!reuse.old.refs) {
          repeat {
-          answer3 <- readline("Change protocol/MEASURE NEXT (p/n-): ")[1]
+          answer3 <- readline("Change protocol? yes/NO (y/n-): ")[1]
           answer3 <- ifelse(answer3 == "", "n", answer3)
-          if (answer3 %in% c("n", "p")) {
+          if (answer3 %in% c("n", "y")) {
             break()
           } else {
             print("Answer not recognized, please try again...")
           }
         }
-        if (answer3 == "p") {
+        if (answer3 == "y") {
           protocol <- protocol_interactive(protocols)
         }
       }

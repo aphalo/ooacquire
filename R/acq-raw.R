@@ -107,16 +107,18 @@ acq_raw_spct <- function(descriptor,
       # It should never happen as we check validity value requested
       warning("The spectrometer has overridden the integration time!")
     }
-    # could improve precision in case of rounding errors
+    # ensure validity of date in case of rounding errors or other mismatches
+    #   compared to intended settings
     x$integ.time[i] <- actual.integ.time
 
     rOmniDriver::set_scans_to_avg(y$w, x$num.scans[i], y$sr.index, y$ch.index)
     actual.num.scans <- rOmniDriver::get_scans_to_avg(y$w, y$sr.index, y$ch.index)
     # We need to
     if (x$num.scans[i] != actual.num.scans) {
-      # We guard against failure to set integration time
-      # It should never happen as we check validity value requested
+      # We guard against failure to number of scans
       warning("The spectrometer has overridden the number of scans!")
+      # ensure validity of data in case of mismatche between actual setting
+      #   and intended setting
       x$num.scans[i] <- actual.num.scans
     }
 
@@ -143,6 +145,7 @@ acq_raw_spct <- function(descriptor,
         break()
       }
     }
+    if (!verbose) message("series ready.")
 
     if (!rOmniDriver::is_spectrum_valid(y$w, y$sr.index, y$ch.index) && !x$force.valid)
     {
@@ -198,10 +201,11 @@ acq_raw_spct <- function(descriptor,
 #'   they are interpreted as time offsets from the start of the sequence.
 #'
 #' @note Obviously the duration of the time steps must be longer than the time
-#'   that a measurment takes. This time can be significantly more than the sum
+#'   that a measurement takes. This time can be significantly more than the sum
 #'   of integration times, as there is considerable overhead in both the
 #'   OmniDriver Java code, in USB communication, in the spectrometer
-#'   itself and in R.
+#'   itself and in R. The overhead depends strongly on the model of
+#'   spectrometer.
 #'
 #'   No multitasking is used or supported, so R waits for the spectrometer to
 #'   answer. The operating system and other programs are not blocked, but the
@@ -232,7 +236,8 @@ acq_raw_spct <- function(descriptor,
 #' spectrum is determined by \code{acq.settings}.
 #'
 #' @seealso \code{\link{acq_raw_spct}} which is used to acquire each member
-#' spectrum.
+#' spectrum. Computations on date times are done with
+#' \code{\link[lubridate]{lubridate}}.
 #'
 acq_raw_mspct <- function(descriptor,
                           acq.settings,
@@ -275,7 +280,7 @@ acq_raw_mspct <- function(descriptor,
                               length.out = seq.settings[["num.steps"]] - 1L)))
   }
   # add initial delay
-  steps <- steps + seq.settings[["initial.delay"]]
+  steps <- steps + seq.settings[["initial.delay"]][1]
 
   previous.protocol <- "none"
 
@@ -305,11 +310,11 @@ acq_raw_mspct <- function(descriptor,
       times <-
         lubridate::ceiling_date(lubridate::now(tzone = "UTC"),
                                 unit = seq.settings[["start.boundary"]]) +
-        seconds(steps)
+        lubridate::seconds(steps)
       z.names <- c(z.names,
                    paste(p,
-                       format_idx(seq_along(times)),
-                       sep = "."))
+                         format_idx(seq_along(times)),
+                         sep = "."))
     } else {
       times <- lubridate::now(tzone = "UTC")
       z.names <- c(z.names, p)
@@ -334,7 +339,7 @@ acq_raw_mspct <- function(descriptor,
                               f.trigger.pulses = f.current,
                               what.measured = paste(p, " HS: ", user.label, sep = ""),
                               where.measured = where.measured,
-                              verbose = FALSE, # avoid delays
+                              verbose = TRUE,
                               return.list = TRUE))
     } else {
       messages.enabled <-

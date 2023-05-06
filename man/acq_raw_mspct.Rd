@@ -80,10 +80,11 @@ Function \code{acq_raw_mspct} acquires directly from a spectrometer
 }
 \note{
 Obviously the duration of the time steps must be longer than the time
-  that a measurment takes. This time can be significantly more than the sum
+  that a measurement takes. This time can be significantly more than the sum
   of integration times, as there is considerable overhead in both the
   OmniDriver Java code, in USB communication, in the spectrometer
-  itself and in R.
+  itself and in R. The overhead depends strongly on the model of
+  spectrometer.
 
   No multitasking is used or supported, so R waits for the spectrometer to
   answer. The operating system and other programs are not blocked, but the
@@ -91,7 +92,8 @@ Obviously the duration of the time steps must be longer than the time
 }
 \seealso{
 \code{\link{acq_raw_spct}} which is used to acquire each member
-spectrum.
+spectrum. Computations on date times are done with
+\code{\link[lubridate]{lubridate}}.
 
 Other raw-counts-spectra acquisition functions: 
 \code{\link{acq_raw_spct}()},

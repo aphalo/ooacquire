@@ -373,6 +373,7 @@ choose_ch_interactive <- function(instruments,
 #'   repeated measurements. Named vector with member names
 #'   \code{"initial.delay"}, \code{"step.delay"}, and \code{"num.steps"}.
 #' @param measurement.duration numeric Duration of one measurement event (s).
+#' @param minimum.step.delay numeric Minimum duration of \code{"step.delay"} (s).
 #'
 #' @details Function \code{seq.settings()} allows users to enter values needed
 #' to define a sequence of spectral acquisitions. These are the delay or time
@@ -393,7 +394,8 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
                                                     initial.delay = 0,
                                                     step.delay = 0,
                                                     num.steps = 1),
-                                measurement.duration = 0) {
+                                measurement.duration = 0,
+                                minimum.step.delay = measurement.duration) {
 
   if (!setequal(names(seq.settings),
       c("start.boundary", "initial.delay", "step.delay", "num.steps"))) {
@@ -408,7 +410,7 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
   repeat{
     if (seq.settings$step.delay < measurement.duration &&
         seq.settings$step.delay != 0) {
-      seq.settings$step.delay <- measurement.duration
+      seq.settings$step.delay <- signif(minimum.step.delay * 1.01, 3)
       message("'step.delay' too short! Reset to ", seq.settings$step.delay, " s.")
     }
     prompt.string <-
