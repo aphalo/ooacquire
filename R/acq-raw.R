@@ -145,7 +145,6 @@ acq_raw_spct <- function(descriptor,
         break()
       }
     }
-    if (!verbose) message("series ready.")
 
     if (!rOmniDriver::is_spectrum_valid(y$w, y$sr.index, y$ch.index) && !x$force.valid)
     {
@@ -349,6 +348,7 @@ acq_raw_mspct <- function(descriptor,
                     )
 
       # acquire multiple spectra one by one at target times
+      if (verbose && !messages.enabled) message("Acquiring ", length(times), " spectra ... ", appendLF = FALSE)
       for (i in seq_along(times)) {
         if (messages.enabled && length(times) > 1L) {
           message("Time step ", i)
@@ -371,7 +371,8 @@ acq_raw_mspct <- function(descriptor,
                        where.measured = where.measured,
                        verbose = messages.enabled)
       }
-    }
+      if (verbose && !messages.enabled) message("ready.")
+     }
   }
   end.time <- lubridate::now(tzone = "UTC")
 

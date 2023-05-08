@@ -275,7 +275,7 @@ acq_irrad_interactive <-
     } else if (grepl("^FLM", serial_no)) {
       acq.overhead <- 1e-3 # 1 ms
     } else if (grepl("^USB", serial_no)) {
-      acq.overhead <- 20e-3 # 20 ms slow
+      acq.overhead <- 0.1 # 100 ms slow
     } else {
       acq.overhead <- 50e-3 # 50 ms, just in case
     }
@@ -420,19 +420,19 @@ acq_irrad_interactive <-
 
       if (grepl("series", interface.mode)) {
 
-        maximum.measurement.durantion <-
-          ((max(settings$tot.time.range) + acq.overhead) * # with HDR one setting
-             length(settings$HDR.mult)) + # number of HDR settings
-          0.75 * mean(settings$in.time) # estimate of worse case overhead due to free-running
+        estimated.measurement.duration <-
+          sum(settings$integ.time * settings$num.scans * 1e-6) +
+          acq.overhead * length(settings$HDR.mult) + # number of HDR acquisitions
+          sum(0.66 * settings$integ.time * 1e-6) # estimate of worse case overhead due to free-running
 
-        message("Estimated duration of one measurement with overhead: ", signif(maximum.measurement.durantion, 3), " s.")
+        message("Estimated duration of one measurement with overhead: ", signif(estimated.measurement.duration, 3), " s.")
 
         seq.settings <-
           set_seq_interactive(seq.settings = seq.settings,
-                              measurement.duration = maximum.measurement.durantion,
+                              measurement.duration = estimated.measurement.duration,
                               minimum.step.delay = ifelse(length(settings$HDR.mult) == 1L,
                                                           0,
-                                                          maximum.measurement.durantion))
+                                                          estimated.measurement.duration))
       }
 
       if (reuse.old.refs) {
