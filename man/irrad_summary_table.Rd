@@ -2,7 +2,7 @@
 % Please edit documentation in R/acq-irrad-interactive.R
 \name{irrad_summary_table}
 \alias{irrad_summary_table}
-\title{Summarize spectral irradiance}
+\title{Summarize spectral irradiance or fluence}
 \usage{
 irrad_summary_table(
   mspct,
@@ -33,8 +33,8 @@ A tibble with one row per spectrum and one column per
    summary quantity and attribute and a column with the names of the spectra.
 }
 \description{
-Compute waveband irradiances and rattios between waveband irradiances of
-interest to plants' and visual responses to light.
+Compute irradiance or fluence by waveband and energy or photon ratios
+between wavebands of interest to plants' and human visual responses to light.
 }
 \details{
 This function packages different functions from pacakge 'photobiology'

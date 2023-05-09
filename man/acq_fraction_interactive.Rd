@@ -164,7 +164,6 @@ This function calls functions \code{\link{tune_interactive}},
   and \code{\link{oo_calib2irrad_mult}} are also called.
 
 Other interactive acquisition functions: 
-\code{\link{acq_fluence_interactive}()},
 \code{\link{acq_irrad_interactive}()}
 }
 \concept{interactive acquisition functions}

@@ -1,17 +1,22 @@
-#' Acquire spectral irradiance
+#' Acquire spectral irradiance or fluence
 #'
-#' Interactive front-end allowing acquisition of spectral irradiance using Ocean
-#' Optics spectrometers. Output of spectral data in R data files stored in
-#' objects suitable for use with packages 'photobiology' and 'ggspectra' as well
-#' as plots as PDF files and summaries as comma separated files.
+#' Interactive front-end allowing acquisition of spectral irradiance and
+#' spectral fluence using Ocean Optics spectrometers. Output of spectral data in
+#' R data files stored in objects suitable for use with packages 'photobiology'
+#' and 'ggspectra' as well as plots as PDF files and summaries as comma
+#' separated files and R objects.
 #'
 #' @details  Function \code{acq_irrad_interactive()} supports measurement of
-#'   spectral irradiance from continuous light sources. (It assumes that the
+#'   spectral irradiance from continuous light sources and spectral fluence
+#'   from discontinuous ones. For spectral irradiance it assumes that the
 #'   duration of the measurement event is the relevant time base for expression
-#'   of the flux of radiation.) This function can be used to acquire spectral
-#'   irradiance using different protocols for acquisition and stray light and
-#'   dark corrections. The protocols are described in the vignettes and in the
-#'   help for the lower level functions called, also from this same package.
+#'   of the flux of radiation. For spectral fluence the flux of radiation is
+#'   expressed per pulse of illumination.
+#'
+#'   This function can be used to acquire spectra using different protocols for
+#'   acquisition and stray light and dark corrections. The protocols are
+#'   described in the vignettes and in the help for the low-level functions
+#'   called by this function, also from this same package.
 #'
 #'   Using this function only requires an Ocean Optics spectrometer to be
 #'   connected to the computer where R is running and the OmniDriver runtime
@@ -26,17 +31,23 @@
 #'   passed to \code{diff.type}. If no irradiance calibration is available,
 #'   counts per second (cps) or raw counts are the only options available.
 #'
-#'   Three default protocols are available by default. They differ in the
-#'   additional measurements done to correct for stray light and dark noise. The
-#'   default protocols are usually suitable, if new protocols are passed, each
-#'   character vector must contain strings "light", "filter" and "dark".
+#'   Three main protocols and two variations are available by default. They
+#'   differ in the additional measurements done to correct for stray light and
+#'   dark noise and in the sequence in which they are acquired. The default
+#'   protocols are usually suitable, if new protocols are passed, each character
+#'   vector must contain strings "light", "filter" and "dark".
 #'
-#'   By default the integration time is set automatically so that the number of
-#'   counts at the highest peak is close to 1 - \code{target.margin} times the
-#'   maximum of the range of the instrument detector (retrieved from the
-#'   calibration or the instrument memory). The minimum \code{tot.time} is
-#'   obtained by increasing the number of scans. The maximum integration time
-#'   supported by the spectrometer is not exceeded.
+#'   In the case of spectral irradiance, the default is to set the integration time
+#'   automatically so that the number of counts at the highest peak is close to
+#'   1 - \code{target.margin} times the maximum of the range of the instrument
+#'   detector (retrieved from the calibration or the instrument memory). The
+#'   minimum \code{tot.time} is obtained by increasing the number of scans. The
+#'   maximum integration time supported by the spectrometer is not exceeded.
+#'
+#'   In the case of spectral fluence the default is for the integration time to
+#'   be set manually and for a message to be displayed asking for the light
+#'   pulse to be manually triggered. It is possible to override the default
+#'   function by one that triggers the light source automatically.
 #'
 #'   Plots are produced with functions from package 'ggspectra' and respect the
 #'   default annotations set with function \code{set_annotations_default()},
@@ -74,8 +85,8 @@
 #'   \code{initial.delay}, \code{"step.delay"} and \code{"num.steps"}.
 #' @param area numeric Passed to \code{o_calib2irrad_mult()}.
 #' @param diff.type character Passed to \code{o_calib2irrad_mult()}.
-#' @param qty.out character One of "Tfr" (spectral transmittance as a fraction
-#'   of one), "irrad" (spectral irardiance), "cps" (counts per second), or "raw"
+#' @param qty.out character One of "irrad" (spectral irradiance), "fluence"
+#'   (spectral fluence), "cps" (counts per second), or "raw"
 #'   (raw sensor counts).
 #' @param summary.type character One of "plant", "PAR" or "VIS".
 #' @param save.pdfs,save.summaries,save.collections logical Whether to save
@@ -84,6 +95,11 @@
 #' @param interface.mode character One of "auto", "simple", "manual", "full",
 #'   "series", "auto-attr", "simple-attr", "manual-attr", "full-atr", and
 #'   "series-attr".
+#' @param num.exposures integer Number or light pulses (flashes) per scan. Set
+#'   to \code{-1L} to indicate that the light source is continuous.
+#' @param f.trigger.pulses function Function to be called to trigger light
+#'   pulse(s). Should accept as its only argument the number of pulses, and
+#'   return \code{TRUE} on success and \code{FALSE} on failure.
 #' @param folder.name,session.name,user.name character Default name of the
 #'   folder used for output, and session and user names.
 #'
@@ -127,7 +143,8 @@
 acq_irrad_interactive <-
   function(tot.time.range = c(5, 15),
            target.margin = 0.1,
-           HDR.mult = c(short = 1, long = 10),
+           HDR.mult = if (qty.out == "fluence")
+                        c(short = 1) else c(short = 1, long = 10),
            protocols = NULL,
            correction.method = NA,
            descriptors = NA,
@@ -141,7 +158,9 @@ acq_irrad_interactive <-
            save.pdfs = TRUE,
            save.summaries = TRUE,
            save.collections = interface.mode != "simple",
-           interface.mode = "auto",
+           interface.mode = ifelse(qty.out == "fluence", "manual", "auto"),
+           num.exposures = ifelse(qty.out == "fluence", 1L, -1L),
+           f.trigger.pulses = f.trigger.message,
            folder.name = paste("acq", qty.out,
                                lubridate::today(tzone = "UTC"),
                                sep = "-"),
@@ -168,7 +187,7 @@ acq_irrad_interactive <-
 
     # validate qty.out
     qty.out <- tolower(qty.out)
-    stopifnot(qty.out %in% c("irrad", "cps", "raw"))
+    stopifnot(qty.out %in% c("irrad", "fluence", "cps", "raw"))
 
     # define measurement protocols
     default.protocols <- list(l = "light",
@@ -176,7 +195,8 @@ acq_irrad_interactive <-
                               lf = c("light", "filter"),
                               lfd = c("light", "filter", "dark"),
                               dl = rev(c("light", "dark")),
-                              dfl = rev(c("light", "filter", "dark")))
+                              dfl = rev(c("light", "filter", "dark"))
+    )
     if (length(protocols) == 0) {
       protocols <- default.protocols
     } else if (inherits(protocols, "character")) {
@@ -289,7 +309,7 @@ acq_irrad_interactive <-
     # We check for valid calibration multipliers
     if (length(descriptor[["inst.calib"]][["irrad.mult"]]) != descriptor[["num.pixs"]] ||
         anyNA(descriptor[["inst.calib"]][["irrad.mult"]])) {
-      if (qty.out == "irrad") {
+      if (qty.out %in% c("irrad", "fluence")) {
         warning("Bad calibration data, returning counts-per-second.",
                 call. = FALSE)
         qty.out = "cps"
@@ -352,7 +372,8 @@ acq_irrad_interactive <-
                              integ.time = start.int.time,
                              target.margin = target.margin,
                              tot.time.range = tot.time.range,
-                             HDR.mult = HDR.mult)
+                             HDR.mult = HDR.mult,
+                             num.exposures = num.exposures)
 
     if (is.null(seq.settings)) {
       seq.settings <- list(start.boundary = "second",
@@ -377,7 +398,6 @@ acq_irrad_interactive <-
 
     repeat { # main loop for UI
       repeat{
-        utils::flush.console()
         user.obj.name <- readline("Give a name to the spectrum: ")
         obj.name <- make.names(user.obj.name)
         if (obj.name != user.obj.name) {
@@ -440,12 +460,14 @@ acq_irrad_interactive <-
                                    acq.settings = settings,
                                    seq.settings = seq.settings,
                                    protocol = "light",
+                                   f.trigger.pulses = f.trigger.pulses,
                                    user.label = obj.name)
       } else {
         raw.mspct <- acq_raw_mspct(descriptor = descriptor,
                                    acq.settings = settings,
                                    seq.settings = seq.settings,
                                    protocol = protocol,
+                                   f.trigger.pulses = f.trigger.pulses,
                                    user.label = obj.name)
       }
 
@@ -514,7 +536,6 @@ acq_irrad_interactive <-
             valid.answers <- c("p", "e", "w", "d", "s")
           }
           repeat {
-            utils::flush.console()
             answer <- readline(plot.prompt)[1]
             answer <- ifelse(answer == "", "s", answer)
             if (answer %in% valid.answers) {
@@ -669,7 +690,7 @@ acq_irrad_interactive <-
                 paste(collection.name, "contents.tb", sep = ".")
               assign(contents.collection.name, summary(collection.mspct))
               collection.objects <- c(collection.objects, contents.collection.name)
-              if (qty.out == "irrad") {
+              if (qty.out %in% c("irrad", "fluence")) {
                 last.summary.type <- summary.type
                 repeat{
                   valid.answers <- c("plant", "PAR", "VIS")
@@ -786,10 +807,10 @@ acq_irrad_interactive <-
 
   }
 
-#' Summarize spectral irradiance
+#' Summarize spectral irradiance or fluence
 #'
-#' Compute waveband irradiances and rattios between waveband irradiances of
-#' interest to plants' and visual responses to light.
+#' Compute irradiance or fluence by waveband and energy or photon ratios
+#' between wavebands of interest to plants' and human visual responses to light.
 #'
 #' @param mspct A source_mspct, or a source_spct object containing spectral
 #'    irradiance for one or more sources.

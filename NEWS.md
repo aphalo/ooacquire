@@ -4,7 +4,13 @@ editor_options:
     wrap: 72
 ---
 
-# ooacquire 0.3.3 (2023-05-05)
+# ooacquire 0.3.4 (2023-05-xx)
+
+-   Update `acq_irrad_interactive()` to measure spectral fluence in addition
+    to spectral irradiance. Remove `acq_fluence_interactive()` and 
+    `acq_fraction_pulsed_interactive()`.
+    
+# ooacquire 0.3.3 (2023-05-09)
 
 -   Improved estimate of measurement duration, and display message.
 -   When possible, if series step delay is too short, set it to zero, and
