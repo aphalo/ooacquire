@@ -284,7 +284,7 @@ acq_raw_mspct <- function(descriptor,
   previous.protocol <- "none"
 
   high.speed <-
-    seq.settings[["step.delay"]] == 0 &&
+    all(seq.settings[["step.delay"]] == 0) &&
     seq.settings[["num.steps"]] > 1L &&
     length(acq.settings[["integ.time"]]) == 1L # no HDR bracketing
 
@@ -320,11 +320,11 @@ acq_raw_mspct <- function(descriptor,
     }
 
     if (verbose) {
-      if (high.speed) {
-        message("Measuring series as fast as possible starting at ", times[1],
-                " taking ", length(times), " measurements")
+      if (high.speed || all(seq.settings[["step.delay"]] == 0)) {
+        message("Fast series acquisition starting at ", times[1],
+               " (\"no progress messages\")")
       } else if (length(times) > 1L) {
-        message("Measuring series from ", times[1], " to ", times[length(times)],
+        message("Series acquisition from ", times[1], " to ", times[length(times)],
                 " taking ", length(times), " measurements")
       }
     }
