@@ -587,7 +587,7 @@ acq_irrad_interactive <-
         file.names <- c(file.names, file.name)
 
         assign(raw.name, raw.mspct)
-        save(list = c(raw.name), file = file.name)
+        save(list = raw.name, file = file.name)
       }
 
       if (save.collections || save.summaries) {

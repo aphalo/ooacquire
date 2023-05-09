@@ -320,11 +320,14 @@ acq_raw_mspct <- function(descriptor,
     }
 
     if (verbose) {
-      if (high.speed || all(seq.settings[["step.delay"]] == 0)) {
-        message("Fast series acquisition starting at ", times[1],
+      if (high.speed) {
+        message("Buffered series acquisition starting at ", times[1],
                " (\"no progress messages\")")
+      } else if (all(seq.settings[["step.delay"]] == 0)) {
+        message("Fast series acquisition starting at ", times[1],
+                " (\"no progress messages\")")
       } else if (length(times) > 1L) {
-        message("Series acquisition from ", times[1], " to ", times[length(times)],
+        message("Timed series acquisition from ", times[1], " to ", times[length(times)],
                 " taking ", length(times), " measurements")
       }
     }
