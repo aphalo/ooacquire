@@ -331,15 +331,16 @@ acq_raw_mspct <- function(descriptor,
 
     if (high.speed && p == "light") {
       # acquire multiple spectra as fast as possible
-      z <- c(z,
-             hs_acq_raw_mspct(descriptor = descriptor,
-                              acq.settings = acq.settings,
-                              num.spectra = length(times),
-                              f.trigger.pulses = f.current,
-                              what.measured = paste(p, " HS: ", user.label, sep = ""),
-                              where.measured = where.measured,
-                              verbose = TRUE,
-                              return.list = TRUE))
+      zz <- hs_acq_raw_mspct(descriptor = descriptor,
+                             acq.settings = acq.settings,
+                             num.spectra = length(times),
+                             f.trigger.pulses = f.current,
+                             what.measured = paste(p, " HS: ", user.label, sep = ""),
+                             where.measured = where.measured,
+                             verbose = TRUE,
+                             return.list = TRUE)
+      z <- c(z, zz)
+      idx <- idx + length(zz)
     } else {
       messages.enabled <-
         verbose && (p %in% c("dark", "filter") ||
@@ -381,7 +382,7 @@ acq_raw_mspct <- function(descriptor,
 
   z <- photobiology::as.raw_mspct(z)
 
-  if (verbose && (length(times) > 1L || high.speed)) {
+  if (verbose && (seq.settings[["num.steps"]] > 1L || high.speed)) {
     light.spectra.idx <- grepl("^light", names(z))
     actual.times <-
       unlist(photobiology::when_measured(z[light.spectra.idx])[["when.measured"]], use.names = FALSE)

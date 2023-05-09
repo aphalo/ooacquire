@@ -9,6 +9,7 @@ editor_options:
 -   Improved estimate of measurement duration, and display message.
 -   When possible, if series step delay is too short, set it to zero, and
     otherwise to the estimated duration.
+-   Fix bug in high speed acquisition of series with protocols ld and lfd.
     
 # ooacquire 0.3.2-1 (2023-04-27)
 
