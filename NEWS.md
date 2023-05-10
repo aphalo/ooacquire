@@ -4,7 +4,12 @@ editor_options:
     wrap: 72
 ---
 
-# ooacquire 0.3.3 (2023-05-05)
+# ooacquire 0.3.3-1 (2023-05-10)
+
+-   Fix bug that made interface mode "series-attr" crash on attempts to change
+    the step delay setting.
+
+# ooacquire 0.3.3 (2023-05-09)
 
 -   Improved estimate of measurement duration, and display message.
 -   When possible, if series step delay is too short, set it to zero, and

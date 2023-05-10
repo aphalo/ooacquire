@@ -268,7 +268,7 @@ acq_irrad_interactive <-
       stop("No spectrometer data found")
     }
 
-    if (interface.mode != "series") {
+    if (!grepl("^series", interface.mode)) {
       acq.overhead <- NA_real_ # safeguard as it should not be used
     } else if (grepl("^MAY", serial_no)) {
       acq.overhead <- 1e-3 # 1 ms
@@ -418,12 +418,17 @@ acq_irrad_interactive <-
                                      interface.mode = interface.mode)
       }
 
-      if (grepl("series", interface.mode)) {
+      if (grepl("^series", interface.mode)) {
 
         estimated.measurement.duration <-
           sum(settings$integ.time * settings$num.scans * 1e-6) +
           acq.overhead * length(settings$HDR.mult) + # number of HDR acquisitions
           sum(0.66 * settings$integ.time * 1e-6) # estimate of worse case overhead due to free-running
+
+        stopifnot("Estimated measurement duration is not finite" =
+                    is.finite(estimated.measurement.duration),
+                  "Estimated measurement duration <= 0" =
+                    estimated.measurement.duration > 0)
 
         message("Estimated duration of one measurement with overhead: ", signif(estimated.measurement.duration, 3), " s.")
 
