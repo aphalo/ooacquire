@@ -4,6 +4,12 @@ editor_options:
     wrap: 72
 ---
 
+# ooacquire 0.3.4 (2023-05-xx)
+
+-   Update `acq_irrad_interactive()` to measure spectral fluence in addition
+    to spectral irradiance. Remove `acq_fluence_interactive()` and 
+    `acq_fraction_pulsed_interactive()`.
+    
 # ooacquire 0.3.3-1 (2023-05-10)
 
 -   Fix bug that made interface mode "series-attr" crash on attempts to change

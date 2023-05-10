@@ -2,12 +2,12 @@
 % Please edit documentation in R/acq-irrad-interactive.R
 \name{acq_irrad_interactive}
 \alias{acq_irrad_interactive}
-\title{Acquire spectral irradiance}
+\title{Acquire spectral irradiance or fluence}
 \usage{
 acq_irrad_interactive(
   tot.time.range = c(5, 15),
   target.margin = 0.1,
-  HDR.mult = c(short = 1, long = 10),
+  HDR.mult = if (qty.out == "fluence") c(short = 1) else c(short = 1, long = 10),
   protocols = NULL,
   correction.method = NA,
   descriptors = NA,
@@ -21,7 +21,9 @@ acq_irrad_interactive(
   save.pdfs = TRUE,
   save.summaries = TRUE,
   save.collections = interface.mode != "simple",
-  interface.mode = "auto",
+  interface.mode = ifelse(qty.out == "fluence", "manual", "auto"),
+  num.exposures = ifelse(qty.out == "fluence", 1L, -1L),
+  f.trigger.pulses = f.trigger.message,
   folder.name = paste("acq", qty.out, lubridate::today(tzone = "UTC"), sep = "-"),
   user.name = Sys.info()[["user"]],
   session.name = paste(user.name, strftime(lubridate::now(tzone = "UTC"),
@@ -59,8 +61,8 @@ created on-the-fly.}
 
 \item{diff.type}{character Passed to \code{o_calib2irrad_mult()}.}
 
-\item{qty.out}{character One of "Tfr" (spectral transmittance as a fraction
-of one), "irrad" (spectral irardiance), "cps" (counts per second), or "raw"
+\item{qty.out}{character One of "irrad" (spectral irradiance), "fluence"
+(spectral fluence), "cps" (counts per second), or "raw"
 (raw sensor counts).}
 
 \item{summary.type}{character One of "plant", "PAR" or "VIS".}
@@ -72,6 +74,13 @@ enable collections user interface or not..}
 \item{interface.mode}{character One of "auto", "simple", "manual", "full",
 "series", "auto-attr", "simple-attr", "manual-attr", "full-atr", and
 "series-attr".}
+
+\item{num.exposures}{integer Number or light pulses (flashes) per scan. Set
+to \code{-1L} to indicate that the light source is continuous.}
+
+\item{f.trigger.pulses}{function Function to be called to trigger light
+pulse(s). Should accept as its only argument the number of pulses, and
+return \code{TRUE} on success and \code{FALSE} on failure.}
 
 \item{folder.name, session.name, user.name}{character Default name of the
 folder used for output, and session and user names.}
@@ -89,19 +98,24 @@ These functions return the acquired spectra through "side effects" as
   connection to the spectrometer.
 }
 \description{
-Interactive front-end allowing acquisition of spectral irradiance using Ocean
-Optics spectrometers. Output of spectral data in R data files stored in
-objects suitable for use with packages 'photobiology' and 'ggspectra' as well
-as plots as PDF files and summaries as comma separated files.
+Interactive front-end allowing acquisition of spectral irradiance and
+spectral fluence using Ocean Optics spectrometers. Output of spectral data in
+R data files stored in objects suitable for use with packages 'photobiology'
+and 'ggspectra' as well as plots as PDF files and summaries as comma
+separated files and R objects.
 }
 \details{
 Function \code{acq_irrad_interactive()} supports measurement of
-  spectral irradiance from continuous light sources. (It assumes that the
+  spectral irradiance from continuous light sources and spectral fluence
+  from discontinuous ones. For spectral irradiance it assumes that the
   duration of the measurement event is the relevant time base for expression
-  of the flux of radiation.) This function can be used to acquire spectral
-  irradiance using different protocols for acquisition and stray light and
-  dark corrections. The protocols are described in the vignettes and in the
-  help for the lower level functions called, also from this same package.
+  of the flux of radiation. For spectral fluence the flux of radiation is
+  expressed per pulse of illumination.
+
+  This function can be used to acquire spectra using different protocols for
+  acquisition and stray light and dark corrections. The protocols are
+  described in the vignettes and in the help for the low-level functions
+  called by this function, also from this same package.
 
   Using this function only requires an Ocean Optics spectrometer to be
   connected to the computer where R is running and the OmniDriver runtime
@@ -116,17 +130,23 @@ Function \code{acq_irrad_interactive()} supports measurement of
   passed to \code{diff.type}. If no irradiance calibration is available,
   counts per second (cps) or raw counts are the only options available.
 
-  Three default protocols are available by default. They differ in the
-  additional measurements done to correct for stray light and dark noise. The
-  default protocols are usually suitable, if new protocols are passed, each
-  character vector must contain strings "light", "filter" and "dark".
+  Three main protocols and two variations are available by default. They
+  differ in the additional measurements done to correct for stray light and
+  dark noise and in the sequence in which they are acquired. The default
+  protocols are usually suitable, if new protocols are passed, each character
+  vector must contain strings "light", "filter" and "dark".
 
-  By default the integration time is set automatically so that the number of
-  counts at the highest peak is close to 1 - \code{target.margin} times the
-  maximum of the range of the instrument detector (retrieved from the
-  calibration or the instrument memory). The minimum \code{tot.time} is
-  obtained by increasing the number of scans. The maximum integration time
-  supported by the spectrometer is not exceeded.
+  In the case of spectral irradiance, the default is to set the integration time
+  automatically so that the number of counts at the highest peak is close to
+  1 - \code{target.margin} times the maximum of the range of the instrument
+  detector (retrieved from the calibration or the instrument memory). The
+  minimum \code{tot.time} is obtained by increasing the number of scans. The
+  maximum integration time supported by the spectrometer is not exceeded.
+
+  In the case of spectral fluence the default is for the integration time to
+  be set manually and for a message to be displayed asking for the light
+  pulse to be manually triggered. It is possible to override the default
+  function by one that triggers the light source automatically.
 
   Plots are produced with functions from package 'ggspectra' and respect the
   default annotations set with function \code{set_annotations_default()},
@@ -171,7 +191,6 @@ This function calls functions \code{\link{tune_interactive}},
   and \code{\link{oo_calib2irrad_mult}} are also called.
 
 Other interactive acquisition functions: 
-\code{\link{acq_fluence_interactive}()},
 \code{\link{acq_fraction_interactive}()}
 }
 \concept{interactive acquisition functions}

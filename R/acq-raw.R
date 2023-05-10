@@ -300,7 +300,7 @@ acq_raw_mspct <- function(descriptor,
         return(raw_mspct())
       }
     }
-    if (p != "dark" && !is.null(f.trigger.pulses)) {
+    if (p != "dark" && is.function(f.trigger.pulses)) {
       f.current <- f.trigger.pulses
     } else {
       f.current <- NULL
@@ -323,12 +323,14 @@ acq_raw_mspct <- function(descriptor,
       if (high.speed) {
         message("Buffered series acquisition starting at ", times[1],
                " (\"no progress messages\")")
-      } else if (all(seq.settings[["step.delay"]] == 0)) {
+      } else if (all(seq.settings[["step.delay"]] == 0) && length(times) > 1L) {
         message("Fast series acquisition starting at ", times[1],
                 " (\"no progress messages\")")
       } else if (length(times) > 1L) {
         message("Timed series acquisition from ", times[1], " to ", times[length(times)],
                 " taking ", length(times), " measurements")
+      } else if (length(times) == 1L && steps[1] > 1) {
+        message("Timed acquisition of one spectrum at ", times[1])
       }
     }
 

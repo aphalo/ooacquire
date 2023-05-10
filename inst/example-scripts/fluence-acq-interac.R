@@ -18,11 +18,9 @@
 # bracketing should be done by varying the number of pulses.
 #
 
-library(r4photobiology)
 library(ooacquire)
+library(photobiologyWavebands)
 library(httr)
-
-options(warn = 1) # no delay when issuing warnings
 
 # By default, the function used simply prompts the operator to manually trigger
 # the flash. We here define a simple function to use a USB relay module to
@@ -60,6 +58,4 @@ yocto.flash.trigger(n = 2)
 yocto.flash.trigger(n = 10)
 yocto.flash.trigger(n = 2, delay = 0.5)
 
-acq_fluence_interactive(f.trigger.pulses = yocto.flash.trigger)
-
-acq_fluence_interactive(3)
+acq_irrad_interactive(qty.out = "fluence")
