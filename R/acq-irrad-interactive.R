@@ -141,7 +141,7 @@
 #' }
 #'
 acq_irrad_interactive <-
-  function(tot.time.range = c(5, 15),
+  function(tot.time.range = if (qty.out == "fluence") 5 else c(5, 15),
            target.margin = 0.1,
            HDR.mult = if (qty.out == "fluence")
                         c(short = 1) else c(short = 1, long = 10),
@@ -170,8 +170,8 @@ acq_irrad_interactive <-
                                          "%Y.%b.%d_%H.%M.%S"),
                                 sep = "_")) {
 
-    old.value <- options(warn = 1)
-    on.exit(options(old.value), add = TRUE, after = TRUE)
+    old.warn.value <- options(warn = 1)
+    on.exit(options(old.warn.value), add = TRUE, after = TRUE)
 
     if (getOption("ooacquire.offline", FALSE)) {
       warning("ooacquire off-line: Aborting...")
@@ -368,8 +368,11 @@ acq_irrad_interactive <-
     start.int.time <- 0.01 # seconds
 
     # initial protocol
+    num.scans <- min(max(tot.time.range) %/% start.int.time, 1L)
+
     settings <- acq_settings(descriptor = descriptor,
                              integ.time = start.int.time,
+                             num.scans = num.scans,
                              target.margin = target.margin,
                              tot.time.range = tot.time.range,
                              HDR.mult = HDR.mult,

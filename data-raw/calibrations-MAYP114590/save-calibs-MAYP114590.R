@@ -56,7 +56,7 @@ files <- list.files("data-raw/calibrations-MAYP114590",
                     full.names = TRUE)
 
 MAYP114590_calib_dates.df <-
-  read_csv("data-raw/calibrations-MAYP114590/calibration-dates.csv", col_types = "ccDDDc", skip = 1)
+  read_csv("data-raw/calibrations-MAYP114590/calibration-dates.csv", col_types = "ccTTTc", skip = 1)
 
 # create a new descriptor for each calibration file
 descriptors <- list()

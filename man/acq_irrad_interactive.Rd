@@ -5,7 +5,7 @@
 \title{Acquire spectral irradiance or fluence}
 \usage{
 acq_irrad_interactive(
-  tot.time.range = c(5, 15),
+  tot.time.range = if (qty.out == "fluence") 5 else c(5, 15),
   target.margin = 0.1,
   HDR.mult = if (qty.out == "fluence") c(short = 1) else c(short = 1, long = 10),
   protocols = NULL,

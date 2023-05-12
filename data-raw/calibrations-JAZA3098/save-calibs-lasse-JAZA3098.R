@@ -106,7 +106,7 @@ rm(descriptor.tmp, d)
 stopifnot(names(descriptors) == c("JAZ3098_ch1", "JAZ3098_ch2"))
 
 JAZA3098_calib_dates.df <-
-  read_csv("data-raw/calibrations-JAZA3098/calibration-dates.csv", col_types = "ccDDDc", skip = 1)
+  read_csv("data-raw/calibrations-JAZA3098/calibration-dates.csv", col_types = "ccTTTc", skip = 1)
 
 # Need to be lists of descriptors, even if of length 1.
 JAZA3098_ch1_descriptors <- descriptors["JAZ3098_ch1"]
