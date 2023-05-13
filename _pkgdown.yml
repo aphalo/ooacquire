@@ -12,7 +12,6 @@ reference:
     contents:
     - acq_irrad_interactive
     - acq_fraction_interactive
-    - acq_fluence_interactive
     - plot_spct_file
     - collect_spct_files
 
