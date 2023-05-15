@@ -78,7 +78,9 @@ files <- list.files("data-raw/calibrations-MAYP112785",
 
 MAYP112785_calib_dates.df <-
   read_csv("data-raw/calibrations-MAYP112785/calibration-dates.csv",
-           col_types = "cccTTTcc", skip = 1)
+           col_types = "cccTTTcc",
+           skip = 1,
+           locale = locale(tz = "UTC"))
 
 # create a new descriptor for each calibration file
 descriptors <- list()

@@ -56,7 +56,10 @@ files <- list.files("data-raw/calibrations-MAYP114590",
                     full.names = TRUE)
 
 MAYP114590_calib_dates.df <-
-  read_csv("data-raw/calibrations-MAYP114590/calibration-dates.csv", col_types = "ccTTTc", skip = 1)
+  read_csv("data-raw/calibrations-MAYP114590/calibration-dates.csv",
+           col_types = "ccTTTc",
+           skip = 1,
+           locale = locale(tz = "UTC"))
 
 # create a new descriptor for each calibration file
 descriptors <- list()
@@ -74,7 +77,8 @@ for (f in files) {
                       wl = tmp[["w.length"]])
   cal.wl.range <-  tmp[["w.length"]][range(which(tmp[["irrad.mult"]] != 0L))]
   cal.wl.range <-  c(ceiling(cal.wl.range[1]), floor(cal.wl.range[2]))
-  cal.wl.range[1] <- max(cal.wl.range[1], 240)
+  cal.wl.range[1] <- max(cal.wl.range[1], 250)
+  cal.wl.range[2] <- min(cal.wl.range[2], 1050)
   descriptor.tmp <-
     set_descriptor_irrad_mult(descriptor = descriptor.tmp,
                               irrad.mult = tmp[["irrad.mult"]],

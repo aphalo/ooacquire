@@ -48,7 +48,10 @@ files <- list.files("data-raw/calibrations-FLMS00440",
                     full.names = TRUE)
 
 FLMS00440_calib_dates.df <-
-  read_csv("data-raw/calibrations-FLMS00440/calibration-dates.csv", col_types = "ccTTTc", skip = 1)
+  read_csv("data-raw/calibrations-FLMS00440/calibration-dates.csv",
+           col_types = "ccTTTc",
+           skip = 1,
+           locale = locale(tz = "UTC"))
 
 # create a new descriptor for each calibration file
 descriptors <- list()
