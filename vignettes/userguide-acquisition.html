@@ -12,7 +12,7 @@
 
 <meta name="author" content="Pedro J. Aphalo" />
 
-<meta name="date" content="2023-04-17" />
+<meta name="date" content="2023-05-25" />
 
 <title>Acquisition of Spectra</title>
 
@@ -339,9 +339,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 <h1 class="title toc-ignore">Acquisition of Spectra</h1>
-<h3 class="subtitle"><code>ooacquire</code> 0.3.1</h3>
+<h3 class="subtitle"><code>ooacquire</code> 0.3.4</h3>
 <h4 class="author">Pedro J. Aphalo</h4>
-<h4 class="date">2023-04-17</h4>
+<h4 class="date">2023-05-25</h4>
 
 
 <div id="TOC">
@@ -374,7 +374,7 @@ scripts</a></li>
 <h2>Summary</h2>
 <p>This package supports direct acquisition of spectra only from Ocean
 Optics spectrometers. It also allows some computations on RAW spectral
-counts to be done with the spectrometer off-line. What distinguishes
+counts to be done with the spectrometer off-line. What distinguishes it
 from other software is the implementation of special algorithms for
 measurement protocols that enhance the signal to noise ratio by one
 order of magnitude, allowing the measurement of ultraviolet-B radiation
@@ -387,26 +387,30 @@ OceanView on PCs and possibly using the open-source SeaBreeze based
 software running on the Raspberry Pi single-board microcomputer. It also
 supports computations based on files acquired autonomously with the Jaz
 spectrometer.</li>
-<li>Irradiance, reflectance, transmittance, absorptance and absorbance
-can be derived from raw spectra.</li>
+<li>Irradiance, fluence, reflectance, transmittance, absorptance and
+absorbance can be derived from raw spectra.</li>
 <li>Measurements of both continuous and pulsed light sources is
 possible.</li>
 <li>Different measurement protocols, data averaging, integration time
 bracketing, automatic adjustment of integration time can be used and
 corrections for stray light and slit function can be applied.</li>
+<li>Acquisition of time series of spectra is also possible in two
+different ways: at timed intervals, or as fast as possible using
+buffered transfer from the spectrometer. The minimum delay depends on
+the spectrometer but can be as short as a few microseconds.</li>
 </ul>
 <p>Although not directly supported by this package, the code it includes
 can serve as a basis for equivalent protocols and corrections of data
-from acquired with software and/or spectrometers of other brands.</p>
+acquired with software and/or spectrometers from other suppliers.</p>
 </div>
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>This document describes only high level functions for interactive
 data acquisition. We first show simple examples of their use, assuming
-that R, the needed R packages, the Java <strong>JDK</strong> and Ocean
-Optics’ free OmniDriver runtime are all installed and working (see this
-package’s README and the README of package ‘rOmniDriver’ for
-details).</p>
+that R, the needed R packages, the Temurin 8 <strong>OpenJDK</strong> or
+Oracle’s Java 8 <strong>JDK</strong> and Ocean Optics’ free OmniDriver
+runtime are all installed and working (see this package’s README and the
+README of package ‘rOmniDriver’ for details).</p>
 <p>In this vignette we provide a tutorial on how to carry out
 measurements. Please, see the vignette <em>Algorithms</em> for the
 details on the computations.</p>
@@ -416,7 +420,6 @@ use of the higher level functions.</p>
 </div>
 <div id="building-this-vignette" class="section level2">
 <h2>Building this vignette</h2>
-<p>We first load the R package to be used.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># change this to TRUE to run acquisition examples</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># these examples require user interaction to complete!!</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>sr.online <span class="ot">&lt;-</span> <span class="cn">FALSE</span></span></code></pre></div>
@@ -512,13 +515,84 @@ the spectrometer. Once the desired protocol is selected, the
 measurements can be acquired with little intervention from the user, and
 the settings are retained across successive measurement events, unless
 expressly modified.</p>
-<p>It is possible to select a different physical quantity to be plotted
-and returned by passing an argument to <code>qty.out</code>, such as
-<code>cps</code> for counts per second or <code>irrad</code> for
-irradiance. The returned data objects include metadata as attributes
-storing the settings used for the measurement and a descriptor of the
-spectrometer and version of the package used. Raw-instrument count
-spectra are always saved, to allow recalculation and verification.</p>
+<p>It is possible to select a different quantity to be plotted and saved
+to files by passing an argument to <code>qty.out</code>:</p>
+<ul>
+<li><code>&quot;raw&quot;</code> skips computations of spectra in physical units
+and saves to file only raw-counts data with metadata. In this conversion
+into physical units must be done at a later time. The descriptor of the
+instrument if missing is retrieved from the instrument.</li>
+<li><code>&quot;cps&quot;</code> (default if no spectral irradiance calibration is
+available) converts raw-counts into linearized counts-per-second and
+saves to file both raw-counts data with metadata and counts-per second
+spectral data. The descriptor of the instrument if missing is retrieved
+from the instrument.</li>
+<li><code>&quot;irrad&quot;</code> (default if a spectral irradiance calibration
+is available) converts raw-counts into corrected spectral irradiance (a
+flux rate expressed per unit time) and saves to a file both raw-counts
+data with metadata and spectral irradiance data. If the descriptor and
+spectral irradiance calibration are not available in R but available in
+the memory of the instrument they are retrieved.</li>
+<li><code>&quot;fluence&quot;</code> same as “irrad”`, but the quantity computed
+is spectral fluence (a flux expressed per measuring event).</li>
+</ul>
+<p>The saved data objects include metadata as attributes:</p>
+<table>
+<caption>Attributes of spectral objects.</caption>
+<colgroup>
+<col width="70%" />
+<col width="10%" />
+<col width="18%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>purpose</th>
+<th>included</th>
+<th>accessor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>user comment</td>
+<td>optional</td>
+<td><code>comment()</code></td>
+</tr>
+<tr class="even">
+<td>what was measured</td>
+<td>optional</td>
+<td><code>what_measured()</code></td>
+</tr>
+<tr class="odd">
+<td>where was measured</td>
+<td>optional</td>
+<td><code>where_measured()</code></td>
+</tr>
+<tr class="even">
+<td>when was measured in UTC time</td>
+<td>automatic</td>
+<td><code>when_measured()</code></td>
+</tr>
+<tr class="odd">
+<td>simply how was measured</td>
+<td>automatic</td>
+<td><code>how_measured()</code></td>
+</tr>
+<tr class="even">
+<td>instrument descriptor including calibration, serial number,
+configuration</td>
+<td>automatic</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>instrument settings used</td>
+<td>automatic</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>These attributes, together with saving raw counts in all cases,
+allows recalculation of physical quantites and provides a built-in trace
+of the origin of the data.</p>
 </div>
 <div id="spectral-irradiance" class="section level2">
 <h2>Spectral irradiance</h2>
@@ -588,8 +662,9 @@ all defaults except for the choice of a simplified user interface.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">acq_irrad_interactive</span>(<span class="at">interface.mode =</span> <span class="st">&quot;simple&quot;</span>)</span></code></pre></div>
 <p>If everything works as expected, the version of OmniDriver that has
 been found will be reported. If one or more spectrometers are found,
-they will be listed with their serial numbers. Once a connection and
-software are initialized data acquisition is possible.</p>
+they will be listed with their serial numbers for the user to choose one
+of them. Once a connection and software are initialized data acquisition
+is possible.</p>
 <ol start="4" style="list-style-type: decimal">
 <li>Follow the prompts to acquire spectra.</li>
 </ol>
@@ -790,7 +865,7 @@ regular intervals manually is difficult for long time steps and
 impossible for very short ones. In most cases we also need to measure
 many light spectra for each “dark” reference measurement. Interface mode
 <code>&quot;series&quot;</code> introduced in version 0.3.0 of ‘ooacquire’ and
-enhanced in version 0.3.1 targets this type of measurements.</p>
+enhanced in laters versions targets this type of measurements.</p>
 <p>For measuring a time series, we pass
 <code>interface.mode = &quot;series&quot;</code> in the call to
 <code>acq_irrad_interactive()</code>. We can set the default parameters
@@ -817,6 +892,21 @@ below has worked well in sunlight.</p>
 <span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>                                          <span class="at">initial.delay =</span> <span class="dv">0</span>,</span>
 <span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>                                          <span class="at">step.delay =</span> <span class="dv">60</span>,</span>
 <span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>                                          <span class="at">num.steps =</span> <span class="dv">60</span>))</span></code></pre></div>
+<p>That the acquisition of spectra is continuously running in the
+spectrometer is something to be aware of, because it means that this is
+what determines the true time step between successively retrieved
+spectra and that, say using a <code>step.delay</code> that is not a
+multiple of the frequency at which the spectrometer is acquiring the
+spectra will result only in missing the retrieval of some of the spectra
+measured by the spectrometer, but not in a different effective time
+step! In other words with short time steps we need to be aware that new
+spectra are acquired at time steps that are a multiple of the
+<strong>integration time</strong> setting of the spectrometer plus some
+small overhead that depends on the model of the spectrometer. This is
+tricky as the length of the integration time needs to be adjusted based
+on irradiance. The problem barely exists if we average multiple spectra
+during a measurement, or the time step includes some idle time between
+acquisitions.</p>
 <p>The OmniDriver API contains special functions for acquisition of
 spectra at high speed. These functions store the spectra in a computer
 memory buffer for later retrieval by user code, minimizing the overhead,
@@ -825,52 +915,51 @@ spectra. The <code>&quot;series&quot;</code> mode uses them only for
 <code>step.delay = 0</code> and no HDR integration time bracketing. In
 all other cases normal API functions are used so as to allow the use of
 HDR bracketing or the choice of the time step between successive
-acquisitions of spectra. Because, of how spectrometer usually work, some
-limitations exist.</p>
+acquisitions of spectra. Because, of how OO array spectrometers work,
+some limitations exist. When using <code>step.delay = 0</code> the time
+step is controlled by the length of the measurement, or the integration
+time if spectra are not averaged for each measurement.</p>
 <p>In my test with a specific PC under Windows 10 together with a
 USB2000 spectrometer and without bracketing I was able to use a minimum
 <code>step.delay = 0.052</code> with <code>tot.time.range = 0.050</code>
 with <code>HDR.mult = 1</code>. From these tests I infer that the
 USB2000 spectrometer is constantly measuring spectra with an overhead of
-2 ms (this may be less in modern spectrometer models) and that the
-overhead incurred by ‘ooacquire’ in reading a spectrum is less than 50
-ms.</p>
-<p>That the acquisition of spectra is continuously running in the
-spectrometer is something to be aware of, because it means that this is
-what determines the true time step between successively retrieved
-spectra and that, say using a <code>step.delay</code> that is not a
-multiple of the frequency at which the spectrometer is acquiring the
-spectra will result only in missing the retrieval of some of the spectra
-measured by the spectrometer, but not in a different effective time
-step! So, in the example in the previous paragraph with a setting of
-<code>tot.time.range = 0.050</code>, one would use 0.052 s or 0.104 s or
-0.156 s or 0.208 s and so on for <code>step.delay</code>.</p>
+<span class="math inline">\(2\,ms\)</span> (this delay is even shorter
+in modern spectrometer models) and that the overhead incurred by
+‘ooacquire’ in reading a spectrum is less than 50 ms.</p>
+<p>In the memory buffered mode with a Maya 2000 Pro I was able to
+measure using an integration time of <span class="math inline">\(7.2\,ms\)</span> a series with a median time step
+of less than 7.23 ms or an overhead of less than <span class="math inline">\(30\,\mu s\)</span>. However, I observed some small
+variation in the length of succesive time step across a series. Anyway
+time stamps are saved with a resolution of <span class="math inline">\(1\,\mu s\)</span>.</p>
 <p><strong>The time overhead depends on the spectrometer, the PC and
-most likely the operating system and possibly version of R and
-‘ooacquire’. Consequently before attempting measurements using
-<code>step.delay</code> values that are not much longer than the largest
-value in the vector passed to <code>tot.time.range</code>, some
-experimentation will be needed.</strong></p>
+most likely the operating system and possibly the version of OmniDriver,
+Java, R and ‘ooacquire’. Consequently before attempting measurements
+using <code>step.delay</code> values that are not much longer than the
+largest value in the vector passed to <code>tot.time.range</code>, some
+experimentation will be needed. The package attempts to detect
+<code>step.delay</code> values that are too short to be achieved and
+overrides them with <code>step.delay = 0</code></strong>.</p>
 <p>When using HDR-integration-time bracketing, the spectrometer is not
-free running and continuously acquiring spectra. Settings need to be
+free running or continuously acquiring spectra. Settings need to be
 changed, acquisition of spectra restarted and the spectral data
 subsequently acquired only after a freshly measured spectrum is
 available. This adds a lot of overhead compared to retrieving spectra
-that are being measured by the spectrometer while the PC is busy with
-other tasks, such as retrieving the previous spectrum. Furthermore, this
-also means that when using HDR bracketing, the overhead depends on the
-<code>tot.time.range</code> and <code>HDR.mult</code> settings and on
-the integration time. In contrast, when the settings are not modified
-between successively acquired spectra the overhead is much less and less
-dependent on the integration time and arguments passed to other
-parameters.</p>
+that are being measured by the spectrometer using multitasking while the
+PC is busy with other tasks, such as retrieving the previous spectrum.
+Furthermore, this also means that when using HDR bracketing, the
+overhead depends on the <code>tot.time.range</code> and
+<code>HDR.mult</code> settings and on the integration time. In contrast,
+when the settings are not modified between successively acquired spectra
+the overhead is much less and less dependent on the integration time and
+arguments passed to other parameters.</p>
 <p>So with care about choosing matching integration times and
 <code>step.delay</code> values without HDR bracketing one can achieve as
-little as 50 ms between acquired spectra. However, when using HDR
-bracketing, a rough guide is that the minimum time step that can be
-achieved is about twice the sum of the summed integration time values
-used. When <code>tot.time.range</code> is set as a range, then the
-longest time should be considered as limiting.</p>
+little as 50 ms between acquired spectra at timed steps. However, when
+using HDR bracketing, a rough guide is that the minimum time step that
+can be achieved is about twice the sum of the summed integration time
+values used. When <code>tot.time.range</code> is set as a range, then
+the longest time should be considered as limiting.</p>
 <p>The high speed acquisition mode retrieves as quickly as possible the
 spectra as they are acquired, and the time step is simply the
 integration time plus the spectrometer overhead. To enable this mode we
@@ -884,8 +973,8 @@ set when the retrieval into the memory buffer is started, but the times
 for the later spectra are set based on time differences computed from
 time stamps retrieved from OmniDriver. The theoretical time resolution
 is better than a microsecond for objects of R’s class
-<code>POSIXct</code> is better than 1 microsecond, and this class is
-used in package ‘photobiology’ to record acquisition times.</p>
+<code>POSIXct</code>, and this class is used in package ‘photobiology’
+to record acquisition times.</p>
 <hr />
 <p><strong>Measurement of series of spectra with single dark and filter
 measurements makes it imperative that the functioning of the
@@ -912,17 +1001,22 @@ of the spectrometer.</strong></p>
 </div>
 <div id="spectral-fluence" class="section level3">
 <h3>Spectral fluence</h3>
-<p>Several features available in <code>acq_irrad_interactive()</code>
-are not implemented in function <code>acq_fluence_interactive</code>. If
-the duration of the exposure to a continuous light source is known, then
-spectral irradiance multiplied by this time duration gives spectral
-fluence, and can be obtained by measuring spectral irradiance as
-described in the previous section. In this section we discuss the case
-when spectral fluence is measured directly, using an integration time
-that encompasses the whole duration of the irradiation event, especially
-when the duration of this event is unknown or spectral irradiance varies
-through the irradiation event and we are interested in the accumulated
-exposure or “dose”.</p>
+<p>Function <code>acq_irrad_interactive()</code> has replaced function
+<code>acq_fluence_interactive</code>. Fluence spectra are returned by
+<code>acq_irrad_interactive()</code> when
+<code>qty.out = &quot;fluence&quot;</code>. Some of the defaults for other
+parameters also change. Otherwise all the functionality described above
+for irradiance measurements is avaialable except the
+<code>&quot;series&quot;</code> interface mode.</p>
+<p>If the duration of the exposure to a continuous light source is
+known, then spectral irradiance multiplied by this time duration gives
+spectral fluence, and can be obtained by measuring spectral irradiance
+as described in the previous section. In this section we discuss the
+case when spectral fluence is measured directly, using an integration
+time that encompasses the whole duration of the irradiation event,
+especially when the duration of this event is unknown or spectral
+irradiance varies through the irradiation event and we are interested in
+the accumulated exposure or “dose”.</p>
 <p>Fluence, also called radiant exposure, is defined per exposure event
 rather than per unit time. When measuring pulsed light sources, the
 length of exposure is determined by the duration of the pulse, which is
@@ -930,21 +1024,17 @@ usually not known with precision. In the discussion below we assume that
 the quantity of interest is fluence per pulse. For this type of
 measurements the integration time setting in the spectrometer only
 affects the window within which pulses will be measured, consequently,
-it is always set manually, and in the current implementation kept
-constant for the whole session. The way of controlling the number of
-photons reaching the detector during an integration is through the
-number of pulses per integration and/or the fluence provided by each
-pulse (e.g. by altering the distance between source and instrument light
-entrance or the power settings).</p>
+it is always set manually. The way of controlling the number of photons
+reaching the detector during an integration is through the number of
+pulses per integration and/or the fluence provided by each pulse (e.g.,
+by altering the distance between source and instrument entrance optics
+or the power settings of the source).</p>
 <p>We start the session as described above for irradiance, but using
-function <code>acq_fluence_interactive()</code>. Using defaults.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">acq_fluence_interactive</span>(<span class="at">correction.method =</span> ooacquire<span class="sc">::</span>MAYP11278_ylianttila.mthd,</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">descriptors =</span> ooacquire<span class="sc">::</span>MAYP11278_descriptors)</span></code></pre></div>
+function <code>acq_fluence_interactive()</code>. Using defaults except
+for <code>qty.out</code>.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">acq_irrad_interactive</span>(<span class="at">qty.out =</span> <span class="st">&quot;fluence&quot;</span>)</span></code></pre></div>
 <p>The integration time can be set when calling the function to start a
-session.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">acq_fluence_interactive</span>(<span class="at">integ.time =</span> <span class="dv">4</span>, <span class="co"># seconds</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">correction.method =</span> ooacquire<span class="sc">::</span>MAYP11278_ylianttila.mthd,</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">descriptors =</span> ooacquire<span class="sc">::</span>MAYP11278_descriptors)</span></code></pre></div>
+session or leter interactively.</p>
 <p>Another important parameter is the number of exposure events. This
 determines how the resulting data are expressed. If we consider that
 each individual pulse is an exposure event, and for example, we trigger
@@ -981,17 +1071,17 @@ reflectance of very dark objects, it might be convenient to use a grey
 reference instead of a white reference). For a reference with 97%
 reflectance across the whole range of wavelengths of interest one would
 use.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">acq_fraction_interactive</span>(<span class="at">ref.value =</span> <span class="fl">0.97</span>,</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">correction.method =</span> ooacquire<span class="sc">::</span>MAYP11278_ylianttila.mthd,</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">descriptors =</span> ooacquire<span class="sc">::</span>MAYP11278_descriptors)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">acq_fraction_interactive</span>(<span class="at">ref.value =</span> <span class="fl">0.97</span>,</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">correction.method =</span> ooacquire<span class="sc">::</span>MAYP11278_ylianttila.mthd,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">descriptors =</span> ooacquire<span class="sc">::</span>MAYP11278_descriptors)</span></code></pre></div>
 <p>Parameters <code>qty.out</code> and <code>type</code> determine the
 class of object and the quantity stored in the returned objects. If the
 optical set-up used is for measuring specular spectral reflectance, we
 use the following code. This information will also be used when plotting
 the data.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">acq_fraction_interactive</span>(<span class="at">qty.out =</span> <span class="st">&quot;Rfr&quot;</span>, <span class="at">type =</span> <span class="st">&quot;specular&quot;</span>,</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">correction.method =</span> ooacquire<span class="sc">::</span>MAYP11278_ylianttila.mthd,</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">descriptors =</span> ooacquire<span class="sc">::</span>MAYP11278_descriptors)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">acq_fraction_interactive</span>(<span class="at">qty.out =</span> <span class="st">&quot;Rfr&quot;</span>, <span class="at">type =</span> <span class="st">&quot;specular&quot;</span>,</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">correction.method =</span> ooacquire<span class="sc">::</span>MAYP11278_ylianttila.mthd,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">descriptors =</span> ooacquire<span class="sc">::</span>MAYP11278_descriptors)</span></code></pre></div>
 <p>Wen using <em>light sources with pulsed emission</em> we start a
 session by calling function
 <code>acq_fraction_pulsed_interactive()</code> instead of
@@ -1026,12 +1116,12 @@ or editing them.</p>
 the ‘ooacquire’ package is installed, and where the file you are
 interested in is, and to copy it to your own workspace. Here we copy the
 script called <code>&quot;irrad-acq-interac.R&quot;</code>.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>filepath <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;example-scripts&quot;</span>, <span class="st">&quot;irrad-acq-interac.R&quot;</span>, <span class="at">package=</span><span class="st">&quot;ooacquire&quot;</span>)</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">file.copy</span>(<span class="at">from =</span> filepath, <span class="at">to =</span> <span class="st">&quot;.&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>filepath <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;example-scripts&quot;</span>, <span class="st">&quot;irrad-acq-interac.R&quot;</span>, <span class="at">package=</span><span class="st">&quot;ooacquire&quot;</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">file.copy</span>(<span class="at">from =</span> filepath, <span class="at">to =</span> <span class="st">&quot;.&quot;</span>)</span></code></pre></div>
 <p>Here we copy all the example scripts.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>folderpath <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;example-scripts&quot;</span>, <span class="at">package=</span><span class="st">&quot;ooacquire&quot;</span>)</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">list.files</span>(<span class="at">path =</span> folderpath, <span class="at">pattern =</span> <span class="st">&quot;.*[.]R&quot;</span>)</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="fu">file.copy</span>(<span class="at">from =</span> <span class="fu">list.files</span>(<span class="at">path =</span> folderpath, <span class="at">pattern =</span> <span class="st">&quot;.*[.]R&quot;</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>), <span class="at">to =</span> <span class="st">&quot;.&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>folderpath <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;example-scripts&quot;</span>, <span class="at">package=</span><span class="st">&quot;ooacquire&quot;</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">list.files</span>(<span class="at">path =</span> folderpath, <span class="at">pattern =</span> <span class="st">&quot;.*[.]R&quot;</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">file.copy</span>(<span class="at">from =</span> <span class="fu">list.files</span>(<span class="at">path =</span> folderpath, <span class="at">pattern =</span> <span class="st">&quot;.*[.]R&quot;</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>), <span class="at">to =</span> <span class="st">&quot;.&quot;</span>)</span></code></pre></div>
 </div>
 
 

@@ -62,14 +62,8 @@ options(warn = 1)
 #                                            step.delay = 60,
 #                                            num.steps = 60))
 
-## ---- eval=sr.online----------------------------------------------------------
-#  acq_fluence_interactive(correction.method = ooacquire::MAYP11278_ylianttila.mthd,
-#                          descriptors = ooacquire::MAYP11278_descriptors)
-
-## ---- eval=sr.online----------------------------------------------------------
-#  acq_fluence_interactive(integ.time = 4, # seconds
-#                          correction.method = ooacquire::MAYP11278_ylianttila.mthd,
-#                          descriptors = ooacquire::MAYP11278_descriptors)
+## ---- eval = sr.online--------------------------------------------------------
+#  acq_irrad_interactive(qty.out = "fluence")
 
 ## ---- eval=sr.online----------------------------------------------------------
 #  acq_fraction_interactive(ref.value = 0.97,
