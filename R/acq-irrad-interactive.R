@@ -660,6 +660,7 @@ acq_irrad_interactive <-
           if (qty.out != "raw") {
             collection.mspct <-
               switch(qty.out,
+                     fluence = photobiology::source_mspct(mget(irrad.names)),
                      irrad = photobiology::source_mspct(mget(irrad.names)),
                      cps =   photobiology::cps_mspct(mget(irrad.names)))
 

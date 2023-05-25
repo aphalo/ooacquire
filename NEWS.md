@@ -4,7 +4,7 @@ editor_options:
     wrap: 72
 ---
 
-# ooacquire 0.3.4 (2023-05-xx)
+# ooacquire 0.3.4 (2023-05-25)
 
 -   Update `acq_irrad_interactive()` to measure spectral fluence in addition
     to spectral irradiance. Remove `acq_fluence_interactive()` and 
