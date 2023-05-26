@@ -88,6 +88,8 @@
 #' @param qty.out character One of "irrad" (spectral irradiance), "fluence"
 #'   (spectral fluence), "cps" (counts per second), or "raw"
 #'   (raw sensor counts).
+#' @param plot.lines.max integer Maximum number of spectra to plot as individual
+#'   lines.
 #' @param summary.type character One of "plant", "PAR" or "VIS".
 #' @param save.pdfs,save.summaries,save.collections logical Whether to save
 #'   plots to PDFs files or not, and collection summaries to csv files or not,
@@ -154,6 +156,7 @@ acq_irrad_interactive <-
            area = NULL,
            diff.type = NULL,
            qty.out = "irrad",
+           plot.lines.max = 50,
            summary.type = "plant",
            save.pdfs = TRUE,
            save.summaries = TRUE,
@@ -523,7 +526,7 @@ acq_irrad_interactive <-
         }
 
         repeat {
-          fig <- ggplot2::autoplot(irrad.spct,
+          fig <- ggplot2::autoplot(sample_spct(irrad.spct, size = plot.lines.max),
                                    annotations = c("-", "colour.guide"),
                                    geom = ifelse(getMultipleWl(irrad.spct) == 1,
                                                  "spct", "line")) +
@@ -671,7 +674,7 @@ acq_irrad_interactive <-
               plot.data = "as.is"
             }
             collection.fig <-
-              ggplot2::autoplot(collection.mspct,
+              ggplot2::autoplot(sample_mspct(collection.mspct, plot.lines.max),
                                 annotations =
                                   c("-", "peaks", "colour.guide", "summaries"),
                                 plot.data = plot.data) +

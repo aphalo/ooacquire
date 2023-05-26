@@ -17,6 +17,7 @@ acq_irrad_interactive(
   area = NULL,
   diff.type = NULL,
   qty.out = "irrad",
+  plot.lines.max = 50,
   summary.type = "plant",
   save.pdfs = TRUE,
   save.summaries = TRUE,
@@ -64,6 +65,9 @@ created on-the-fly.}
 \item{qty.out}{character One of "irrad" (spectral irradiance), "fluence"
 (spectral fluence), "cps" (counts per second), or "raw"
 (raw sensor counts).}
+
+\item{plot.lines.max}{integer Maximum number of spectra to plot as individual
+lines.}
 
 \item{summary.type}{character One of "plant", "PAR" or "VIS".}
 
