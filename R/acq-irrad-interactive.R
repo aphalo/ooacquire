@@ -213,6 +213,12 @@ acq_irrad_interactive <-
     w <- start_session()
     on.exit(end_session(w)) # ensure session is always closed!
 
+    # Transfer focus to console (e.g., from editor pane)
+    if (requireNamespace("rstudioapi", quietly = TRUE) &&
+        rstudioapi::isAvailable()) {
+      rstudioapi::executeCommand('activateConsole')
+    }
+
     instruments <- list_srs_interactive(w = w)
     sr.index <- choose_sr_interactive(instruments = instruments)
     if (sr.index < 0L) {
