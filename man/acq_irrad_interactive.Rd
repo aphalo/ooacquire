@@ -92,14 +92,14 @@ folder used for output, and session and user names.}
 \value{
 These functions return the acquired spectra through "side effects" as
   each spectrum is saved, both as raw counts data and optionally as spectral
-  irradiance or counts-per-second  spectral data in an \code{.rda} file as
-  objects of the classes defined in package 'photobiology'. Optionally, the
-  plot for each spectrum is saved as a \code{.pdf} file. At any time, the
-  current group of spectra can be saved as a collection. When a collection
-  is created, spectral data are for several spectra are saved together.
-  Summaries are saved to a CSV file and joint plots to a \code{.pdf} file.
-  The value returned by the function is that from closing the
-  connection to the spectrometer.
+  irradiance, spectral fluence or counts-per-second  spectral data in an
+  \code{.rda} file as objects of the classes defined in package
+  'photobiology'. Optionally, the plot for each spectrum is saved as a
+  \code{.pdf} file. At any time, the current group of spectra can be saved as
+  a collection. When a collection is created, spectral data are for several
+  spectra are saved together. Summaries are saved to a CSV file and joint
+  plots to a \code{.pdf} file. The value returned by the function is that
+  from closing the connection to the spectrometer.
 }
 \description{
 Interactive front-end allowing acquisition of spectral irradiance and
@@ -151,6 +151,31 @@ Function \code{acq_irrad_interactive()} supports measurement of
   be set manually and for a message to be displayed asking for the light
   pulse to be manually triggered. It is possible to override the default
   function by one that triggers the light source automatically.
+
+  Different argumenst passed to \code{interface.mode} modify which aspects
+  of the user interface are available through menues, without altering
+  the ability to control the behaviour through arguments passed to formal
+  parameters when calling the function. For example, mode "series" exposes
+  the menue used to change schedulling of single measurements and time
+  series of measurements.
+
+  Sequences of light measurements using single "dark" and "filter"
+  measurements are scheduled by setting the four members of the named list
+  passed as argument to \code{seq.settings}. The member \code{initial.delay}
+  is numeric and gives a minimum delay in seconds before the start of
+  measurements with a default of 0s. Member \code{step.delay} is numeric and
+  gives the delay in seconds between successive "light" measurements. In
+  most cases a vector of length one is used as time delta in seconds. Any
+  vector shorter than the number of steps will be extended with
+  \code{rep_len()}, and the values interpreted as the time increment
+  in seconds between the start of successive measurements. If the length is
+  the same as "num.steps", and the values are monotonically increasing, they
+  are interpreted as time offsets from the start of the sequence. Member
+  \code{start.boundary} can take one of "none", "second", "minute" or "hour"
+  indicating the unit to which the start of the series should be scheduled,
+  e.g. the next minute and 0s, for "minute". Member \code{num.steps} must
+  be an integer between 1 and small thousands indicating the number of time
+  steps in the series.
 
   Plots are produced with functions from package 'ggspectra' and respect the
   default annotations set with function \code{set_annotations_default()},

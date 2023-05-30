@@ -192,12 +192,23 @@ acq_raw_spct <- function(descriptor,
 #'   request the operator to trigger the flash or change the light conditions
 #'   according to the names of the steps in the argument to \code{protocol}.
 #'
-#'   For sequences of light measurements using single "dark" and "filter"
-#'   measurements the interpretation of "step.delay" can vary. If shorter than
-#'   the number of steps, the values are interpreted as the time increment in
-#'   seconds between the start of successive measurements. If the length is
-#'   the same as "num.steps", and the values are monotonically increasing,
-#'   they are interpreted as time offsets from the start of the sequence.
+#'   Sequences of light measurements using single "dark" and "filter"
+#'   measurements are scheduled by setting the four members of the named list
+#'   passed as argument to \code{seq.settings}. The member \code{initial.delay}
+#'   is numeric and gives a minimum delay in seconds before the start of
+#'   measurements with a default of 0s. Member \code{step.delay} is numeric and
+#'   gives the delay in seconds between successive "light" measurements. In
+#'   most cases a vector of length one is used as time delta in seconds. Any
+#'   vector shorter than the number of steps will be extended with
+#'   \code{rep_len()}, and the values interpreted as the time increment
+#'   in seconds between the start of successive measurements. If the length is
+#'   the same as "num.steps", and the values are monotonically increasing, they
+#'   are interpreted as time offsets from the start of the sequence. Member
+#'   \code{start.boundary} can take one of "none", "second", "minute" or "hour"
+#'   indicating the unit to which the start of the series should be scheduled,
+#'   e.g. the next minute and 0s, for "minute". Member \code{num.steps} must
+#'   be an integer between 1 and small thousands indicating the number of time
+#'   steps in the series.
 #'
 #' @note Obviously the duration of the time steps must be longer than the time
 #'   that a measurement takes. This time can be significantly more than the sum
@@ -242,7 +253,7 @@ acq_raw_mspct <- function(descriptor,
                           acq.settings,
                           f.trigger.pulses = f.trigger.message,
                           seq.settings = list(initial.delay = 0,
-                                              start.boundary = "second",
+                                              start.boundary = "none",
                                               step.delay = 0,
                                               num.steps = 1L),
                           protocol = c("light", "filter", "dark"),
@@ -306,10 +317,17 @@ acq_raw_mspct <- function(descriptor,
       f.current <- NULL
     }
     if (p == "light") {
-      times <-
-        lubridate::ceiling_date(lubridate::now(tzone = "UTC"),
-                                unit = seq.settings[["start.boundary"]]) +
-        lubridate::seconds(steps)
+      if (seq.settings[["start.boundary"]] == "none") {
+        times <- lubridate::now(tzone = "UTC") +
+          lubridate::milliseconds(10) +
+          lubridate::seconds(steps)
+      } else {
+        times <-
+          lubridate::ceiling_date(lubridate::now(tzone = "UTC") +
+                                    lubridate::milliseconds(10),
+                                  unit = seq.settings[["start.boundary"]]) +
+          lubridate::seconds(steps)
+      }
       z.names <- c(z.names,
                    paste(p,
                          format_idx(seq_along(times)),
@@ -321,16 +339,15 @@ acq_raw_mspct <- function(descriptor,
 
     if (verbose) {
       if (high.speed) {
-        message("Buffered series acquisition starting at ", times[1],
-               " (\"no progress messages\")")
+        message("Buffered series of ", seq.settings[["num.steps"]], " from ", times[1],
+               " (\"quiet\")")
       } else if (all(seq.settings[["step.delay"]] == 0) && length(times) > 1L) {
-        message("Fast series acquisition starting at ", times[1],
-                " (\"no progress messages\")")
+        message("Fast series  of ", seq.settings[["num.steps"]], " from ", times[1],
+                " (\"quiet\")")
       } else if (length(times) > 1L) {
-        message("Timed series acquisition from ", times[1], " to ", times[length(times)],
-                " taking ", length(times), " measurements")
-      } else if (length(times) == 1L && steps[1] > 1) {
-        message("Timed acquisition of one spectrum at ", times[1])
+        message("Timed series of ", length(times), " from ", times[1], " to ", times[length(times)])
+      } else if (times[1] > 2) {
+        message("Timed acquisition at ", times[1])
       }
     }
 
@@ -354,10 +371,10 @@ acq_raw_mspct <- function(descriptor,
                     )
 
       # acquire multiple spectra one by one at target times
-      if (verbose && !messages.enabled) message("Acquiring ", length(times), " spectra ... ", appendLF = FALSE)
+      if (verbose && !messages.enabled) message("Acquiring spectra ... ", appendLF = FALSE)
       for (i in seq_along(times)) {
         if (messages.enabled && length(times) > 1L) {
-          message("Time step ", i)
+          message("Time ", i, " of ", length(times))
         }
         repeat {
           # we could subtract a lag correction dependent on host and spectrometer

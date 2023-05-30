@@ -8,7 +8,7 @@ acq_raw_mspct(
   descriptor,
   acq.settings,
   f.trigger.pulses = f.trigger.message,
-  seq.settings = list(initial.delay = 0, start.boundary = "second", step.delay = 0,
+  seq.settings = list(initial.delay = 0, start.boundary = "none", step.delay = 0,
     num.steps = 1L),
   protocol = c("light", "filter", "dark"),
   user.label = "",
@@ -71,12 +71,23 @@ Function \code{acq_raw_mspct} acquires directly from a spectrometer
   request the operator to trigger the flash or change the light conditions
   according to the names of the steps in the argument to \code{protocol}.
 
-  For sequences of light measurements using single "dark" and "filter"
-  measurements the interpretation of "step.delay" can vary. If shorter than
-  the number of steps, the values are interpreted as the time increment in
-  seconds between the start of successive measurements. If the length is
-  the same as "num.steps", and the values are monotonically increasing,
-  they are interpreted as time offsets from the start of the sequence.
+  Sequences of light measurements using single "dark" and "filter"
+  measurements are scheduled by setting the four members of the named list
+  passed as argument to \code{seq.settings}. The member \code{initial.delay}
+  is numeric and gives a minimum delay in seconds before the start of
+  measurements with a default of 0s. Member \code{step.delay} is numeric and
+  gives the delay in seconds between successive "light" measurements. In
+  most cases a vector of length one is used as time delta in seconds. Any
+  vector shorter than the number of steps will be extended with
+  \code{rep_len()}, and the values interpreted as the time increment
+  in seconds between the start of successive measurements. If the length is
+  the same as "num.steps", and the values are monotonically increasing, they
+  are interpreted as time offsets from the start of the sequence. Member
+  \code{start.boundary} can take one of "none", "second", "minute" or "hour"
+  indicating the unit to which the start of the series should be scheduled,
+  e.g. the next minute and 0s, for "minute". Member \code{num.steps} must
+  be an integer between 1 and small thousands indicating the number of time
+  steps in the series.
 }
 \note{
 Obviously the duration of the time steps must be longer than the time
