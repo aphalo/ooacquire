@@ -8,7 +8,7 @@
 ^pkgdown$
 ^_pkgdown\.yml$
 ^.*\.sh$
-^tests$
+^test-scripts-interactive$
 README.Rmd
 ^CITATION\.cff$
 ^\.github$

@@ -13,8 +13,9 @@ set_seq_interactive(
 }
 \arguments{
 \item{seq.settings}{numeric Definition of time steps for a sequence of
-repeated measurements. Named vector with member names
-\code{"initial.delay"}, \code{"step.delay"}, and \code{"num.steps"}.}
+repeated measurements. Named vector with member named
+\code{start.boundary}, \code{"initial.delay"}, \code{"step.delay"}, and
+\code{"num.steps"}.}
 
 \item{measurement.duration}{numeric Duration of one measurement event (s).}
 
@@ -29,13 +30,16 @@ series.
 }
 \details{
 Function \code{seq.settings()} allows users to enter values needed
-to define a sequence of spectral acquisitions. These are the delay or time
+to define a sequence of spectral acquisitions. These are the time unit
+boundary to synchronize to, the delay or duration of the time
 step between successive acquisitions and the number of acquisitions in the
 series. The \code{measurement.time} determines the minimum length for
 \code{"step"}.
 
 A sequence of measurements are expected to share a single reference or
-dark scan, and be done in "rapid" sequence.
+dark scan, and be done as a sequence. With a single time point, the initial
+delay or time unit boundary can be used to schedule a single timed
+measurement.
 }
 \seealso{
 Other interactive acquisition utility functions: 
