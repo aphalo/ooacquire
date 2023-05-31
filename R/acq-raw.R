@@ -337,17 +337,21 @@ acq_raw_mspct <- function(descriptor,
       z.names <- c(z.names, p)
     }
 
-    if (verbose) {
+    if (verbose && p == "light") {
       if (high.speed) {
-        message("Buffered series of ", seq.settings[["num.steps"]], " from ", times[1],
+        message("Buffered series of ", seq.settings[["num.steps"]], " starting at ",
+                strftime(times[1], format = "%H:%M:%OS", usetz = TRUE),
                " (\"quiet\")")
       } else if (all(seq.settings[["step.delay"]] == 0) && length(times) > 1L) {
-        message("Fast series  of ", seq.settings[["num.steps"]], " from ", times[1],
+        message("Fast series  of ", seq.settings[["num.steps"]], " starting at ",
+                strftime(times[1], format = "%H:%M:%OS", usetz = TRUE),
                 " (\"quiet\")")
       } else if (length(times) > 1L) {
-        message("Timed series of ", length(times), " from ", times[1], " to ", times[length(times)])
-      } else if (times[1] > 2) {
-        message("Timed acquisition at ", times[1])
+        message("Timed series of ", length(times), " from ",
+                strftime(times[1], format = "%H:%M:%OS", usetz = TRUE), " to ",
+                strftime(times[length(times)], format = "%H:%M:%OS", usetz = TRUE))
+      } else if (times[1] > 1) {
+        message("Timed acquisition at ", strftime(times[1], format = "%H:%M:%OS", usetz = TRUE))
       }
     }
 
@@ -374,7 +378,7 @@ acq_raw_mspct <- function(descriptor,
       if (verbose && !messages.enabled) message("Acquiring spectra ... ", appendLF = FALSE)
       for (i in seq_along(times)) {
         if (messages.enabled && length(times) > 1L) {
-          message("Time ", i, " of ", length(times))
+          message("Time point ", i, " of ", length(times))
         }
         repeat {
           # we could subtract a lag correction dependent on host and spectrometer
@@ -407,17 +411,24 @@ acq_raw_mspct <- function(descriptor,
   if (verbose && (seq.settings[["num.steps"]] > 1L || high.speed)) {
     light.spectra.idx <- grepl("^light", names(z))
     actual.times <-
-      unlist(photobiology::when_measured(z[light.spectra.idx])[["when.measured"]], use.names = FALSE)
+      unlist(photobiology::when_measured(z[light.spectra.idx])[["when.measured"]],
+             use.names = FALSE)
     actual.steps <- round(diff(actual.times), 3) # rounded to millisecond
     message("Realized series of ",
             length(actual.times),
-            " from ", actual.times[1], " to ",
-            actual.times[length(actual.times)])
-    message("with ", length(actual.steps), " time intervals (min, median, max): ",
-            paste(format(c(min(actual.steps), stats::median(actual.steps), max(actual.steps))),
+            " from ",
+            strftime(actual.times[1], format = "%H:%M:%OS", usetz = TRUE),
+            " to ",
+            strftime(actual.times[length(actual.times)],
+                     format = "%H:%M:%OS", usetz = TRUE))
+    message(length(actual.steps), " time intervals (min, median, max): ",
+            paste(format(c(min(actual.steps),
+                           stats::median(actual.steps),
+                           max(actual.steps))),
                   collapse = ", "))
-    message("Total ellapsed time ", format(end.time - start.time, digits = 4),
-            "; from ", start.time, " to ", end.time)
+    message("Elapsed time ", format(end.time - start.time, digits = 4),
+            "; from ", strftime(start.time, format = "%H:%M:%OS", usetz = TRUE),
+            " to ",  strftime(end.time, format = "%H:%M:%OS", usetz = TRUE))
   }
   z
 }

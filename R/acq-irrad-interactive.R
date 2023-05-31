@@ -198,8 +198,12 @@ acq_irrad_interactive <-
                                          "%Y.%b.%d_%H.%M.%S"),
                                 sep = "_")) {
 
-    old.warn.value <- options(warn = 1)
-    on.exit(options(old.warn.value), add = TRUE, after = TRUE)
+    if (is.null(getOption("digits.secs"))) {
+      old.options <- options(warn = 1, "digits.secs" = 3)
+    } else {
+      old.options <- options(warn = 1)
+    }
+    on.exit(options(old.options), add = TRUE, after = TRUE)
 
     if (getOption("ooacquire.offline", FALSE)) {
       warning("ooacquire off-line: Aborting...")
@@ -538,6 +542,10 @@ acq_irrad_interactive <-
                filter = "filter",
                dark = "dark")
 
+        if (length(raw.mspct) > 10L) {
+          message("Computing ", qty.out, " ... ", appendLF = FALSE)
+        }
+
         irrad.spct <- s_irrad_corrected(x = raw.mspct,
                                         spct.names = spct.names,
                                         correction.method = correction.method,
@@ -554,6 +562,10 @@ acq_irrad_interactive <-
         if (user.attrs$comment.text != "") {
           comment(irrad.spct) <-
             paste(comment(irrad.spct), user.attrs$comment.text, sep = "\n")
+        }
+
+        if (length(raw.mspct) > 10L) {
+          message("ready.")
         }
 
         repeat {
@@ -965,4 +977,3 @@ irrad_summary_table <-
 
   summary.tb
 }
-
