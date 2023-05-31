@@ -370,19 +370,23 @@ choose_ch_interactive <- function(instruments,
 #' series.
 #'
 #' @param seq.settings numeric Definition of time steps for a sequence of
-#'   repeated measurements. Named vector with member names
-#'   \code{"initial.delay"}, \code{"step.delay"}, and \code{"num.steps"}.
+#'   repeated measurements. Named vector with member named
+#'   \code{start.boundary}, \code{"initial.delay"}, \code{"step.delay"}, and
+#'   \code{"num.steps"}.
 #' @param measurement.duration numeric Duration of one measurement event (s).
 #' @param minimum.step.delay numeric Minimum duration of \code{"step.delay"} (s).
 #'
 #' @details Function \code{seq.settings()} allows users to enter values needed
-#' to define a sequence of spectral acquisitions. These are the delay or time
+#' to define a sequence of spectral acquisitions. These are the time unit
+#' boundary to synchronize to, the delay or duration of the time
 #' step between successive acquisitions and the number of acquisitions in the
 #' series. The \code{measurement.time} determines the minimum length for
 #' \code{"step"}.
 #'
 #' A sequence of measurements are expected to share a single reference or
-#' dark scan, and be done in "rapid" sequence.
+#' dark scan, and be done as a sequence. With a single time point, the initial
+#' delay or time unit boundary can be used to schedule a single timed
+#' measurement.
 #'
 #' @family interactive acquisition utility functions
 #'
@@ -435,7 +439,7 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
     } else if (substr(answ, 1, 1) == "b") {
       time.unit <- readline(sprintf("Start at next %s, new: ",
                                     seq.settings[["start.boundary"]]))
-      if (time.unit %in% c("second", "minute", "hour")) {
+      if (time.unit %in% c("none", "second", "minute", "hour")) {
         seq.settings[["start.boundary"]] <- time.unit
       } else {
         print("Value not changed!")
