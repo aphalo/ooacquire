@@ -569,13 +569,22 @@ acq_irrad_interactive <-
         }
 
         repeat {
+          if (plot.lines.max < getMultipleWl(irrad.spct)) {
+            title.text <- paste(what_measured(irrad.spct)[[1L]],
+                                " (n = ", plot.lines.max,
+                                "/", getMultipleWl(irrad.spct),
+                                ")",
+                                sep = "")
+          } else {
+            title.text <- paste(what_measured(irrad.spct)[[1L]],
+                                " (n = ", getMultipleWl(irrad.spct), ")",
+                                sep = "")
+          }
           fig <- ggplot2::autoplot(sample_spct(irrad.spct, size = plot.lines.max),
                                    annotations = c("-", "colour.guide"),
                                    geom = ifelse(getMultipleWl(irrad.spct) == 1,
                                                  "spct", "line")) +
-            ggplot2::labs(title = paste(what_measured(irrad.spct)[[1L]],
-                                        " (n = ", getMultipleWl(irrad.spct), ")",
-                                        sep = ""),
+            ggplot2::labs(title = title.text,
                           subtitle = when_measured(irrad.spct)[[1L]],
                           caption = how_measured(irrad.spct)[[1L]]) +
             ggplot2::theme(legend.position = "bottom") +
@@ -711,19 +720,21 @@ acq_irrad_interactive <-
                      cps =   photobiology::cps_mspct(mget(irrad.names)))
 
             # plot collection and summaries
-            if (length(collection.mspct) > 200) {
-              plot.data = "median"
+            if (plot.lines.max < getMultipleWl(irrad.spct)) {
+              collection.title <- paste(collection.title,
+                                        " (sample of ", plot.lines.max, ")",
+                                        sep = "")
             } else {
-              plot.data = "as.is"
+              collection.title <- paste(collection.title,
+                                        " (n = ", getMultipleWl(irrad.spct), ")",
+                                        sep = "")
             }
+
             collection.fig <-
               ggplot2::autoplot(sample_mspct(collection.mspct, plot.lines.max),
                                 annotations =
-                                  c("-", "peaks", "colour.guide", "summaries"),
-                                plot.data = plot.data) +
-              ggplot2::labs(title = paste(collection.title, " (n = ",
-                                          length(collection.mspct), ")",
-                                          sep = ""),
+                                  c("-", "peaks", "colour.guide", "summaries")) +
+              ggplot2::labs(title = collection.title,
                             subtitle = session.label,
                             caption = how_measured(collection.mspct[[1L]])) +
               ggplot2::theme(legend.position = "bottom")
