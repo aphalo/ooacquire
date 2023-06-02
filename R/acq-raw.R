@@ -51,6 +51,9 @@ acq_raw_spct <- function(descriptor,
     x <- set_num_exposures(x, num.exposures)
   }
 
+  if (anyNA(num.exposures)) {
+    stop("'num.exposures' contains NAs")
+  }
   stopifnot(length(num.exposures) >= num.readings)
   stopifnot(length(x$HDR.mult) == num.readings)
 
@@ -350,7 +353,7 @@ acq_raw_mspct <- function(descriptor,
         message("Timed series of ", length(times), " from ",
                 strftime(times[1], format = "%H:%M:%OS", usetz = TRUE), " to ",
                 strftime(times[length(times)], format = "%H:%M:%OS", usetz = TRUE))
-      } else if (times[1] > 1) {
+      } else if (steps[1] > 1) {
         message("Timed acquisition at ", strftime(times[1], format = "%H:%M:%OS", usetz = TRUE))
       }
     }

@@ -32,11 +32,13 @@ acq_irrad_interactive(folder.name = "./defaults/fluence-test",
 # defaults "cps" ----------------------------------------------------------
 
 acq_irrad_interactive(folder.name = "./defaults/cps-test",
+                      HDR.mult = 0.67,
                       qty.out = "cps")
 
 # defaults "raw" ----------------------------------------------------------
 
 acq_irrad_interactive(folder.name = "./defaults/fluence-test",
+                      HDR.mult = 0.67,
                       qty.out = "raw")
 
 # time series and timed ---------------------------------------------------
