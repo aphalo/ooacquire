@@ -47,9 +47,9 @@ Table 1 lists the measuring protocols supported. Different approaches in general
 +=============+=============+=============+=============+=============+
 | "l"         | yes         | no          | no          | yes/no      |
 +-------------+-------------+-------------+-------------+-------------+
-| "ld"        | yes         | yes         | no          | yes/no      |
+| "ld", "dl"  | yes         | yes         | no          | yes/no      |
 +-------------+-------------+-------------+-------------+-------------+
-| "lfd"       | yes         | yes         | yes         | yes/no      |
+| "lfd", "dfl"| yes         | yes         | yes         | yes/no      |
 +-------------+-------------+-------------+-------------+-------------+
 
 By using these protocols we obtain raw counts data from the detector array. These need to be converted into spectral irradiance (energy or photon based). Not all detectors behave similarly. For example, for some types of arrays the dark noise increases only for very long integration times while for others more quickly. To be on the safe side even if not strictly necessary, the default acquisition protocols when multiple integration times are used, these multiple times are applied to light, dark and filter measurements.

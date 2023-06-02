@@ -12,7 +12,7 @@
 
 <meta name="author" content="Pedro J. Aphalo" />
 
-<meta name="date" content="2023-05-25" />
+<meta name="date" content="2023-06-03" />
 
 <title>Acquisition of Spectra</title>
 
@@ -339,9 +339,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 <h1 class="title toc-ignore">Acquisition of Spectra</h1>
-<h3 class="subtitle"><code>ooacquire</code> 0.3.4</h3>
+<h3 class="subtitle"><code>ooacquire</code> 0.4.0</h3>
 <h4 class="author">Pedro J. Aphalo</h4>
-<h4 class="date">2023-05-25</h4>
+<h4 class="date">2023-06-03</h4>
 
 
 <div id="TOC">
@@ -515,6 +515,71 @@ the spectrometer. Once the desired protocol is selected, the
 measurements can be acquired with little intervention from the user, and
 the settings are retained across successive measurement events, unless
 expressly modified.</p>
+<p>Whether a time series of spectra or a single spectra is acquired
+depends on the argumentes passed to parameters of the function.</p>
+<table>
+<caption>Timing of the acquisition of spectra. Buffered acquisition is
+as fast as the spectromter allows, with the frequency controlled by the
+total integration time plus an overhead &lt; 1 ms. In the case of
+Buffered acquisition there is minimal dead time between acquisitions.
+Fast acquisition has more dead time as settings in the spectrometer need
+to we modified two or more times per measuring event. While Buffered and
+Fast series are acquired as fast as possible, in the case of a timed
+series, spectra are retrieved at specific times, with dead time
+in-between.</caption>
+<colgroup>
+<col width="16%" />
+<col width="16%" />
+<col width="16%" />
+<col width="16%" />
+<col width="16%" />
+<col width="19%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Parameter</th>
+<th align="center">Buffered</th>
+<th align="center">Fast series</th>
+<th align="center">Timed series</th>
+<th align="center">Timed single</th>
+<th align="center">Single</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">interface.mode</td>
+<td align="center">“series”</td>
+<td align="center">“series”</td>
+<td align="center">“series”</td>
+<td align="center">“series”</td>
+<td align="center">“auto”/“simple”</td>
+</tr>
+<tr class="even">
+<td align="left">step.delay</td>
+<td align="center">0 s</td>
+<td align="center">0 s</td>
+<td align="center">&gt; 0 s</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">start.delay</td>
+<td align="center">&gt;= 0 s</td>
+<td align="center">&gt;= 0 s</td>
+<td align="center">&gt;= 0 s</td>
+<td align="center">&gt; 0 s</td>
+<td align="center">= 0 s</td>
+</tr>
+<tr class="even">
+<td align="left">HDR</td>
+<td align="center">no</td>
+<td align="center">yes</td>
+<td align="center">yes/no</td>
+<td align="center">yes/no</td>
+<td align="center">yes/no</td>
+</tr>
+</tbody>
+</table>
 <p>It is possible to select a different quantity to be plotted and saved
 to files by passing an argument to <code>qty.out</code>:</p>
 <ul>
@@ -546,47 +611,47 @@ is spectral fluence (a flux expressed per measuring event).</li>
 </colgroup>
 <thead>
 <tr class="header">
-<th>purpose</th>
-<th>included</th>
-<th>accessor</th>
+<th align="left">purpose</th>
+<th align="center">included</th>
+<th align="center">accessor</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>user comment</td>
-<td>optional</td>
-<td><code>comment()</code></td>
+<td align="left">user comment</td>
+<td align="center">optional</td>
+<td align="center"><code>comment()</code></td>
 </tr>
 <tr class="even">
-<td>what was measured</td>
-<td>optional</td>
-<td><code>what_measured()</code></td>
+<td align="left">what was measured</td>
+<td align="center">optional</td>
+<td align="center"><code>what_measured()</code></td>
 </tr>
 <tr class="odd">
-<td>where was measured</td>
-<td>optional</td>
-<td><code>where_measured()</code></td>
+<td align="left">where was measured</td>
+<td align="center">optional</td>
+<td align="center"><code>where_measured()</code></td>
 </tr>
 <tr class="even">
-<td>when was measured in UTC time</td>
-<td>automatic</td>
-<td><code>when_measured()</code></td>
+<td align="left">when was measured in UTC time</td>
+<td align="center">automatic</td>
+<td align="center"><code>when_measured()</code></td>
 </tr>
 <tr class="odd">
-<td>simply how was measured</td>
-<td>automatic</td>
-<td><code>how_measured()</code></td>
+<td align="left">simply how was measured</td>
+<td align="center">automatic</td>
+<td align="center"><code>how_measured()</code></td>
 </tr>
 <tr class="even">
-<td>instrument descriptor including calibration, serial number,
-configuration</td>
-<td>automatic</td>
-<td></td>
+<td align="left">instrument descriptor including calibration, serial
+number, configuration</td>
+<td align="center">automatic</td>
+<td align="center"></td>
 </tr>
 <tr class="odd">
-<td>instrument settings used</td>
-<td>automatic</td>
-<td></td>
+<td align="left">instrument settings used</td>
+<td align="center">automatic</td>
+<td align="center"></td>
 </tr>
 </tbody>
 </table>

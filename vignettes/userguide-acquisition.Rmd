@@ -174,6 +174,18 @@ selected, the measurements can be acquired with little intervention from
 the user, and the settings are retained across successive measurement
 events, unless expressly modified.
 
+Whether a time series of spectra or a single spectra is acquired depends
+on the argumentes passed to parameters of the function.
+
+|  Parameter  | Buffered    | Fast series | Timed series| Timed single| Single         |
+|:------------|:-----------:|:-----------:|:-----------:|:-----------:|:--------------:|
+| interface.mode  | "series"    | "series"    | "series"    | "series"    | "auto"/"simple"|
+| step.delay  | 0 s         | 0 s         | > 0 s       | NA          | NA             |
+| start.delay | >= 0 s      | >= 0 s      | >= 0 s      | > 0 s       | = 0 s          |
+| HDR         | no          | yes         | yes/no      | yes/no      | yes/no         |
+
+: Timing of the acquisition of spectra. Buffered acquisition is as fast as the spectromter allows, with the frequency controlled by the total integration time plus an overhead < 1 ms. In the case of Buffered acquisition there is minimal dead time between acquisitions. Fast acquisition has more dead time as settings in the spectrometer need to we modified two or more times per measuring event. While Buffered and Fast series are acquired as fast as possible, in the case of a timed series, spectra are retrieved at specific times, with dead time in-between.  
+ 
 It is possible to select a different quantity to be plotted and saved to
 files by passing an argument to `qty.out`:
 
@@ -198,7 +210,7 @@ files by passing an argument to `qty.out`:
 The saved data objects include metadata as attributes:
 
 | purpose                                                                   | included  | accessor           |
-|---------------------------------------------------------------------------|-----------|--------------------|
+|:--------------------------------------------------------------------------|:---------:|:------------------:|
 | user comment                                                              | optional  | `comment()`        |
 | what was measured                                                         | optional  | `what_measured()`  |
 | where was measured                                                        | optional  | `where_measured()` |

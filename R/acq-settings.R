@@ -78,7 +78,8 @@ acq_settings <- function(descriptor,
     num.scans <- rep(1, times = length(num.exposures))
   }
 
-  stopifnot(length(integ.time) == length(num.scans))
+  stopifnot(length(integ.time) == length(num.scans),
+            !anyNA(integ.time))
 
   # if calculations are per exposure, HDR.mult should be all 1
   stopifnot(all(num.exposures == -1L) || all(HDR.mult == 1))

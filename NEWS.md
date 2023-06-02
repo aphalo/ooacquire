@@ -4,6 +4,13 @@ editor_options:
     wrap: 72
 ---
 
+# ooacquire 0.4.0 (2023-06-02)
+
+-   Interface mode `"series"` of function `acq_irrad_interactive()` is fully 
+    functional and quite well tested.
+-   Tested working with OmniDriver 2.72 (2023-05-10), 2.71 and 2.56. Most other
+    versions most likely also work.
+
 # ooacquire 0.3.4 (2023-05-25)
 
 -   Update `acq_irrad_interactive()` to measure spectral fluence in addition
