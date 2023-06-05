@@ -198,17 +198,17 @@ acq_irrad_interactive <-
                                          "%Y.%b.%d_%H.%M.%S"),
                                 sep = "_")) {
 
+    if (getOption("ooacquire.offline", FALSE)) {
+      warning("ooacquire off-line: Aborting...")
+      return()
+    }
+
     if (is.null(getOption("digits.secs"))) {
       old.options <- options(warn = 1, "digits.secs" = 3)
     } else {
       old.options <- options(warn = 1)
     }
     on.exit(options(old.options), add = TRUE, after = TRUE)
-
-    if (getOption("ooacquire.offline", FALSE)) {
-      warning("ooacquire off-line: Aborting...")
-      return()
-    }
 
     # validate interface mode
     interface.mode <- tolower(interface.mode)
@@ -262,6 +262,17 @@ acq_irrad_interactive <-
 
     message("Using channel ", ch.index,
             " from spectrometer with serial number: ", serial_no)
+
+    # temporary kludge
+    if (serial_no == "MAYP11278") {
+      if (is.null(entrance.optics) || grepl("^cos", entrance.optics) ) {
+        entrance.optics <- "cosine"
+      } else if (entrance.optics == "dome" || grepl("^hemis", entrance.optics)) {
+        entrance.optics <- "hemispherical"
+      } else {
+        stop("'entrance.optics' must be one of \"cosine\" or \"hemispherical\" for MAYP11278")
+      }
+    }
 
     if (anyNA(c(descriptors[[1]], correction.method[[1]]))) {
       descriptor <-
