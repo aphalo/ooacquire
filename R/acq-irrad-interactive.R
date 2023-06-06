@@ -398,10 +398,11 @@ acq_irrad_interactive <-
            comment.text = "",
            how.measured = paste("Acquired with ", descriptor[["spectrometer.name"]],
                                 " (", descriptor[["spectrometer.sn"]],
-                                "), R (", paste(R.version[["major"]], R.version[["minor"]], sep = "."),
+                                "), with a ", descriptor[["entrance.optics"]][["geometry"]], " diffuser",
+                                ")\nR (", paste(R.version[["major"]], R.version[["minor"]], sep = "."),
                                 "), 'ooacquire' (", utils::packageVersion("ooacquire"),
                                 ") in mode \"", interface.mode,
-                                "\",\n 'rOmniDriver' (", utils::packageVersion("rOmniDriver"),
+                                "\", 'rOmniDriver' (", utils::packageVersion("rOmniDriver"),
                                 ") and OmniDriver (", rOmniDriver::get_api_version(w), ").",
                                 sep = ""))
 
