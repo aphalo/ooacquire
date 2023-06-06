@@ -25,6 +25,21 @@ MAYP11278_ylianttila.mthd <- list(
   trim = 0
 )
 
+# create an object with the parameters for Lasse Ylianttila's original method
+# for Maya suitable for sunlight modified by shifting the flt reference -10nm
+MAYP11278_short_flt_ref.mthd <- list(
+  spectrometer.sn = descriptor$spectrometer.sn,
+  stray.light.method = "original",
+  stray.light.wl = c(218.5, 228.5),
+  flt.dark.wl = c(193, 209.5),        # used for $N$2 in Lasse's calc worksheet
+  flt.ref.wl = c(350, 369.5),         # used for $N$3 in Lasse's calc worksheet
+  flt.Tfr = 1,
+  inst.dark.pixs = 1:4,
+  tail.coeffs = c(-7.273130, -0.05688),
+  worker.fun = "MAYP11278_tail_correction",
+  trim = 0
+)
+
 # create an object with the parameters for a method good only for sunlight,
 # based on Lasse Ylianttila's original method suitable ONLY for sunlight.
 MAYP11278_sun.mthd <- list(
@@ -123,6 +138,7 @@ stopifnot(basename(files) == MAYP11278_calib_dates.df[["coeffs.file"]])
 
 MAYP11278_descriptors <- descriptors
 save(MAYP11278_ylianttila.mthd,
+     MAYP11278_short_flt_ref.mthd,
      MAYP11278_sun.mthd,
      MAYP11278_simple.mthd,
      MAYP11278_descriptors,

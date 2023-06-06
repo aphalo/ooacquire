@@ -99,10 +99,17 @@ merge_cps <- function(x) {
     cols <- counts.cols[order(num.exposures, decreasing = TRUE)]
   }
   x[["cps"]] <- x[[cols[1]]]
+
   for (i in 2:length(cols)) {
-    x[["cps"]] <- ifelse(is.na(x[["cps"]]),
-                          x[[cols[i]]],
-                          x[["cps"]] )
+    if (anyNA(x[["cps"]][x[["w.length"]] < 400])) {
+      # if there is saturation in UV we replace the whole column
+      x[["cps"]] <- x[[cols[i]]]
+    } else {
+      # otherwise we replace only clipped pixels
+      x[["cps"]] <- ifelse(is.na(x[["cps"]]),
+                           x[[cols[i]]],
+                           x[["cps"]] )
+    }
   }
   z <- x[ , c("w.length", "cps")]
   z <- photobiology::copy_attributes(x, z)
@@ -111,7 +118,7 @@ merge_cps <- function(x) {
 
 #' Expand NA's to neighbouring pixels
 #'
-#' Replace "good" data from pixels adyacent to NAs with NAs as data from pixels
+#' Replace "good" data from pixels adjacent to NAs with NAs as data from pixels
 #' not saturated but located in the neighbourhood of saturated pixels can return
 #' unreliable data. This correction is needed by a phenomenon similar to
 #' "blooming" in camera sensors whereby when a sensor well gets saturated some
@@ -130,7 +137,7 @@ merge_cps <- function(x) {
 #'   are assumed not to be ever saturated. The value of n needed for each
 #'   detector type/instrument needs to be found through testing. As rule of
 #'   thumb use 5 < n < 10 for Sony's ILxxx and 8 < n < 14 for Hamamatsu xxxx. At
-#'   the moment we use a symetric window although "blooming" could be asymetric.
+#'   the moment we use a symmetric window although "blooming" could be asymmetric.
 #'
 bleed_nas <- function(x, n = 10) {
   stopifnot(is.raw_spct(x))
@@ -149,3 +156,63 @@ bleed_nas <- function(x, n = 10) {
   }
   z
 }
+
+#' Quality control of dark spectra
+#'
+#' Function used to check the number of pixels that deviate from the median.
+#'
+#' @details The expectation is that in a spectrum measured in the dark, to be
+#'   used as a reference, the variation among pixel counts is small. This also
+#'   applies in some cases to ranges of pixels protected from radiation by a
+#'   long pass or short pass filter. By default the whole spectrum is included
+#'   in the QC check, but if needed an argument can be passed to \code{range}
+#'   to select a smaller region.
+#'
+#' @param x cps_spct or raw_spct A spectrum measured in darkness.
+#' @param range numeric A wavelength range [nm].
+#' @param tol.margin numeric in [0..small integer] indicating the tolerance
+#'   margin as a fraction of the median counts.
+#' @param max.hot,max.cold integer Maximum number of hot and cold pixels
+#'   accepted.
+#' @param spct.label character A character string to use in message.
+#' @param verbose logical If true a message is emitted in addition to returning
+#'   the outcome.
+#'
+#' @return A logical value.
+#'
+#' @export
+#'
+QC_dark <-
+  function(x,
+           range = NULL,
+           tol.margin = 0.5,
+           max.hot = 10,
+           max.cold = 10,
+           spct.label = "Spectrum ",
+           verbose = getOption("photobiology.verbose", default = TRUE)) {
+  stopifnot(is.raw_spct(x) || is.cps_spct(x))
+  if (!is.null(range)) {
+    x <- clip_wl(x = x, range = range)
+  }
+  cols <- setdiff(colnames(x), "w.length")
+  num.hot <- 0
+  num.cold <- 0
+  for (col in cols) {
+    if (!is.numeric(x[[col]])) next()
+    median.cps <- median(x[[col]], na.rm = TRUE)
+    num.hot <- max(num.hot,
+                   sum(x[[col]] > median.cps * (1 + tol.margin), na.rm = TRUE))
+    num.cold <- max(num.cold,
+                    sum(x[[col]] < median.cps * (1 - tol.margin), na.rm = TRUE))
+
+  }
+  if (num.hot > max.hot || num.cold > max.cold) {
+    warning(spct.label, " failed QC: ", num.hot, " hot, ", num.cold, " cold pixels",
+            call. = FALSE, immediate.	= TRUE, domain = NA)
+    FALSE
+  } else {
+#    message(spct.label, " passed QC: ", num.hot, " hot, ", num.cold, " cold pixels")
+    TRUE
+  }
+}
+

@@ -16,7 +16,7 @@ a copy of x with values replaced by NAs as needed in all counts
   columns present.
 }
 \description{
-Replace "good" data from pixels adyacent to NAs with NAs as data from pixels
+Replace "good" data from pixels adjacent to NAs with NAs as data from pixels
 not saturated but located in the neighbourhood of saturated pixels can return
 unreliable data. This correction is needed by a phenomenon similar to
 "blooming" in camera sensors whereby when a sensor well gets saturated some
@@ -28,5 +28,5 @@ Avoid using very large n values as n pixels at each end of the array
   are assumed not to be ever saturated. The value of n needed for each
   detector type/instrument needs to be found through testing. As rule of
   thumb use 5 < n < 10 for Sony's ILxxx and 8 < n < 14 for Hamamatsu xxxx. At
-  the moment we use a symetric window although "blooming" could be asymetric.
+  the moment we use a symmetric window although "blooming" could be asymmetric.
 }

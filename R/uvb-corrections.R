@@ -253,6 +253,18 @@ filter_correction <-
     # Find maximum cps
     max_x_cps <- max(x[["cps"]], na.rm = TRUE)
 
+    # Rescale flt reference assuming stray ligth is NIR
+    max_x_cps <- mean(clip_wl(x, range = c(950, 1020))[["cps"]], na.rm = TRUE)
+    max_flt_cps <- mean(clip_wl(flt, range = c(950, 1020))[["cps"]], na.rm = TRUE)
+
+    x2flt.k <- max_x_cps * 0.85 / max_flt_cps # assumed filter transmittance
+
+    # this is an attempt to deal with changing light conditions
+    if (x2flt.k < 0.8 || x2flt.k > 1.2) {
+ #     message("Rescaling \"filter\" spectrum by ", signif(x2flt.k, 3))
+      flt <- flt * x2flt.k
+    }
+
     # compute filter short wl "dark" cps
     if (anyNA(flt.dark.wl)) {
       mean_flt_cps_short <- 0
