@@ -4,6 +4,16 @@ editor_options:
     wrap: 72
 ---
 
+# ooacquire 0.4.1 (2023-06-xx)
+
+-   Add `QC_dark()` and implement its use in acquisition and in 
+    `s_irrad_corrected()`. (Aimed at detecting problems with MAYP11278
+    changing raw-counts baseline.)
+-   In `merge_cps()` check that all counts for walengths < 400 nm are measured
+    with the same integration time.
+-   EXPERIMENTAL!! Scale dark and filter reference spectra based on NIR
+    readings.
+
 # ooacquire 0.4.0 (2023-06-02)
 
 -   Interface mode `"series"` of function `acq_irrad_interactive()` is fully 
