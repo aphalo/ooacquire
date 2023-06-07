@@ -199,7 +199,7 @@ QC_dark <-
   num.cold <- 0
   for (col in cols) {
     if (!is.numeric(x[[col]])) next()
-    median.cps <- median(x[[col]], na.rm = TRUE)
+    median.cps <- stats::median(x[[col]], na.rm = TRUE)
     num.hot <- max(num.hot,
                    sum(x[[col]] > median.cps * (1 + tol.margin), na.rm = TRUE))
     num.cold <- max(num.cold,

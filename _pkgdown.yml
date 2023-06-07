@@ -120,6 +120,7 @@ reference:
     - MAYP11278_calib_dates.df
     - MAYP11278_descriptors
     - MAYP11278_ylianttila.mthd
+    - MAYP11278_short_flt_ref.mthd
     - MAYP11278_tail_correction
     - MAYP11278_simple.mthd
     - MAYP11278_sun.mthd

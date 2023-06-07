@@ -10,7 +10,7 @@ QC_dark(
   tol.margin = 0.5,
   max.hot = 10,
   max.cold = 10,
-  spct.label = "A",
+  spct.label = "Spectrum ",
   verbose = getOption("photobiology.verbose", default = TRUE)
 )
 }

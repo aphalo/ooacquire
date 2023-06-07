@@ -102,14 +102,19 @@ s_irrad_corrected.raw_mspct <-
       spct.names <- spct.names[names(spct.names) != "filter"]
     }
 
-    # only outputs a message or warning
-    QC_spct <-
-      QC_dark(x[[spct.names[["dark"]]]], max.hot = 15,
-              spct.label = "Dark spectrum", verbose = verbose)
-    QC_spct <-
-      QC_spct &&
-      QC_dark(x[[spct.names[["filter"]]]], max.hot = 40, range = c(NA, 400),
-              spct.label = "Filter spectrum", verbose = verbose)
+    # experimental, issues warning in case of failure and tags spectrum
+    QC_spct <- TRUE
+    if ("dark" %in% names(spct.names)) {
+      QC_spct <-
+        QC_dark(x[[spct.names[["dark"]]]], max.hot = 15,
+                spct.label = "Dark spectrum", verbose = verbose)
+    }
+    if ("filter" %in% names(spct.names)) {
+      QC_spct <-
+        QC_spct &&
+        QC_dark(x[[spct.names[["filter"]]]], max.hot = 40, range = c(NA, 400),
+                spct.label = "Filter spectrum", verbose = verbose)
+    }
 
     if (is.list(spct.names) && (
       length(spct.names[["light"]]) > 1L || spct.names[["light"]][1] == "*")) {

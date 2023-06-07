@@ -25,6 +25,7 @@ Other objects containing instrument-specific data:
 \code{\link{MAYP112785_ylianttila.mthd}},
 \code{\link{MAYP11278_calib_dates.df}},
 \code{\link{MAYP11278_descriptors}},
+\code{\link{MAYP11278_short_flt_ref.mthd}},
 \code{\link{MAYP11278_simple.mthd}},
 \code{\link{MAYP11278_sun.mthd}},
 \code{\link{MAYP11278_ylianttila.mthd}},

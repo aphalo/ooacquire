@@ -41,6 +41,21 @@
 
 #' Correction method definition
 #'
+#' A list with data needed to process raw data in the example files. It
+#' contains constants and functions defining the method developed by Lasse
+#' Ylianttila. Method modified to use 10 nm shorter wavelengths as the
+#' reference region for matching filter and dark spectra. EXPERIMENTAL!!
+#'
+#' @docType data
+#' @keywords datasets
+#' @format A list.
+#'
+#' @family objects containing instrument-specific data
+#'
+"MAYP11278_short_flt_ref.mthd"
+
+#' Correction method definition
+#'
 #' List with data needed to process raw data in the example files. It
 #' contains constants and functions defining a derivative of the method
 #' developed by Lasse Ylianttila.
