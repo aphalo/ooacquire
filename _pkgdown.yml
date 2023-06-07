@@ -48,6 +48,7 @@ reference:
     - acq_raw_mspct
     - hs_acq_raw_mspct
     - check_sn_match
+    - QC_dark
 
   - title: Data import from text files
   - subtitle: Read data
