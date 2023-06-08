@@ -73,17 +73,34 @@ skip_bad_pixs <- function(x) {
 
 #' Merge counts per second data
 #'
-#' Replace NAs in longer integration time cps with cps values from shorter
-#' integration.
+#' In a \code{cps_spct} object with multiple columns of CPS data, each acquired
+#' using a different integration time, merge columns into a single column.
+#'
+#' @details
+#' Pixels affected directly or by neighbourhood by clipping, should be
+#' set to \code{NA} before passing the spectrum as argument to this function. Starting from the variable corresponding to the
+#' longest integration time, NA values are replaced by cps values from the next
+#' shorter integration. The procedure is repeated until no \code{NA} remains or
+#' until no shorter integration time data are available.
+#'
+#' When measuring daylight different exposures for HDR are taken sequentially,
+#' and if light conditions change rapidly the cps values may be inconsistent.
+#' If the mean ratio of cps values is outside plus/minus the tolerance, instead
+#' of merging, the data for the longer of the two exposures is discarded instead
+#' of merged (or spliced) with the longer exposure, in which case a message is
+#' emitted.
 #'
 #' @param x cps_spct object
+#' @param tolerance numeric Tolerance for mean deviation among cps columns as
+#'   a fraction of one.
 #'
 #' @export
 #'
 #' @return  a copy of x with values replaced as needed in all counts columns
 #'   present.
 #'
-merge_cps <- function(x) {
+merge_cps <- function(x,
+                      tolerance = 0.10) {
   stopifnot(is.cps_spct(x))
   counts.cols <- grep("^cps", names(x), value = TRUE)
   if (length(counts.cols) == 1) {
@@ -93,7 +110,7 @@ merge_cps <- function(x) {
   instr.settings <- getInstrSettings(x)
   integ.times <- instr.settings[["integ.time"]]
   num.exposures <- instr.settings[["num.exposures"]]
-  if (all(num.exposures < 0L)) {
+  if (all(num.exposures < 0L)) { # -1L is used for continuous light
     cols <- counts.cols[order(integ.times, decreasing = TRUE)]
   } else {
     cols <- counts.cols[order(num.exposures, decreasing = TRUE)]
@@ -101,14 +118,26 @@ merge_cps <- function(x) {
   x[["cps"]] <- x[[cols[1]]]
 
   for (i in 2:length(cols)) {
-    if (anyNA(x[["cps"]][x[["w.length"]] < 400])) {
+    to.replace.idx <- is.na(x[["cps"]])
+    if (sum(!to.replace.idx) < 30 ||
+        anyNA(x[["cps"]][x[["w.length"]] < 400])) {
       # if there is saturation in UV we replace the whole column
       x[["cps"]] <- x[[cols[i]]]
     } else {
-      # otherwise we replace only clipped pixels
-      x[["cps"]] <- ifelse(is.na(x[["cps"]]),
-                           x[[cols[i]]],
-                           x[["cps"]] )
+      # replace only clipped pixels if cps consistent across columns
+      columns.ratio <-
+          sum(x[[cols[i]]][!to.replace.idx]) / sum(x[["cps"]][!to.replace.idx])
+      if (columns.ratio > (1 - tolerance) && columns.ratio < (1 + tolerance)) {
+        x[["cps"]] <- ifelse(is.na(x[["cps"]]),
+                             x[[cols[i]]],
+                             x[["cps"]] )
+      } else {
+        message("Inconsistent cps in HDR exposures, replacing instead of merging")
+        x[["cps"]] <- x[[cols[i]]]
+      }
+    }
+    if (!anyNA(x[["cps"]])) {
+      break()
     }
   }
   z <- x[ , c("w.length", "cps")]

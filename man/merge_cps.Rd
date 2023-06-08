@@ -4,16 +4,33 @@
 \alias{merge_cps}
 \title{Merge counts per second data}
 \usage{
-merge_cps(x)
+merge_cps(x, tolerance = 0.1)
 }
 \arguments{
 \item{x}{cps_spct object}
+
+\item{tolerance}{numeric Tolerance for mean deviation among cps columns as
+a fraction of one.}
 }
 \value{
 a copy of x with values replaced as needed in all counts columns
   present.
 }
 \description{
-Replace NAs in longer integration time cps with cps values from shorter
-integration.
+In a \code{cps_spct} object with multiple columns of CPS data, each acquired
+using a different integration time, merge columns into a single column.
+}
+\details{
+Pixels affected directly or by neighbourhood by clipping, should be
+set to \code{NA} before passing the spectrum as argument to this function. Starting from the variable corresponding to the
+longest integration time, NA values are replaced by cps values from the next
+shorter integration. The procedure is repeated until no \code{NA} remains or
+until no shorter integration time data are available.
+
+When measuring daylight different exposures for HDR are taken sequentially,
+and if light conditions change rapidly the cps values may be inconsistent.
+If the mean ratio of cps values is outside plus/minus the tolerance, instead
+of merging, the data for the longer of the two exposures is discarded instead
+of merged (or spliced) with the longer exposure, in which case a message is
+emitted.
 }

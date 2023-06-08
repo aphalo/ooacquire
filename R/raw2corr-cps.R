@@ -19,7 +19,7 @@
 #'
 #' @export raw2corr_cps
 #'
-raw2corr_cps  <- function(x,
+ raw2corr_cps  <- function(x,
                           ref.pixs.range,
                           ...) UseMethod("raw2corr_cps")
 

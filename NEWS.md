@@ -9,8 +9,7 @@ editor_options:
 -   Add `QC_dark()` and implement its use in acquisition and in 
     `s_irrad_corrected()`. (Aimed at detecting problems with MAYP11278
     changing raw-counts baseline.)
--   In `merge_cps()` check that all counts for walengths < 400 nm are measured
-    with the same integration time.
+-   In `merge_cps()` check consistency among data for different integration times before merge and avoid merges within 250-400 nm region.
 -   EXPERIMENTAL!! Scale dark and filter reference spectra based on NIR
     readings.
 

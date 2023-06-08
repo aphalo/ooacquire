@@ -10,6 +10,8 @@ descriptor$num.dark.pixs <- 20
 
 descriptor$w <- NULL
 
+# inst.dark.pixs is set to 2:4 as reading from pixel 1 is not consistent.
+
 # create an object with the parameters for Lasse Ylianttila's original method
 # for Maya suitable for sunlight
 MAYP11278_ylianttila.mthd <- list(
@@ -19,7 +21,7 @@ MAYP11278_ylianttila.mthd <- list(
   flt.dark.wl = c(193, 209.5),        # used for $N$2 in Lasse's calc worksheet
   flt.ref.wl = c(360, 379.5),         # used for $N$3 in Lasse's calc worksheet
   flt.Tfr = 1,
-  inst.dark.pixs = 1:4,
+  inst.dark.pixs = 2:4,
   tail.coeffs = c(-7.273130, -0.05688),
   worker.fun = "MAYP11278_tail_correction",
   trim = 0
@@ -34,7 +36,7 @@ MAYP11278_short_flt_ref.mthd <- list(
   flt.dark.wl = c(193, 209.5),        # used for $N$2 in Lasse's calc worksheet
   flt.ref.wl = c(350, 369.5),         # used for $N$3 in Lasse's calc worksheet
   flt.Tfr = 1,
-  inst.dark.pixs = 1:4,
+  inst.dark.pixs = 2:4,
   tail.coeffs = c(-7.273130, -0.05688),
   worker.fun = "MAYP11278_tail_correction",
   trim = 0
@@ -49,7 +51,7 @@ MAYP11278_sun.mthd <- list(
   flt.dark.wl = c(193, 209.5),
   flt.ref.wl = c(360, 379.5),
   flt.Tfr = 1,
-  inst.dark.pixs = 1:4,
+  inst.dark.pixs = 2:4,
   tail.coeffs = c(-7.273130, -0.05688),
   worker.fun = "MAYP11278_tail_correction",
   trim = 0.05
@@ -64,7 +66,7 @@ MAYP11278_simple.mthd <- list(
   flt.dark.wl = c(193, 209.5),
   flt.ref.wl = c(360, 379.5),
   flt.Tfr = 1,
-  inst.dark.pixs = 1:4,
+  inst.dark.pixs = 2:4,
   tail.coeffs = c(-7.273130, -0.05688),
   worker.fun = "MAYP11278_tail_correction",
   trim = 0.05
