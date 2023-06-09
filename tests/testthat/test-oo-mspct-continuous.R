@@ -5,16 +5,17 @@ test_that("ooacquire irrad continuous MAYA", {
 
   rm(list = ls(pattern = "*"))
 
-  files <- list.files("test-irrad-mspct-maya-data", pattern = "*.Rda")
-
+  files <- list.files("test-irrad-mspct-maya-data", pattern = "*.[Rr]da")
+  print(files)
   for (f in files) {
     load(paste("test-irrad-mspct-maya-data", f, sep = "/"))
-    old.raw.mspct <- get(sub("spct.Rda", "raw_mspct", f))
+    old.raw.mspct <- get(sub("spct.[Rr]da", "raw_mspct", f))
     serial.no <- getInstrDesc(old.raw.mspct[[1]])$spectrometer.sn
     correction.method <-
       switch(serial.no,
              MAYP11278 = ooacquire::MAYP11278_ylianttila.mthd,
              MAYP112785 = ooacquire::MAYP112785_ylianttila.mthd,
+             MAYP114590 = ooacquire::MAYP114590_simple.mthd,
              new_correction_method(descriptor,
                                    stray.light.method = NA)
       )
@@ -22,6 +23,7 @@ test_that("ooacquire irrad continuous MAYA", {
     new.spct <- trimInstrDesc(new.spct) # needed to avoid futile call to .jcall
     expect_known_value(new.spct, file = paste("ref", f, sep = "-"), update = TRUE)
   }
+
 })
 
 # Should be enabled after a few suitable files are added for the tests.

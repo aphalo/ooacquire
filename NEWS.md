@@ -6,12 +6,10 @@ editor_options:
 
 # ooacquire 0.4.1 (2023-06-xx)
 
--   Add `QC_dark()` and implement its use in acquisition and in 
-    `s_irrad_corrected()`. (Aimed at detecting problems with MAYP11278
-    changing raw-counts baseline.)
+-   Add `QC_dark()` and implement its use in acquisition and in s_irrad_corrected()`. Aimed at detecting problems with changing raw-counts baseline, usually as a consequence of warming of the spectrometer.)
 -   In `merge_cps()` check consistency among data for different integration times before merge and avoid merges within 250-400 nm region.
--   EXPERIMENTAL!! Scale dark and filter reference spectra based on NIR
-    readings.
+-   EXPERIMENTAL!! Scale filter reference spectrum based on NIR
+readings.
 
 # ooacquire 0.4.0 (2023-06-02)
 

@@ -16,6 +16,7 @@ uvb_corrections(
   inst.dark.pixs = 1:4,
   worker.fun = NULL,
   trim = 0.05,
+  hdr.tolerance = getOption("ooacquire.hdr.tolerance, default = 0.10"),
   verbose = getOption("photobiology.verbose", default = FALSE),
   ...
 )
@@ -23,6 +24,7 @@ uvb_corrections(
 slit_function_correction(
   x,
   worker.fun = NULL,
+  hdr.tolerance = getOption("ooacquire.hdr.tolerance, default = 0.10"),
   verbose = getOption("photobiology.verbose", default = FALSE),
   ...
 )
@@ -46,16 +48,19 @@ array in the filter correction.}
 of stray light, used only for method "simple".}
 
 \item{inst.dark.pixs}{numeric vector with indexes to array pixels that
-are in full drakness by instrument design.}
+are in full darkness by instrument design.}
 
 \item{worker.fun}{function actually doing the correction on the w.lengths and
 counts per second vectors, or the name of the function as a character string.}
 
 \item{trim}{a numeric value to be used as argument for mean}
 
+\item{hdr.tolerance}{numeric Tolerance for mean deviation among cps columns as
+a fraction of one. Used in check of HDR consistency.}
+
 \item{verbose}{Logical indicating the level of warnings wanted.}
 
-\item{...}{additional params passed to worker.fun.}
+\item{...}{additional parameters passed to worker.fun.}
 }
 \value{
 A \code{cps_spct} object with the corrected count-per-second values

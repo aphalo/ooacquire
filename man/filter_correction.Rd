@@ -14,6 +14,7 @@ filter_correction(
   flt.ref.wl = c(360, 379.5),
   flt.Tfr = 1,
   trim = 0.05,
+  hdr.tolerance = getOption("ooacquire.hdr.tolerance, default = 0.10"),
   verbose = getOption("photobiology.verbose", default = FALSE)
 )
 
@@ -24,6 +25,7 @@ no_filter_correction(
   flt.ref.wl = NULL,
   flt.Tfr = 1,
   trim = 0,
+  hdr.tolerance = getOption("ooacquire.hdr.tolerance, default = 0.10"),
   verbose = getOption("photobiology.verbose", default = FALSE)
 )
 }
@@ -45,6 +47,9 @@ in the filter correction.}
 of stray light, used only for method "simple".}
 
 \item{trim}{a numeric value to be used as argument for mean}
+
+\item{hdr.tolerance}{numeric Tolerance for mean deviation among cps columns as
+a fraction of one. Used in check of HDR consistency.}
 
 \item{verbose}{Logical indicating the level of warnings wanted.}
 }

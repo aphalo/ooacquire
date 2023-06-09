@@ -18,12 +18,14 @@
 #' @param flt.Tfr numeric fractional transmittance of the filter to the source
 #'   of stray light, used only for method "simple".
 #' @param inst.dark.pixs numeric vector with indexes to array pixels that
-#'   are in full drakness by instrument design.
+#'   are in full darkness by instrument design.
 #' @param worker.fun function actually doing the correction on the w.lengths and
 #'   counts per second vectors, or the name of the function as a character string.
 #' @param trim a numeric value to be used as argument for mean
+#' @param hdr.tolerance numeric Tolerance for mean deviation among cps columns as
+#'   a fraction of one. Used in check of HDR consistency.
 #' @param verbose Logical indicating the level of warnings wanted.
-#' @param ... additional params passed to worker.fun.
+#' @param ... additional parameters passed to worker.fun.
 #'
 #' @return A \code{cps_spct} object with the corrected count-per-second values
 #'   in coulmn "cps".
@@ -56,6 +58,7 @@ uvb_corrections <-
            inst.dark.pixs = 1:4,
            worker.fun = NULL,
            trim = 0.05,
+           hdr.tolerance = getOption("ooacquire.hdr.tolerance, default = 0.10"),
            verbose = getOption("photobiology.verbose", default = FALSE),
            ...) {
 
@@ -135,6 +138,7 @@ uvb_corrections <-
                              flt.ref.wl = flt.ref.wl,
                              flt.Tfr = flt.Tfr,
                              trim = trim,
+                             hdr.tolerance = hdr.tolerance,
                              verbose = verbose)
     } else if (stray.light.method != "none") {
       if (verbose) {
@@ -146,6 +150,7 @@ uvb_corrections <-
                                 flt.dark.wl = flt.dark.wl,
                                 flt.Tfr = flt.Tfr,
                                 trim = trim,
+                                hdr.tolerance = hdr.tolerance,
                                 verbose = verbose)
     }  else {
       z <- y[["light"]]
@@ -156,7 +161,10 @@ uvb_corrections <-
         warning("Skipping slit function tail correction: no function available.")
       }
     } else {
-      z <- slit_function_correction(z, worker.fun = worker.fun, ...)
+      z <- slit_function_correction(z,
+                                    worker.fun = worker.fun,
+                                    hdr.tolerance = hdr.tolerance,
+                                    ...)
     }
 
     z
@@ -169,6 +177,7 @@ uvb_corrections <-
 slit_function_correction <-
   function(x,
            worker.fun = NULL,
+           hdr.tolerance = getOption("ooacquire.hdr.tolerance, default = 0.10"),
            verbose = getOption("photobiology.verbose", default = FALSE),
            ...) {
     stopifnot(is.cps_spct(x))
@@ -194,7 +203,7 @@ slit_function_correction <-
     }
 
     # check number of cps columns and merge if needed
-    x <- merge_cps(x)
+    x <- merge_cps(x, tolerance = hdr.tolerance)
 
     new.cps <- worker.fun(x[["w.length"]], x[["cps"]], ...)
     x[["cps"]] <- x[["cps"]] - new.cps[["tail"]]
@@ -219,6 +228,8 @@ slit_function_correction <-
 #' @param flt.Tfr numeric fractional transmittance of the filter to the source
 #'   of stray light, used only for method "simple".
 #' @param trim a numeric value to be used as argument for mean
+#' @param hdr.tolerance numeric Tolerance for mean deviation among cps columns as
+#'   a fraction of one. Used in check of HDR consistency.
 #' @param verbose Logical indicating the level of warnings wanted.
 #'
 #' @export
@@ -232,6 +243,7 @@ filter_correction <-
            flt.ref.wl = c(360, 379.5),
            flt.Tfr = 1,
            trim = 0.05,
+           hdr.tolerance = getOption("ooacquire.hdr.tolerance, default = 0.10"),
            verbose = getOption("photobiology.verbose", default = FALSE)) {
     stopifnot(is.cps_spct(x) && is.cps_spct(flt))
     stopifnot(all(wl_range(x) == wl_range(flt)) && nrow(x) == nrow(flt))
@@ -247,8 +259,8 @@ filter_correction <-
     }
 
     # check number of cps columns and merge if needed
-    x   <- merge_cps(x)
-    flt <- merge_cps(flt)
+    x   <- merge_cps(x, tolerance = hdr.tolerance)
+    flt <- merge_cps(flt, tolerance = hdr.tolerance)
 
     # Find maximum cps
     max_x_cps <- max(x[["cps"]], na.rm = TRUE)
@@ -412,6 +424,7 @@ no_filter_correction <-
            flt.ref.wl = NULL,
            flt.Tfr = 1,
            trim = 0,
+           hdr.tolerance = getOption("ooacquire.hdr.tolerance, default = 0.10"),
            verbose = getOption("photobiology.verbose", default = FALSE)) {
     stopifnot(is.null(attr(x, "straylight.corrected")) ||
                 !attr(x, "straylight.corrected"))
@@ -422,7 +435,7 @@ no_filter_correction <-
         warning("Multiple 'cps' variables found in 'x': ",
                 "merging them before continuing!")
       }
-      x <- merge_cps(x)
+      x <- merge_cps(x, tolerance = hdr.tolerance)
     }
 
     # Estimate for dark counts
