@@ -228,8 +228,11 @@ slit_function_correction <-
 #' @param flt.Tfr numeric fractional transmittance of the filter to the source
 #'   of stray light, used only for method "simple".
 #' @param trim a numeric value to be used as argument for mean
-#' @param hdr.tolerance numeric Tolerance for mean deviation among cps columns as
-#'   a fraction of one. Used in check of HDR consistency.
+#' @param filter.nir.adjust logical Flag indicating if the cps in the
+#'   "filter" reference spectrum need to be adjust based on NIR region cps
+#'   in the "light" spectrum. EXPERIMENTAL!!
+#' @param hdr.tolerance numeric Tolerance for mean deviation among cps columns
+#'   as a fraction of one. Used in check of HDR consistency.
 #' @param verbose Logical indicating the level of warnings wanted.
 #'
 #' @export
@@ -243,6 +246,7 @@ filter_correction <-
            flt.ref.wl = c(360, 379.5),
            flt.Tfr = 1,
            trim = 0.05,
+           filter.nir.adjust = FALSE,
            hdr.tolerance = getOption("ooacquire.hdr.tolerance, default = 0.10"),
            verbose = getOption("photobiology.verbose", default = FALSE)) {
     stopifnot(is.cps_spct(x) && is.cps_spct(flt))
@@ -262,20 +266,24 @@ filter_correction <-
     x   <- merge_cps(x, tolerance = hdr.tolerance)
     flt <- merge_cps(flt, tolerance = hdr.tolerance)
 
+    if (filter.nir.adjust) {
+
+      # Rescale flt reference assuming stray light is all NIR
+      max_x_nir_cps <- mean(clip_wl(x, range = c(950, 1020))[["cps"]], na.rm = TRUE)
+      max_flt_nir_cps <- mean(clip_wl(flt, range = c(950, 1020))[["cps"]], na.rm = TRUE)
+
+      x2flt.k <- max_x_nir_cps * 0.85 / max_flt_nir_cps # assumed filter transmittance
+
+      # this is an attempt to deal with changing light conditions
+      if (x2flt.k < 0.8 || x2flt.k > 1.2) {
+        #     message("Rescaling \"filter\" spectrum by ", signif(x2flt.k, 3))
+        flt <- flt * x2flt.k
+      }
+
+    }
+
     # Find maximum cps
     max_x_cps <- max(x[["cps"]], na.rm = TRUE)
-
-    # Rescale flt reference assuming stray ligth is NIR
-    max_x_cps <- mean(clip_wl(x, range = c(950, 1020))[["cps"]], na.rm = TRUE)
-    max_flt_cps <- mean(clip_wl(flt, range = c(950, 1020))[["cps"]], na.rm = TRUE)
-
-    x2flt.k <- max_x_cps * 0.85 / max_flt_cps # assumed filter transmittance
-
-    # this is an attempt to deal with changing light conditions
-    if (x2flt.k < 0.8 || x2flt.k > 1.2) {
- #     message("Rescaling \"filter\" spectrum by ", signif(x2flt.k, 3))
-      flt <- flt * x2flt.k
-    }
 
     # compute filter short wl "dark" cps
     if (anyNA(flt.dark.wl)) {

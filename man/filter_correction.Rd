@@ -14,6 +14,7 @@ filter_correction(
   flt.ref.wl = c(360, 379.5),
   flt.Tfr = 1,
   trim = 0.05,
+  filter.nir.adjust = FALSE,
   hdr.tolerance = getOption("ooacquire.hdr.tolerance, default = 0.10"),
   verbose = getOption("photobiology.verbose", default = FALSE)
 )
@@ -48,8 +49,12 @@ of stray light, used only for method "simple".}
 
 \item{trim}{a numeric value to be used as argument for mean}
 
-\item{hdr.tolerance}{numeric Tolerance for mean deviation among cps columns as
-a fraction of one. Used in check of HDR consistency.}
+\item{filter.nir.adjust}{logical Flag indicating if the cps in the
+"filter" reference spectrum need to be adjust based on NIR region cps
+in the "light" spectrum. EXPERIMENTAL!!}
+
+\item{hdr.tolerance}{numeric Tolerance for mean deviation among cps columns
+as a fraction of one. Used in check of HDR consistency.}
 
 \item{verbose}{Logical indicating the level of warnings wanted.}
 }
