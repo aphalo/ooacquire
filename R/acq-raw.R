@@ -384,7 +384,6 @@ acq_raw_mspct <- function(descriptor,
           message("Time point ", i, " of ", length(times))
         }
         repeat {
-          # we could subtract a lag correction dependent on host and spectrometer
           seconds.to.wait <- lubridate::seconds(times[[i]] - lubridate::now(tzone = "UTC"))
           if (seconds.to.wait <= 0.0005) {
             break()
