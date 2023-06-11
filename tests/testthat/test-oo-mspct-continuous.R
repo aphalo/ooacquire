@@ -6,7 +6,7 @@ test_that("ooacquire irrad continuous MAYA", {
   rm(list = ls(pattern = "*"))
 
   files <- list.files("test-irrad-mspct-maya-data", pattern = "*.[Rr]da")
-  print(files)
+#  print(files)
   for (f in files) {
     load(paste("test-irrad-mspct-maya-data", f, sep = "/"))
     old.raw.mspct <- get(sub("spct.[Rr]da", "raw_mspct", f))
