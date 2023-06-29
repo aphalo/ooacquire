@@ -297,10 +297,13 @@ acq_raw_mspct <- function(descriptor,
 
   previous.protocol <- "none"
 
-  high.speed <-
-    all(seq.settings[["step.delay"]] == 0) &&
-    seq.settings[["num.steps"]] > 1L &&
-    length(acq.settings[["integ.time"]]) == 1L # no HDR bracketing
+  if (all(seq.settings[["step.delay"]] == 0)) {
+    # check if HDR in use (or left over)
+    high.speed <-
+      seq.settings[["num.steps"]] > 1L &&
+      length(acq.settings[["HDR.mult"]]) == 1L &&
+      length(acq.settings[["integ.time"]]) == 1L
+   }
 
   z <- list()
   z.names <- character()

@@ -49,14 +49,12 @@ hs_acq_raw_mspct <- function(descriptor,
     return(raw_spct())
   }
   x <- acq.settings
-  if (length(x$integ.time) > 1L) {
-    warning("No bracketing or HDR supported at high speed: using smallest value.")
-    x$integ.time <- as.integer(min(x$integ.time)) # integer microseconds
+  if (length(x$integ.time) > 1L ||
+      length(x$HDR.mult) > 1L ||
+      length(x$tot.time) > 1L ||
+      length(x$rel.signal) > 1L) {
+    stop("No HDR possible at high speed.")
   }
-
-  num.readings <- 1L #
-
-  num.exposures <- -1L # unsupported
 
   y <- descriptor
 
