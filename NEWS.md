@@ -4,12 +4,16 @@ editor_options:
     wrap: 72
 ---
 
-# ooacquire 0.4.1 (2023-06-xx)
+# ooacquire 0.4.2 (2023-08-xx)
+
+-   Check and update bad (hot) pixels in MAP11278 calibration (add one pixel). 
+
+# ooacquire 0.4.1 (2023-06-11)
 
 -   Add `QC_dark()` and implement its use in acquisition and in 
-    `s_irrad_corrected()`. Aimed at detecting problems raw-counts dark baseline, 
-    specifically, pixel-position dependence usually as a consequence of warming 
-    of the spectrometer.
+    `s_irrad_corrected()`. Aimed at detecting problems with raw-counts dark 
+    baseline, specifically, pixel-position dependent enhanced dark counts 
+    usually as a consequence of increased warming of the spectrometer.
 -   In `merge_cps()` check consistency among data for different integration 
     times before merge and avoid merges within 250-400 nm region.
 -   EXPERIMENTAL!! Scale filter reference spectrum based on NIR readings
