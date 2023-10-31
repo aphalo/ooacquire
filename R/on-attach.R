@@ -1,6 +1,6 @@
 .onAttach <- function(libname, pkgname) {
   if (getOption("ooacquire.offline", TRUE) || getOption("rOmniDriver.offline", TRUE) ) {
-    packageStartupMessage("ooacquire Off-line: package 'rOmniDriver' needs to be installed to access spectrometers.")
+    packageStartupMessage("Package 'ooacquire' is Off-line: package 'rOmniDriver' needs to be installed and enabled to access spectrometers.")
   }
 }
 
