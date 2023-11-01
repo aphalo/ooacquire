@@ -11,7 +11,7 @@
 Functions to acquire data directly from Ocean Optics spectrometers, and functions to read similar data from files. Functions to convert raw-counts into counts-per-second and physical quantities. Data are saved in objects of classes defined in package 'photobiology'. The instrument settings, instrument description, date-time of acquisition and optionally goecode are stored as attributes.
 }
 \details{
-Processing of raw-counts data adquired following different protocols and
+Processing of raw-counts data acquired following different protocols and
 corrections including integration-time bracketing and merging, slit function
 corrections, subtraction of stray light and adaptive smoothing corrections.
 

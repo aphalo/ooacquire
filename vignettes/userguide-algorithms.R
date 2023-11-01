@@ -1,4 +1,4 @@
-## ---- echo=FALSE, message=FALSE-----------------------------------------------
+## ----echo=FALSE, message=FALSE------------------------------------------------
 require("knitr")
 dirpath <- system.file("extdata", package="ooacquire")
 opts_knit$set(autodep = TRUE, fig.width=8, fig.asp=0.5, out.width = '90%')
@@ -34,7 +34,7 @@ getInstrSettings(sun001.raw_mspct[["light"]])
 ## -----------------------------------------------------------------------------
 attr(sun001.raw_mspct[["light"]], which = "instr.desc")$spectrometer.name
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ----fig.width=8, fig.asp=0.5-------------------------------------------------
 sun001_recalc.spct <-
   s_irrad_corrected(sun001.raw_mspct, 
                     correction.method = ooacquire::MAYP11278_ylianttila.mthd)
@@ -42,13 +42,13 @@ sun001_recalc.spct <-
 ## -----------------------------------------------------------------------------
 summary(sun001_recalc.spct)
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ----fig.width=8, fig.asp=0.5-------------------------------------------------
 autoplot(sun001_recalc.spct)
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  get_attributes(sun001_recalc.spct)
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ----fig.width=8, fig.asp=0.5-------------------------------------------------
 sun001_recalc_sun.spct <-
   s_irrad_corrected(sun001.raw_mspct, 
                     correction.method = ooacquire::MAYP11278_sun.mthd)
@@ -56,10 +56,10 @@ sun001_recalc_sun.spct <-
 ## -----------------------------------------------------------------------------
 summary(sun001_recalc_sun.spct)
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ----fig.width=8, fig.asp=0.5-------------------------------------------------
 autoplot(sun001_recalc_sun.spct)
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ----fig.width=8, fig.asp=0.5-------------------------------------------------
 sun001_recalc.cps_spct <-
   s_irrad_corrected(sun001.raw_mspct, 
                     correction.method = ooacquire::MAYP11278_ylianttila.mthd,
@@ -68,7 +68,7 @@ sun001_recalc.cps_spct <-
 ## -----------------------------------------------------------------------------
 summary(sun001_recalc.cps_spct)
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ----fig.width=8, fig.asp=0.5-------------------------------------------------
 autoplot(sun001_recalc.cps_spct)
 
 ## -----------------------------------------------------------------------------
@@ -77,13 +77,13 @@ getInstrDesc(sun001_recalc.cps_spct)
 ## -----------------------------------------------------------------------------
 str(getInstrDesc(sun001_recalc.cps_spct))
 
-## ---- eval = FALSE------------------------------------------------------------
+## ----eval = FALSE-------------------------------------------------------------
 #  sun001_recalc.source_spct <- cps2irrad(sun001_recalc.cps_spct)
 
-## ---- eval = FALSE------------------------------------------------------------
+## ----eval = FALSE-------------------------------------------------------------
 #  summary(sun001_recalc.source_spct)
 
-## ---- fig.width=8, fig.asp=0.5, eval = FALSE----------------------------------
+## ----fig.width=8, fig.asp=0.5, eval = FALSE-----------------------------------
 #  autoplot(sun001_recalc.source_spct)
 
 ## -----------------------------------------------------------------------------
@@ -101,62 +101,62 @@ getInstrDesc(sun001.raw_mspct[["light"]])$max.counts
 ## -----------------------------------------------------------------------------
 getInstrSettings(sun001.raw_mspct[["light"]])
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ----fig.width=8, fig.asp=0.5-------------------------------------------------
 autoplot(sun001.raw_mspct[["light"]])
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ----fig.width=8, fig.asp=0.5-------------------------------------------------
 autoplot(sun001.raw_mspct[["filter"]])
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ----fig.width=8, fig.asp=0.5-------------------------------------------------
 autoplot(sun001.raw_mspct[["dark"]])
 
-## ---- fig.width=8, fig.asp=1.5------------------------------------------------
+## ----fig.width=8, fig.asp=1.5-------------------------------------------------
 for (m in names(sun001.raw_mspct)) {
   sun001.raw_mspct[[m]] <-
     skip_bad_pixs(sun001.raw_mspct[[m]])
 }
 autoplot(sun001.raw_mspct, facets = 1)
 
-## ---- fig.width=8, fig.asp=1.5------------------------------------------------
+## ----fig.width=8, fig.asp=1.5-------------------------------------------------
 for (m in names(sun001.raw_mspct)) {
   sun001.raw_mspct[[m]] <-
     trim_counts(sun001.raw_mspct[[m]])
 }
 autoplot(sun001.raw_mspct, facets = 1)
 
-## ---- fig.width=8, fig.asp=1.5------------------------------------------------
+## ----fig.width=8, fig.asp=1.5-------------------------------------------------
 for (m in names(sun001.raw_mspct)) {
   sun001.raw_mspct[[m]] <-
     bleed_nas(sun001.raw_mspct[[m]])
 }
 autoplot(sun001.raw_mspct, facets = 1)
 
-## ---- fig.width=8, fig.asp=1.5------------------------------------------------
+## ----fig.width=8, fig.asp=1.5-------------------------------------------------
 for (m in names(sun001.raw_mspct)) {
   sun001.raw_mspct[[m]] <-
     linearize_counts(sun001.raw_mspct[[m]])
 }
 autoplot(sun001.raw_mspct, facets = 1)
 
-## ---- fig.width=8, fig.asp=1.5------------------------------------------------
+## ----fig.width=8, fig.asp=1.5-------------------------------------------------
 for (m in names(sun001.raw_mspct)) {
   sun001.raw_mspct[[m]] <-
     fshift(sun001.raw_mspct[[m]], range = c(218.5,228.5))
 }
 autoplot(sun001.raw_mspct, facets = 1)
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ----fig.width=8, fig.asp=0.5-------------------------------------------------
 sun001.cps_mspct <- raw2cps(sun001.raw_mspct)
 autoplot(sun001.cps_mspct, facets = TRUE)
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ----fig.width=8, fig.asp=0.5-------------------------------------------------
 for (m in names(sun001.cps_mspct)) {
   sun001.cps_mspct[[m]] <-
     merge_cps(sun001.cps_mspct[[m]])
 }
 autoplot(sun001.cps_mspct)
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ----fig.width=8, fig.asp=0.5-------------------------------------------------
 sun001_mdark.cps_mspct <- cps_mspct()
 
 sun001_mdark.cps_mspct[["light"]] <- 
@@ -172,7 +172,7 @@ autoplot(sun001_mdark.cps_mspct) + ggtitle("Dark subtracted")
 autoplot(clip_wl(sun001_mdark.cps_mspct, range = c(280, 310))) +
   ggtitle("Dark subtracted")
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ----fig.width=8, fig.asp=0.5-------------------------------------------------
 ggplot(clip_wl(sun001_mdark.cps_mspct[["filter"]] /
                    sun001_mdark.cps_mspct[["light"]], 
                  range = c(280, 310))) +
@@ -191,20 +191,20 @@ sun001_mdark.cps_mspct[["filter"]] <-
   copy_attributes(sun001.cps_mspct[["filter"]],
                 sun001_mdark.cps_mspct[["filter"]])
 
-## ---- fig.width=8, fig.asp=0.5, eval = FALSE----------------------------------
+## ----fig.width=8, fig.asp=0.5, eval = FALSE-----------------------------------
 #  sun001.irrad_spct <- cps2irrad(sun001_mdark.cps_mspct[["light"]])
 #  autoplot(sun001.irrad_spct)
 #  sun001_filter.irrad_spct <- cps2irrad(sun001_mdark.cps_mspct[["filter"]])
 #  autoplot(sun001_filter.irrad_spct)
 
-## ---- fig.width=8, fig.asp=0.5, eval = FALSE----------------------------------
+## ----fig.width=8, fig.asp=0.5, eval = FALSE-----------------------------------
 #  sun001.irrad_spct <- smooth_spct(sun001.irrad_spct)
 #  autoplot(sun001.irrad_spct)
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ----fig.width=8, fig.asp=0.5-------------------------------------------------
 autoplot(sun001_recalc.spct)
 
-## ---- fig.width=8, fig.asp=0.5, eval = FALSE----------------------------------
+## ----fig.width=8, fig.asp=0.5, eval = FALSE-----------------------------------
 #  autoplot(smooth_spct(sun001_recalc.spct))
 
 ## -----------------------------------------------------------------------------
@@ -219,7 +219,7 @@ names(halogen.raw_mspct[["light"]])
 ## -----------------------------------------------------------------------------
 summary(halogen.raw_mspct[["light"]])
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ----fig.width=8, fig.asp=0.5-------------------------------------------------
 halogen.spct <-
   s_irrad_corrected(halogen.raw_mspct, correction.method= MAYP11278_ylianttila.mthd)
 autoplot(halogen.spct)
@@ -238,7 +238,7 @@ for (m in names(halogen.raw_mspct)) {
 }
 names(halogen.cps_mspct)
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ----fig.width=8, fig.asp=0.5-------------------------------------------------
 for (m in names(halogen.cps_mspct)) {
   print(autoplot(halogen.cps_mspct[[m]]) + ggtitle(m))
   print(autoplot(halogen.cps_mspct[[m]], range = c(250, 410)) + ggtitle(m))
@@ -255,7 +255,7 @@ for (m in setdiff(names(halogen.cps_mspct), "dark")) {
 }
 names(halogen01.cps_mspct)
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ----fig.width=8, fig.asp=0.5-------------------------------------------------
 for (m in names(halogen01.cps_mspct)) {
   print(autoplot(halogen01.cps_mspct[[m]]) + ggtitle(m))
   print(autoplot(halogen01.cps_mspct[[m]], range = c(250, 410)) + ggtitle(m))
@@ -270,7 +270,7 @@ halogen_corrected.cps_spct <-
 names(halogen_corrected.cps_spct)
 getTimeUnit(halogen_corrected.cps_spct)
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ----fig.width=8, fig.asp=0.5-------------------------------------------------
 autoplot(halogen_corrected.cps_spct)
 autoplot(halogen_corrected.cps_spct, range = c(250, 410))
 mean(clip_wl(halogen_corrected.cps_spct, range = c(250, 300))[["cps"]])
@@ -285,7 +285,7 @@ q_ratio(halogen.source_spct, list(UVC(), UVB(), UVA()), PAR()) * 1e3
 ## -----------------------------------------------------------------------------
 halogen_sm0.source_spct <- smooth_spct(halogen.source_spct)
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ----fig.width=8, fig.asp=0.5-------------------------------------------------
 autoplot(halogen_sm0.source_spct)
 autoplot(halogen_sm0.source_spct, range = c(250, 410))
 
@@ -295,7 +295,7 @@ q_ratio(halogen_sm0.source_spct, list(UVC(), UVB(), UVA()), PAR()) * 1e3
 ## -----------------------------------------------------------------------------
 halogen_sm.source_spct <- smooth_spct(halogen.source_spct, method = "supsmu", strength = 3)
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ----fig.width=8, fig.asp=0.5-------------------------------------------------
 autoplot(halogen_sm.source_spct)
 autoplot(halogen_sm.source_spct, range = c(250, 410))
 
@@ -314,19 +314,19 @@ summary(xenon_flash.raw_mspct[["light"]])
 ## -----------------------------------------------------------------------------
 getInstrSettings(xenon_flash.raw_mspct[["light"]])$num.exposures
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ----fig.width=8, fig.asp=0.5-------------------------------------------------
 xenon_flash.spct <-
   s_irrad_corrected(xenon_flash.raw_mspct, correction.method = MAYP11278_ylianttila.mthd)
 getTimeUnit(xenon_flash.spct)
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ----fig.width=8, fig.asp=0.5-------------------------------------------------
 autoplot(xenon_flash.spct, range = c(315, NA))
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ----fig.width=8, fig.asp=0.5-------------------------------------------------
 xenon_flash.cps_spct <-
   s_irrad_corrected(xenon_flash.raw_mspct, correction.method= MAYP11278_ylianttila.mthd, return.cps = TRUE)
 getTimeUnit(xenon_flash.cps_spct)
 
-## ---- fig.width=8, fig.asp=0.5------------------------------------------------
+## ----fig.width=8, fig.asp=0.5-------------------------------------------------
 autoplot(xenon_flash.cps_spct, range = c(315, NA))
 

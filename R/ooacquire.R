@@ -1,5 +1,5 @@
 #' @details
-#' Processing of raw-counts data adquired following different protocols and
+#' Processing of raw-counts data acquired following different protocols and
 #' corrections including integration-time bracketing and merging, slit function
 #' corrections, subtraction of stray light and adaptive smoothing corrections.
 #'
