@@ -592,7 +592,7 @@ acq_irrad_interactive <-
                                 " (n = ", getMultipleWl(irrad.spct), ")",
                                 sep = "")
           }
-          fig <- ggplot2::autoplot(sample_spct(irrad.spct, size = plot.lines.max),
+          fig <- ggplot2::autoplot(pull_sample(irrad.spct, size = plot.lines.max),
                                    annotations = c("-", "colour.guide"),
                                    geom = ifelse(getMultipleWl(irrad.spct) == 1,
                                                  "spct", "line")) +
@@ -743,7 +743,7 @@ acq_irrad_interactive <-
             }
 
             collection.fig <-
-              ggplot2::autoplot(sample_mspct(collection.mspct, plot.lines.max),
+              ggplot2::autoplot(pull_sample(collection.mspct, plot.lines.max),
                                 annotations =
                                   c("-", "peaks", "colour.guide", "summaries")) +
               ggplot2::labs(title = collection.title,

@@ -6,7 +6,8 @@ editor_options:
 
 # ooacquire 0.4.2 (2023-08-xx)
 
--   Check and update bad (hot) pixels in MAP11278 calibration (add one pixel). 
+-   Check and update bad (hot) pixels in MAP11278 calibration (add one pixel).
+-   Depend on 'photobiology' (>= 0.11.0).
 
 # ooacquire 0.4.1 (2023-06-11)
 
