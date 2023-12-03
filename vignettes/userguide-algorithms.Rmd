@@ -363,7 +363,7 @@ At this point we have "clean" RAW counts data. The **sixth step** is to convert 
 
 ```{r, fig.width=8, fig.asp=0.5}
 sun001.cps_mspct <- raw2cps(sun001.raw_mspct)
-autoplot(sun001.cps_mspct, facets = TRUE)
+# autoplot(sun001.cps_mspct, facets = TRUE)
 ```
 
 The **seventh step** splicing the three pairs of "bracketed" *light*, *filter* and *dark* counts-per-second spectra into three combined spectra.

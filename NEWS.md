@@ -4,7 +4,7 @@ editor_options:
     wrap: 72
 ---
 
-# ooacquire 0.4.2 (2023-08-xx)
+# ooacquire 0.4.2 (2023-12-03)
 
 -   Check and update bad (hot) pixels in MAP11278 calibration (add one pixel).
 -   Depend on 'photobiology' (>= 0.11.0).
