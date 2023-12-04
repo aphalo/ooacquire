@@ -147,7 +147,7 @@ autoplot(sun001.raw_mspct, facets = 1)
 
 ## ----fig.width=8, fig.asp=0.5-------------------------------------------------
 sun001.cps_mspct <- raw2cps(sun001.raw_mspct)
-autoplot(sun001.cps_mspct, facets = TRUE)
+# autoplot(sun001.cps_mspct, facets = TRUE)
 
 ## ----fig.width=8, fig.asp=0.5-------------------------------------------------
 for (m in names(sun001.cps_mspct)) {
