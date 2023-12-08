@@ -121,7 +121,7 @@
 #'   enable collections user interface or not..
 #' @param interface.mode character One of "auto", "simple", "manual", "full",
 #'   "series", "auto-attr", "simple-attr", "manual-attr", "full-atr", and
-#'   "series-attr".
+#'   "series-attr", "series".
 #' @param num.exposures integer Number or light pulses (flashes) per scan. Set
 #'   to \code{-1L} to indicate that the light source is continuous.
 #' @param f.trigger.pulses function Function to be called to trigger light
@@ -220,6 +220,13 @@ acq_irrad_interactive <-
     # validate qty.out
     qty.out <- tolower(qty.out)
     stopifnot(qty.out %in% c("irrad", "fluence", "cps", "raw"))
+
+    # initialize mirai
+    rda.mirai <- NA
+    pdf.mirai <- NA
+#    collection.mirai <- NA
+#    summaries.mirai <- NA
+#   mirai::demons(4) # possibly not needed
 
     # define measurement protocols
     default.protocols <- list(l = "light",
@@ -665,14 +672,31 @@ acq_irrad_interactive <-
 
           assign(raw.name, raw.mspct)
           assign(irrad.name, irrad.spct)
+          obj.names <- c(raw.name, irrad.name)
 
-          save(list = c(raw.name, irrad.name), file = file.name)
+          if (seq.settings$num.steps > 10 && !mirai::unresolved(rda.mirai)) {
+            rda.mirai <- mirai::mirai(save(list = obj.names, file = file.name),
+                                      .args = list(obj.names, file.name))
+          } else {
+            save(list = obj.names, file = file.name)
+          }
 
           if (save.pdfs) {
             pdf.name <- paste(obj.name, "spct.pdf", sep = ".")
-            grDevices::pdf(file = pdf.name, width = 8, height = 6)
-            print(fig)
-            grDevices::dev.off()
+            if (seq.settings$num.steps > 10 && !mirai::unresolved(pdf.mirai)) {
+              pdf.mirai <- mirai::mirai({
+                grDevices::pdf(file = pdf.name, width = 8, height = 6)
+                print(fig)
+                grDevices::dev.off()
+              },
+              pdf.name = pdf.name,
+              fig = fig
+              )
+            } else {
+              grDevices::pdf(file = pdf.name, width = 8, height = 6)
+              print(fig)
+              grDevices::dev.off()
+            }
           }
           break()
         }

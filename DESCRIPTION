@@ -1,8 +1,8 @@
 Package: ooacquire
 Type: Package
 Title: Acquire Data from OO Spectrometers
-Version: 0.4.2
-Date: 2023-12-03
+Version: 0.4.2.9000
+Date: 2023-12-09
 Authors@R:
    c(
     person("Pedro J.", "Aphalo", email = "pedro.aphalo@helsinki.fi", role = c("aut", "trl", "cre")),
@@ -37,7 +37,8 @@ Imports:
     stringr (>= 1.5.0),
     dplyr (>= 1.0.9),
     readr (>= 2.1.4),
-    magrittr (>= 2.0.3)
+    magrittr (>= 2.0.3),
+    mirai (>= 0.11.3)
 Suggests:
     rOmniDriver (>= 0.1.19),
     rstudioapi (>= 0.10),

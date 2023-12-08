@@ -77,7 +77,7 @@ enable collections user interface or not..}
 
 \item{interface.mode}{character One of "auto", "simple", "manual", "full",
 "series", "auto-attr", "simple-attr", "manual-attr", "full-atr", and
-"series-attr".}
+"series-attr", "series".}
 
 \item{num.exposures}{integer Number or light pulses (flashes) per scan. Set
 to \code{-1L} to indicate that the light source is continuous.}
