@@ -6,8 +6,10 @@ editor_options:
 
 # ooacquire 0.4.3 (2023-12-xx)
 
--   Use 'mirai' to asynchronously save R data files and PDF files.
+-   Use R package 'mirai' to asynchronously save R data files and PDF files.
+    Package 'mirai' is now imported and has to be installed.
 -   Make real-time display of plots optional (no change to default).
+-   Fix bug in "slow" series acquisition introduced in 0.4.2.
 
 # ooacquire 0.4.2 (2023-12-03)
 

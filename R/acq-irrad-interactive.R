@@ -228,21 +228,6 @@ acq_irrad_interactive <-
     # initialize mirai
     rda.mirai <- NA
     pdf.mirai <- NA
-    mirai::daemons(3) # decreases overhead and setting of working directory once
-    on.exit({
-      if (mirai::unresolved(rda.mirai) || mirai::unresolved(pdf.mirai)) {
-        cat("Saving files ")
-        while (mirai::unresolved(rda.mirai) || mirai::unresolved(pdf.mirai)) {
-          cat(".")
-          Sys.sleep(0.25)
-        }
-        cat("\n")
-      }
-      print(mirai::status()$daemons)
-      print("Killing daemons...")
-      mirai::daemons(0)
-    },
-    add = TRUE)
 
     # define measurement protocols
     default.protocols <- list(l = "light",
@@ -436,10 +421,6 @@ acq_irrad_interactive <-
     oldwd <- setwd(folder.name)
     on.exit(setwd(oldwd), add = TRUE)
     on.exit(message("Folder reset to: ", getwd(), "\nBye!"), add = TRUE)
-
-    # set working directory of daemons
-    mirai::everywhere(setwd(folder.name),
-                      .args = list(folder.name = folder.name))
 
     protocol <- protocol_interactive(protocols = protocols,
                                      default = default.protocol)
@@ -703,8 +684,17 @@ acq_irrad_interactive <-
 
           if (!mirai::unresolved(rda.mirai)) {
             # non-blocking
-            rda.mirai <- mirai::mirai(save(list = obj.names, file = file.name),
-                                      .args = list(obj.names, file.name))
+            rda.mirai <-
+              mirai::mirai({
+                assign(obj.names[1], raw.mspct)
+                assign(obj.names[2], irrad.spct)
+                save(list = obj.names, file = file.name)
+              },
+              obj.names = obj.names,
+              file.name = file.name,
+              raw.mspct = raw.mspct,
+              irrad.spct = irrad.spct
+              )
           } else {
             # fall back to main process
             save(list = obj.names, file = file.name)
@@ -943,6 +933,19 @@ acq_irrad_interactive <-
       }
 
     } # end of main UI loop
+
+    if (mirai::unresolved(rda.mirai) || mirai::unresolved(pdf.mirai)) {
+      cat("Saving files ")
+      while (mirai::unresolved(rda.mirai) || mirai::unresolved(pdf.mirai)) {
+        cat(".")
+        Sys.sleep(0.25)
+      }
+      cat("\n")
+    }
+
+    if (mirai::status()$connections) {
+      print(mirai::status()$daemons)
+    }
 
     save(file.names,
          file = paste("files4session-",
