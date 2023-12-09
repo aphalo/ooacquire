@@ -22,6 +22,7 @@ acq_irrad_interactive(
   save.pdfs = TRUE,
   save.summaries = TRUE,
   save.collections = interface.mode != "simple",
+  show.figs = TRUE,
   interface.mode = ifelse(qty.out == "fluence", "manual", "auto"),
   num.exposures = ifelse(qty.out == "fluence", 1L, -1L),
   f.trigger.pulses = f.trigger.message,
@@ -67,17 +68,21 @@ created on-the-fly.}
 (raw sensor counts).}
 
 \item{plot.lines.max}{integer Maximum number of spectra to plot as individual
-lines.}
+lines. Random sampling is used if number of spectra exceeds
+\code{plot.lines.max}.}
 
 \item{summary.type}{character One of "plant", "PAR" or "VIS".}
 
 \item{save.pdfs, save.summaries, save.collections}{logical Whether to save
 plots to PDFs files or not, and collection summaries to csv files or not,
-enable collections user interface or not..}
+enable collections user interface or not.}
+
+\item{show.figs}{logical Default for flag enabling display plots of acquired
+spectra.}
 
 \item{interface.mode}{character One of "auto", "simple", "manual", "full",
 "series", "auto-attr", "simple-attr", "manual-attr", "full-atr", and
-"series-attr", "series".}
+"series-attr".}
 
 \item{num.exposures}{integer Number or light pulses (flashes) per scan. Set
 to \code{-1L} to indicate that the light source is continuous.}

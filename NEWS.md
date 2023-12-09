@@ -4,9 +4,10 @@ editor_options:
     wrap: 72
 ---
 
-# ooacquire 0.5.0 (2023-12-xx)
+# ooacquire 0.4.3 (2023-12-xx)
 
 -   Use 'mirai' to asynchronously save R data files and PDF files.
+-   Make real-time display of plots optional (no change to default).
 
 # ooacquire 0.4.2 (2023-12-03)
 
