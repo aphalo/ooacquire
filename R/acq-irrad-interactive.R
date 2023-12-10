@@ -615,7 +615,7 @@ acq_irrad_interactive <-
             print(fig)
           } else {
             # clear plot viewer panel of RStudio
-            try(dev.off(dev.list()["RStudioGD"]), silent=TRUE)
+            try(grDevices::dev.off(grDevices::dev.list()["RStudioGD"]), silent=TRUE)
           }
           if(qty.out == "cps") {
             plot.prompt <- "fig/w.bands/discard/SAVE+NEXT (f/w/d/s-): "
