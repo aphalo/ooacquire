@@ -4,6 +4,13 @@ editor_options:
     wrap: 72
 ---
 
+# ooacquire 0.4.3 (2023-12-xx)
+
+-   Use R package 'mirai' to asynchronously save R data files and PDF files.
+    Package 'mirai' is now imported and has to be installed.
+-   Make real-time display of plots optional (no change to default).
+-   Fix bug in "slow" series acquisition introduced in 0.4.2.
+
 # ooacquire 0.4.2 (2023-12-03)
 
 -   Check and update bad (hot) pixels in MAP11278 calibration (add one pixel).

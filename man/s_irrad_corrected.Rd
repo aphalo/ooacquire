@@ -52,7 +52,7 @@ the final calculation step.}
 file is used, and if \code{NA}, date is set to NA.}
 
 \item{correction.method}{A named list of constants and functions defining the
-method to be sued for stray light and dark signal corrections.}
+method to be used for stray light and dark signal corrections.}
 
 \item{return.cps}{logical Useful when there is no need to apply a calibration,
 such as when computing new calibration multipliers.}

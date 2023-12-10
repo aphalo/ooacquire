@@ -114,11 +114,14 @@
 #'   (spectral fluence), "cps" (counts per second), or "raw"
 #'   (raw sensor counts).
 #' @param plot.lines.max integer Maximum number of spectra to plot as individual
-#'   lines.
+#'   lines. Random sampling is used if number of spectra exceeds
+#'   \code{plot.lines.max}.
 #' @param summary.type character One of "plant", "PAR" or "VIS".
 #' @param save.pdfs,save.summaries,save.collections logical Whether to save
 #'   plots to PDFs files or not, and collection summaries to csv files or not,
-#'   enable collections user interface or not..
+#'   enable collections user interface or not.
+#' @param show.figs logical Default for flag enabling display plots of acquired
+#'   spectra.
 #' @param interface.mode character One of "auto", "simple", "manual", "full",
 #'   "series", "auto-attr", "simple-attr", "manual-attr", "full-atr", and
 #'   "series-attr".
@@ -186,6 +189,7 @@ acq_irrad_interactive <-
            save.pdfs = TRUE,
            save.summaries = TRUE,
            save.collections = interface.mode != "simple",
+           show.figs = TRUE,
            interface.mode = ifelse(qty.out == "fluence", "manual", "auto"),
            num.exposures = ifelse(qty.out == "fluence", 1L, -1L),
            f.trigger.pulses = f.trigger.message,
@@ -221,6 +225,10 @@ acq_irrad_interactive <-
     qty.out <- tolower(qty.out)
     stopifnot(qty.out %in% c("irrad", "fluence", "cps", "raw"))
 
+    # initialize mirai
+    rda.mirai <- NA
+    pdf.mirai <- NA
+
     # define measurement protocols
     default.protocols <- list(l = "light",
                               ld = c("light", "dark"),
@@ -240,7 +248,8 @@ acq_irrad_interactive <-
 
     # connect to spectrometer
     w <- start_session()
-    on.exit(end_session(w)) # ensure session is always closed!
+    on.exit(end_session(w),
+            add = TRUE) # ensure session is always closed!
 
     # Transfer focus to console (e.g., from editor pane)
     if (requireNamespace("rstudioapi", quietly = TRUE) &&
@@ -408,6 +417,7 @@ acq_irrad_interactive <-
 
     folder.name <- set_folder_interactive(folder.name)
 
+    # set working directory of current session
     oldwd <- setwd(folder.name)
     on.exit(setwd(oldwd), add = TRUE)
     on.exit(message("Folder reset to: ", getwd(), "\nBye!"), add = TRUE)
@@ -530,7 +540,7 @@ acq_irrad_interactive <-
       }
 
       if (length(raw.mspct) == 0) {
-        # failed data acquisition
+        message("Failure: no data acquired!")
         next()
       }
 
@@ -601,14 +611,18 @@ acq_irrad_interactive <-
                           caption = how_measured(irrad.spct)[[1L]]) +
             ggplot2::theme(legend.position = "bottom") +
             ggplot2::theme_bw()
-          print(fig)
-
-          if(qty.out == "cps") {
-            plot.prompt <- "Plot: wavebands/discard/SAVE+NEXT (w/d/s-): "
-            valid.answers <-  c("w", "d", "s")
+          if (show.figs) {
+            print(fig)
           } else {
-            plot.prompt <- "photons/energy/wavebands/discard/SAVE+NEXT (p/e/w/d/s-): "
-            valid.answers <- c("p", "e", "w", "d", "s")
+            # clear plot viewer panel of RStudio
+            try(grDevices::dev.off(grDevices::dev.list()["RStudioGD"]), silent=TRUE)
+          }
+          if(qty.out == "cps") {
+            plot.prompt <- "fig/w.bands/discard/SAVE+NEXT (f/w/d/s-): "
+            valid.answers <-  c("f","w", "d", "s")
+          } else {
+            plot.prompt <- "fig/photons/energy/w.bands/discard/SAVE+NEXT (f/p/e/w/d/s-): "
+            valid.answers <- c("f","p", "e", "w", "d", "s")
           }
           repeat {
             answer <- readline(plot.prompt)[1]
@@ -620,6 +634,7 @@ acq_irrad_interactive <-
             }
           }
           switch(answer,
+                 f = {show.figs <- !show.figs; next()},
                  p = {options(photobiology.radiation.unit = "photon"); next()},
                  e = {options(photobiology.radiation.unit = "energy"); next()},
                  w = {
@@ -665,25 +680,72 @@ acq_irrad_interactive <-
 
           assign(raw.name, raw.mspct)
           assign(irrad.name, irrad.spct)
+          obj.names <- c(raw.name, irrad.name)
 
-          save(list = c(raw.name, irrad.name), file = file.name)
+          if (!mirai::unresolved(rda.mirai)) {
+            # non-blocking
+            rda.mirai <-
+              mirai::mirai({
+                assign(obj.names[1], raw.mspct)
+                assign(obj.names[2], irrad.spct)
+                save(list = obj.names, file = file.name)
+              },
+              obj.names = obj.names,
+              file.name = file.name,
+              raw.mspct = raw.mspct,
+              irrad.spct = irrad.spct
+              )
+          } else {
+            # fall back to main process
+            save(list = obj.names, file = file.name)
+          }
 
           if (save.pdfs) {
             pdf.name <- paste(obj.name, "spct.pdf", sep = ".")
-            grDevices::pdf(file = pdf.name, width = 8, height = 6)
-            print(fig)
-            grDevices::dev.off()
+            if (!mirai::unresolved(pdf.mirai)) {
+              pdf.mirai <- mirai::mirai({
+                grDevices::pdf(file = pdf.name, width = 8, height = 6)
+                print(fig)
+                grDevices::dev.off()
+              },
+              pdf.name = pdf.name,
+              fig = fig
+              )
+            } else {
+              grDevices::pdf(file = pdf.name, width = 8, height = 6)
+              print(fig)
+              grDevices::dev.off()
+            }
           }
           break()
         }
 
       } else {
         # moved from above so that saving is skipped for discarded spectra
-        raw.names <- c(raw.names, raw.name)
-        file.names <- c(file.names, file.name)
+        raw.prompt <- "discard/SAVE+NEXT (d/s-): "
+        valid.answers <-  c("d", "s")
+        repeat {
+          answer <- readline(plot.prompt)[1]
+          answer <- ifelse(answer == "", "s", answer)
+          if (answer %in% valid.answers) {
+            break()
+          } else {
+            print("Answer not recognized, please try again...")
+          }
+        }
+        if (answer == "s") {
+          raw.names <- c(raw.names, raw.name)
+          file.names <- c(file.names, file.name)
 
-        assign(raw.name, raw.mspct)
-        save(list = raw.name, file = file.name)
+          assign(raw.name, raw.mspct)
+
+          if (!mirai::unresolved(rda.mirai)) {
+            rda.mirai <- mirai::mirai(save(list = raw.name, file = file.name),
+                                      .args = list(raw.name, file.name))
+          } else {
+            save(list = raw.name, file = file.name)
+          }
+        }
       }
 
       if (save.collections || save.summaries) {
@@ -871,6 +933,19 @@ acq_irrad_interactive <-
       }
 
     } # end of main UI loop
+
+    if (mirai::unresolved(rda.mirai) || mirai::unresolved(pdf.mirai)) {
+      cat("Saving files ")
+      while (mirai::unresolved(rda.mirai) || mirai::unresolved(pdf.mirai)) {
+        cat(".")
+        Sys.sleep(0.25)
+      }
+      cat("\n")
+    }
+
+    if (mirai::status()$connections) {
+      print(mirai::status()$daemons)
+    }
 
     save(file.names,
          file = paste("files4session-",
