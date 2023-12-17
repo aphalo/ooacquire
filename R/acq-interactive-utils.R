@@ -375,6 +375,10 @@ choose_ch_interactive <- function(instruments,
 #'   \code{"num.steps"}.
 #' @param measurement.duration numeric Duration of one measurement event (s).
 #' @param minimum.step.delay numeric Minimum duration of \code{"step.delay"} (s).
+#' @param time.division numeric The step is forced to be a multiple of this
+#'   time duration, because spectrometers normally are constantly acquiring
+#'   spectra and they return the most recently acquired one. Should be set to
+#'   the integration time plus a very small overhead (s).
 #'
 #' @details Function \code{seq.settings()} allows users to enter values needed
 #' to define a sequence of spectral acquisitions. These are the time unit
@@ -399,7 +403,21 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
                                                     step.delay = 0,
                                                     num.steps = 1),
                                 measurement.duration = 0,
-                                minimum.step.delay = measurement.duration) {
+                                minimum.step.delay = measurement.duration,
+                                time.division = 0) {
+
+  # ensure that step.delay is a multiple of time.division (integration time)
+  check.step.delay <- function(step, time.div) {
+    if (time.division > 0) {
+      num.time.divs <- (step + 1e-7) %/% time.division # protect from loss of precision
+      if (num.time.divs < 2) {
+        step <- 0
+      } else {
+        step <- time.division * num.time.divs
+      }
+    }
+    step
+  }
 
   if (!setequal(names(seq.settings),
       c("start.boundary", "initial.delay", "step.delay", "num.steps"))) {
@@ -411,11 +429,14 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
   }
   old.seq.settings <- seq.settings
 
+  seq.settings$step.delay <-
+    check.step.delay(seq.settings$step.delay, time.division)
+
   repeat{
     if (seq.settings$step.delay < measurement.duration &&
         seq.settings$step.delay != 0) {
       seq.settings$step.delay <- signif(minimum.step.delay * 1.01, 3)
-      message("'step.delay' too short! Reset to ", seq.settings$step.delay, " s.")
+      cat("'step.delay' too short! Reset to ", seq.settings$step.delay, " s.\n")
     }
     prompt.string <-
            sprintf("Series: wait = %.3g s, boundary = %s, step = %.3g s, reps = %i, undo (w/b/s/r/u/m-): ",
@@ -434,7 +455,7 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
       if (!is.na(step)) {
         seq.settings[["initial.delay"]] <- step
       } else {
-        print("Value not changed!")
+        cat("Imitial delay value not changed!\n")
       }
     } else if (substr(answ, 1, 1) == "b") {
       time.unit <- readline(sprintf("Start at next %s, new: ",
@@ -442,23 +463,25 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
       if (time.unit %in% c("none", "second", "minute", "hour")) {
         seq.settings[["start.boundary"]] <- time.unit
       } else {
-        print("Value not changed!")
+        cat("Start-boundary Value not changed!\n")
       }
     } else if (substr(answ, 1, 1) == "s") {
       step <- readline(sprintf("Step = %.3g seconds, new: ",
                                seq.settings[["step.delay"]]))
       step <- try(as.numeric(step))
       if (!is.na(step)) {
-        seq.settings[["step.delay"]] <- step
+        seq.settings$step.delay <-
+          check.step.delay(step, time.division)
+        cat("Time step set to", signif(seq.settings$step.delay, 3), "s\n")
       } else {
-        print("Value not changed!")
+        cat("Time step value not changed!\n")
       }
     } else if (substr(answ, 1, 1) == "r") {
       num.steps <- readline(sprintf("Repeats = %i spectra, new: ",
                                     seq.settings[["num.steps"]]))
       num.steps <- try(as.integer(num.steps))
       if (is.na(num.steps)) {
-        print("Number of spectra must be a positive integer. Value not changed!")
+        cat("Number of spectra must be a positive integer. Value not changed!\n")
       } else if (num.steps < 1L || num.steps > 10000L) {
         warning("Number of spectra must be in range 1..10000. Value not changed!")
       } else {
