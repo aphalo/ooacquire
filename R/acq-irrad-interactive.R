@@ -189,6 +189,7 @@ acq_irrad_interactive <-
            save.pdfs = TRUE,
            save.summaries = TRUE,
            save.collections = interface.mode != "simple",
+#           backup.raw = 30L,
            show.figs = TRUE,
            interface.mode = ifelse(qty.out == "fluence", "manual", "auto"),
            num.exposures = ifelse(qty.out == "fluence", 1L, -1L),
@@ -503,24 +504,40 @@ acq_irrad_interactive <-
 
       if (grepl("^series", interface.mode)) {
 
-        estimated.measurement.duration <-
-          sum(settings$integ.time * settings$num.scans * 1e-6) +
-          acq.overhead * length(settings$HDR.mult) + # number of HDR acquisitions
-          sum(0.66 * settings$integ.time * 1e-6) # estimate of worse case overhead due to free-running
+        if (length(settings$HDR.mult) > 1) { # acq settings once per integ time value
+          estimated.measurement.duration <-
+            sum(settings$integ.time * settings$num.scans * 1e-6) +
+            acq.overhead * length(settings$HDR.mult) + # number of HDR acquisitions
+            sum(0.66 * settings$integ.time * 1e-6) # worse case overhead due to restart
+        } else if (length(settings$HDR.mult) == 1) { # no need to change of acq settings
+          if (settings$num.scans > 1) {
+            estimated.measurement.duration <-
+              settings$integ.time * settings$num.scans * 1e-6 + acq.overhead
+          } else if (settings$num.scans == 1) { # buffered high speed acquisition
+            estimated.measurement.duration <-
+              settings$integ.time * 1e-6 # no overhead
+          } else {
+            estimated.measurement.duration <- NA_real_
+          }
+        }
 
         stopifnot("Estimated measurement duration is not finite" =
                     is.finite(estimated.measurement.duration),
                   "Estimated measurement duration <= 0" =
                     estimated.measurement.duration > 0)
 
-        message("Estimated duration of one measurement with overhead: ", signif(estimated.measurement.duration, 3), " s.")
+        message("Duration of each repeated measurement: ",
+                signif(estimated.measurement.duration, 3), " s.")
 
         seq.settings <-
           set_seq_interactive(seq.settings = seq.settings,
                               measurement.duration = estimated.measurement.duration,
                               minimum.step.delay = ifelse(length(settings$HDR.mult) == 1L,
                                                           0,
-                                                          estimated.measurement.duration))
+                                                          estimated.measurement.duration),
+                              time.division = ifelse(length(settings$HDR.mult) == 1L,
+                                                     settings$integ.time * 1e-6, # -> seconds
+                                                     0))
       }
 
       if (reuse.old.refs) {

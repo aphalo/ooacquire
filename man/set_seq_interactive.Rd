@@ -8,7 +8,8 @@ set_seq_interactive(
   seq.settings = list(start.boundary = "second", initial.delay = 0, step.delay = 0,
     num.steps = 1),
   measurement.duration = 0,
-  minimum.step.delay = measurement.duration
+  minimum.step.delay = measurement.duration,
+  time.division = 0
 )
 }
 \arguments{
@@ -20,6 +21,11 @@ repeated measurements. Named vector with member named
 \item{measurement.duration}{numeric Duration of one measurement event (s).}
 
 \item{minimum.step.delay}{numeric Minimum duration of \code{"step.delay"} (s).}
+
+\item{time.division}{numeric The step is forced to be a multiple of this
+time duration, because spectrometers normally are constantly acquiring
+spectra and they return the most recently acquired one. Should be set to
+the integration time plus a very small overhead (s).}
 }
 \value{
 A named numeric vector of length two.
