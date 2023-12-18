@@ -4,10 +4,7 @@
 vignettes/a-quick-guide_files
 vignettes/b-user-guide_files
 vignettes/c-algorithm-step-through_files
-src-i386
-src-x64
-garbage
-
+src/ooacquire.dll
 inst-not/single/
 acq-irrad*
 irrad-series*
