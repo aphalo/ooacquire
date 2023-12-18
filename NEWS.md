@@ -15,6 +15,7 @@ editor_options:
 -   Implement adjustment of the step delay time in time series to be a multiple
     of the integration time for buffered acquisition and normal acquisition 
     when not using HDR.
+-   Implement multiple repeats of whole time series.
 
 # ooacquire 0.4.2 (2023-12-03)
 

@@ -187,9 +187,8 @@ acq_irrad_interactive <-
            plot.lines.max = 50,
            summary.type = "plant",
            save.pdfs = TRUE,
-           save.summaries = TRUE,
-           save.collections = interface.mode != "simple",
-#           backup.raw = 30L,
+           save.summaries = !interface.mode %in% c("series", "series-attr"),
+           save.collections = !interface.mode %in% c("simple", "series", "series-attr"),
            show.figs = TRUE,
            interface.mode = ifelse(qty.out == "fluence", "manual", "auto"),
            num.exposures = ifelse(qty.out == "fluence", 1L, -1L),
@@ -229,6 +228,11 @@ acq_irrad_interactive <-
     # initialize mirai
     rda.mirai <- NA
     pdf.mirai <- NA
+
+    # initialize repeats counter
+
+    series.repeats <- 1L
+    series.start <- TRUE
 
     # define measurement protocols
     default.protocols <- list(l = "light",
@@ -459,6 +463,7 @@ acq_irrad_interactive <-
     file.names <- character()
 
     reuse.old.refs <- FALSE # none yet available
+    reuse.seq.settings <- FALSE
 
     repeat { # main loop for UI
       repeat{
@@ -526,18 +531,20 @@ acq_irrad_interactive <-
                   "Estimated measurement duration <= 0" =
                     estimated.measurement.duration > 0)
 
-        message("Duration of each repeated measurement: ",
-                signif(estimated.measurement.duration, 3), " s.")
+        if (!reuse.seq.settings) {
+          message("Duration of each repeated measurement: ",
+                  signif(estimated.measurement.duration, 3), " s.")
 
-        seq.settings <-
-          set_seq_interactive(seq.settings = seq.settings,
-                              measurement.duration = estimated.measurement.duration,
-                              minimum.step.delay = ifelse(length(settings$HDR.mult) == 1L,
-                                                          0,
-                                                          estimated.measurement.duration),
-                              time.division = ifelse(length(settings$HDR.mult) == 1L,
-                                                     settings$integ.time * 1e-6, # -> seconds
-                                                     0))
+          seq.settings <-
+            set_seq_interactive(seq.settings = seq.settings,
+                                measurement.duration = estimated.measurement.duration,
+                                minimum.step.delay = ifelse(length(settings$HDR.mult) == 1L,
+                                                            0,
+                                                            estimated.measurement.duration),
+                                time.division = ifelse(length(settings$HDR.mult) == 1L,
+                                                       settings$integ.time * 1e-6, # -> seconds
+                                                       0))
+        }
       }
 
       if (reuse.old.refs) {
@@ -634,60 +641,63 @@ acq_irrad_interactive <-
             # clear plot viewer panel of RStudio
             try(grDevices::dev.off(grDevices::dev.list()["RStudioGD"]), silent=TRUE)
           }
-          if(qty.out == "cps") {
-            plot.prompt <- "fig/w.bands/discard/SAVE+NEXT (f/w/d/s-): "
-            valid.answers <-  c("f","w", "d", "s")
-          } else {
-            plot.prompt <- "fig/photons/energy/w.bands/discard/SAVE+NEXT (f/p/e/w/d/s-): "
-            valid.answers <- c("f","p", "e", "w", "d", "s")
-          }
-          repeat {
-            answer <- readline(plot.prompt)[1]
-            answer <- ifelse(answer == "", "s", answer)
-            if (answer %in% valid.answers) {
-              break()
+
+          if (!reuse.seq.settings) {
+            if(qty.out == "cps") {
+              plot.prompt <- "fig/w.bands/discard/SAVE+NEXT (f/w/d/s-): "
+              valid.answers <-  c("f","w", "d", "s")
             } else {
-              print("Answer not recognized, please try again...")
+              plot.prompt <- "fig/photons/energy/w.bands/discard/SAVE+NEXT (f/p/e/w/d/s-): "
+              valid.answers <- c("f","p", "e", "w", "d", "s")
             }
-          }
-          switch(answer,
-                 f = {show.figs <- !show.figs; next()},
-                 p = {options(photobiology.radiation.unit = "photon"); next()},
-                 e = {options(photobiology.radiation.unit = "energy"); next()},
-                 w = {
-                   repeat {
-                     utils::flush.console()
-                     answer1 <-
-                       tolower(
-                         readline("Bands: UV+PhR/UV+PAR/plants/VIS/TOT/DEFAULT (u/a/p/v/t/d-): ")
-                       )[1]
-                     answer1 <- ifelse(answer1 == "", "d", answer1)
-                     if (answer1 %in% c("u", "a", "p", "v", "t", "d")) {
-                       break()
-                     } else {
-                       print("Answer not recognized. Please try again...")
+            repeat {
+              answer <- readline(plot.prompt)[1]
+              answer <- ifelse(answer == "", "s", answer)
+              if (answer %in% valid.answers) {
+                break()
+              } else {
+                print("Answer not recognized, please try again...")
+              }
+            }
+            switch(answer,
+                   f = {show.figs <- !show.figs; next()},
+                   p = {options(photobiology.radiation.unit = "photon"); next()},
+                   e = {options(photobiology.radiation.unit = "energy"); next()},
+                   w = {
+                     repeat {
+                       utils::flush.console()
+                       answer1 <-
+                         tolower(
+                           readline("Bands: UV+PhR/UV+PAR/plants/VIS/TOT/DEFAULT (u/a/p/v/t/d-): ")
+                         )[1]
+                       answer1 <- ifelse(answer1 == "", "d", answer1)
+                       if (answer1 %in% c("u", "a", "p", "v", "t", "d")) {
+                         break()
+                       } else {
+                         print("Answer not recognized. Please try again...")
+                       }
                      }
-                   }
-                   switch(answer1,
-                          u = options(photobiology.plot.bands =
-                                        c(photobiologyWavebands::UV_bands(),
-                                          list(photobiologyWavebands::PhR()))),
-                          a = options(photobiology.plot.bands =
-                                        c(photobiologyWavebands::UV_bands(),
-                                          list(photobiologyWavebands::PAR()))),
-                          p = options(photobiology.plot.bands =
-                                        photobiologyWavebands::Plant_bands()),
-                          v = options(photobiology.plot.bands =
-                                        photobiologyWavebands::VIS_bands()),
-                          t = options(photobiology.plot.bands =
-                                        list(photobiology::new_waveband(
-                                          photobiology::wl_min(irrad.spct),
-                                          photobiology::wl_max(irrad.spct),
-                                          wb.name = "Total"))),
-                          options(photobiology.plot.bands = NULL))
-                   next()},
-                 d = break()
-          )
+                     switch(answer1,
+                            u = options(photobiology.plot.bands =
+                                          c(photobiologyWavebands::UV_bands(),
+                                            list(photobiologyWavebands::PhR()))),
+                            a = options(photobiology.plot.bands =
+                                          c(photobiologyWavebands::UV_bands(),
+                                            list(photobiologyWavebands::PAR()))),
+                            p = options(photobiology.plot.bands =
+                                          photobiologyWavebands::Plant_bands()),
+                            v = options(photobiology.plot.bands =
+                                          photobiologyWavebands::VIS_bands()),
+                            t = options(photobiology.plot.bands =
+                                          list(photobiology::new_waveband(
+                                            photobiology::wl_min(irrad.spct),
+                                            photobiology::wl_max(irrad.spct),
+                                            wb.name = "Total"))),
+                            options(photobiology.plot.bands = NULL))
+                     next()},
+                   d = break()
+            )
+          }
 
           # moved from above so that saving is skipped for discarded spectra
           # one could use a temporary file for maximum safety...
@@ -913,40 +923,71 @@ acq_irrad_interactive <-
         }
       }
 
-      repeat {
-        valid.answers <- c("q", "r", "n")
-        answer2 <-
-          readline("quit/repeat/NEXT (q/r/n-): ")[1]
-        answer2 <- ifelse(answer2 == "", "n", answer2)
-        if (answer2 %in% valid.answers) {
-          break()
+      series.repeats <- series.repeats - 1L
+
+      if (series.repeats < 1) {
+
+        if (grepl("^series", interface.mode)) {
+          loop.valid.answers <- c("q", "r", "R", "n")
+          loop.prompt <- "quit/repeat/Repeat series/NEXT (q/r/R/n-): "
         } else {
-          print("Answer not recognized. Please try again...")
+          loop.valid.answers <- c("q", "r", "n")
+          loop.prompt <- "quit/repeat/NEXT (q/r/R/n-): "
         }
-      }
-
-      if (answer2 == "r") {
-        reuse.old.refs <- TRUE
-        answer2 <- "n"
-      } else {
-        reuse.old.refs <- FALSE
-      }
-
-      if (answer2 == "q") {
-        break() # out of UI main loop
-      } else if (!reuse.old.refs) {
-         repeat {
-          answer3 <- readline("Change protocol? yes/NO (y/n-): ")[1]
-          answer3 <- ifelse(answer3 == "", "n", answer3)
-          if (answer3 %in% c("n", "y")) {
+        repeat {
+          answer2 <-
+            readline(loop.prompt)[1]
+          answer2 <- ifelse(answer2 == "", "n", answer2)
+          if (answer2 %in% loop.valid.answers) {
             break()
           } else {
-            print("Answer not recognized, please try again...")
+            print("Answer not recognized. Please try again...")
           }
         }
-        if (answer3 == "y") {
-          protocol <- protocol_interactive(protocols)
+
+        if (answer2 == "R") {
+          reuse.old.refs <- TRUE
+          reuse.seq.settings <- TRUE
+          repeat {
+            answer3 <- readline("Number of repeats of whole time series (integer >= 1 or \"\"): ")
+            if (answer3 == "") {
+              answer3 <- "1"
+            }
+            series.repeats <- try(as.integer(answer3))
+            if (!is.na(series.repeats)) {
+              break()
+            } else {
+              cat("Value enetered is not a number!\n")
+            }
+            file.numbers <- series.repeats:1L
+          }
+          answer2 <- "n"
+        } else if (answer2 == "r") {
+          reuse.old.refs <- TRUE
+          reuse.seq.settings <- FALSE
+          answer2 <- "n"
+        } else {
+          reuse.old.refs <- FALSE
+          reuse.seq.settings <- FALSE
         }
+
+        if (answer2 == "q") {
+          break() # out of UI main loop
+        } else if (!reuse.old.refs) {
+          repeat {
+            answer3 <- readline("Change protocol? yes/NO (y/n-): ")[1]
+            answer3 <- ifelse(answer3 == "", "n", answer3)
+            if (answer3 %in% c("n", "y")) {
+              break()
+            } else {
+              print("Answer not recognized, please try again...")
+            }
+          }
+          if (answer3 == "y") {
+            protocol <- protocol_interactive(protocols)
+          }
+        }
+
       }
 
     } # end of main UI loop
