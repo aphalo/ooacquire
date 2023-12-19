@@ -464,17 +464,39 @@ acq_irrad_interactive <-
 
     reuse.old.refs <- FALSE # none yet available
     reuse.seq.settings <- FALSE
+    get.obj.name <- TRUE
+    file.counter <- 0
 
     repeat { # main loop for UI
       repeat{
-        user.obj.name <- readline("Give a name to the spectrum: ")
-        obj.name <- make.names(user.obj.name)
-        if (obj.name != user.obj.name) {
-          utils::flush.console()
-          answ <- readline(paste("Use sanitised name:", obj.name, " (y-/n) :"))
-          if (answ == "n") {
-            obj.name <- ""
+        if (get.obj.name) {
+          if (file.counter > 0) {
+            obj.name.prompt <- paste("Give a name to the spectrum (", base.obj.name, ") : ", sep = "")
+          } else {
+            obj.name.prompt <- "Give a name to the spectrum: "
           }
+          user.obj.name <- readline(obj.name.prompt)
+          if (!(user.obj.name == "" && file.counter > 0)) {
+            if (reuse.seq.settings || grepl("#$", user.obj.name)) {
+              file.counter <- 1
+              user.obj.name <- sub("#$", "", user.obj.name)
+            } else {
+              file.counter <- 0
+            }
+            base.obj.name <- make.names(user.obj.name)
+            if (obj.name != user.obj.name) {
+              utils::flush.console()
+              answ <- readline(paste("Use sanitised (base) name:", base.obj.name, " (y-/n) :"))
+              if (answ == "n") {
+                obj.name <- ""
+              }
+            }
+          }
+        }
+        if (file.counter > 0) {
+          obj.name <- paste(base.obj.name, formatC(file.counter, width = 3, flag = "0"), sep = "")
+        } else {
+          obj.name <- base.obj.name
         }
         if (length(obj.name) > 0 && obj.name != "") {
           # we make names
@@ -923,10 +945,13 @@ acq_irrad_interactive <-
         }
       }
 
+      # whole-time-series repeats remaining to be done
       series.repeats <- series.repeats - 1L
 
-      if (series.repeats < 1) {
-
+      if (series.repeats >= 1) {
+        get.obj.name <- FALSE
+      } else {
+        get.obj.name <- TRUE
         if (grepl("^series", interface.mode)) {
           loop.valid.answers <- c("q", "r", "R", "n")
           loop.prompt <- "quit/repeat/Repeat series/NEXT (q/r/R/n-): "
@@ -959,7 +984,6 @@ acq_irrad_interactive <-
             } else {
               cat("Value enetered is not a number!\n")
             }
-            file.numbers <- series.repeats:1L
           }
           answer2 <- "n"
         } else if (answer2 == "r") {

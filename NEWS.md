@@ -16,7 +16,8 @@ editor_options:
     of the integration time for buffered acquisition and normal acquisition 
     when not using HDR.
 -   Implement multiple repeats of whole time series.
-
+-   Implement generation of "numbered" object names and file names.
+ 
 # ooacquire 0.4.2 (2023-12-03)
 
 -   Check and update bad (hot) pixels in MAP11278 calibration (add one pixel).
