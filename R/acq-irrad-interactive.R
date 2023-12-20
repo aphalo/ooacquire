@@ -11,7 +11,14 @@
 #'   from discontinuous ones. For spectral irradiance it assumes that the
 #'   duration of the measurement event is the relevant time base for expression
 #'   of the flux of radiation. For spectral fluence the flux of radiation is
-#'   expressed per pulse of illumination.
+#'   expressed per pulse of illumination. The acquisition of both individual
+#'   spectra and time series of spectra are supported.
+#'
+#'   Different arguments passed to \code{interface.mode} modify which aspects
+#'   of the user interface are available through menues, without altering
+#'   the ability to control the behaviour through arguments passed to formal
+#'   parameters when calling the function (see section Interface Modes for
+#'   details).
 #'
 #'   This function can be used to acquire spectra using different protocols for
 #'   acquisition and stray light and dark corrections. The protocols are
@@ -21,7 +28,7 @@
 #'   Using this function only requires an Ocean Optics spectrometer to be
 #'   connected to the computer where R is running and the OmniDriver runtime
 #'   from Ocean Insight installed. The connection to the spectrometer and
-#'   selection of channel, when relevant, is done from within these functions.
+#'   selection of channel, when relevant, is done from within this function.
 #'
 #'   The irradiance calibration will be retrieved from the spectrometer memory
 #'   as a last resource if not supplied in any other way. Given that the factors
@@ -29,62 +36,114 @@
 #'   either the effective cosine diffuser area in xxx should be passed to
 #'   parameter \code{area} or a character string with the type of the diffuser
 #'   passed to \code{diff.type}. If no irradiance calibration is available,
-#'   counts per second (cps) or raw counts are the only options available.
+#'   counts per second (cps) or raw counts are the only options available for
+#'   the returned spectral data.
 #'
 #'   Three main protocols and two variations are available by default. They
 #'   differ in the additional measurements done to correct for stray light and
-#'   dark noise and in the sequence in which they are acquired. The default
-#'   protocols are usually suitable, if new protocols are passed, each character
-#'   vector must contain strings "light", "filter" and "dark".
+#'   dark noise and in the sequence in which they are acquired. In most
+#'   situations least one of the default protocols is suitable. If new protocols
+#'   are passed argument, each character vector must contain strings named
+#'   "light", "filter" and "dark".
 #'
-#'   In the case of spectral irradiance, the default is to set the integration time
-#'   automatically so that the number of counts at the highest peak is close to
-#'   1 - \code{target.margin} times the maximum of the range of the instrument
-#'   detector (retrieved from the calibration or the instrument memory). The
-#'   minimum \code{tot.time} is obtained by increasing the number of scans. The
-#'   maximum integration time supported by the spectrometer is not exceeded.
+#'   In the case of spectral irradiance, the default is to set the integration
+#'   time automatically so that the number of counts at the highest peak is
+#'   close to 1 - \code{target.margin} times the maximum raw-counts of the
+#'   instrument detector (retrieved from the calibration or the instrument
+#'   memory). The minimum \code{tot.time} is obtained by increasing the number
+#'   of scans. The maximum integration time supported by the spectrometer cannot
+#'   exceeded.
 #'
 #'   In the case of spectral fluence the default is for the integration time to
 #'   be set manually and for a message to be displayed asking for the light
 #'   pulse to be manually triggered. It is possible to override the default
 #'   function by one that triggers the light source automatically.
 #'
-#'   Different argumenst passed to \code{interface.mode} modify which aspects
-#'   of the user interface are available through menues, without altering
-#'   the ability to control the behaviour through arguments passed to formal
-#'   parameters when calling the function. For example, mode "series" exposes
-#'   the menue used to change schedulling of single measurements and time
-#'   series of measurements.
+#'   Repeated measurements are converted into physical units immediately after
+#'   acquisition and saved to file on disk. Each repeated measurement can be
+#'   either a single spectrum or a time series of spectra. To avoid long delays
+#'   caused by saving large files, \code{async.saves} can be enabled.
 #'
-#'   Sequences of light measurements using single "dark" and "filter"
-#'   measurements are scheduled by setting the four members of the named list
-#'   passed as argument to \code{seq.settings}. The member \code{initial.delay}
-#'   is numeric and gives a minimum delay in seconds before the start of
-#'   measurements with a default of 0s. Member \code{step.delay} is numeric and
-#'   gives the delay in seconds between successive "light" measurements. In
-#'   most cases a vector of length one is used as time delta in seconds. Any
-#'   vector shorter than the number of steps will be extended with
-#'   \code{rep_len()}, and the values interpreted as the time increment
-#'   in seconds between the start of successive measurements. If the length is
-#'   the same as "num.steps", and the values are monotonically increasing, they
-#'   are interpreted as time offsets from the start of the sequence. Member
-#'   \code{start.boundary} can take one of "none", "second", "minute" or "hour"
-#'   indicating the unit to which the start of the series should be scheduled,
-#'   e.g. the next minute and 0s, for "minute". Member \code{num.steps} must
-#'   be an integer between 1 and small thousands indicating the number of time
-#'   steps in the series.
+#'   Time series of spectra are acquired as fast as possible, converted into
+#'   physical units after the acquisition of all individual raw-counts spectra
+#'   and saved as a single \code{cps_spct} or \code{source_spct} in long form.
+#'
+#'   Time series of light measurements using single "dark" and "filter"
+#'   measurements are scheduled by setting four members of the named list
+#'   passed as argument to \code{seq.settings}, or interactively through the
+#'   user interface.
+#'
+#'   The \code{initial.delay} is numeric and gives a minimum delay in
+#'   seconds before the start of measurements with a default of 0s.
+#'
+#'   The \code{step.delay} is numeric and gives the delay in seconds between
+#'   successive "light" measurements. The value entered by the user is adjusted
+#'   based on the estimated duration of individual spectral acquisition. In most
+#'   cases a vector of length one is used as time delta in seconds. Any vector
+#'   shorter than the number of steps will be extended with \code{rep_len()},
+#'   and the values interpreted as the time increment in seconds between the
+#'   start of successive measurements. If the length is the same as "num.steps",
+#'   and the values are monotonically increasing, they are interpreted as time
+#'   offsets from the start of the sequence. Member
+#'
+#'   The \code{start.boundary} must be set to "none", "second", "minute" or
+#'   "hour" indicating the unit to which the start of the series should be
+#'   scheduled, e.g., the next minute and 0s, for "minute".
+#'
+#'   The \code{num.steps} must be an integer between 1 and a few thousands
+#'   indicating the number of time steps in the series. The maximum value
+#'   depends on the available memory. It is possible to set \code{qty.out =
+#'   "raw"} decreasing the memory requirement as well as the processing time, in
+#'   which case the conversion to physical units must be done later "off-line".
 #'
 #'   Plots are produced with functions from package 'ggspectra' and respect the
 #'   default annotations set with function \code{set_annotations_default()},
 #'   default wavebands set with function \code{set_w.band_default()}, and
 #'   irradiance quantities set with \code{photon_as_default()}, and
-#'   \code{energy_as_default()}.
+#'   \code{energy_as_default()}. The ggplots are not saved as 'gg' objects as
+#'   they contain redundant copies of the spectral data. They can be easily
+#'   recreated using function \code{autoplot()} after attaching package
+#'   'ggspectra'.
 #'
-#'   The different interface modes available are suitable for different types of
-#'   measurements.
+#'   The screen display of plot can be disabled, as in some cases the delay
+#'   introduced by rendering can be a nuisance. Alternatively, the value of
+#'   \code{plot.lines.max} can be decreased from its default.
+#'
+#' @section Interface Modes:
+#'   Mode \strong{simple} displays a simplified user interface, supporting the
+#'   acquisition of individual irradiance spectra. Integration time is adjusted
+#'   automatically.
+#'
+#'   Mode \strong{auto} displays a user interface supporting the acquisition of
+#'   individual irradiance spectra and creation of collections of spectra.
+#'   Integration time is adjusted automatically.
+#'
+#'   Mode \strong{manual} displays a user interface supporting the acquisition
+#'   of individual fluence or irradiance spectra and creation of collections of
+#'   spectra. Integration time can adjusted automatically but also set manually.
+#'
+#'   Mode \strong{series} displays a user interface supporting the acquisition
+#'   of individual spectra and time series of irradiance spectra. Integration
+#'   time can adjusted automatically.
+#'
+#'   All these modes with \strong{-attr} appended, enable a menue and dialogues
+#'   that make it possible to set the values stored in attributes \code{comment}
+#'   and \code{what.measure} interactively for each data acquisition.
+#'
+#'   All modes support repeated measurements with unchanged acquisition settings
+#'   reusing the reference spectra ('dark' and 'filter') from the most recent
+#'   previous measurement.
+#'
+#' @section Object names:
+#' Object names entered interactively are sanitized if necessary. Sequentially
+#' numbered object names are enabled by appending "#" to the desired base name.
+#' As long as no new name is entered, the sequence continues. If a new name is
+#' entered, numbering restarts at 001 or stops depending on whether the new name
+#' ends in "#" or not. In the case of repeated measurements, sequential
+#' numbering is enforced to ensure unique names.
 #'
 #' @seealso This function calls functions \code{\link{tune_interactive}},
-#'   \code{\link{protocol_interactive}} and
+#'   \code{\link{protocol_interactive}}, \code{\link{set_seq_interactive}} and
 #'   \code{\link{set_attributes_interactive}}. If irradiance calibration is
 #'   retrieved from the instrument, functions \code{\link{get_oo_descriptor}}
 #'   and \code{\link{oo_calib2irrad_mult}} are also called.
@@ -120,6 +179,9 @@
 #' @param save.pdfs,save.summaries,save.collections logical Whether to save
 #'   plots to PDFs files or not, and collection summaries to csv files or not,
 #'   enable collections user interface or not.
+#' @param async.saves logical A flag enabling or disabling the use of separate
+#'   processes to save data to files. Package 'mirai' must be installed before
+#'   enabling is possible.
 #' @param show.figs logical Default for flag enabling display plots of acquired
 #'   spectra.
 #' @param interface.mode character One of "auto", "simple", "manual", "full",
@@ -152,11 +214,13 @@
 #'   each spectrum is saved, both as raw counts data and optionally as spectral
 #'   irradiance, spectral fluence or counts-per-second  spectral data in an
 #'   \code{.rda} file as objects of the classes defined in package
-#'   'photobiology'. Optionally, the plot for each spectrum is saved as a
-#'   \code{.pdf} file. At any time, the current group of spectra can be saved as
-#'   a collection. When a collection is created, spectral data are for several
-#'   spectra are saved together. Summaries are saved to a CSV file and joint
-#'   plots to a \code{.pdf} file. The value returned by the function is that
+#'   'photobiology'. Optionally, the plot for each spectrum or a time series of
+#'   spectra is saved as a \code{.pdf} file. At any time, the current group of
+#'   spectra can be saved as a collection. When a collection is created, all
+#'   recently measured spectra are saved together, decreasing the number of
+#'   files and keeping related spectra together. Summaries of the spectra in a
+#'   coleection are additionally saved to a CSV file and a plot of the spectra
+#'   saved to a \code{.pdf} file. The value returned by the function is that
 #'   from closing the connection to the spectrometer.
 #'
 #' @examples
@@ -189,6 +253,7 @@ acq_irrad_interactive <-
            save.pdfs = TRUE,
            save.summaries = !interface.mode %in% c("series", "series-attr"),
            save.collections = !interface.mode %in% c("simple", "series", "series-attr"),
+           async.saves = FALSE,
            show.figs = TRUE,
            interface.mode = ifelse(qty.out == "fluence", "manual", "auto"),
            num.exposures = ifelse(qty.out == "fluence", 1L, -1L),
@@ -205,6 +270,16 @@ acq_irrad_interactive <-
     if (getOption("ooacquire.offline", FALSE)) {
       warning("ooacquire off-line: Aborting...")
       return()
+    }
+
+    if (is.null(async.saves) || async.saves) {
+      async.saves <- requireNamespace("mirai", quietly = TRUE)
+    }
+
+    if (async.saves) {
+      message("Saving files asynchronously (non blocking, no wait)")
+    } else {
+      message("Saving files synchronously (blocking, wait)")
     }
 
     if (is.null(getOption("digits.secs"))) {
@@ -231,7 +306,7 @@ acq_irrad_interactive <-
 
     # initialize repeats counter
 
-    series.repeats <- 1L
+    pending.repeats <- 1L
     series.start <- TRUE
 
     # define measurement protocols
@@ -262,6 +337,7 @@ acq_irrad_interactive <-
       rstudioapi::executeCommand('activateConsole')
     }
 
+    # If multiple spectrometers are connected, ask which one to use
     instruments <- list_srs_interactive(w = w)
     sr.index <- choose_sr_interactive(instruments = instruments)
     if (sr.index < 0L) {
@@ -269,15 +345,18 @@ acq_irrad_interactive <-
       message("Bye!")
       return(NULL)
     }
+    # If the spectrometer has > 1 channel, ask which one to use
     ch.index <- choose_ch_interactive(instruments = instruments,
                                       sr.index = sr.index)
 
+    # retrieve serial number of spectrometer in use
     serial_no <- as.character(instruments[sr.index + 1L, 3])
 
     message("Using channel ", ch.index,
             " from spectrometer with serial number: ", serial_no)
 
-    # temporary kludge
+    # if multiple entrance optics are available, each has a different calibration
+    # we validate the argument passed in the case of on spectrometer
     if (serial_no == "MAYP11278") {
       if (is.null(entrance.optics) || grepl("^cos", entrance.optics) ) {
         entrance.optics <- "cosine"
@@ -288,6 +367,7 @@ acq_irrad_interactive <-
       }
     }
 
+    # spectrometer-specific correction method parameters
     if (anyNA(c(descriptors[[1]], correction.method[[1]]))) {
       descriptor <-
         switch(serial_no,
@@ -324,6 +404,7 @@ acq_irrad_interactive <-
                }
         )
 
+      # default protocols depend of implemented correction methods
       default.protocol <-
         switch(serial_no,
                MAYP11278 = "lfd",
@@ -342,7 +423,8 @@ acq_irrad_interactive <-
       default.protocol <- "ld"
     }
 
-    # needed only for descriptors retrieved from data
+    # jwrapper and spectrometer indexes have to be set to current ones if
+    # descriptor was not acquired from the spectrometer in the current session
     descriptor[["w"]] <- w
     descriptor[["sr.index"]] <- sr.index
     descriptor[["ch.index"]] <- ch.index
@@ -363,13 +445,13 @@ acq_irrad_interactive <-
       acq.overhead <- 50e-3 # 50 ms, just in case
     }
 
-    # We still check serial numbers, really needed only for user supplied descriptors
+    # check serial numbers, really needed only for user supplied descriptors
     descriptor.inst <- get_oo_descriptor(w)
     stopifnot(descriptor[["spectrometer.sn"]] == descriptor.inst[["spectrometer.sn"]])
 
-    # We check that wavelength calibration is available
+    # check that wavelength calibration is available
     stopifnot(length(descriptor[["wavelengths"]]) == descriptor[["num.pixs"]])
-    # We check for valid calibration multipliers
+    # check for valid calibration multipliers
     if (length(descriptor[["inst.calib"]][["irrad.mult"]]) != descriptor[["num.pixs"]] ||
         anyNA(descriptor[["inst.calib"]][["irrad.mult"]])) {
       if (qty.out %in% c("irrad", "fluence")) {
@@ -379,10 +461,10 @@ acq_irrad_interactive <-
       }
     }
 
-    # We get metadata from user, offering defaults
+    # metadata: get session name and user name from user, offering defaults
+
     session.name <- make.names(session.name) # validate argument passed in call
     session.prompt <- paste("Session's name (<string>/\"", session.name, "\"-): ", sep = "")
-    utils::flush.console()
     user.session.name <- readline(session.prompt)
     if (! user.session.name == "") {
       session.name <- make.names(user.session.name)
@@ -396,7 +478,6 @@ acq_irrad_interactive <-
 
     user.name <- make.names(user.name) # validate argument passed in call
     user.name.prompt <- paste("Operator's name (<string>/\"", user.name, "\"-): ", sep = "")
-    utils::flush.console()
     user.user.name <- readline(user.name.prompt)
     if (! user.user.name == "") {
       user.name <- make.names(user.user.name)
@@ -407,6 +488,7 @@ acq_irrad_interactive <-
                            ", instrument s.n.: ", descriptor[["spectrometer.sn"]],
                            sep = "")
 
+    # set default for metadata attributes
     user.attrs <-
       list(what.measured = "",
            comment.text = "",
@@ -423,16 +505,20 @@ acq_irrad_interactive <-
     folder.name <- set_folder_interactive(folder.name)
 
     # set working directory of current session
+
     oldwd <- setwd(folder.name)
     on.exit(setwd(oldwd), add = TRUE)
     on.exit(message("Folder reset to: ", getwd(), "\nBye!"), add = TRUE)
+
+    # ask user to choose protocol
 
     protocol <- protocol_interactive(protocols = protocols,
                                      default = default.protocol)
 
     start.int.time <- 0.01 # seconds
 
-    # initial protocol
+    # set default data acquisition settings based of call arguments
+
     num.scans <- min(max(tot.time.range) %/% start.int.time, 1L)
 
     settings <- acq_settings(descriptor = descriptor,
@@ -458,68 +544,132 @@ acq_irrad_interactive <-
     }
 
     # initialize lists to collect names from current session
+
     irrad.names <- character()
     raw.names <- character()
     file.names <- character()
 
+    # initialize interface logic flags
+
     reuse.old.refs <- FALSE # none yet available
     reuse.seq.settings <- FALSE
+    reset.count <- TRUE
     get.obj.name <- TRUE
+    get.seq.settings <- grepl("^series", interface.mode)
+    sequential.naming <- FALSE
+    sequential.naming.required <- FALSE
+
+    # initialize counter used for sequential naming
+
     file.counter <- 0
 
+    # initialize default object name
+
+    base.obj.name <- "ooacq_"
+
+
+
     repeat { # main loop for UI
-      repeat{
+
+      repeat{ # obtain a valid object name from user
+
         if (get.obj.name) {
-          if (file.counter > 0) {
-            obj.name.prompt <- paste("Give a name to the spectrum (", base.obj.name, ") : ", sep = "")
+          current.sequential.naming <- sequential.naming
+          current.base.obj.name <- base.obj.name
+          if (sequential.naming && file.counter > 0) {
+            obj.name.prompt <-
+              paste("Give a name to the spectrum (",
+                    current.base.obj.name, "#) : ", sep = "")
           } else {
-            obj.name.prompt <- "Give a name to the spectrum: "
+            obj.name.prompt <-
+              "Give a name to the spectrum: "
           }
-          user.obj.name <- readline(obj.name.prompt)
-          if (!(user.obj.name == "" && file.counter > 0)) {
-            if (reuse.seq.settings || grepl("#$", user.obj.name)) {
-              file.counter <- 1
+
+          repeat {
+            user.obj.name <- readline(obj.name.prompt)
+
+            if (user.obj.name == "" && current.sequential.naming) {
+              # we reuse base.obj.name and keep counting
+              reset.count <- FALSE
+              sequential.naming <- TRUE
+              user.obj.name <- base.obj.name
+            } else if (grepl("#$", user.obj.name)) {
+              # we start the count using a new base.name
+              reset.count <- TRUE
+              sequential.naming <- TRUE
               user.obj.name <- sub("#$", "", user.obj.name)
             } else {
-              file.counter <- 0
+              # new name with no hash
+              sequential.naming <- sequential.naming.required
+              reset.count <- TRUE
             }
+
             base.obj.name <- make.names(user.obj.name)
-            if (obj.name != user.obj.name) {
-              utils::flush.console()
+            if (base.obj.name != user.obj.name) {
               answ <- readline(paste("Use sanitised (base) name:", base.obj.name, " (y-/n) :"))
               if (answ == "n") {
-                obj.name <- ""
+                base.obj.name <- current.base.obj.name
+                next()
               }
             }
+            break()
           }
         }
-        if (file.counter > 0) {
+
+        # sequential object and file naming
+
+        if (sequential.naming) {
+          if (reset.count) {
+            file.counter <- 1
+            reset.count <- FALSE
+          } else {
+            file.counter <- file.counter + 1
+          }
+        } else {
+          file.counter <- 0
+        }
+
+        if (sequential.naming) {
           obj.name <- paste(base.obj.name, formatC(file.counter, width = 3, flag = "0"), sep = "")
         } else {
           obj.name <- base.obj.name
         }
-        if (length(obj.name) > 0 && obj.name != "") {
-          # we make names
-          irrad.name <- paste(obj.name, "spct", sep = ".")
-          raw.name <- paste(obj.name, "raw_mspct", sep = ".")
-          file.name <- paste(obj.name, "spct.Rda", sep = ".")
-          if ((irrad.name %in% irrad.names) || file.exists(file.name)) {
+
+        # generate object names from base name
+
+        irrad.name <- paste(obj.name, "spct", sep = ".")
+        raw.name <- paste(obj.name, "raw_mspct", sep = ".")
+        file.name <- paste(obj.name, "spct.Rda", sep = ".")
+
+        # although base name is known valid, the name may be already in use
+        if ((irrad.name %in% irrad.names) || file.exists(file.name)) {
+          if (sequential.naming && reuse.seq.settings) {
+            # likely running unattended
+            cat("Overwriting existing: '", irrad.name, "'.", sep = "")
+            irrad.names <- setdiff(irrad.names, irrad.name)
+            raw.names <- setdiff(raw.names, raw.name)
+            break()
+          } else {
+            # operator likely present
             if (readline(paste("Overwrite existing: '", irrad.name, ". (y/n-) :"))[1] == "y") {
               irrad.names <- setdiff(irrad.names, irrad.name)
               raw.names <- setdiff(raw.names, raw.name)
               break()
             }
-          } else {
-            break()
           }
+        } else {
+          break()
         }
         print("A valid and unique name is required. Please try again...")
-      }
 
+      } # obtain a valid object name from user
+
+      # user input of metadata for attributes "comment" and "what.measured"
       if (grepl("-attr", interface.mode)) {
         user.attrs <- set_attributes_interactive(user.attrs)
       }
 
+      # adjust acquisition settings
       if (!reuse.old.refs) {
         # using previous dark and filter spectra is possible only with
         # same settings
@@ -529,14 +679,16 @@ acq_irrad_interactive <-
                                      interface.mode = interface.mode)
       }
 
-      if (grepl("^series", interface.mode)) {
+      # time series settings
+      if (get.seq.settings) {
 
+        # Estimate time needed for measuring one spectrum
         if (length(settings$HDR.mult) > 1) { # acq settings once per integ time value
           estimated.measurement.duration <-
             sum(settings$integ.time * settings$num.scans * 1e-6) +
             acq.overhead * length(settings$HDR.mult) + # number of HDR acquisitions
             sum(0.66 * settings$integ.time * 1e-6) # worse case overhead due to restart
-        } else if (length(settings$HDR.mult) == 1) { # no need to change of acq settings
+        } else if (length(settings$HDR.mult) == 1) { # no need to change acq settings
           if (settings$num.scans > 1) {
             estimated.measurement.duration <-
               settings$integ.time * settings$num.scans * 1e-6 + acq.overhead
@@ -553,43 +705,63 @@ acq_irrad_interactive <-
                   "Estimated measurement duration <= 0" =
                     estimated.measurement.duration > 0)
 
-        if (!reuse.seq.settings) {
-          message("Duration of each repeated measurement: ",
-                  signif(estimated.measurement.duration, 3), " s.")
+        message("Duration of each repeated measurement: ",
+                signif(estimated.measurement.duration, 3), " s.")
 
-          seq.settings <-
-            set_seq_interactive(seq.settings = seq.settings,
-                                measurement.duration = estimated.measurement.duration,
-                                minimum.step.delay = ifelse(length(settings$HDR.mult) == 1L,
-                                                            0,
-                                                            estimated.measurement.duration),
-                                time.division = ifelse(length(settings$HDR.mult) == 1L,
-                                                       settings$integ.time * 1e-6, # -> seconds
-                                                       0))
-        }
+        seq.settings <-
+          set_seq_interactive(seq.settings = seq.settings,
+                              measurement.duration = estimated.measurement.duration,
+                              minimum.step.delay = ifelse(length(settings$HDR.mult) == 1L,
+                                                          0,
+                                                          estimated.measurement.duration),
+                              time.division = ifelse(length(settings$HDR.mult) == 1L,
+                                                     settings$integ.time * 1e-6, # -> seconds
+                                                     0))
+        get.seq.settings <- FALSE
+
       }
 
-      if (reuse.old.refs) {
-        raw.mspct <- acq_raw_mspct(descriptor = descriptor,
-                                   acq.settings = settings,
-                                   seq.settings = seq.settings,
-                                   protocol = "light",
-                                   f.trigger.pulses = f.trigger.pulses,
-                                   user.label = obj.name)
-      } else {
+      # acquire raw-counts spectra
+
+      if (reuse.old.refs) { # acquire only light spectra
+        if (acq.pausing) {
+          raw.mspct <- acq_raw_mspct(descriptor = descriptor,
+                                     acq.settings = settings,
+                                     seq.settings = seq.settings,
+                                     protocol = "light",
+                                     pause.fun = NULL,
+                                     f.trigger.pulses = f.trigger.pulses,
+                                     user.label = obj.name)
+        } else {
+          raw.mspct <- acq_raw_mspct(descriptor = descriptor,
+                                     acq.settings = settings,
+                                     seq.settings = seq.settings,
+                                     protocol = "light",
+                                     pause.fun = function(...) {TRUE},
+                                     f.trigger.pulses = f.trigger.pulses,
+                                     user.label = obj.name)
+        }
+      } else { # acquire all spectra needed for protocol
         raw.mspct <- acq_raw_mspct(descriptor = descriptor,
                                    acq.settings = settings,
                                    seq.settings = seq.settings,
                                    protocol = protocol,
+                                   pause.fun = NULL, # default
                                    f.trigger.pulses = f.trigger.pulses,
                                    user.label = obj.name)
       }
 
       if (length(raw.mspct) == 0) {
         message("Failure: no data acquired!")
-        next()
+        if (reuse.seq.settings) {
+          # avoid endless looping when unattended
+          break()
+        } else {
+          next()
+        }
       }
 
+      # combine spectra if needed
       if (reuse.old.refs) {
         # we add old refs to new light data
         raw.mspct <- c(old.refs.mpsct, raw.mspct)
@@ -599,10 +771,11 @@ acq_irrad_interactive <-
         if (length(refs.selector)) {
           old.refs.mpsct <- raw.mspct[refs.selector]
         } else {
-          old.refs.mpsct <- raw_mspct()
+          old.refs.mpsct <- raw_mspct() # empty object
         }
       }
 
+      # convert into physical units, display and save to file
       if (qty.out != "raw") {
         # for series measurements we can have multiple "light" raw spectra
         spct.names <-
@@ -636,6 +809,7 @@ acq_irrad_interactive <-
           message("ready.")
         }
 
+        # display plot, allowing user to tweak it
         repeat {
           if (plot.lines.max < getMultipleWl(irrad.spct)) {
             title.text <- paste(what_measured(irrad.spct)[[1L]],
@@ -664,7 +838,9 @@ acq_irrad_interactive <-
             try(grDevices::dev.off(grDevices::dev.list()["RStudioGD"]), silent=TRUE)
           }
 
-          if (!reuse.seq.settings) {
+          # user interaction and display of plot only if at end of measurement
+          # to avoid delays
+          if (!reuse.seq.settings || pending.repeats == 1) {
             if(qty.out == "cps") {
               plot.prompt <- "fig/w.bands/discard/SAVE+NEXT (f/w/d/s-): "
               valid.answers <-  c("f","w", "d", "s")
@@ -717,21 +893,23 @@ acq_irrad_interactive <-
                                             wb.name = "Total"))),
                             options(photobiology.plot.bands = NULL))
                      next()},
-                   d = break()
+                   d = break() # exit loop early, discarding acquired data
             )
           }
 
-          # moved from above so that saving is skipped for discarded spectra
-          # one could use a temporary file for maximum safety...
+          # update lists of objects and files created during current session
+          # since start or most recent saving of a collection.
           raw.names <- c(raw.names, raw.name)
           file.names <- c(file.names, file.name)
           irrad.names <- c(irrad.names, irrad.name)
 
+          # "rename" temporary objects
           assign(raw.name, raw.mspct)
           assign(irrad.name, irrad.spct)
           obj.names <- c(raw.name, irrad.name)
 
-          if (!mirai::unresolved(rda.mirai)) {
+          # save objects to files on disk
+          if (async.saves && !mirai::unresolved(rda.mirai)) {
             # non-blocking
             rda.mirai <-
               mirai::mirai({
@@ -749,9 +927,10 @@ acq_irrad_interactive <-
             save(list = obj.names, file = file.name)
           }
 
+          # save plots to files on disk
           if (save.pdfs) {
             pdf.name <- paste(obj.name, "spct.pdf", sep = ".")
-            if (!mirai::unresolved(pdf.mirai)) {
+            if (async.saves && !mirai::unresolved(pdf.mirai)) {
               pdf.mirai <- mirai::mirai({
                 grDevices::pdf(file = pdf.name, width = 8, height = 6)
                 print(fig)
@@ -769,8 +948,8 @@ acq_irrad_interactive <-
           break()
         }
 
-      } else {
-        # moved from above so that saving is skipped for discarded spectra
+      } else { # qty.out == "raw"
+        # currently no plotting!
         raw.prompt <- "discard/SAVE+NEXT (d/s-): "
         valid.answers <-  c("d", "s")
         repeat {
@@ -782,13 +961,15 @@ acq_irrad_interactive <-
             print("Answer not recognized, please try again...")
           }
         }
+
+        # save raw-counts data to file on disk
         if (answer == "s") {
           raw.names <- c(raw.names, raw.name)
           file.names <- c(file.names, file.name)
 
           assign(raw.name, raw.mspct)
 
-          if (!mirai::unresolved(rda.mirai)) {
+          if (async.saves && !mirai::unresolved(rda.mirai)) {
             rda.mirai <- mirai::mirai(save(list = raw.name, file = file.name),
                                       .args = list(raw.name, file.name))
           } else {
@@ -797,7 +978,10 @@ acq_irrad_interactive <-
         }
       }
 
-      if (save.collections || save.summaries) {
+      # make collection from all spectra acquired since start of session or last
+      # saving of a collection
+      if (pending.repeats == 0 && (save.collections || save.summaries)) {
+
         repeat {
           answer.collect <-
             readline("collect and/or summarize? yes/NO (y/n-): ")[1]
@@ -812,6 +996,7 @@ acq_irrad_interactive <-
           }
         }
 
+        # Construct collection object and create plot of collection
         if (collect.and.save) {
           message("Corrected ", qty.out, " spectra to collect: ",
                   paste(irrad.names, collapse = ", "))
@@ -832,10 +1017,15 @@ acq_irrad_interactive <-
           if (collection.title == "") {
             collection.title <- collection.name
           }
+
+          # name of the Rda file used to save the collection
           collection.file.name <- paste(collection.name, "Rda", sep = ".")
+          # collection.objects used to collect all R objects to be saved to the Rda file
           collection.objects <- character()
 
           if (qty.out != "raw") {
+            # construct collection of computed spectra, needed for summaries
+            # even when not saved to file on disk!
             collection.mspct <-
               switch(qty.out,
                      fluence = photobiology::source_mspct(mget(irrad.names)),
@@ -853,6 +1043,8 @@ acq_irrad_interactive <-
                                         sep = "")
             }
 
+            # create plot
+            # if too many spectra to plot, draw a random sample of the maximum size
             collection.fig <-
               ggplot2::autoplot(pull_sample(collection.mspct, plot.lines.max),
                                 annotations =
@@ -864,6 +1056,7 @@ acq_irrad_interactive <-
             print(collection.fig)
             rm(collection.title)
 
+            # save plot to file on disk
             if (save.pdfs) {
               collection.pdf.name <- paste(collection.name, "pdf", sep = ".")
               grDevices::pdf(file = collection.pdf.name, onefile = TRUE,
@@ -874,11 +1067,13 @@ acq_irrad_interactive <-
             }
             rm(collection.fig)
 
+            # create table of summaries from the spectra in the collection
             if (save.summaries) {
               contents.collection.name <-
                 paste(collection.name, "contents.tb", sep = ".")
               assign(contents.collection.name, summary(collection.mspct))
               collection.objects <- c(collection.objects, contents.collection.name)
+
               if (qty.out %in% c("irrad", "fluence")) {
                 last.summary.type <- summary.type
                 repeat{
@@ -898,11 +1093,14 @@ acq_irrad_interactive <-
                 }
                 summary.tb <-
                   irrad_summary_table(mspct = collection.mspct)
+
+                # save summary table to file on disk
                 if (!is.null(summary.tb) && is.data.frame(summary.tb)) {
                   readr::write_delim(summary.tb,
                                      file =  paste(collection.name, "csv", sep = "."),
                                      delim = readr::locale()$grouping_mark)
                   summary.collection.name <- paste(collection.name, "summary.tb", sep = ".")
+                  # "rename" data frame with summaries
                   assign(summary.collection.name, summary.tb)
                   collection.objects <- c(collection.objects, summary.collection.name)
                 } else {
@@ -911,7 +1109,9 @@ acq_irrad_interactive <-
               }
             }
 
+            # create collection of raw-counts spectra and save all collections
             if (save.collections) {
+              # "rename" temporary objects
               irrad.collection.name <- paste(collection.name, qty.out, "mspct", sep = ".")
               assign(irrad.collection.name, collection.mspct)
               collection.objects <- c(collection.objects, irrad.collection.name)
@@ -919,6 +1119,8 @@ acq_irrad_interactive <-
               raw.collection.name <- paste(collection.name, "raw", "lst", sep = ".")
               assign(raw.collection.name, mget(raw.names))
               collection.objects <- c(collection.objects, raw.collection.name)
+
+              # save collections to files on disk
               repeat {
                 save(list = collection.objects, file = collection.file.name, precheck = TRUE)
                 if (file.exists(collection.file.name)) {
@@ -935,9 +1137,10 @@ acq_irrad_interactive <-
                   rm(list = c(raw.names))
                   irrad.names <- character()
                   raw.names <- character()
+                  message("Object lists reset")
                   break()
                 } else {
-                  message("Saving of the collection to file failed!")
+                  message("Saving of the collection to file failed! (object lists not reset)")
                 }
               }
             }
@@ -945,23 +1148,23 @@ acq_irrad_interactive <-
         }
       }
 
-      # whole-time-series repeats remaining to be done
-      series.repeats <- series.repeats - 1L
+      # whole-measurement repeats remaining to be done
+      pending.repeats <- pending.repeats - 1L
 
-      if (series.repeats >= 1) {
+      if (pending.repeats >= 1) {
+        message("Pending: ", pending.repeats, " repeats.")
         get.obj.name <- FALSE
+        acq.pausing <- acq.pausing.always
       } else {
         get.obj.name <- TRUE
-        if (grepl("^series", interface.mode)) {
-          loop.valid.answers <- c("q", "r", "R", "n")
-          loop.prompt <- "quit/repeat/Repeat series/NEXT (q/r/R/n-): "
-        } else {
-          loop.valid.answers <- c("q", "r", "n")
-          loop.prompt <- "quit/repeat/NEXT (q/r/R/n-): "
-        }
+        acq.pausing <- TRUE
+
+        get.seq.settings <- grepl("^series", interface.mode)
+
+        loop.valid.answers <- c("q", "r", "p", "n")
+        loop.prompt <- "quit/repeat non-stop/repeat pausing/NEXT (q/r/p/n-): "
         repeat {
-          answer2 <-
-            readline(loop.prompt)[1]
+          answer2 <- readline(loop.prompt)[1]
           answer2 <- ifelse(answer2 == "", "n", answer2)
           if (answer2 %in% loop.valid.answers) {
             break()
@@ -970,29 +1173,36 @@ acq_irrad_interactive <-
           }
         }
 
-        if (answer2 == "R") {
+        if (answer2 %in% c("r", "p")) {
+          acq.pausing.always <- answer2 == "p"
+          show.figs <- show.figs && answer2 == "p"
+          if (acq.pausing.always) {
+            message("Pausing between repeats")
+          } else {
+            message("Not pausing between repeats")
+          }
           reuse.old.refs <- TRUE
-          reuse.seq.settings <- TRUE
           repeat {
-            answer3 <- readline("Number of repeats of whole time series (integer >= 1 or \"\"): ")
+            answer3 <- readline("Number of repeated acquisitions (integer >= 1 or \"\"): ")
             if (answer3 == "") {
               answer3 <- "1"
             }
-            series.repeats <- try(as.integer(answer3))
-            if (!is.na(series.repeats)) {
+            pending.repeats <- try(as.integer(answer3))
+            if (!is.na(pending.repeats) && pending.repeats >= 1L) {
               break()
             } else {
-              cat("Value enetered is not a number!\n")
+              cat("Value entered is not a number >= 1!\n")
             }
           }
-          answer2 <- "n"
-        } else if (answer2 == "r") {
-          reuse.old.refs <- TRUE
-          reuse.seq.settings <- FALSE
+          reuse.seq.settings <- pending.repeats > 1L
+          sequential.naming.required <- pending.repeats > 1L
           answer2 <- "n"
         } else {
+          acq.pausing.always <- FALSE
           reuse.old.refs <- FALSE
           reuse.seq.settings <- FALSE
+          sequential.naming.required <- FALSE
+          pending.repeats <- 1
         }
 
         if (answer2 == "q") {
@@ -1016,7 +1226,8 @@ acq_irrad_interactive <-
 
     } # end of main UI loop
 
-    if (mirai::unresolved(rda.mirai) || mirai::unresolved(pdf.mirai)) {
+    # Wait for all files to be saved (needed?)
+    if (async.saves && (mirai::unresolved(rda.mirai) || mirai::unresolved(pdf.mirai))) {
       cat("Saving files ")
       while (mirai::unresolved(rda.mirai) || mirai::unresolved(pdf.mirai)) {
         cat(".")
@@ -1025,10 +1236,12 @@ acq_irrad_interactive <-
       cat("\n")
     }
 
-    if (mirai::status()$connections) {
+    # report on asynchronous file saving
+    if (async.saves && mirai::status()$connections) {
       print(mirai::status()$daemons)
     }
 
+    # save list of all file saved during session
     save(file.names,
          file = paste("files4session-",
                       make.names(session.name),
@@ -1039,6 +1252,9 @@ acq_irrad_interactive <-
             paste(file.names, collapse = ",\n"), ".", sep = "")
 
     message("Ending data acquisition...")
+
+    # connection to spectrometer is closed using on.exit() to ensure
+    # disconnection even when end of session is forced by error or by user
 
   }
 

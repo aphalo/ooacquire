@@ -265,14 +265,16 @@ acq_raw_mspct <- function(descriptor,
                           pause.fun = NULL,
                           verbose = TRUE,
                           ...) {
+
   if (getOption("ooacquire.offline", TRUE)) {
     warning("Package 'rOmniDriver' required to access spectrometer. Data acquisition skipped.")
     return(raw_mspct())
   }
+
   default_pause_fun <- function(acq.what, ...) {
     utils::flush.console()
     answ <- readline(paste("Acquire", toupper(acq.what),
-                           "scans, z = abort (m-/z):"))[1]
+                           "readings: g = GO, z = abort (g-/z):"))[1]
     tolower(answ) != "z"
   }
 

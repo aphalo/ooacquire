@@ -5,7 +5,7 @@ vignettes/a-quick-guide_files
 vignettes/b-user-guide_files
 vignettes/c-algorithm-step-through_files
 src/ooacquire.dll
-inst-not/single/
 acq-irrad*
-irrad-series*
-inst-not/series/
+inst-not/fluence*
+inst-not/irrad*
+inst-not/series*

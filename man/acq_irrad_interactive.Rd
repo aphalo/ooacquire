@@ -22,6 +22,7 @@ acq_irrad_interactive(
   save.pdfs = TRUE,
   save.summaries = !interface.mode \%in\% c("series", "series-attr"),
   save.collections = !interface.mode \%in\% c("simple", "series", "series-attr"),
+  async.saves = FALSE,
   show.figs = TRUE,
   interface.mode = ifelse(qty.out == "fluence", "manual", "auto"),
   num.exposures = ifelse(qty.out == "fluence", 1L, -1L),
@@ -77,6 +78,10 @@ lines. Random sampling is used if number of spectra exceeds
 plots to PDFs files or not, and collection summaries to csv files or not,
 enable collections user interface or not.}
 
+\item{async.saves}{logical A flag enabling or disabling the use of separate
+processes to save data to files. Package 'mirai' must be installed before
+enabling is possible.}
+
 \item{show.figs}{logical Default for flag enabling display plots of acquired
 spectra.}
 
@@ -99,11 +104,13 @@ These functions return the acquired spectra through "side effects" as
   each spectrum is saved, both as raw counts data and optionally as spectral
   irradiance, spectral fluence or counts-per-second  spectral data in an
   \code{.rda} file as objects of the classes defined in package
-  'photobiology'. Optionally, the plot for each spectrum is saved as a
-  \code{.pdf} file. At any time, the current group of spectra can be saved as
-  a collection. When a collection is created, spectral data are for several
-  spectra are saved together. Summaries are saved to a CSV file and joint
-  plots to a \code{.pdf} file. The value returned by the function is that
+  'photobiology'. Optionally, the plot for each spectrum or a time series of
+  spectra is saved as a \code{.pdf} file. At any time, the current group of
+  spectra can be saved as a collection. When a collection is created, all
+  recently measured spectra are saved together, decreasing the number of
+  files and keeping related spectra together. Summaries of the spectra in a
+  coleection are additionally saved to a CSV file and a plot of the spectra
+  saved to a \code{.pdf} file. The value returned by the function is that
   from closing the connection to the spectrometer.
 }
 \description{
@@ -119,7 +126,14 @@ Function \code{acq_irrad_interactive()} supports measurement of
   from discontinuous ones. For spectral irradiance it assumes that the
   duration of the measurement event is the relevant time base for expression
   of the flux of radiation. For spectral fluence the flux of radiation is
-  expressed per pulse of illumination.
+  expressed per pulse of illumination. The acquisition of both individual
+  spectra and time series of spectra are supported.
+
+  Different arguments passed to \code{interface.mode} modify which aspects
+  of the user interface are available through menues, without altering
+  the ability to control the behaviour through arguments passed to formal
+  parameters when calling the function (see section Interface Modes for
+  details).
 
   This function can be used to acquire spectra using different protocols for
   acquisition and stray light and dark corrections. The protocols are
@@ -129,7 +143,7 @@ Function \code{acq_irrad_interactive()} supports measurement of
   Using this function only requires an Ocean Optics spectrometer to be
   connected to the computer where R is running and the OmniDriver runtime
   from Ocean Insight installed. The connection to the spectrometer and
-  selection of channel, when relevant, is done from within these functions.
+  selection of channel, when relevant, is done from within this function.
 
   The irradiance calibration will be retrieved from the spectrometer memory
   as a last resource if not supplied in any other way. Given that the factors
@@ -137,59 +151,78 @@ Function \code{acq_irrad_interactive()} supports measurement of
   either the effective cosine diffuser area in xxx should be passed to
   parameter \code{area} or a character string with the type of the diffuser
   passed to \code{diff.type}. If no irradiance calibration is available,
-  counts per second (cps) or raw counts are the only options available.
+  counts per second (cps) or raw counts are the only options available for
+  the returned spectral data.
 
   Three main protocols and two variations are available by default. They
   differ in the additional measurements done to correct for stray light and
-  dark noise and in the sequence in which they are acquired. The default
-  protocols are usually suitable, if new protocols are passed, each character
-  vector must contain strings "light", "filter" and "dark".
+  dark noise and in the sequence in which they are acquired. In most
+  situations least one of the default protocols is suitable. If new protocols
+  are passed argument, each character vector must contain strings named
+  "light", "filter" and "dark".
 
-  In the case of spectral irradiance, the default is to set the integration time
-  automatically so that the number of counts at the highest peak is close to
-  1 - \code{target.margin} times the maximum of the range of the instrument
-  detector (retrieved from the calibration or the instrument memory). The
-  minimum \code{tot.time} is obtained by increasing the number of scans. The
-  maximum integration time supported by the spectrometer is not exceeded.
+  In the case of spectral irradiance, the default is to set the integration
+  time automatically so that the number of counts at the highest peak is
+  close to 1 - \code{target.margin} times the maximum raw-counts of the
+  instrument detector (retrieved from the calibration or the instrument
+  memory). The minimum \code{tot.time} is obtained by increasing the number
+  of scans. The maximum integration time supported by the spectrometer cannot
+  exceeded.
 
   In the case of spectral fluence the default is for the integration time to
   be set manually and for a message to be displayed asking for the light
   pulse to be manually triggered. It is possible to override the default
   function by one that triggers the light source automatically.
 
-  Different argumenst passed to \code{interface.mode} modify which aspects
-  of the user interface are available through menues, without altering
-  the ability to control the behaviour through arguments passed to formal
-  parameters when calling the function. For example, mode "series" exposes
-  the menue used to change schedulling of single measurements and time
-  series of measurements.
+  Repeated measurements are converted into physical units immediately after
+  acquisition and saved to file on disk. Each repeated measurement can be
+  either a single spectrum or a time series of spectra. To avoid long delays
+  caused by saving large files, \code{async.saves} can be enabled.
 
-  Sequences of light measurements using single "dark" and "filter"
-  measurements are scheduled by setting the four members of the named list
-  passed as argument to \code{seq.settings}. The member \code{initial.delay}
-  is numeric and gives a minimum delay in seconds before the start of
-  measurements with a default of 0s. Member \code{step.delay} is numeric and
-  gives the delay in seconds between successive "light" measurements. In
-  most cases a vector of length one is used as time delta in seconds. Any
-  vector shorter than the number of steps will be extended with
-  \code{rep_len()}, and the values interpreted as the time increment
-  in seconds between the start of successive measurements. If the length is
-  the same as "num.steps", and the values are monotonically increasing, they
-  are interpreted as time offsets from the start of the sequence. Member
-  \code{start.boundary} can take one of "none", "second", "minute" or "hour"
-  indicating the unit to which the start of the series should be scheduled,
-  e.g. the next minute and 0s, for "minute". Member \code{num.steps} must
-  be an integer between 1 and small thousands indicating the number of time
-  steps in the series.
+  Time series of spectra are acquired as fast as possible, converted into
+  physical units after the acquisition of all individual raw-counts spectra
+  and saved as a single \code{cps_spct} or \code{source_spct} in long form.
+
+  Time series of light measurements using single "dark" and "filter"
+  measurements are scheduled by setting four members of the named list
+  passed as argument to \code{seq.settings}, or interactively through the
+  user interface.
+
+  The \code{initial.delay} is numeric and gives a minimum delay in
+  seconds before the start of measurements with a default of 0s.
+
+  The \code{step.delay} is numeric and gives the delay in seconds between
+  successive "light" measurements. The value entered by the user is adjusted
+  based on the estimated duration of individual spectral acquisition. In most
+  cases a vector of length one is used as time delta in seconds. Any vector
+  shorter than the number of steps will be extended with \code{rep_len()},
+  and the values interpreted as the time increment in seconds between the
+  start of successive measurements. If the length is the same as "num.steps",
+  and the values are monotonically increasing, they are interpreted as time
+  offsets from the start of the sequence. Member
+
+  The \code{start.boundary} must be set to "none", "second", "minute" or
+  "hour" indicating the unit to which the start of the series should be
+  scheduled, e.g., the next minute and 0s, for "minute".
+
+  The \code{num.steps} must be an integer between 1 and a few thousands
+  indicating the number of time steps in the series. The maximum value
+  depends on the available memory. It is possible to set \code{qty.out =
+  "raw"} decreasing the memory requirement as well as the processing time, in
+  which case the conversion to physical units must be done later "off-line".
 
   Plots are produced with functions from package 'ggspectra' and respect the
   default annotations set with function \code{set_annotations_default()},
   default wavebands set with function \code{set_w.band_default()}, and
   irradiance quantities set with \code{photon_as_default()}, and
-  \code{energy_as_default()}.
+  \code{energy_as_default()}. The ggplots are not saved as 'gg' objects as
+  they contain redundant copies of the spectral data. They can be easily
+  recreated using function \code{autoplot()} after attaching package
+  'ggspectra'.
 
-  The different interface modes available are suitable for different types of
-  measurements.
+  The screen display of plot can be disabled, as in some cases the delay
+  introduced by rendering can be a nuisance. Alternatively, the value of
+  \code{plot.lines.max} can be decreased from its default.
 }
 \note{
 Calibration data needs in most cases to be imported into R and
@@ -205,6 +238,43 @@ Calibration data needs in most cases to be imported into R and
   reshuffled and combined with other functions to define new variations
   possibly better suited to users' needs and tastes.
 }
+\section{Interface Modes}{
+
+  Mode \strong{simple} displays a simplified user interface, supporting the
+  acquisition of individual irradiance spectra. Integration time is adjusted
+  automatically.
+
+  Mode \strong{auto} displays a user interface supporting the acquisition of
+  individual irradiance spectra and creation of collections of spectra.
+  Integration time is adjusted automatically.
+
+  Mode \strong{manual} displays a user interface supporting the acquisition
+  of individual fluence or irradiance spectra and creation of collections of
+  spectra. Integration time can adjusted automatically but also set manually.
+
+  Mode \strong{series} displays a user interface supporting the acquisition
+  of individual spectra and time series of irradiance spectra. Integration
+  time can adjusted automatically.
+
+  All these modes with \strong{-attr} appended, enable a menue and dialogues
+  that make it possible to set the values stored in attributes \code{comment}
+  and \code{what.measure} interactively for each data acquisition.
+
+  All modes support repeated measurements with unchanged acquisition settings
+  reusing the reference spectra ('dark' and 'filter') from the most recent
+  previous measurement.
+}
+
+\section{Object names}{
+
+Object names entered interactively are sanitized if necessary. Sequentially
+numbered object names are enabled by appending "#" to the desired base name.
+As long as no new name is entered, the sequence continues. If a new name is
+entered, numbering restarts at 001 or stops depending on whether the new name
+ends in "#" or not. In the case of repeated measurements, sequential
+numbering is enforced to ensure unique names.
+}
+
 \examples{
 # please, see also the example scripts installed with the package
 
@@ -219,7 +289,7 @@ acq_irrad_interactive(qty.out = "cps")
 }
 \seealso{
 This function calls functions \code{\link{tune_interactive}},
-  \code{\link{protocol_interactive}} and
+  \code{\link{protocol_interactive}}, \code{\link{set_seq_interactive}} and
   \code{\link{set_attributes_interactive}}. If irradiance calibration is
   retrieved from the instrument, functions \code{\link{get_oo_descriptor}}
   and \code{\link{oo_calib2irrad_mult}} are also called.

@@ -43,21 +43,21 @@ tune_interactive <- function(descriptor,
   prompt.text1 <-
     switch(interface.mode,
            simple = "RETUNE/range/HDR mult./undo/help/measure (t-/r/h/u/?/m): ",
-           auto = "RETUNE/tune/saturation/range/HDR mult./undo/help/measure (t-/T/s/r/h/u/?/m): ",
+           auto = "fixed/RETUNE/tune/saturation/range/HDR mult./undo/help/measure (f/t-/T/s/r/h/u/?/m): ",
            manual = "FIXED/range/HDR mult./undo/help/measure (f-/r/h/u/?/m): ",
            full = "FIXED/retune/tune/saturation/range/HDR mult./undo/help/measure (f-/t/T/s/r/h/u/?/m): "
     )
   prompt.text2 <-
     switch(interface.mode,
            simple = "retune/range/HDR mult./undo/help/MEASURE (t/r/h/u/?/m-): ",
-           auto = "retune/tune/saturation/range/HDR mult./undo/help/MEASURE (t/T/s/r/h/u/?/m-): ",
+           auto = "fixed/retune/tune/saturation/range/HDR mult./undo/help/MEASURE (f/t/T/s/r/h/u/?/m-): ",
            manual = "fixed/range/HDR mult./undo/help/MEASURE (f/r/h/u/?/m-): ",
            full = "fixed/retune/tune/saturation/range/HDR mult./undo/help/MEASURE (f/t/T/s/r/h/u/?/m-): "
     )
   valid.input <-
     switch(interface.mode,
            simple = c("t", "r", "h", "u", "?", "m", ""),
-           auto = c("t", "T", "s", "r", "h", "u", "?", "m", ""),
+           auto = c("f", "t", "T", "s", "r", "h", "u", "?", "m", ""),
            manual = c("f", "r", "h", "u", "?", "m", ""),
            full = c("f", "t", "T", "s", "r", "h", "u", "?", "m", "")
     )
@@ -69,12 +69,12 @@ tune_interactive <- function(descriptor,
            full = c("f", "m")
     )
   # set help
-  all.help <- c(t = "t = retune. Adjust integration time starting from last value.",
+  all.help <- c(f = "f = fixed. User-suplied \"base\" integration time in seconds.",
+                t = "t = retune. Adjust integration time starting from last value.",
                 T = "T = tune. Adjust integration time starting from default value.",
                 s = "s = saturation margin. Tuned integration time is maximum * (1 - margin).",
                 r = "r = range. Total measurement time in seconds, as a single value or a range.",
                 h = "h = HDR mult. High dynamic range or bracketing, as multipliers for target integration time.",
-                f = "f = fixed. User-suplied \"base\" integration time in seconds.",
                 u = "u = undo. Restore settings from last measurement.",
                 H = "? = help. Show this help text.",
                 m = "m = MEASURE. Measure without setting/tuning integration time.",

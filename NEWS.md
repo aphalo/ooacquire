@@ -6,17 +6,22 @@ editor_options:
 
 # ooacquire 0.4.3 (2023-12-xx)
 
--   Use R package 'mirai' to asynchronously save R data files and PDF files.
-    Package 'mirai' is now imported and has to be installed.
 -   Make real-time display of plots optional (no change to default).
--   Fix bug: crash in "slow" series acquisition introduced in 0.4.2.
--   Fix bug: wrong estimate of duration of individual measurements for "fast" 
-    (buffered) series acquisition.
 -   Implement adjustment of the step delay time in time series to be a multiple
     of the integration time for buffered acquisition and normal acquisition 
     when not using HDR.
--   Implement multiple repeats of whole time series.
--   Implement generation of "numbered" object names and file names.
+-   Implement multiple repeats of individual measurements including whole time 
+    series. As earlier, repeats reuse 'dark' and 'filter' measurements from
+    the most recent previous measurement.
+-   Implement generation of sequentially "numbered" object names and file names. 
+    Available in all interface modes.
+-   Use R package 'mirai' to asynchronously save R data files and PDF files.
+    Package 'mirai' is now in "suggests" and has to be installed to enable this
+    feature. Experimental, by default not enabled, as it is unreliable 
+    under Windows 11 and not yet tested under Unix or Linux..
+-   Fix bug: crash in "slow" series acquisition introduced in 0.4.2.
+-   Fix bug: wrong estimate of duration of individual measurements for "fast" 
+    (buffered) series acquisition.
  
 # ooacquire 0.4.2 (2023-12-03)
 

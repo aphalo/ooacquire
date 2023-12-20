@@ -12,4 +12,7 @@ acq_irrad_interactive(interface.mode = "full",
                       folder.name = sprintf("./inst-not/irrad-full-%s", lubridate::today()))
 
 acq_irrad_interactive(interface.mode = "auto",
-                      folder.name = sprintf("./inst-not/auto-series-%s", lubridate::today()))
+                      folder.name = sprintf("./inst-not/irrad-auto-%s", lubridate::today()))
+
+acq_irrad_interactive(qty.out = "fluence",
+                      folder.name = sprintf("./inst-not/fluence-%s", lubridate::today()))
