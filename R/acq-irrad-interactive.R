@@ -1,10 +1,55 @@
-#' Acquire spectral irradiance or fluence
+#' Acquire spectral irradiance or spectral fluence
 #'
 #' Interactive front-end allowing acquisition of spectral irradiance and
 #' spectral fluence using Ocean Optics spectrometers. Output of spectral data in
 #' R data files stored in objects suitable for use with packages 'photobiology'
 #' and 'ggspectra' as well as plots as PDF files and summaries as comma
 #' separated files and R objects.
+#'
+#' @param tot.time.range numeric vector Range of total times for a measurement
+#'   in seconds.
+#' @param target.margin numeric (0..1) when tuning integration time, how big a
+#'   head space to leave.
+#' @param HDR.mult numeric the integration time for each bracketed integration
+#'   as a multiplier of the set or tuned integration time.
+#' @param protocols named list of character vectors, or a character vector with
+#'   names of at least one member of the default list of protocols.
+#' @param correction.method list The method to use when applying the calibration
+#' @param descriptors list A list of instrument descriptors containing
+#'   calibration data.
+#' @param entrance.optics character, name or geometry of diffuser, needed only
+#'   if there is more than one for the same instrument.
+#' @param stray.light.method character Used only when the correction method is
+#'   created on-the-fly.
+#' @param seq.settings named list with numeric members \code{start.boundary},
+#'   \code{initial.delay}, \code{"step.delay"} and \code{"num.steps"}.
+#' @param area numeric Passed to \code{o_calib2irrad_mult()}.
+#' @param diff.type character Passed to \code{o_calib2irrad_mult()}.
+#' @param qty.out character One of "irrad" (spectral irradiance), "fluence"
+#'   (spectral fluence), "cps" (counts per second), or "raw"
+#'   (raw sensor counts).
+#' @param plot.lines.max integer Maximum number of spectra to plot as individual
+#'   lines. Random sampling is used if number of spectra exceeds
+#'   \code{plot.lines.max}.
+#' @param summary.type character One of "plant", "PAR" or "VIS".
+#' @param save.pdfs,save.summaries,save.collections logical Whether to save
+#'   plots to PDFs files or not, and collection summaries to csv files or not,
+#'   enable collections user interface or not.
+#' @param async.saves logical A flag enabling or disabling the use of separate
+#'   processes to save data to files. Package 'mirai' must be installed before
+#'   enabling is possible.
+#' @param show.figs logical Default for flag enabling display plots of acquired
+#'   spectra.
+#' @param interface.mode character One of "auto", "simple", "manual", "full",
+#'   "series", "auto-attr", "simple-attr", "manual-attr", "full-atr", and
+#'   "series-attr".
+#' @param num.exposures integer Number or light pulses (flashes) per scan. Set
+#'   to \code{-1L} to indicate that the light source is continuous.
+#' @param f.trigger.pulses function Function to be called to trigger light
+#'   pulse(s). Should accept as its only argument the number of pulses, and
+#'   return \code{TRUE} on success and \code{FALSE} on failure.
+#' @param folder.name,session.name,user.name character Default name of the
+#'   folder used for output, and session and user names.
 #'
 #' @details  Function \code{acq_irrad_interactive()} supports measurement of
 #'   spectral irradiance from continuous light sources and spectral fluence
@@ -124,7 +169,7 @@
 #'
 #'   Mode \strong{series} displays a user interface supporting the acquisition
 #'   of individual spectra and time series of irradiance spectra. Integration
-#'   time can adjusted automatically.
+#'   time can adjusted automatically but also set manually.
 #'
 #'   All these modes with \strong{-attr} appended, enable a menue and dialogues
 #'   that make it possible to set the values stored in attributes \code{comment}
@@ -142,62 +187,8 @@
 #' ends in "#" or not. In the case of repeated measurements, sequential
 #' numbering is enforced to ensure unique names.
 #'
-#' @seealso This function calls functions \code{\link{tune_interactive}},
-#'   \code{\link{protocol_interactive}}, \code{\link{set_seq_interactive}} and
-#'   \code{\link{set_attributes_interactive}}. If irradiance calibration is
-#'   retrieved from the instrument, functions \code{\link{get_oo_descriptor}}
-#'   and \code{\link{oo_calib2irrad_mult}} are also called.
-#'
-#' @family interactive acquisition functions
-#'
-#' @param tot.time.range numeric vector Range of total times for a measurement
-#'   in seconds.
-#' @param target.margin numeric (0..1) when tuning integration time, how big a
-#'   head space to leave.
-#' @param HDR.mult numeric the integration time for each bracketed integration
-#'   as a multiplier of the set or tuned integration time.
-#' @param protocols named list of character vectors, or a character vector with
-#'   names of at least one member of the default list of protocols.
-#' @param correction.method list The method to use when applying the calibration
-#' @param descriptors list A list of instrument descriptors containing
-#'   calibration data.
-#' @param entrance.optics character, name or geometry of diffuser, needed only
-#'   if there is more than one for the same instrument.
-#' @param stray.light.method character Used only when the correction method is
-#'   created on-the-fly.
-#' @param seq.settings named list with numeric members \code{start.boundary},
-#'   \code{initial.delay}, \code{"step.delay"} and \code{"num.steps"}.
-#' @param area numeric Passed to \code{o_calib2irrad_mult()}.
-#' @param diff.type character Passed to \code{o_calib2irrad_mult()}.
-#' @param qty.out character One of "irrad" (spectral irradiance), "fluence"
-#'   (spectral fluence), "cps" (counts per second), or "raw"
-#'   (raw sensor counts).
-#' @param plot.lines.max integer Maximum number of spectra to plot as individual
-#'   lines. Random sampling is used if number of spectra exceeds
-#'   \code{plot.lines.max}.
-#' @param summary.type character One of "plant", "PAR" or "VIS".
-#' @param save.pdfs,save.summaries,save.collections logical Whether to save
-#'   plots to PDFs files or not, and collection summaries to csv files or not,
-#'   enable collections user interface or not.
-#' @param async.saves logical A flag enabling or disabling the use of separate
-#'   processes to save data to files. Package 'mirai' must be installed before
-#'   enabling is possible.
-#' @param show.figs logical Default for flag enabling display plots of acquired
-#'   spectra.
-#' @param interface.mode character One of "auto", "simple", "manual", "full",
-#'   "series", "auto-attr", "simple-attr", "manual-attr", "full-atr", and
-#'   "series-attr".
-#' @param num.exposures integer Number or light pulses (flashes) per scan. Set
-#'   to \code{-1L} to indicate that the light source is continuous.
-#' @param f.trigger.pulses function Function to be called to trigger light
-#'   pulse(s). Should accept as its only argument the number of pulses, and
-#'   return \code{TRUE} on success and \code{FALSE} on failure.
-#' @param folder.name,session.name,user.name character Default name of the
-#'   folder used for output, and session and user names.
-#'
-#' @export
-#'
-#' @note Calibration data needs in most cases to be imported into R and
+#' @section Irradiance calibration:
+#'   Calibration data needs in most cases to be imported into R and
 #'   parameters entered for the special correction algorithms into a correction
 #'   method descriptor. The corrections are skipped if the needed information is
 #'   missing. If no spectral irradiance calibration is available and attempt is
@@ -210,10 +201,11 @@
 #'   reshuffled and combined with other functions to define new variations
 #'   possibly better suited to users' needs and tastes.
 #'
-#' @return These functions return the acquired spectra through "side effects" as
+#' @return This function returns the acquired spectra through "side effects" as
 #'   each spectrum is saved, both as raw counts data and optionally as spectral
-#'   irradiance, spectral fluence or counts-per-second  spectral data in an
-#'   \code{.rda} file as objects of the classes defined in package
+#'   irradiance, spectral fluence or counts-per-second  spectral data in
+#'   an \code{.rda}
+#'   file as objects of the classes defined in package
 #'   'photobiology'. Optionally, the plot for each spectrum or a time series of
 #'   spectra is saved as a \code{.pdf} file. At any time, the current group of
 #'   spectra can be saved as a collection. When a collection is created, all
@@ -222,6 +214,16 @@
 #'   coleection are additionally saved to a CSV file and a plot of the spectra
 #'   saved to a \code{.pdf} file. The value returned by the function is that
 #'   from closing the connection to the spectrometer.
+#'
+#' @seealso This function calls functions \code{\link{tune_interactive}},
+#'   \code{\link{protocol_interactive}}, \code{\link{set_seq_interactive}} and
+#'   \code{\link{set_attributes_interactive}}. If irradiance calibration is
+#'   retrieved from the instrument, functions \code{\link{get_oo_descriptor}}
+#'   and \code{\link{oo_calib2irrad_mult}} are also called.
+#'
+#' @family interactive acquisition functions
+#'
+#' @export
 #'
 #' @examples
 #' # please, see also the example scripts installed with the package

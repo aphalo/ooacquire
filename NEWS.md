@@ -11,8 +11,8 @@ editor_options:
     of the integration time for buffered acquisition and normal acquisition 
     when not using HDR.
 -   Implement multiple repeats of individual measurements including whole time 
-    series. As earlier, repeats reuse 'dark' and 'filter' measurements from
-    the most recent previous measurement.
+    series. As in earlier versions, repeats reuse 'dark' and 'filter' 
+    measurements from the most recent previous measurement.
 -   Implement generation of sequentially "numbered" object names and file names. 
     Available in all interface modes.
 -   Use R package 'mirai' to asynchronously save R data files and PDF files.

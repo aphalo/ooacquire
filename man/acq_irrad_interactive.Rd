@@ -2,7 +2,7 @@
 % Please edit documentation in R/acq-irrad-interactive.R
 \name{acq_irrad_interactive}
 \alias{acq_irrad_interactive}
-\title{Acquire spectral irradiance or fluence}
+\title{Acquire spectral irradiance or spectral fluence}
 \usage{
 acq_irrad_interactive(
   tot.time.range = if (qty.out == "fluence") 5 else c(5, 15),
@@ -100,10 +100,11 @@ return \code{TRUE} on success and \code{FALSE} on failure.}
 folder used for output, and session and user names.}
 }
 \value{
-These functions return the acquired spectra through "side effects" as
+This function returns the acquired spectra through "side effects" as
   each spectrum is saved, both as raw counts data and optionally as spectral
-  irradiance, spectral fluence or counts-per-second  spectral data in an
-  \code{.rda} file as objects of the classes defined in package
+  irradiance, spectral fluence or counts-per-second  spectral data in
+  an \code{.rda}
+  file as objects of the classes defined in package
   'photobiology'. Optionally, the plot for each spectrum or a time series of
   spectra is saved as a \code{.pdf} file. At any time, the current group of
   spectra can be saved as a collection. When a collection is created, all
@@ -224,20 +225,6 @@ Function \code{acq_irrad_interactive()} supports measurement of
   introduced by rendering can be a nuisance. Alternatively, the value of
   \code{plot.lines.max} can be decreased from its default.
 }
-\note{
-Calibration data needs in most cases to be imported into R and
-  parameters entered for the special correction algorithms into a correction
-  method descriptor. The corrections are skipped if the needed information is
-  missing. If no spectral irradiance calibration is available and attempt is
-  made to retrieve it from the spectrometer, but given the format used by
-  Ocean Optics/Ocean Insight, in this case the effective \code{area} of the
-  cosine diffuser used (or the model name if from Ocean Optics) should be
-  supplied by the user.
-
-  The function is composed in a modular way from functions that can be
-  reshuffled and combined with other functions to define new variations
-  possibly better suited to users' needs and tastes.
-}
 \section{Interface Modes}{
 
   Mode \strong{simple} displays a simplified user interface, supporting the
@@ -254,7 +241,7 @@ Calibration data needs in most cases to be imported into R and
 
   Mode \strong{series} displays a user interface supporting the acquisition
   of individual spectra and time series of irradiance spectra. Integration
-  time can adjusted automatically.
+  time can adjusted automatically but also set manually.
 
   All these modes with \strong{-attr} appended, enable a menue and dialogues
   that make it possible to set the values stored in attributes \code{comment}
@@ -273,6 +260,22 @@ As long as no new name is entered, the sequence continues. If a new name is
 entered, numbering restarts at 001 or stops depending on whether the new name
 ends in "#" or not. In the case of repeated measurements, sequential
 numbering is enforced to ensure unique names.
+}
+
+\section{Irradiance calibration}{
+
+  Calibration data needs in most cases to be imported into R and
+  parameters entered for the special correction algorithms into a correction
+  method descriptor. The corrections are skipped if the needed information is
+  missing. If no spectral irradiance calibration is available and attempt is
+  made to retrieve it from the spectrometer, but given the format used by
+  Ocean Optics/Ocean Insight, in this case the effective \code{area} of the
+  cosine diffuser used (or the model name if from Ocean Optics) should be
+  supplied by the user.
+
+  The function is composed in a modular way from functions that can be
+  reshuffled and combined with other functions to define new variations
+  possibly better suited to users' needs and tastes.
 }
 
 \examples{

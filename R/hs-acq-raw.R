@@ -1,8 +1,8 @@
-#' quire spectra at high speed
+#' Acquire spectra at high speed
 #'
-#' Take one set of spectra using the same instruments settings at high speed
-#' using the special OmniDriver API functions. No HDR bracketing is possible,
-#' and synchorization with a pulsed light source is not supported.
+#' Take one set of spectra at high speed using unchanged instrument settings
+#' special OmniDriver API functions for buffered acquisition. No HDR bracketing
+#' is possible, and synchronization with a pulsed light source is not supported.
 #'
 #' @param descriptor list as returned by function \code{get_oo_descriptor}.
 #' @param acq.settings list as returned by functions \code{tune_acq_settings}.
@@ -11,7 +11,7 @@
 #'   by this string followed by a sequential numeric index.
 #' @param f.trigger.pulses function Function to be called to trigger an
 #'   action. Should accept as its only argument the number of pulses, and
-#'   return \code{TRUE} on sucess and \code{FALSE} on failure.
+#'   return \code{TRUE} on success and \code{FALSE} on failure.
 #' @param what.measured value used to set attribute.
 #' @param where.measured data.frame with at least columns "lon" and "lat"
 #'   compatible with value returned by \code{ggmap::geocode()}.

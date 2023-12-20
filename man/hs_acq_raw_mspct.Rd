@@ -2,7 +2,7 @@
 % Please edit documentation in R/hs-acq-raw.R
 \name{hs_acq_raw_mspct}
 \alias{hs_acq_raw_mspct}
-\title{quire spectra at high speed}
+\title{Acquire spectra at high speed}
 \usage{
 hs_acq_raw_mspct(
   descriptor,
@@ -29,7 +29,7 @@ by this string followed by a sequential numeric index.}
 
 \item{f.trigger.pulses}{function Function to be called to trigger an
 action. Should accept as its only argument the number of pulses, and
-return \code{TRUE} on sucess and \code{FALSE} on failure.}
+return \code{TRUE} on success and \code{FALSE} on failure.}
 
 \item{what.measured}{value used to set attribute.}
 
@@ -51,9 +51,9 @@ A \code{raw_mspct} containing one \code{raw_spct} object with one
   smallest value.
 }
 \description{
-Take one set of spectra using the same instruments settings at high speed
-using the special OmniDriver API functions. No HDR bracketing is possible,
-and synchorization with a pulsed light source is not supported.
+Take one set of spectra at high speed using unchanged instrument settings
+special OmniDriver API functions for buffered acquisition. No HDR bracketing
+is possible, and synchronization with a pulsed light source is not supported.
 }
 \seealso{
 For normal speed acquisition of a single spectrum and multiple

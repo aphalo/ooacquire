@@ -71,8 +71,8 @@ cases are also included in the package. Here it is important to remember that a 
 | `tune_acq_settings` | tune the integration time and number of scans to the current radiation conditions |
 | `acq_raw_spct` | take one measurement (data point) |
 | `acq_raw_mspct` | take a sequence of spectral measurements (several data points) |
-| `acq_irrad_interactive` | interactively acquire spectral irradiance and save data and plots to disk |
-| `acq_fluence_interactive` | interactively acquire spectral fluence and save data and plots to disk |
+| `hs_acq_raw_mspct` | take a sequence of spectral measurements at high speed |
+| `acq_irrad_interactive` | interactively acquire spectral irradiance or fluence and save data and plots to disk |
 | `acq_fraction_interactive` | interactively acquire spectral transmittance or reflectance and save data and plots to disk |
 | `acq_fraction_pulsed_interactive` | as above but using a pulsed light source |
 | **data procesing** | |

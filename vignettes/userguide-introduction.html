@@ -12,7 +12,7 @@
 
 <meta name="author" content="Pedro J. Aphalo" />
 
-<meta name="date" content="2023-10-31" />
+<meta name="date" content="2023-12-21" />
 
 <title>User Guide</title>
 
@@ -339,9 +339,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 <h1 class="title toc-ignore">User Guide</h1>
-<h3 class="subtitle"><code>ooacquire</code> 0.4.1.9000</h3>
+<h3 class="subtitle"><code>ooacquire</code> 0.4.2.9001</h3>
 <h4 class="author">Pedro J. Aphalo</h4>
-<h4 class="date">2023-10-31</h4>
+<h4 class="date">2023-12-21</h4>
 
 
 <div id="TOC">
@@ -556,14 +556,14 @@ current radiation conditions</td>
 points)</td>
 </tr>
 <tr class="even">
-<td align="left"><code>acq_irrad_interactive</code></td>
-<td align="left">interactively acquire spectral irradiance and save data
-and plots to disk</td>
+<td align="left"><code>hs_acq_raw_mspct</code></td>
+<td align="left">take a sequence of spectral measurements at high
+speed</td>
 </tr>
 <tr class="odd">
-<td align="left"><code>acq_fluence_interactive</code></td>
-<td align="left">interactively acquire spectral fluence and save data
-and plots to disk</td>
+<td align="left"><code>acq_irrad_interactive</code></td>
+<td align="left">interactively acquire spectral irradiance or fluence
+and save data and plots to disk</td>
 </tr>
 <tr class="even">
 <td align="left"><code>acq_fraction_interactive</code></td>
@@ -1065,8 +1065,8 @@ irradiance values form wavelengths shorter than 290 nm.</p>
 ##   &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;  
 ## 1    NA    NA &lt;NA&gt;</code></pre>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">comment</span>(one_file.spct))</span></code></pre></div>
-<pre><code>## Processed on 2023-10-31
-## with &#39;s_irrad_corrected()&#39; from &#39;ooacquire&#39; ver. 0.4.1.9000
+<pre><code>## Processed on 2023-12-20
+## with &#39;s_irrad_corrected()&#39; from &#39;ooacquire&#39; ver. 0.4.2.9001
 ## 
 ## from files:
 ## light: C:/Users/aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/light-short.txt</code></pre>
@@ -1140,8 +1140,8 @@ noise from regions known to be zero as we did above.</p>
 ##   &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;  
 ## 1    NA    NA &lt;NA&gt;</code></pre>
 <div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">comment</span>(five_files.spct))</span></code></pre></div>
-<pre><code>## Processed on 2023-10-31
-## with &#39;s_irrad_corrected()&#39; from &#39;ooacquire&#39; ver. 0.4.1.9000
+<pre><code>## Processed on 2023-12-20
+## with &#39;s_irrad_corrected()&#39; from &#39;ooacquire&#39; ver. 0.4.2.9001
 ## 
 ## from files:
 ## light: C:/Users/aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/light-short.txt, C:/Users/aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/light-long.txt
