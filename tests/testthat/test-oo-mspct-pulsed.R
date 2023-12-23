@@ -3,7 +3,7 @@ context("convert raw pulsed source")
 library(photobiology)
 # library(ggspectra)
 
-test_that("ooacquire fluence", {
+test_that("raw from pulsed to fluence works", {
 
   rm(list = ls(pattern = "*"))
 
@@ -29,7 +29,7 @@ test_that("ooacquire fluence", {
 })
 
 
-test_that("ooacquire filter pulsed source", {
+test_that("raw from pulsed to Tfr works", {
 
   rm(list = ls(pattern = "*"))
 

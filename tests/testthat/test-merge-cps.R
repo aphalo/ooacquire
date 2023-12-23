@@ -1,6 +1,6 @@
-context("read raw Ocean Optics")
+context("raw-counts to cps")
 
-test_that("merge_cps works with good data", {
+test_that("convert and merge_cps works with good data", {
 
   load("./test-irrad-mspct-maya-data/sun_hdr4.spct.rda")
 
@@ -15,7 +15,7 @@ test_that("merge_cps works with good data", {
 })
 
 
-test_that("merge_cps works with bad data", {
+test_that("convert and merge_cps works with bad data", {
 
   load("./test-irrad-mspct-maya-data/sun_hdr4.spct.rda")
 
