@@ -1129,26 +1129,29 @@ acq_irrad_interactive <-
               collection.objects <- c(collection.objects, raw.collection.name)
 
               # save collections to files on disk
+              retrying <- FALSE
               repeat {
                 save(list = collection.objects, file = collection.file.name, precheck = TRUE)
                 if (file.exists(collection.file.name)) {
                   message("Collection objects saved to file '",
                           collection.file.name, "'.", sep = "")
-                  # save file name to report at end of sessions
+                  # save file name to report at end of session
                   file.names <- c(file.names, collection.file.name)
                   # remove saved objects and the list with their names
                   rm(list = collection.objects)
                   rm(collection.objects)
-                  # clean up by removing the spectra that have been added to the
-                  # saved collection and reset the list of names for next collection
-                  rm(list = c(irrad.names))
-                  rm(list = c(raw.names))
+                  # reset the lists of names for next collection
                   irrad.names <- character()
                   raw.names <- character()
                   message("Object lists reset")
                   break()
                 } else {
-                  message("Saving of the collection to file failed! (object lists not reset)")
+                  if (retrying) {
+                    message("Saving of the collection to file failed again! (Aborting)")
+                    break()
+                  }
+                  message("Saving of the collection to file failed! (Trying again)")
+                  retrying <- TRUE
                 }
               }
             }
