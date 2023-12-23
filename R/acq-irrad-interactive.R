@@ -928,7 +928,8 @@ acq_irrad_interactive <-
               obj.names = obj.names,
               file.name = file.name,
               raw.mspct = raw.mspct,
-              irrad.spct = irrad.spct
+              irrad.spct = irrad.spct,
+              .timeout = 60000 # 1 min
               )
           } else {
             # fall back to main process
@@ -945,7 +946,8 @@ acq_irrad_interactive <-
                 grDevices::dev.off()
               },
               pdf.name = pdf.name,
-              fig = fig
+              fig = fig,
+              .timeout = 60000 # 1 min
               )
             } else {
               grDevices::pdf(file = pdf.name, width = 8, height = 6)
@@ -978,8 +980,12 @@ acq_irrad_interactive <-
           assign(raw.name, raw.mspct)
 
           if (async.saves && !mirai::unresolved(rda.mirai)) {
-            rda.mirai <- mirai::mirai(save(list = raw.name, file = file.name),
-                                      .args = list(raw.name, file.name))
+            rda.mirai <- mirai::mirai({
+              assign(raw.name, raw.mspct)
+              save(list = raw.name, file = file.name)
+            },
+            .args = list(raw.name, file.name, raw.mspct),
+            .timeout = 60000) # 1 min
           } else {
             save(list = raw.name, file = file.name)
           }
