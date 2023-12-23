@@ -35,9 +35,9 @@
 #' @param save.pdfs,save.summaries,save.collections logical Whether to save
 #'   plots to PDFs files or not, and collection summaries to csv files or not,
 #'   enable collections user interface or not.
-#' @param async.saves logical A flag enabling or disabling the use of separate
+#' @param async.saves logical A flag enabling or disabling the use of concurrent
 #'   processes to save data to files. Package 'mirai' must be installed before
-#'   enabling is possible.
+#'   enabling this feature.
 #' @param show.figs logical Default for flag enabling display plots of acquired
 #'   spectra.
 #' @param interface.mode character One of "auto", "simple", "manual", "full",
@@ -274,8 +274,14 @@ acq_irrad_interactive <-
       return()
     }
 
-    if (is.null(async.saves) || async.saves) {
-      async.saves <- requireNamespace("mirai", quietly = TRUE)
+    if (is.null(async.saves)) {
+      # in the future NULL could be a dynamic default dependent of file size
+      async.saves <- FALSE
+    }
+
+    if (async.saves && !requireNamespace("mirai", quietly = TRUE)) {
+      message("Ignoring 'async.saves = TRUE' as package 'mirai' is not installed")
+      async.saves <- FALSE
     }
 
     if (async.saves) {
@@ -1228,7 +1234,7 @@ acq_irrad_interactive <-
 
     } # end of main UI loop
 
-    # Wait for all files to be saved (needed?)
+    # Wait for all files to be saved (needed? but anyway a  reassuring)
     if (async.saves && (mirai::unresolved(rda.mirai) || mirai::unresolved(pdf.mirai))) {
       cat("Saving files ")
       while (mirai::unresolved(rda.mirai) || mirai::unresolved(pdf.mirai)) {
@@ -1239,9 +1245,10 @@ acq_irrad_interactive <-
     }
 
     # report on asynchronous file saving
-    if (async.saves && mirai::status()$connections) {
-      print(mirai::status()$daemons)
-    }
+    # (if and only if persistent daemons are created!)
+    # if (async.saves && mirai::status()$connections) {
+    #   print(mirai::status()$daemons)
+    # }
 
     # save list of all file saved during session
     save(file.names,

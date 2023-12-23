@@ -8,6 +8,9 @@ acq_irrad_interactive(interface.mode = "series",
                       tot.time.range = c(0, 10),
                       folder.name = sprintf("./inst-not/irrad-series-%s", lubridate::today()))
 
+acq_irrad_interactive(interface.mode = "simple",
+                      folder.name = sprintf("./inst-not/irrad-full-%s", lubridate::today()))
+
 acq_irrad_interactive(interface.mode = "full",
                       folder.name = sprintf("./inst-not/irrad-full-%s", lubridate::today()))
 

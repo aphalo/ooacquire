@@ -127,11 +127,15 @@ tune_interactive <- function(descriptor,
                                         acq.settings = acq.settings)
       tuned <- TRUE
     } else if (answ == "f") {
-      cat("Integration time (seconds): ")
+      cat("Integration time(s) (seconds): ")
       user.integ.time <- scan(nmax = 4L) * 1e6
-      acq.settings <- set_integ_time(acq.settings = acq.settings,
-                                     integ.time = user.integ.time)
-      tuned <- TRUE
+      if (length(user.integ.time) >= 1) {
+        acq.settings <- set_integ_time(acq.settings = acq.settings,
+                                       integ.time = user.integ.time)
+        tuned <- TRUE
+      } else {
+        cat("Value not changed!\n")
+      }
     } else if (answ == "s") {
       margin <- readline(sprintf("Saturation margin = %.2g, new: ",
                                  acq.settings[["target.margin"]]))
@@ -140,14 +144,19 @@ tune_interactive <- function(descriptor,
         acq.settings[["target.margin"]] <- margin
         tuned <- FALSE
       } else {
-        cat("Value not changed!\n")
+        cat("Input not recValue not changed!\n")
       }
     } else if (answ == "r") {
-      cat("Total time range (seconds), 2 numbers: ")
-      tot.time.range <- range(scan(nmax = 2)) * 1e6
-      if (tot.time.range[1] >= 0) {
-        acq.settings[["tot.time.range"]] <- tot.time.range
-        tuned <- FALSE
+      cat("Total time range (seconds), 1 or 2 numbers: ")
+      tot.time.range <- scan(nmax = 2) * 1e6
+      if (length(tot.time.range) >= 1) {
+        tot.time.range <- range(tot.time.range)
+        if (tot.time.range[1] >= 0) {
+          acq.settings[["tot.time.range"]] <- tot.time.range
+          tuned <- FALSE
+        } else {
+          cat("Request ignored: entered value < 0!\n")
+        }
       } else {
         cat("Value not changed!\n")
       }
@@ -155,7 +164,8 @@ tune_interactive <- function(descriptor,
       old.hdr.mult.len <- length(acq.settings[["HDR.mult"]])
       cat("HDR multipliers, 1 to 4 numbers: ")
       HDR.mult <- sort(scan(nmax = 4))
-      if (HDR.mult[1] >= 0  && HDR.mult[length(HDR.mult)] < 1000) {
+      if (length(HDR.mult) >= 1 &&
+          HDR.mult[1] >= 0  && HDR.mult[length(HDR.mult)] < 1000) {
         acq.settings[["HDR.mult"]] <- HDR.mult
         tuned <- FALSE
         if (length(HDR.mult) != old.hdr.mult.len) {

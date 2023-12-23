@@ -22,6 +22,8 @@ test_that("ooacquire fluence", {
       )
     new.spct <- s_irrad_corrected(old.raw.mspct, correction.method = correction.method)
     new.spct <- trimInstrDesc(new.spct) # needed to avoid futile call to .jcall
+    new.spct <- clip_wl(new.spct, range = c(315, NA))
+    print(wl_range(new.spct))
     expect_known_value(new.spct, file = paste("ref", f, sep = "-"), update = TRUE)
   }
 })
@@ -53,13 +55,17 @@ test_that("ooacquire filter pulsed source", {
                                    stray.light.method = NA)
       )
 
+    disable_check_spct()
     new.spct <- s_fraction_corrected(old.raw.mspct,
                                      correction.method = correction.method,
                                      type = "total",
                                      qty.out = "Tfr")
-    new.spct <- trim_wl(new.spct, range = c(400:1100))
+    new.spct <- trimInstrDesc(new.spct)
+    new.spct <- trim_wl(new.spct, range = c(400, 1000))
+    new.spct <- smooth_spct(new.spct, method = "supsmu")
+    enable_check_spct()
     print(getWhenMeasured(new.spct))
-#    expect_known_value(new.spct, file = paste("ref", f, sep = "-"), update = TRUE)
+    expect_known_value(new.spct, file = paste("ref", f, sep = "-"), update = TRUE)
   }
 })
 

@@ -78,13 +78,16 @@ test_that("ooacquire filter continuous", {
              new_correction_method(descriptor,
                                    stray.light.method = NA)
       )
+    disable_check_spct()
     new.spct <- s_fraction_corrected(old.raw.mspct,
                                      correction.method = correction.method,
                                      type = "total",
                                      qty.out = "Tfr")
     new.spct <- trim_wl(smooth_spct(new.spct, method = "supsmu", na.rm = TRUE),
                         range = c(450:800))
-#    expect_known_value(new.spct, file = paste("ref", f, sep = "-"), update = TRUE)
+    new.spct <- trimInstrDesc(new.spct)
+    enable_check_spct()
+    expect_known_value(new.spct, file = paste("ref", f, sep = "-"), update = TRUE)
   }
 })
 

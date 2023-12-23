@@ -78,9 +78,9 @@ lines. Random sampling is used if number of spectra exceeds
 plots to PDFs files or not, and collection summaries to csv files or not,
 enable collections user interface or not.}
 
-\item{async.saves}{logical A flag enabling or disabling the use of separate
+\item{async.saves}{logical A flag enabling or disabling the use of concurrent
 processes to save data to files. Package 'mirai' must be installed before
-enabling is possible.}
+enabling this feature.}
 
 \item{show.figs}{logical Default for flag enabling display plots of acquired
 spectra.}
