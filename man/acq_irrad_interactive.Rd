@@ -30,7 +30,8 @@ acq_irrad_interactive(
   folder.name = paste("acq", qty.out, lubridate::today(tzone = "UTC"), sep = "-"),
   user.name = Sys.info()[["user"]],
   session.name = paste(user.name, strftime(lubridate::now(tzone = "UTC"),
-    "\%Y.\%b.\%d_\%H.\%M.\%S"), sep = "_")
+    "\%Y.\%b.\%d_\%H.\%M.\%S"), sep = "_"),
+  verbose = getOption("photobiology.verbose", default = FALSE)
 )
 }
 \arguments{
@@ -98,6 +99,9 @@ return \code{TRUE} on success and \code{FALSE} on failure.}
 
 \item{folder.name, session.name, user.name}{character Default name of the
 folder used for output, and session and user names.}
+
+\item{verbose}{logical If TRUE additional messages are emitted, including
+report on memory usage.}
 }
 \value{
 This function returns the acquired spectra through "side effects" as

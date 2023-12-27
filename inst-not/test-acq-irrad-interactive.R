@@ -1,6 +1,8 @@
 ## run tests
 library(ooacquire)
 
+options(photobiology.verbose = TRUE)
+
 photon_as_default()
 
 # default for async.saves

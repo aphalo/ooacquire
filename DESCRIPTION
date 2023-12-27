@@ -1,8 +1,8 @@
 Package: ooacquire
 Type: Package
 Title: Acquire Data from OO Spectrometers
-Version: 0.4.2.9001
-Date: 2023-12-19
+Version: 0.4.3
+Date: 2023-12-27
 Authors@R:
    c(
     person("Pedro J.", "Aphalo", email = "pedro.aphalo@helsinki.fi", role = c("aut", "trl", "cre")),
@@ -20,7 +20,7 @@ Depends:
     R (>= 4.2.0),
     lubridate (>= 1.9.0),
     photobiology (>= 0.11.0),
-    ggspectra (>= 0.3.11)
+    ggspectra (>= 0.3.12)
 Imports:
     grDevices,
     utils,
@@ -30,20 +30,20 @@ Imports:
     ggplot2 (>= 3.4.0),
     caTools (>= 1.18.2),
     Rcpp (>= 1.0.10),
-    photobiologyWavebands (>= 0.5.1),
+    photobiologyWavebands (>= 0.5.2),
     photobiologyInOut (>= 0.4.26),
     anytime (>= 0.3.9),
     polynom (>= 1.4-1),
     stringr (>= 1.5.0),
-    dplyr (>= 1.0.9),
+    dplyr (>= 1.1.1),
     readr (>= 2.1.4),
     magrittr (>= 2.0.3)
 Suggests:
-    rOmniDriver (>= 0.1.19),
+    rOmniDriver (>= 0.1.20),
     mirai (>= 0.11.3),
     rstudioapi (>= 0.10),
-    knitr (>= 1.39),
-    rmarkdown (>= 2.14),
+    knitr (>= 1.45),
+    rmarkdown (>= 2.25),
     testthat (>= 3.1.4)
 LazyData: yes
 LazyLoad: yes

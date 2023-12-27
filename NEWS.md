@@ -15,10 +15,6 @@ editor_options:
     measurements from the most recent previous measurement.
 -   Implement generation of sequentially "numbered" object names and file names. 
     Available in all interface modes.
--   Use R package 'mirai' to asynchronously save R data files and PDF files.
-    Package 'mirai' is now in "suggests" and has to be installed to enable this
-    feature. Experimental, by default not enabled, as it is unreliable 
-    under Windows 11 and not yet tested under Unix or Linux..
 -   Fix bug: crash in "slow" series acquisition introduced in 0.4.2.
 -   Fix bug: wrong estimate of duration of individual measurements for "fast" 
     (buffered) series acquisition.
@@ -28,6 +24,10 @@ editor_options:
     the dark pixels in the spectrometer array returned unreliable readings. The
     new approach can be potentially disturbed by light sources emitting at
     wavelengths shorter than about 240 nm.
+-   Use R package 'mirai' to asynchronously save R data files and PDF files.
+    Package 'mirai' is now in "suggests" and has to be installed to enable this
+    feature. Experimental, by default not enabled, as it is unreliable 
+    under Windows 11 and not yet tested under Unix or Linux..
  
 # ooacquire 0.4.2 (2023-12-03)
 

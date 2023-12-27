@@ -50,6 +50,8 @@
 #'   return \code{TRUE} on success and \code{FALSE} on failure.
 #' @param folder.name,session.name,user.name character Default name of the
 #'   folder used for output, and session and user names.
+#' @param verbose logical If TRUE additional messages are emitted, including
+#'   report on memory usage.
 #'
 #' @details  Function \code{acq_irrad_interactive()} supports measurement of
 #'   spectral irradiance from continuous light sources and spectral fluence
@@ -267,7 +269,8 @@ acq_irrad_interactive <-
            session.name = paste(user.name,
                                 strftime(lubridate::now(tzone = "UTC"),
                                          "%Y.%b.%d_%H.%M.%S"),
-                                sep = "_")) {
+                                sep = "_"),
+           verbose = getOption("photobiology.verbose", default = FALSE)) {
 
     if (getOption("ooacquire.offline", FALSE)) {
       warning("ooacquire off-line: Aborting...")
@@ -567,6 +570,7 @@ acq_irrad_interactive <-
     get.seq.settings <- grepl("^series", interface.mode)
     sequential.naming <- FALSE
     sequential.naming.required <- FALSE
+    clear.display <- FALSE
 
     # initialize counter used for sequential naming
 
@@ -576,7 +580,21 @@ acq_irrad_interactive <-
 
     base.obj.name <- "ooacq_#"
 
+
     repeat { # main loop for UI
+
+      # forcing memory garbage collection could help avoid random delays
+      # during time-series acquisition
+      gc.data <- gc(full = TRUE)
+      if (verbose) {
+        print(gc.data)
+      }
+
+      if (clear.display) {
+        # clear plot viewer panel of RStudio
+        print(ggplot() + ggtitle("Display of plots disabled") + theme_minimal())
+        clear.display <- FALSE
+      }
 
       repeat{ # obtain a valid object name from user
 
@@ -841,8 +859,11 @@ acq_irrad_interactive <-
           if (show.figs) {
             print(fig)
           } else {
-            # clear plot viewer panel of RStudio
-            try(grDevices::dev.off(grDevices::dev.list()["RStudioGD"]), silent=TRUE)
+            if (clear.display) {
+              # clear plot viewer panel of RStudio
+              print(ggplot() + ggtitle("Display of plots disabled") + theme_minimal())
+              clear.display <- FALSE
+            }
           }
 
           # user interaction and display of plot only if at end of measurement
@@ -865,7 +886,7 @@ acq_irrad_interactive <-
               }
             }
             switch(answer,
-                   f = {show.figs <- !show.figs; next()},
+                   f = {clear.display <- show.figs; show.figs <- !show.figs; next()},
                    p = {options(photobiology.radiation.unit = "photon"); next()},
                    e = {options(photobiology.radiation.unit = "energy"); next()},
                    w = {
@@ -1194,6 +1215,7 @@ acq_irrad_interactive <-
 
         if (answer2 %in% c("r", "p")) {
           acq.pausing.always <- answer2 == "p"
+          clear.display <- show.figs && !acq.pausing.always
           show.figs <- show.figs && answer2 == "p"
           if (acq.pausing.always) {
             message("Pausing between repeats")
