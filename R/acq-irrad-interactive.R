@@ -374,6 +374,7 @@ acq_irrad_interactive <-
         stop("'entrance.optics' must be one of \"cosine\" or \"hemispherical\" for MAYP11278")
       }
     }
+    message("Entrance optics \"", entrance.optics, "\" selected")
 
     # spectrometer-specific correction method parameters
     if (anyNA(c(descriptors[[1]], correction.method[[1]]))) {
@@ -573,9 +574,7 @@ acq_irrad_interactive <-
 
     # initialize default object name
 
-    base.obj.name <- "ooacq_"
-
-
+    base.obj.name <- "ooacq_#"
 
     repeat { # main loop for UI
 
@@ -924,12 +923,13 @@ acq_irrad_interactive <-
                 assign(obj.names[1], raw.mspct)
                 assign(obj.names[2], irrad.spct)
                 save(list = obj.names, file = file.name)
+              return(file.exists(file.name))
               },
               obj.names = obj.names,
               file.name = file.name,
               raw.mspct = raw.mspct,
               irrad.spct = irrad.spct,
-              .timeout = 60000 # 1 min
+              .timeout = 60000 # 60 s
               )
           } else {
             # fall back to main process
@@ -944,10 +944,11 @@ acq_irrad_interactive <-
                 grDevices::pdf(file = pdf.name, width = 8, height = 6)
                 print(fig)
                 grDevices::dev.off()
+                return(file.exists(pdf.name))
               },
               pdf.name = pdf.name,
               fig = fig,
-              .timeout = 60000 # 1 min
+              .timeout = 120000 # 120 s
               )
             } else {
               grDevices::pdf(file = pdf.name, width = 8, height = 6)
@@ -983,6 +984,7 @@ acq_irrad_interactive <-
             rda.mirai <- mirai::mirai({
               assign(raw.name, raw.mspct)
               save(list = raw.name, file = file.name)
+              return(file.exists(file.name))
             },
             .args = list(raw.name, file.name, raw.mspct),
             .timeout = 60000) # 1 min

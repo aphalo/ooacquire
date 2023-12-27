@@ -11,7 +11,7 @@ descriptor$num.pixs <- 2068
 descriptor$num.dark.pixs <- 20
 descriptor$bad.pixs <-  c(123, 195, 380, 388, 467, 534, 697, 1830, 1994, 2032)
 
-black.pixeks <- c(1, 2, 3, 4, 2065, 2066, 2067, 2068) # all covered?
+black.pixels <- c(1, 2, 3, 4, 2065, 2066, 2067, 2068) # all covered?
 
 # light.hot.pixels <- c(470)
 

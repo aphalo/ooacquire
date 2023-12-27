@@ -22,6 +22,12 @@ editor_options:
 -   Fix bug: crash in "slow" series acquisition introduced in 0.4.2.
 -   Fix bug: wrong estimate of duration of individual measurements for "fast" 
     (buffered) series acquisition.
+-   Fix bug in `no_filter_correction()`: stray light correction would be too
+    easily skipped. This was causing problems only with the protocol that did not
+    rely on a dark measurement to correct for stray light in those cases when'
+    the dark pixels in the spectrometer array returned unreliable readings. The
+    new approach can be potentially disturbed by light sources emitting at
+    wavelengths shorter than about 240 nm.
  
 # ooacquire 0.4.2 (2023-12-03)
 
