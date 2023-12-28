@@ -87,16 +87,19 @@ an USB port. The first time you connect an instrument the operating
 system will install the drivers as they are made available by the
 *OmniDriver* installation.
 
-Direct acquisition has been tested with our *Maya2000Pro*, *Flame* and
-*Jaz* instruments under MS-windows 7 and MS-Windows 10, but can be
-expected also to work with any other modern spectrometer from Ocean
-Optics, and under OS X, and Linux in addition to MS-Windows. Package
-**‘ooacquire’** manages acquisition settings semi-automatically storing
-all the settings needed for acquisition into a single data object.
-Functions for automatic tuning of integration time are also provided.
-Settings used for acquisition of spectra and a descriptor of the
-instrument are stored at the time of acquisition as attributes of the
-object where the raw counts are stored. These metadata are preserved
+Direct acquisition has been well tested with our *Maya2000Pro*, *Flame*
+and *Jaz* instruments under MS-windows 7. MS-Windows 10, and MS-Windows
+11, it is known to work under OS X, and can be expected to work also
+under Linux distributions. It can be expected to support all modern
+spectrometers from Ocean Optics as long as they are supported by the
+OmniDriver free runtime.
+
+Package **‘ooacquire’** manages acquisition settings semi-automatically
+storing all the settings needed for acquisition into a single data
+object. Functions for automatic tuning of integration time are also
+provided. Settings used for acquisition of spectra and a descriptor of
+the instrument are stored at the time of acquisition as attributes of
+the object where the raw counts are stored. These metadata are preserved
 through all processing steps. Most of these metadata are also available
 in the header of data files created with software from Ocean Insight.
 When raw-counts data are read from files, these metadata are read and
@@ -134,9 +137,11 @@ options(repos = repos)
 
 Installation of Java/Temurin and OmniDriver should be done first.
 
-1.  **Temurin 8 OpenJDK** or **Java 8 JDK** (Java Open development kit).
-    *The Java run-time is not enough!* Temurin OpenJDK is free in
-    contrast to Oracle’s Java 8 JDK.
+1.  **Temurin 8 OpenJDK**, **Corretto 8 OpenJDK**, or **Java 8 JDK**
+    (Java Open development kit). *The Java run-time is not enough!*
+    Temurin OpenJDK and Corretto OpenJDK are free distributions, in
+    contrast to Oracle’s Java 8, which has some restrictions and is less
+    frequently updated.
 2.  **rOmniDriver run-time** from Ocean Optics which is a free download.
     It is the same installer as for the non-free SDP, but if run-time is
     selected during installation no key/password are asked for.
@@ -170,20 +175,23 @@ The latest, possibly buggy, development version can be installed from
 the Git repository at GitHub. For this we can use package ‘remotes’. As
 package’s ‘ooacquire’ although coded mainly in R but includes one
 function in C++, the build chain for R packages needs to be installed.
-In MS-Windows this is achieved by installing Rtools.
+In MS-Windows this is achieved by installing Rtools and in OS X and
+Linux by installing the tools needed to build R packages from sources.
 
 Assuming that R and the build tools are installed the following steps
 should be done in sequence:
 
-1.  Install the **Java 8 OpenJDK** (Java Open development kit). *The
-    Java run-time is not enough!* Temurin’s OpenJDK is free in contrast
-    to Oracle’s Java 8 JDK.
+1.  **Temurin 8 OpenJDK**, **Corretto 8 OpenJDK**, or **Java 8 JDK**
+    (Java Open development kit). *The Java run-time is not enough!*
+    Temurin OpenJDK and Corretto OpenJDK are free distributions, in
+    contrast to Oracle’s Java 8, which has some restrictions and is less
+    frequently updated.
 2.  Install the **rOmniDriver run-time** from Ocean Optics which is a
     free download. It is the same installer as for the non-free SDP, but
     if run-time is selected during installation no key/password are
     asked for.
 3.  Install the **R packages** ‘photobiology’, ‘photobiologyInOut’,
-    ‘ggspectra’ plus the ‘tidyverse’, all available from CRAN.
+    ‘ggspectra’ ‘rJava’ and ‘tidyverse’, all available from CRAN.
 4.  Install ‘rOmniDriver’ from GitHub.
 5.  Install ‘ooacquire’ from GitHub.
 
@@ -282,12 +290,12 @@ acknowledge this by citing the package according to:
 
 ``` r
 citation("ooacquire")
-#> 
 #> To cite package 'ooacquire' in publications use:
 #> 
 #>   Aphalo P, Ylianttila L (2023). _ooacquire: Acquire Data from OO
-#>   Spectrometers_. https://docs.r4photobiology.info/ooacquire/,
-#>   https://github.com/aphalo/ooacquire.
+#>   Spectrometers_. R package version 0.4.3,
+#>   https://github.com/aphalo/ooacquire,
+#>   <https://docs.r4photobiology.info/ooacquire/>.
 #> 
 #> A BibTeX entry for LaTeX users is
 #> 
@@ -295,8 +303,9 @@ citation("ooacquire")
 #>     title = {ooacquire: Acquire Data from OO Spectrometers},
 #>     author = {Pedro J. Aphalo and Lasse Ylianttila},
 #>     year = {2023},
-#>     note = {https://docs.r4photobiology.info/ooacquire/,
+#>     note = {R package version 0.4.3, 
 #> https://github.com/aphalo/ooacquire},
+#>     url = {https://docs.r4photobiology.info/ooacquire/},
 #>   }
 ```
 

@@ -1,7 +1,7 @@
 ## run tests
 library(ooacquire)
 
-options(photobiology.verbose = TRUE)
+# options(photobiology.verbose = TRUE)
 
 photon_as_default()
 
@@ -10,6 +10,7 @@ photon_as_default()
 acq_irrad_interactive(interface.mode = "series",
                       HDR.mult = 1,
                       tot.time.range = c(0, 10),
+#                      verbose = TRUE, # report memory use
                       folder.name = sprintf("./inst-not/irrad-series-%s", lubridate::today()))
 
 acq_irrad_interactive(interface.mode = "simple",
