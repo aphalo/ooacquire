@@ -433,7 +433,7 @@ acq_irrad_interactive <-
     } else {
       descriptor <- which_descriptor(descriptors = descriptors)
       stopifnot(exists("spectrometer.name", descriptor))
-      default.protocol <- "ld"
+      default.protocol <- ifelse("ld" %in% available.protocols, "ld", available.protocols[1])
     }
 
     # jwrapper and spectrometer indexes have to be set to current ones if
@@ -529,7 +529,7 @@ acq_irrad_interactive <-
       protocol <- protocol_interactive(protocols = protocols,
                                        default = default.protocol)
     } else {
-      protocol <- default.protocol
+      protocol <- protocols[[default.protocol]]
     }
 
     start.int.time <- 0.01 # seconds
@@ -753,8 +753,11 @@ acq_irrad_interactive <-
 
       }
 
-      # acquire raw-counts spectra
+      if (pending.repeats >= 1) {
+        message("Pending: ", pending.repeats, " repeats.")
+      }
 
+      # acquire raw-counts spectra
       if (reuse.old.refs) { # acquire only light spectra
         if (acq.pausing) {
           raw.mspct <- acq_raw_mspct(descriptor = descriptor,
@@ -1201,7 +1204,6 @@ acq_irrad_interactive <-
       pending.repeats <- pending.repeats - 1L
 
       if (pending.repeats >= 1) {
-        message("Pending: ", pending.repeats, " repeats.")
         get.obj.name <- FALSE
         acq.pausing <- acq.pausing.always
       } else {
@@ -1210,11 +1212,11 @@ acq_irrad_interactive <-
 
         get.seq.settings <- grepl("^series", interface.mode)
 
-        loop.valid.answers <- c("q", "r", "p", "n")
-        loop.prompt <- "quit/repeat non-stop/repeat pausing/NEXT (q/r/p/n-): "
+        loop.valid.answers <- c("n", "r", "p", "q", "m", "f")
+        loop.prompt <- "Repeats:auto/no figs./with figs./pausing//quit/GO (r/n/f/p/q/m-): "
         repeat {
           answer2 <- readline(loop.prompt)[1]
-          answer2 <- ifelse(answer2 == "", "n", answer2)
+          answer2 <- ifelse(answer2 == "", "m", answer2)
           if (answer2 %in% loop.valid.answers) {
             break()
           } else {
@@ -1222,18 +1224,9 @@ acq_irrad_interactive <-
           }
         }
 
-        if (answer2 %in% c("r", "p")) {
-          acq.pausing.always <- answer2 == "p"
-          clear.display <- show.figs && !acq.pausing.always
-          show.figs <- show.figs && answer2 == "p"
-          if (acq.pausing.always) {
-            message("Pausing between repeats")
-          } else {
-            message("Not pausing between repeats")
-          }
-          reuse.old.refs <- TRUE
+        if (answer2 %in% c("r", "n", "f", "p")) {
           repeat {
-            answer3 <- readline("Number of repeated acquisitions (integer >= 1 or \"\"): ")
+            answer3 <- readline("Number of repeats (integer >= 1 or \"\"): ")
             if (answer3 == "") {
               answer3 <- "1"
             }
@@ -1244,9 +1237,25 @@ acq_irrad_interactive <-
               cat("Value entered is not a number >= 1!\n")
             }
           }
+          if (answer2 == "r") {
+            if (pending.repeats > 1L) {
+              answer2 <- "n"
+            } else {
+              answer2 <- "f"
+            }
+          }
+          acq.pausing.always <- answer2 == "p"
+          clear.display <- show.figs && answer2 == "n"
+          show.figs <- answer2 %in% c("p", "f")
+          if (acq.pausing.always) {
+            message("Pausing between repeats")
+          } else {
+            message("Not pausing between repeats")
+          }
+          reuse.old.refs <- TRUE
           reuse.seq.settings <- pending.repeats > 1L
           sequential.naming.required <- pending.repeats > 1L
-          answer2 <- "n"
+          answer2 <- "m"
         } else {
           acq.pausing.always <- FALSE
           reuse.old.refs <- FALSE
