@@ -417,16 +417,17 @@ acq_irrad_interactive <-
         )
 
       # default protocols depend of implemented correction methods
+      available.protocols <- names(protocols)
       default.protocol <-
         switch(serial_no,
-               MAYP11278 = "lfd",
-               MAYP112785 = "lfd",
-               MAYP114590 = "lfd",
-               FLMS04133 = "ld",
-               FLMS00673 = "ld",
-               FLMS00440 = "ld",
-               FLMS00416 = "ld",
-               "ld"
+               MAYP11278 = ifelse("lfd" %in% available.protocols, "lfd", available.protocols[1]),
+               MAYP112785 = ifelse("lfd" %in% available.protocols, "lfd", available.protocols[1]),
+               MAYP114590 = ifelse("lfd" %in% available.protocols, "lfd", available.protocols[1]),
+               FLMS04133 = ifelse("ld" %in% available.protocols, "ld", available.protocols[1]),
+               FLMS00673 = ifelse("ld" %in% available.protocols, "ld", available.protocols[1]),
+               FLMS00440 = ifelse("ld" %in% available.protocols, "ld", available.protocols[1]),
+               FLMS00416 = ifelse("ld" %in% available.protocols, "ld", available.protocols[1]),
+               ifelse("ld" %in% available.protocols, "ld", available.protocols[1])
         )
 
     } else {
@@ -522,10 +523,14 @@ acq_irrad_interactive <-
     on.exit(setwd(oldwd), add = TRUE)
     on.exit(message("Folder reset to: ", getwd(), "\nBye!"), add = TRUE)
 
-    # ask user to choose protocol
+    # ask user to choose protocol only if needed
 
-    protocol <- protocol_interactive(protocols = protocols,
-                                     default = default.protocol)
+    if (length(protocols) > 1) {
+      protocol <- protocol_interactive(protocols = protocols,
+                                       default = default.protocol)
+    } else {
+      protocol <- default.protocol
+    }
 
     start.int.time <- 0.01 # seconds
 
@@ -592,7 +597,9 @@ acq_irrad_interactive <-
 
       if (clear.display) {
         # clear plot viewer panel of RStudio
-        print(ggplot() + ggtitle("Display of plots disabled") + theme_minimal())
+        print(ggplot2::ggplot() +
+                ggplot2::ggtitle("Display of plots disabled") +
+                ggplot2::theme_minimal())
         clear.display <- FALSE
       }
 
@@ -861,7 +868,9 @@ acq_irrad_interactive <-
           } else {
             if (clear.display) {
               # clear plot viewer panel of RStudio
-              print(ggplot() + ggtitle("Display of plots disabled") + theme_minimal())
+              print(ggplot2::ggplot() +
+                      ggplot2::ggtitle("Display of plots disabled") +
+                      ggplot2::theme_minimal())
               clear.display <- FALSE
             }
           }
@@ -870,10 +879,10 @@ acq_irrad_interactive <-
           # to avoid delays
           if (!reuse.seq.settings || pending.repeats == 1) {
             if(qty.out == "cps") {
-              plot.prompt <- "fig/w.bands/discard/SAVE+NEXT (f/w/d/s-): "
+              plot.prompt <- "fig/w.bands/discard+go/SAVE+GO (f/w/d/s-): "
               valid.answers <-  c("f","w", "d", "s")
             } else {
-              plot.prompt <- "fig/photons/energy/w.bands/discard/SAVE+NEXT (f/p/e/w/d/s-): "
+              plot.prompt <- "fig/photons/energy/w.bands/discard+go/SAVE+GO (f/p/e/w/d/s-): "
               valid.answers <- c("f","p", "e", "w", "d", "s")
             }
             repeat {

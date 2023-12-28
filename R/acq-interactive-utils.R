@@ -449,20 +449,21 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
       cat("'step.delay' too short! Reset to ", seq.settings$step.delay, " s.\n")
     }
     prompt.string <-
-           sprintf("Series: wait = %.3g s, boundary = %s, step = %.3g s, reps = %i, undo (w/b/s/r/u/m-): ",
+           sprintf("Series: wait = %.3g s, boundary = %s, step = %.3g s, reps = %i, undo, MEASURE (w/b/s/r/u/m-): ",
                    seq.settings[["initial.delay"]],
                    seq.settings[["start.boundary"]],
                    seq.settings[["step.delay"]],
                    seq.settings[["num.steps"]])
-    answ <- readline(prompt  = prompt.string)
+    answ <- readline(prompt = prompt.string)
     if (answ %in% c("", "m")) {
       break()
     }
     if (substr(answ, 1, 1) == "w") {
       step <- readline(sprintf("Wait = %.3g seconds, new: ",
                                seq.settings[["initial.delay"]]))
-      step <- try(as.numeric(step))
+      step <- period(step)
       if (!is.na(step)) {
+        step <- as.numeric(step) # period to seconds
         seq.settings[["initial.delay"]] <- step
       } else {
         cat("Imitial delay value not changed!\n")
@@ -470,7 +471,7 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
     } else if (substr(answ, 1, 1) == "b") {
       time.unit <- readline(sprintf("Start at next %s, new: ",
                                     seq.settings[["start.boundary"]]))
-      if (time.unit %in% c("none", "second", "minute", "hour")) {
+      if (grepl("^none$", time.unit) || !is.na(lubridate::period(time.unit))) {
         seq.settings[["start.boundary"]] <- time.unit
       } else {
         cat("Start-boundary Value not changed!\n")
@@ -478,8 +479,9 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
     } else if (substr(answ, 1, 1) == "s") {
       step <- readline(sprintf("Step = %.3g seconds, new: ",
                                seq.settings[["step.delay"]]))
-      step <- try(as.numeric(step))
+      step <- lubridate::period(step)
       if (!is.na(step)) {
+        step <- as.numeric(step) # period to seconds
         seq.settings$step.delay <-
           check.step.delay(step, time.division)
         cat("Time step set to", signif(seq.settings$step.delay, 3), "s\n")

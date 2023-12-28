@@ -4,7 +4,7 @@ editor_options:
     wrap: 72
 ---
 
-# ooacquire 0.4.3 (2023-12-xx)
+# ooacquire 0.4.3 (2023-12-28)
 
 -   Make real-time display of plots optional (no change to default).
 -   Implement adjustment of the step delay time in time series to be a multiple
@@ -20,10 +20,13 @@ editor_options:
     (buffered) series acquisition.
 -   Fix bug in `no_filter_correction()`: stray light correction would be too
     easily skipped. This was causing problems only with the protocol that did not
-    rely on a dark measurement to correct for stray light in those cases when'
+    rely on a dark measurement to correct for stray light in those cases when
     the dark pixels in the spectrometer array returned unreliable readings. The
-    new approach can be potentially disturbed by light sources emitting at
+    new approach can be potentially disturbed by light sources strongly emitting at
     wavelengths shorter than about 240 nm.
+-   Accept additional ways of inputting time periods in the menu for settings
+    for acquisition of time series of spectra.
+-   Minor fixes and tweaks to the user interface for selecting protocols.
 -   Use R package 'mirai' to asynchronously save R data files and PDF files.
     Package 'mirai' is now in "suggests" and has to be installed to enable this
     feature. Experimental, by default not enabled, as it is unreliable 
