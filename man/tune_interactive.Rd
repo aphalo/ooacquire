@@ -13,7 +13,7 @@ tune_interactive(
 }
 \arguments{
 \item{descriptor}{list Descriptor of the instrument, including wrapper to
-Java object used to acces the instrument.}
+Java object used to access the instrument.}
 
 \item{acq.settings}{list containing starting values for instrument settings.}
 
@@ -23,9 +23,9 @@ tuning the settings.}
 \item{interface.mode}{character One of "simple", "auto", or "manual".}
 }
 \description{
-Adjust integration time settings, allowing the user to repeat the tunning,
-and to change some of the parameters used for tunning such as total
-compound integration time and intergration time bracketing.
+Adjust integration time settings, allowing the user to repeat the tuning,
+and to change some of the parameters used for tuning such as total
+compound integration time and integration time bracketing.
 }
 \details{
 This function implements three different user interfaces: 1) "simple" is an
@@ -38,10 +38,10 @@ directly entered by the user.
 
 Tuning of the integration time takes into account the range of times
 supported by the connected instrument, read from the instrument descriptor.
-The algorithm also makes use of the linearization function when extrapolating
+The algorithm also makes use of the linearisation function when extrapolating
 to guess the integration time needed. Initial (default) values are read from
 \code{acq.settings} while \code{start.int.time} provides a default starting
-value for integration time for tuning when the user choses not to use the
+value for integration time for tuning when the user chooses not to use the
 value stored in \code{acq.settings}.
 }
 \seealso{

@@ -4,6 +4,10 @@ editor_options:
     wrap: 72
 ---
 
+# ooacquire 0.4.3-2 (2023-12-xx)
+
+-   Tweak menus to be narrower and more informative.
+
 # ooacquire 0.4.3 (2023-12-28)
 
 -   Make real-time display of plots optional (no change to default).

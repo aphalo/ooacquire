@@ -1,11 +1,11 @@
 #' Interactively adjust the integration time settings
 #'
-#' Adjust integration time settings, allowing the user to repeat the tunning,
-#' and to change some of the parameters used for tunning such as total
-#' compound integration time and intergration time bracketing.
+#' Adjust integration time settings, allowing the user to repeat the tuning,
+#' and to change some of the parameters used for tuning such as total
+#' compound integration time and integration time bracketing.
 #'
 #' @param descriptor list Descriptor of the instrument, including wrapper to
-#'   Java object used to acces the instrument.
+#'   Java object used to access the instrument.
 #' @param acq.settings list containing starting values for instrument settings.
 #' @param start.int.time numeric Integration time to use as starting guess when
 #'   tuning the settings.
@@ -22,10 +22,10 @@
 #'
 #' Tuning of the integration time takes into account the range of times
 #' supported by the connected instrument, read from the instrument descriptor.
-#' The algorithm also makes use of the linearization function when extrapolating
+#' The algorithm also makes use of the linearisation function when extrapolating
 #' to guess the integration time needed. Initial (default) values are read from
 #' \code{acq.settings} while \code{start.int.time} provides a default starting
-#' value for integration time for tuning when the user choses not to use the
+#' value for integration time for tuning when the user chooses not to use the
 #' value stored in \code{acq.settings}.
 #'
 #' @family interactive acquisition utility functions
@@ -39,6 +39,13 @@ tune_interactive <- function(descriptor,
   if (!interface.mode %in% c("simple", "auto", "manual", "full")) {
     interface.mode <- "auto" # gets used for "series"
   }
+  acq.settings.string <-
+    sprintf("Acq: integ.time= %.3g s, tot.range = %.3g-%.3g s, HDR = %s, margin = %.2f \n",
+            acq.settings[["integ.time"]],
+            acq.settings[["tot.time.range"]],
+            paste(as.character(acq.settings[["HDR.mult"]]), collapse = ","),
+            acq.settings[["target.margin"]])
+  cat(acq.settings.string)
   # configure interface for active mode
   prompt.text1 <-
     switch(interface.mode,
@@ -429,6 +436,7 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
     step
   }
 
+  # validate input
   if (!setequal(names(seq.settings),
       c("start.boundary", "initial.delay", "step.delay", "num.steps"))) {
     warning("Resetting invalid 'seq.settings' to defaults.")
@@ -437,28 +445,47 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
                          step.delay = 0,
                          num.steps = 1)
   }
-  old.seq.settings <- seq.settings
 
   seq.settings$step.delay <-
     check.step.delay(seq.settings$step.delay, time.division)
 
+  # support undo
+  old.seq.settings <- seq.settings
+
+  # set help
+  all.help <- c(w = "w = wait. Waiting time before start of acquisition of time series.",
+                b = "b = boundary. The time boundary at which to start acquisition of time series.",
+                s = "s = step duration. The time step between the start of succesive acquisitions in a time series.",
+                r = "r = step repetitions. The number of spectra to measure for the current time series.",
+                H = "? = help. Show this help text.",
+                m = "m = MEASURE. Measure without setting/tuning integration time.",
+                default = "- = default. Action selected by pressing \"Enter\" key.")
+  help.text <- paste(all.help, collapse = "\n")
+
   repeat{
+    # ensure step delay is achievable
     if (seq.settings$step.delay < measurement.duration &&
         seq.settings$step.delay != 0) {
       seq.settings$step.delay <- signif(minimum.step.delay * 1.01, 3)
       cat("'step.delay' too short! Reset to ", seq.settings$step.delay, " s.\n")
     }
-    prompt.string <-
-           sprintf("Series: wait = %.3g s, boundary = %s, step = %.3g s, reps = %i, undo, MEASURE (w/b/s/r/u/m-): ",
+    # display current settings before prompt for user input
+    seq.settings.string <-
+           sprintf("Seq: wait = %.3g s, boundary = %s, step = %.3g s, reps = %i \n",
                    seq.settings[["initial.delay"]],
                    seq.settings[["start.boundary"]],
                    seq.settings[["step.delay"]],
                    seq.settings[["num.steps"]])
-    answ <- readline(prompt = prompt.string)
+    cat(seq.settings.string)
+
+    answ <- readline(prompt = "wait/boundary/step-len/step-reps/undo/help/GO (w/b/s/r/u/?/m-): ")
+
     if (answ %in% c("", "m")) {
       break()
     }
-    if (substr(answ, 1, 1) == "w") {
+    if (answ == "?") {
+      cat(help.text)
+    } else if (substr(answ, 1, 1) == "w") {
       step <- readline(sprintf("Wait = %.3g seconds, new: ",
                                seq.settings[["initial.delay"]]))
       step <- period(step)

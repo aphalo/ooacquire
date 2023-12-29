@@ -1212,8 +1212,8 @@ acq_irrad_interactive <-
 
         get.seq.settings <- grepl("^series", interface.mode)
 
-        loop.valid.answers <- c("n", "r", "p", "q", "m", "f")
-        loop.prompt <- "Repeats:auto/no figs./with figs./pausing//quit/GO (r/n/f/p/q/m-): "
+        loop.valid.answers <- c("q", "r", "m")
+        loop.prompt <- "quit/repeat-/NEW-MEASUREMENT (q/r/m-): "
         repeat {
           answer2 <- readline(loop.prompt)[1]
           answer2 <- ifelse(answer2 == "", "m", answer2)
@@ -1224,11 +1224,11 @@ acq_irrad_interactive <-
           }
         }
 
-        if (answer2 %in% c("r", "n", "f", "p")) {
+        if (answer2 == "r") {
           repeat {
-            answer3 <- readline("Number of repeats (integer >= 1 or \"\"): ")
-            if (answer3 == "") {
-              answer3 <- "1"
+            answer4 <- readline("Number of repeats (integer >= 1 or \"\"): ")
+            if (answer4 == "") {
+              answer4 <- "1"
             }
             pending.repeats <- try(as.integer(answer3))
             if (!is.na(pending.repeats) && pending.repeats >= 1L) {
@@ -1237,16 +1237,27 @@ acq_irrad_interactive <-
               cat("Value entered is not a number >= 1!\n")
             }
           }
-          if (answer2 == "r") {
-            if (pending.repeats > 1L) {
-              answer2 <- "n"
+          repeat {
+            answer3 <- readline("Repeats: no figs./with figs./pausing/AUTO- (n/f/p/a-): ")
+            if (answer3 == "") {
+              answer3 <- "a"
+            }
+            if (answer3 %in% c("n", "f", "p", "a")) {
+              break()
             } else {
-              answer2 <- "f"
+              cat("Answer not recognized, please try again...")
             }
           }
-          acq.pausing.always <- answer2 == "p"
-          clear.display <- show.figs && answer2 == "n"
-          show.figs <- answer2 %in% c("p", "f")
+           if (answer3 == "a") {
+            if (pending.repeats > 1L) {
+              answer3 <- "n"
+            } else {
+              answer3 <- "f"
+            }
+          }
+          acq.pausing.always <- answer3 == "p"
+          clear.display <- show.figs && answer3 == "n"
+          show.figs <- answer3 %in% c("p", "f")
           if (acq.pausing.always) {
             message("Pausing between repeats")
           } else {
@@ -1268,15 +1279,15 @@ acq_irrad_interactive <-
           break() # out of UI main loop
         } else if (!reuse.old.refs) {
           repeat {
-            answer3 <- readline("Change protocol? yes/NO (y/n-): ")[1]
-            answer3 <- ifelse(answer3 == "", "n", answer3)
-            if (answer3 %in% c("n", "y")) {
+            answer5 <- readline("Change protocol? yes/NO (y/n-): ")[1]
+            answer5 <- ifelse(answer3 == "", "n", answer3)
+            if (answer5 %in% c("n", "y")) {
               break()
             } else {
               print("Answer not recognized, please try again...")
             }
           }
-          if (answer3 == "y") {
+          if (answer5 == "y") {
             protocol <- protocol_interactive(protocols)
           }
         }
