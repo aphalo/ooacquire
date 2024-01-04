@@ -709,6 +709,7 @@ acq_irrad_interactive <-
                                      acq.settings = settings,
                                      start.int.time = start.int.time,
                                      interface.mode = interface.mode)
+        get.seq.settings <- grepl("series", interface.mode)
       }
 
       # time series settings
@@ -737,8 +738,8 @@ acq_irrad_interactive <-
                   "Estimated measurement duration <= 0" =
                     estimated.measurement.duration > 0)
 
-        message("Duration of each repeated measurement: ",
-                signif(estimated.measurement.duration, 3), " s.")
+        cat("Duration of each repeated measurement: ",
+                signif(estimated.measurement.duration, 3), " s.\n")
 
         seq.settings <-
           set_seq_interactive(seq.settings = seq.settings,
@@ -754,7 +755,7 @@ acq_irrad_interactive <-
       }
 
       if (pending.repeats >= 1) {
-        message("Pending: ", pending.repeats, " repeats.")
+        cat("Pending: ", pending.repeats, " repeats.\n")
       }
 
       # acquire raw-counts spectra
@@ -819,7 +820,7 @@ acq_irrad_interactive <-
                dark = "dark")
 
         if (length(raw.mspct) > 10L) {
-          message("Computing ", qty.out, " ... ", appendLF = FALSE)
+          cat("Computing ", qty.out, " ... ")
         }
 
         irrad.spct <- s_irrad_corrected(x = raw.mspct,
@@ -841,7 +842,7 @@ acq_irrad_interactive <-
         }
 
         if (length(raw.mspct) > 10L) {
-          message("ready.")
+          cat(" ready.\n")
         }
 
         # display plot, allowing user to tweak it
@@ -1230,7 +1231,7 @@ acq_irrad_interactive <-
             if (answer4 == "") {
               answer4 <- "1"
             }
-            pending.repeats <- try(as.integer(answer3))
+            pending.repeats <- try(as.integer(answer4))
             if (!is.na(pending.repeats) && pending.repeats >= 1L) {
               break()
             } else {
@@ -1280,7 +1281,7 @@ acq_irrad_interactive <-
         } else if (!reuse.old.refs) {
           repeat {
             answer5 <- readline("Change protocol? yes/NO (y/n-): ")[1]
-            answer5 <- ifelse(answer3 == "", "n", answer3)
+            answer5 <- ifelse(answer5 == "", "n", answer5)
             if (answer5 %in% c("n", "y")) {
               break()
             } else {

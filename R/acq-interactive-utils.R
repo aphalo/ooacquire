@@ -39,13 +39,6 @@ tune_interactive <- function(descriptor,
   if (!interface.mode %in% c("simple", "auto", "manual", "full")) {
     interface.mode <- "auto" # gets used for "series"
   }
-  acq.settings.string <-
-    sprintf("Acq: integ.time= %.3g s, tot.range = %.3g-%.3g s, HDR = %s, margin = %.2f \n",
-            acq.settings[["integ.time"]],
-            acq.settings[["tot.time.range"]],
-            paste(as.character(acq.settings[["HDR.mult"]]), collapse = ","),
-            acq.settings[["target.margin"]])
-  cat(acq.settings.string)
   # configure interface for active mode
   prompt.text1 <-
     switch(interface.mode,
@@ -91,6 +84,14 @@ tune_interactive <- function(descriptor,
   old.settings <- acq.settings # allow starting over
   tuned <- FALSE
   repeat{
+    acq.settings.string <-
+      sprintf("Acq: integ.time = %.3gs, margin = %.2f, tot.range = %.3g-%.3gs, HDR.mult = %s\n",
+              acq.settings[["integ.time"]][1] * 1e-6,
+              acq.settings[["target.margin"]],
+              min(acq.settings[["tot.time.range"]]) * 1e-6,
+              max(acq.settings[["tot.time.range"]]) * 1e-6,
+              paste(as.character(acq.settings[["HDR.mult"]]), collapse = ","))
+    cat(acq.settings.string)
     if (tuned) {
       prompt.text <- prompt.text2
     } else {
@@ -394,7 +395,7 @@ choose_ch_interactive <- function(instruments,
 #' @param minimum.step.delay numeric Minimum duration of \code{"step.delay"} (s).
 #' @param time.division numeric The step is forced to be a multiple of this
 #'   time duration, because spectrometers normally are constantly acquiring
-#'   spectra and they return the most recently acquired one. Should be set to
+#'   spectra and thbey return the most recently acquired one. Should be set to
 #'   the integration time plus a very small overhead (s).
 #'
 #' @details Function \code{seq.settings()} allows users to enter values needed
