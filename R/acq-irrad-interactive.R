@@ -252,7 +252,7 @@ acq_irrad_interactive <-
            area = NULL,
            diff.type = NULL,
            qty.out = "irrad",
-           plot.lines.max = 50,
+           plot.lines.max = 11,
            summary.type = "plant",
            save.pdfs = TRUE,
            save.summaries = !interface.mode %in% c("series", "series-attr"),
@@ -845,23 +845,27 @@ acq_irrad_interactive <-
           cat("ready.\n")
         }
 
+        # prepare plot invariants
+        if (plot.lines.max < getMultipleWl(irrad.spct)) {
+          title.text <- paste(what_measured(irrad.spct)[[1L]],
+                              " (n = ", plot.lines.max,
+                              "/", getMultipleWl(irrad.spct),
+                              ")",
+                              sep = "")
+          plot.spct <- pull_sample(irrad.spct, size = plot.lines.max)
+        } else {
+          title.text <- paste(what_measured(irrad.spct)[[1L]],
+                              " (n = ", getMultipleWl(irrad.spct), ")",
+                              sep = "")
+          plot.spct <- irrad.spct
+        }
+
         # display plot, allowing user to tweak it
         repeat {
           if (length(raw.mspct) > 10L) {
             cat("Building plot ... ")
           }
-          if (plot.lines.max < getMultipleWl(irrad.spct)) {
-            title.text <- paste(what_measured(irrad.spct)[[1L]],
-                                " (n = ", plot.lines.max,
-                                "/", getMultipleWl(irrad.spct),
-                                ")",
-                                sep = "")
-          } else {
-            title.text <- paste(what_measured(irrad.spct)[[1L]],
-                                " (n = ", getMultipleWl(irrad.spct), ")",
-                                sep = "")
-          }
-          fig <- ggplot2::autoplot(pull_sample(irrad.spct, size = plot.lines.max),
+          fig <- ggplot2::autoplot(plot.spct,
                                    annotations = c("-", "colour.guide"),
                                    geom = ifelse(getMultipleWl(irrad.spct) == 1,
                                                  "spct", "line")) +
@@ -1005,38 +1009,40 @@ acq_irrad_interactive <-
 
       } else { # qty.out == "raw"
         # currently no plotting!
-        raw.prompt <- "discard/SAVE+NEXT (d/s-): "
-        valid.answers <-  c("d", "s")
-        repeat {
-          answer <- readline(raw.prompt)[1]
-          answer <- ifelse(answer == "", "s", answer)
-          if (answer %in% valid.answers) {
-            break()
-          } else {
-            print("Answer not recognized, please try again...")
+        if (!reuse.seq.settings || pending.repeats == 1) {
+          raw.prompt <- "discard/SAVE+NEXT (d/s-): "
+          valid.answers <-  c("d", "s")
+          repeat {
+            answer <- readline(raw.prompt)[1]
+            answer <- ifelse(answer == "", "s", answer)
+            if (answer %in% valid.answers) {
+              break()
+            } else {
+              print("Answer not recognized, please try again...")
+            }
           }
-        }
 
-        # save raw-counts data to file on disk
-        if (answer == "s") {
-          raw.names <- c(raw.names, raw.name)
-          file.names <- c(file.names, file.name)
+          # save raw-counts data to file on disk
+          if (answer == "s") {
+            raw.names <- c(raw.names, raw.name)
+            file.names <- c(file.names, file.name)
 
-          assign(raw.name, raw.mspct)
+            assign(raw.name, raw.mspct)
 
-          if (async.saves && !mirai::unresolved(rda.mirai)) {
-            cat("Saving files asynchronously\n")
-            rda.mirai <- mirai::mirai({
-              assign(raw.name, raw.mspct)
+            if (async.saves && !mirai::unresolved(rda.mirai)) {
+              cat("Saving files asynchronously\n")
+              rda.mirai <- mirai::mirai({
+                assign(raw.name, raw.mspct)
+                save(list = raw.name, file = file.name)
+                return(file.exists(file.name))
+              },
+              .args = list(raw.name, file.name, raw.mspct),
+              .timeout = 60000) # 1 min
+            } else {
+              cat("Saving files ... ")
               save(list = raw.name, file = file.name)
-              return(file.exists(file.name))
-            },
-            .args = list(raw.name, file.name, raw.mspct),
-            .timeout = 60000) # 1 min
-          } else {
-            cat("Saving files ... ")
-            save(list = raw.name, file = file.name)
-            cat("ready\n")
+              cat("ready\n")
+            }
           }
         }
       }

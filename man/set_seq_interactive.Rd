@@ -24,7 +24,7 @@ repeated measurements. Named vector with member named
 
 \item{time.division}{numeric The step is forced to be a multiple of this
 time duration, because spectrometers normally are constantly acquiring
-spectra and they return the most recently acquired one. Should be set to
+spectra and thbey return the most recently acquired one. Should be set to
 the integration time plus a very small overhead (s).}
 }
 \value{
