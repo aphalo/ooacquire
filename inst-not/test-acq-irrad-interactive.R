@@ -29,6 +29,7 @@ acq_irrad_interactive(qty.out = "fluence",
 
 acq_irrad_interactive(interface.mode = "series",
                       HDR.mult = 1,
+#                      qty.out = "raw",
                       tot.time.range = c(0, 10),
                       async.saves = TRUE,
                       folder.name = sprintf("./inst-not/irrad-series-%s", lubridate::today()))

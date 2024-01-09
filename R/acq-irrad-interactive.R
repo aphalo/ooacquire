@@ -755,7 +755,7 @@ acq_irrad_interactive <-
       }
 
       if (pending.repeats >= 1) {
-        cat("Pending: ", pending.repeats, " repeats.\n")
+        cat("Pending: ", pending.repeats, " repeats.\n", sep = "")
       }
 
       # acquire raw-counts spectra
@@ -820,7 +820,7 @@ acq_irrad_interactive <-
                dark = "dark")
 
         if (length(raw.mspct) > 10L) {
-          cat("Computing ", qty.out, " ... ")
+          cat("Computing ", qty.out, " ... ", sep = "")
         }
 
         irrad.spct <- s_irrad_corrected(x = raw.mspct,
@@ -842,11 +842,14 @@ acq_irrad_interactive <-
         }
 
         if (length(raw.mspct) > 10L) {
-          cat(" ready.\n")
+          cat("ready.\n")
         }
 
         # display plot, allowing user to tweak it
         repeat {
+          if (length(raw.mspct) > 10L) {
+            cat("Building plot ... ")
+          }
           if (plot.lines.max < getMultipleWl(irrad.spct)) {
             title.text <- paste(what_measured(irrad.spct)[[1L]],
                                 " (n = ", plot.lines.max,
@@ -867,6 +870,10 @@ acq_irrad_interactive <-
                           caption = how_measured(irrad.spct)[[1L]]) +
             ggplot2::theme(legend.position = "bottom") +
             ggplot2::theme_bw()
+          if (length(raw.mspct) > 10L) {
+            cat("ready.\n")
+          }
+
           if (show.figs) {
             print(fig)
           } else {
@@ -952,6 +959,7 @@ acq_irrad_interactive <-
           # save objects to files on disk
           if (async.saves && !mirai::unresolved(rda.mirai)) {
             # non-blocking
+            cat("Saving files asynchronously ...\n")
             rda.mirai <-
               mirai::mirai({
                 assign(obj.names[1], raw.mspct)
@@ -967,7 +975,9 @@ acq_irrad_interactive <-
               )
           } else {
             # fall back to main process
+            cat("Saving files ... ")
             save(list = obj.names, file = file.name)
+            cat("ready\n")
           }
 
           # save plots to files on disk
@@ -998,7 +1008,7 @@ acq_irrad_interactive <-
         raw.prompt <- "discard/SAVE+NEXT (d/s-): "
         valid.answers <-  c("d", "s")
         repeat {
-          answer <- readline(plot.prompt)[1]
+          answer <- readline(raw.prompt)[1]
           answer <- ifelse(answer == "", "s", answer)
           if (answer %in% valid.answers) {
             break()
@@ -1015,6 +1025,7 @@ acq_irrad_interactive <-
           assign(raw.name, raw.mspct)
 
           if (async.saves && !mirai::unresolved(rda.mirai)) {
+            cat("Saving files asynchronously\n")
             rda.mirai <- mirai::mirai({
               assign(raw.name, raw.mspct)
               save(list = raw.name, file = file.name)
@@ -1023,7 +1034,9 @@ acq_irrad_interactive <-
             .args = list(raw.name, file.name, raw.mspct),
             .timeout = 60000) # 1 min
           } else {
+            cat("Saving files ... ")
             save(list = raw.name, file = file.name)
+            cat("ready\n")
           }
         }
       }

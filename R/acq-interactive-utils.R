@@ -42,17 +42,17 @@ tune_interactive <- function(descriptor,
   # configure interface for active mode
   prompt.text1 <-
     switch(interface.mode,
-           simple = "RETUNE/range/HDR mult./undo/help/measure (t-/r/h/u/?/m): ",
-           auto = "fixed/RETUNE/tune/saturation/range/HDR mult./undo/help/measure (f/t-/T/s/r/h/u/?/m): ",
-           manual = "FIXED/range/HDR mult./undo/help/measure (f-/r/h/u/?/m): ",
-           full = "FIXED/retune/tune/saturation/range/HDR mult./undo/help/measure (f-/t/T/s/r/h/u/?/m): "
+           simple = "RETUNE/range/HDR/undo/help/go (t-/r/h/u/?/g): ",
+           auto = "fixed/RETUNE/tune/sat/range/HDR/undo/help/go (f/t-/T/s/r/h/u/?/g): ",
+           manual = "FIXED/range/HDR/undo/help/go (f-/r/h/u/?/m): ",
+           full = "FIXED/retune/tune/sat/range/HDR/undo/help/go (f-/t/T/s/r/h/u/?/g): "
     )
   prompt.text2 <-
     switch(interface.mode,
-           simple = "retune/range/HDR mult./undo/help/MEASURE (t/r/h/u/?/m-): ",
-           auto = "fixed/retune/tune/saturation/range/HDR mult./undo/help/MEASURE (f/t/T/s/r/h/u/?/m-): ",
-           manual = "fixed/range/HDR mult./undo/help/MEASURE (f/r/h/u/?/m-): ",
-           full = "fixed/retune/tune/saturation/range/HDR mult./undo/help/MEASURE (f/t/T/s/r/h/u/?/m-): "
+           simple = "retune/range/HDR/undo/help/GO (t/r/h/u/?/m-): ",
+           auto = "fixed/retune/tune/sat/range/HDR/undo/help/GO (f/t/T/s/r/h/u/?/g-): ",
+           manual = "fixed/range/HDR/undo/help/GO (f/r/h/u/?/m-): ",
+           full = "fixed/retune/tune/sat/range/HDR/undo/help/GO (f/t/T/s/r/h/u/?/g-): "
     )
   valid.input <-
     switch(interface.mode,
@@ -74,10 +74,10 @@ tune_interactive <- function(descriptor,
                 T = "T = tune. Adjust integration time starting from default value.",
                 s = "s = saturation margin. Tuned integration time is maximum * (1 - margin).",
                 r = "r = range. Total measurement time in seconds, as a single value or a range.",
-                h = "h = HDR mult. High dynamic range or bracketing, as multipliers for target integration time.",
+                h = "h = HDR multipliers. High dynamic range or bracketing, as multipliers for target integration time.",
                 u = "u = undo. Restore settings from last measurement.",
                 H = "? = help. Show this help text.",
-                m = "m = MEASURE. Measure without setting/tuning integration time.",
+                m = "g = go. Go ahead to next step, without setting/tuning integration time.",
                 default = "- = default. Action selected by pressing \"Enter\" key.")
   help.text <- paste(all.help[setdiff(valid.input, "")], collapse = "\n")
   # common code to all modes
@@ -85,7 +85,7 @@ tune_interactive <- function(descriptor,
   tuned <- FALSE
   repeat{
     acq.settings.string <-
-      sprintf("Acq: integ.time = %.3gs, margin = %.2f, tot.range = %.3g-%.3gs, HDR.mult = %s\n",
+      sprintf("Acq: integ. = %.3gS, saturation = %.2f, tot. range = %.3g-%.3gS, HDR mult. = %s\n",
               acq.settings[["integ.time"]][1] * 1e-6,
               acq.settings[["target.margin"]],
               min(acq.settings[["tot.time.range"]]) * 1e-6,
@@ -147,12 +147,12 @@ tune_interactive <- function(descriptor,
     } else if (answ == "s") {
       margin <- readline(sprintf("Saturation margin = %.2g, new: ",
                                  acq.settings[["target.margin"]]))
-      margin <- try(as.numeric(margin))
-      if (!is.na(margin)) {
+      margin <- try(as.numeric(margin))[1]
+      if (!is.na(margin) && margin >= 0 && margin < 1) {
         acq.settings[["target.margin"]] <- margin
         tuned <- FALSE
       } else {
-        cat("Input not recValue not changed!\n")
+        cat("Request ignored: value not in 0..1 range\n")
       }
     } else if (answ == "r") {
       cat("Total time range (seconds), 1 or 2 numbers: ")
@@ -472,7 +472,7 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
     }
     # display current settings before prompt for user input
     seq.settings.string <-
-           sprintf("Seq: wait = %.3g s, boundary = %s, step = %.3g s, reps = %i \n",
+           sprintf("Seq: wait = %.3gS, boundary = %s, step = %.3gS, reps = %i \n",
                    seq.settings[["initial.delay"]],
                    seq.settings[["start.boundary"]],
                    seq.settings[["step.delay"]],
@@ -487,7 +487,7 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
     if (answ == "?") {
       cat(help.text)
     } else if (substr(answ, 1, 1) == "w") {
-      step <- readline(sprintf("Wait = %.3g seconds, new: ",
+      step <- readline(sprintf("Wait = %.3gS, new: ",
                                seq.settings[["initial.delay"]]))
       step <- period(step)
       if (!is.na(step)) {
@@ -505,7 +505,7 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
         cat("Start-boundary Value not changed!\n")
       }
     } else if (substr(answ, 1, 1) == "s") {
-      step <- readline(sprintf("Step = %.3g seconds, new: ",
+      step <- readline(sprintf("Step = %.3gS, new: ",
                                seq.settings[["step.delay"]]))
       step <- lubridate::period(step)
       if (!is.na(step)) {
