@@ -4,7 +4,7 @@
 \alias{read_period}
 \title{Read period from the user}
 \usage{
-read_period(prompt, n.max = 1L, pattern = "[,;]")
+read_period(prompt, n.max = 1L, pattern = "[,;]", pass.through = "")
 }
 \arguments{
 \item{prompt}{character Prompt displayed at the console.}
@@ -13,6 +13,8 @@ read_period(prompt, n.max = 1L, pattern = "[,;]")
 
 \item{pattern}{character Passed to \code{gsub()}. Characters matched are
 substituted by a space.}
+
+\item{pass.through}{character Vector of strings that are returned as is.}
 }
 \value{
 A \code{period} vector of lengths of time, negative times such as

@@ -4,7 +4,7 @@
 \alias{read_numbers}
 \title{Read numbers from the user}
 \usage{
-read_numbers(prompt, n.max = 1L, pattern = "[,;]")
+read_numbers(prompt, n.max = 1L, pattern = "[,;]", pass.through = "")
 }
 \arguments{
 \item{prompt}{character Prompt displayed at the console.}
@@ -13,6 +13,8 @@ read_numbers(prompt, n.max = 1L, pattern = "[,;]")
 
 \item{pattern}{character Passed to \code{gsub()}. Characters matched are
 substituted by a space.}
+
+\item{pass.through}{character Vector of strings that are returned as is.}
 }
 \description{
 A character string is read from the command prompt. The string is split at

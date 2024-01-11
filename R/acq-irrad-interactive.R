@@ -767,6 +767,12 @@ acq_irrad_interactive <-
                                      pause.fun = NULL,
                                      f.trigger.pulses = f.trigger.pulses,
                                      user.label = obj.name)
+          if (pending.repeats > 1) {
+            answer.abort <- readline(prompt = "Abort pending repeats? yes/NO (y/n-): ")
+            if (answer.abort %in% c("y", "z")) {
+              pending.repeats <- 1
+            }
+          }
         } else {
           raw.mspct <- acq_raw_mspct(descriptor = descriptor,
                                      acq.settings = settings,
@@ -1066,7 +1072,7 @@ acq_irrad_interactive <-
 
         # Construct collection object and create plot of collection
         if (collect.and.save) {
-          message("Corrected ", qty.out, " spectra to collect: ",
+          message("Quantity \"", qty.out, "\" spectra to collect: ",
                   paste(irrad.names, collapse = ", "))
           message("Raw objects to collect: ",
                   paste(raw.names, collapse = ", "), sep = " ")
@@ -1231,7 +1237,7 @@ acq_irrad_interactive <-
 
         get.seq.settings <- grepl("^series", interface.mode)
 
-        loop.valid.answers <- c("q", "r", "m")
+        loop.valid.answers <- c("q", "r", "m", "n")
         loop.prompt <- "quit/repeat-/NEW-MEASUREMENT (q/r/m-): "
         repeat {
           answer2 <- readline(loop.prompt)[1]

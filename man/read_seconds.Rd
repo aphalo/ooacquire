@@ -4,7 +4,13 @@
 \alias{read_seconds}
 \title{Read a duration as seconds from the user}
 \usage{
-read_seconds(prompt, n.max = 1L, pattern = "[,;S]", minimum = 0)
+read_seconds(
+  prompt,
+  n.max = 1L,
+  pattern = "[,;S]",
+  pass.through = "",
+  minimum = 0
+)
 }
 \arguments{
 \item{prompt}{character Prompt displayed at the console.}
@@ -13,6 +19,10 @@ read_seconds(prompt, n.max = 1L, pattern = "[,;S]", minimum = 0)
 
 \item{pattern}{character Passed to \code{gsub()}. Characters matched are
 substituted by a space.}
+
+\item{pass.through}{character Vector of strings that are returned as is.}
+
+\item{minimum}{numeric Vector of length one.}
 }
 \value{
 A \code{numeric} vector of lengths of time in seconds.
