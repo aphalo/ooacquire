@@ -641,6 +641,8 @@ f.trigger.message <- function(n = 1L) {
 #'   enough leading zeros to accommodate \code{max.idx}.
 #' @param max.idx integer vector of length one.
 #'
+#' @keywords internal
+#'
 format_idx <- function(idx, max.idx = NULL) {
   if (is.null(max.idx)) {
     max.idx <- max(idx)
@@ -648,4 +650,111 @@ format_idx <- function(idx, max.idx = NULL) {
   formatC(idx,
           width = trunc(log10(max.idx[1L] + 0.1) + 1),
           format = "d", flag = "0")
+}
+
+#' Read numbers from the user
+#'
+#' A character string is read from the command prompt. The string is split at
+#' white space and converted into \code{numeric}. If conversion fails NAs are
+#' returned. If the \code{numeric} vector is longer than \code{n.max} it is
+#' truncated.
+#'
+#' @param prompt character Prompt displayed at the console.
+#' @param n.max integer Maximum vector length to return.
+#' @param pattern character Passed to \code{gsub()}. Characters matched are
+#' substituted by a space.
+#'
+#' @keywords internal
+#'
+read_numbers <- function(prompt, n.max = 1L, pattern = "[,;S]") {
+  readline(prompt) |>
+    gsub(pattern, " ", x = _) |>
+    trimws() |>
+    strsplit( "\\s+") |>
+    unlist() |> print() |>
+    as.numeric() -> z
+
+  if (length(z) <= n.max) {
+    z
+  } else {
+    z[1:n.max]
+  }
+}
+
+#' Read a duration as seconds from the user
+#'
+#' A character string is read from the command prompt. The string is split at
+#' white space and converted into \code{period}. If conversion fails NAs are
+#' returned. If the \code{period} vector is longer than \code{n.max} it is
+#' truncated.
+#'
+#' @param prompt character Prompt displayed at the console.
+#' @param n.max integer Maximum vector length to return.
+#' @param pattern character Passed to \code{gsub()}. Characters matched are
+#' substituted by a space.
+#'
+#' @return A \code{numeric} vector of lengths of time in seconds.
+#'
+#' @keywords internal
+#'
+read_seconds <- function(prompt, n.max = 1L, pattern = "[,;S]", minimum = 0) {
+  repeat {
+    readline(prompt) |>
+      gsub(pattern, " ", x = _) |>
+      trimws() |>
+      strsplit( "\\s+") |>
+      unlist() -> z
+
+    z <- suppressWarnings(as.numeric(z))
+
+    if (length(z) & !anyNA(z) & all(z > minimum)) {
+      if (length(z) > n.max) {
+        message("Maximum of ", n.max, " value(s) accepted; ",
+                length(z) - n.max, " value(s) discarded!")
+        z <- z[1:n.max]
+      }
+      break()
+    }
+    message("Please, try again. Numbers or numbers followed by S; >= ",
+            minimum, "seconds")
+  }
+  z
+}
+
+#' Read period from the user
+#'
+#' A character string is read from the command prompt. The string is split at
+#' white space and converted into \code{period}. If conversion fails NAs are
+#' returned. If the \code{period} vector is longer than \code{n.max} it is
+#' truncated.
+#'
+#' @param prompt character Prompt displayed at the console.
+#' @param n.max integer Maximum vector length to return.
+#' @param pattern character Passed to \code{gsub()}. Characters matched are
+#' substituted by a space.
+#'
+#' @return A \code{period} vector of lengths of time, negative times such as
+#' -1S are interpreted as 1 second (sign is dropped).
+#' .
+#'
+#' @keywords internal
+#'
+read_period <- function(prompt, n.max = 1L, pattern = "[,;]") {
+  repeat {
+    readline(prompt) |>
+      gsub(pattern, " ", x = _) |>
+      trimws() |>
+      strsplit( "\\s+") |>
+      unlist() |>
+      lubridate::period() -> z
+
+    if (length(z) & !anyNA(z)) {
+      if (length(z) > n.max) {
+        z <- z[1:n.max]
+      }
+      break()
+    }
+    message("Please, try again. Numbers followed by S, M, or H.\n6S = 6 seconds, 10M12S = 10 minutes 12 seconds.")
+  }
+  z
 }

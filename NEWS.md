@@ -4,9 +4,24 @@ editor_options:
     wrap: 72
 ---
 
-# ooacquire 0.4.3-2 (2023-12-xx)
+# ooacquire 0.4.4 (2024-01-11)
 
--   Tweak menus to be narrower and more informative.
+**The new features allowing measurement of time series of thousands of spectra at a
+very fast rate are easily affected by glitches in the USB connection. If the
+acquisition hangs from time to time, a high quality and short USB cable with
+ferrite beads is likely to help.**
+
+-   Edit menus used in in `acq_irrad_interactive()` to be narrower and more 
+    informative.
+-   Improve interactive input of `numeric` and `period` values, so that bad 
+    input is handled gracefully.
+-   Add activity messages to keep the user informed about time-consuming 
+    activities (several activity messages are shown only for long time series).
+-   Decrease the default maximum number of spectra per plot to speed up user
+    interaction.
+-   Update in 'photobiology' 0.11.0 improves/fixes handling of metadata.
+-   Update in 'photobiology' 0.11.1 improves the speed of plotting sampled
+    time series.
 
 # ooacquire 0.4.3 (2023-12-28)
 

@@ -15,3 +15,4 @@ enough leading zeros to accommodate \code{max.idx}.}
 \description{
 Format index with enough leading zeros
 }
+\keyword{internal}
