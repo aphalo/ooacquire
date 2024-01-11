@@ -15,7 +15,9 @@ read_period(prompt, n.max = 1L, pattern = "[,;]")
 substituted by a space.}
 }
 \value{
-A \code{period} vector of lengths of time.
+A \code{period} vector of lengths of time, negative times such as
+-1S are interpreted as 1 second (sign is dropped).
+.
 }
 \description{
 A character string is read from the command prompt. The string is split at

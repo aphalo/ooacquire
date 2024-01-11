@@ -664,7 +664,12 @@ format_idx <- function(idx, max.idx = NULL) {
 #' @keywords internal
 #'
 read_numbers <- function(prompt, n.max = 1L, pattern = "[,;]") {
-  readline(prompt) |>
+  y <- readline(prompt)
+  if (y == "") {
+    return(numeric())
+  }
+
+  y |>
     gsub(pattern, " ", x = _) |>
     trimws() |>
     strsplit( "\\s+") |>
@@ -696,7 +701,12 @@ read_numbers <- function(prompt, n.max = 1L, pattern = "[,;]") {
 #'
 read_seconds <- function(prompt, n.max = 1L, pattern = "[,;S]", minimum = 0) {
   repeat {
-    readline(prompt) |>
+    y <- readline(prompt)
+    if (y == "") {
+      return(numeric())
+    }
+
+    y |>
       gsub(pattern, " ", x = _) |>
       trimws() |>
       strsplit( "\\s+") |>
@@ -738,7 +748,12 @@ read_seconds <- function(prompt, n.max = 1L, pattern = "[,;S]", minimum = 0) {
 #'
 read_period <- function(prompt, n.max = 1L, pattern = "[,;]") {
   repeat {
-    readline(prompt) |>
+    y <- readline(prompt)
+    if (y == "") {
+      return(period())
+    }
+
+    y |>
       gsub(pattern, " ", x = _) |>
       trimws() |>
       strsplit( "\\s+") |>

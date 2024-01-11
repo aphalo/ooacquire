@@ -4,7 +4,7 @@
 \alias{read_seconds}
 \title{Read a duration as seconds from the user}
 \usage{
-read_seconds(prompt, n.max = 1L, pattern = "[,;S]")
+read_seconds(prompt, n.max = 1L, pattern = "[,;S]", minimum = 0)
 }
 \arguments{
 \item{prompt}{character Prompt displayed at the console.}

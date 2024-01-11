@@ -4,7 +4,7 @@
 \alias{read_numbers}
 \title{Read numbers from the user}
 \usage{
-read_numbers(prompt, n.max = 1L, pattern = "[,;S]")
+read_numbers(prompt, n.max = 1L, pattern = "[,;]")
 }
 \arguments{
 \item{prompt}{character Prompt displayed at the console.}
