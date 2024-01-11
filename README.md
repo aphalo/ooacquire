@@ -104,7 +104,7 @@ through all processing steps. Most of these metadata are also available
 in the header of data files created with software from Ocean Insight.
 When raw-counts data are read from files, these metadata are read and
 saved to the objects together with the data. The aim is to make
-traceabilty of the origin of the data automatic.
+traceability of the origin of the data automatic.
 
 ## Technical aspects
 
@@ -112,17 +112,24 @@ Package **‘rOmniDriver’** makes available in R the API functions from
 the *OmniDriver SDP* by wrapping the Java calls in R functions of the
 same name and doing argument type conversions when needed. *OmniDriver*
 allows to change settings and acquire spectra using most Ocean Optics
-USB-connected spectrometer. *As support from some older devices has been
+USB-connected spectrometers. *As support for some older devices has been
 discontinued in recent versions of *OmniDriver*, to use, for example,
 the formerly very popular USB2000 spectrometer, it is necessary to
 install an old version of *OmniDriver* instead of the current one.*
 
 ## Installation of the released version
 
-*The ‘ooacquire’ package should be installed only after the system
+*The ‘ooacquire’ package should be preferably installed after the system
 requirements are met by installing drivers and software required at the
 operating system level. Please, read carefully the whole installation
 instructions before attempting to install this package.*
+
+*Some of the systems requirements need to be installed only for direct
+connection of spectrometers. If spectral data will be input from files
+on disk to do computations rather than acquired from a connected
+spectrometer, installation of the OmniDriver runtime, package
+‘rOmniDriver’ and their respective dependencies can be skipped.
+‘ooacuire’ detects their absence and switches to an “off-line” mode.*
 
 The package is not hosted in CRAN, but instead at a private “CRAN-like”
 repository. In recent versions of R an option can be set to make this
@@ -145,10 +152,10 @@ Installation of Java/Temurin and OmniDriver should be done first.
 2.  **rOmniDriver run-time** from Ocean Optics which is a free download.
     It is the same installer as for the non-free SDP, but if run-time is
     selected during installation no key/password are asked for.
-3.  Install ‘ooacquire’ after setting the `repos` option, which ensures
-    dependencies will be installed automatically. Once the option is set
-    installation is as for packages hosted at CRAN. Using the menu entry
-    in RStudio or RGui or the code below.
+3.  Install ‘rOmniDriver’ and ‘ooacquire’ after setting the `repos`
+    option, which ensures dependencies will be installed automatically.
+    Once the option is set, installation is as for packages hosted at
+    CRAN. Using the menu entry in RStudio or RGui or the code below.
 
 ``` r
 install.packages("ooacquire")
@@ -271,8 +278,7 @@ Guide* and a description of the algorithms.
 
 The API documentation for the *OmniDriver SDP* is available from Ocean
 Insight
-[on-line](https://www.oceaninsight.com/globalassets/catalog-blocks-and-images/software-downloads-installers/javadocs-api/omnidriver/index.html "API")
-from Ocean Insight.
+[on-line](https://www.oceaninsight.com/globalassets/catalog-blocks-and-images/software-downloads-installers/javadocs-api/omnidriver/index.html "API").
 
 News about updates are regularly posted at
 (<https://www.r4photobiology.info/>).
@@ -293,7 +299,7 @@ citation("ooacquire")
 #> To cite package 'ooacquire' in publications use:
 #> 
 #>   Aphalo P, Ylianttila L (2023). _ooacquire: Acquire Data from OO
-#>   Spectrometers_. R package version 0.4.3,
+#>   Spectrometers_. R package version 0.4.3-2,
 #>   https://github.com/aphalo/ooacquire,
 #>   <https://docs.r4photobiology.info/ooacquire/>.
 #> 
@@ -303,7 +309,7 @@ citation("ooacquire")
 #>     title = {ooacquire: Acquire Data from OO Spectrometers},
 #>     author = {Pedro J. Aphalo and Lasse Ylianttila},
 #>     year = {2023},
-#>     note = {R package version 0.4.3, 
+#>     note = {R package version 0.4.3-2, 
 #> https://github.com/aphalo/ooacquire},
 #>     url = {https://docs.r4photobiology.info/ooacquire/},
 #>   }
@@ -311,7 +317,7 @@ citation("ooacquire")
 
 ## License
 
-© 2016-2023 Pedro J. Aphalo (<pedro.aphalo@helsinki.fi>) for the code.
+© 2016-2024 Pedro J. Aphalo (<pedro.aphalo@helsinki.fi>) for the code.
 Lasse Ylianttila developed the majority of the algorithms used. Released
 under the GPL, version 2 or greater. This software carries no warranty
 of any kind.

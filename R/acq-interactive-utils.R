@@ -85,7 +85,8 @@ tune_interactive <- function(descriptor,
   tuned <- FALSE
   repeat{
     acq.settings.string <-
-      sprintf("Acq: integ. = %.3gS, saturation = %.2f, tot. range = %.3g-%.3gS, HDR mult. = %s\n",
+      sprintf("Acq: %s = %.3gS, saturation = %.2f, tot. range = %.3g-%.3gS, HDR mult. = %s\n",
+              ifelse(tuned, "integ(??)", "integ(OK)"),
               acq.settings[["integ.time"]][1] * 1e-6,
               acq.settings[["target.margin"]],
               min(acq.settings[["tot.time.range"]]) * 1e-6,
@@ -135,8 +136,8 @@ tune_interactive <- function(descriptor,
                                         acq.settings = acq.settings)
       tuned <- TRUE
     } else if (answ == "f") {
-      cat("Integration time(s) (seconds): ")
-      user.integ.time <- scan(nmax = 4L) * 1e6
+      user.integ.time <- read_seconds("Integration time(s) (seconds): ", n.max = 4)
+      user.integ.time <- user.integ.time * 1e6 # seconds -> microseconds
       if (length(user.integ.time) >= 1) {
         acq.settings <- set_integ_time(acq.settings = acq.settings,
                                        integ.time = user.integ.time)
@@ -145,8 +146,7 @@ tune_interactive <- function(descriptor,
         cat("Value not changed!\n")
       }
     } else if (answ == "s") {
-      margin <- readline(sprintf("Saturation margin = %.2g, new: ",
-                                 acq.settings[["target.margin"]]))
+      margin <- readline("Saturation safety margin [0..1]: ")
       margin <- try(as.numeric(margin))[1]
       if (!is.na(margin) && margin >= 0 && margin < 1) {
         acq.settings[["target.margin"]] <- margin
@@ -155,8 +155,8 @@ tune_interactive <- function(descriptor,
         cat("Request ignored: value not in 0..1 range\n")
       }
     } else if (answ == "r") {
-      cat("Total time range (seconds), 1 or 2 numbers: ")
-      tot.time.range <- scan(nmax = 2) * 1e6
+      tot.time.range <- read_seconds("Total time range (seconds), 1 or 2 numbers: ", n.max = 2)
+      tot.time.range <- tot.time.range * 1e6
       if (length(tot.time.range) >= 1) {
         tot.time.range <- range(tot.time.range)
         if (tot.time.range[1] >= 0) {
@@ -170,8 +170,8 @@ tune_interactive <- function(descriptor,
       }
     }  else if (answ == "h") {
       old.hdr.mult.len <- length(acq.settings[["HDR.mult"]])
-      cat("HDR multipliers, 1 to 4 numbers: ")
-      HDR.mult <- sort(scan(nmax = 4))
+      HDR.mult <- read_numbers("HDR multipliers, 1 to 4 numbers: ", n.max = 4)
+      HDR.mult <- sort(HDR.mult)
       if (length(HDR.mult) >= 1 &&
           HDR.mult[1] >= 0  && HDR.mult[length(HDR.mult)] < 1000) {
         acq.settings[["HDR.mult"]] <- HDR.mult
@@ -428,7 +428,7 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
   check.step.delay <- function(step, time.div) {
     if (time.division > 0) {
       num.time.divs <- (step + 1e-7) %/% time.division # protect from loss of precision
-      if (num.time.divs < 2) {
+      if (num.time.divs < 1) {
         step <- 0
       } else {
         step <- time.division * num.time.divs
@@ -487,9 +487,10 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
     if (answ == "?") {
       cat(help.text)
     } else if (substr(answ, 1, 1) == "w") {
-      step <- readline(sprintf("Wait = %.3gS, new: ",
-                               seq.settings[["initial.delay"]]))
-      step <- period(step)
+      step <- read_period("Wait before starting, new: ", n.max = 1)
+      # step <- readline(sprintf("Wait = %.3gS, new: ",
+      #                          seq.settings[["initial.delay"]]))
+      # step <- period(step)
       if (!is.na(step)) {
         step <- as.numeric(step) # period to seconds
         seq.settings[["initial.delay"]] <- step
@@ -497,28 +498,24 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
         cat("Imitial delay value not changed!\n")
       }
     } else if (substr(answ, 1, 1) == "b") {
-      time.unit <- readline(sprintf("Start at next %s, new: ",
-                                    seq.settings[["start.boundary"]]))
-      if (grepl("^none$", time.unit) || !is.na(lubridate::period(time.unit))) {
+      time.unit <- read_period("Start when time is divisible by:", n.max = 1)
+      if (!is.na(lubridate::period(time.unit))) {
         seq.settings[["start.boundary"]] <- time.unit
       } else {
         cat("Start-boundary Value not changed!\n")
       }
     } else if (substr(answ, 1, 1) == "s") {
-      step <- readline(sprintf("Step = %.3gS, new: ",
-                               seq.settings[["step.delay"]]))
-      step <- lubridate::period(step)
+      step <- read_period("Acquisition time step: ", n.max = 1)
       if (!is.na(step)) {
         step <- as.numeric(step) # period to seconds
         seq.settings$step.delay <-
           check.step.delay(step, time.division)
-        cat("Time step set to", signif(seq.settings$step.delay, 3), "s\n")
+        cat("Time step set to ", step, ", ", signif(seq.settings$step.delay, 3), "s\n")
       } else {
         cat("Time step value not changed!\n")
       }
     } else if (substr(answ, 1, 1) == "r") {
-      num.steps <- readline(sprintf("Repeats = %i spectra, new: ",
-                                    seq.settings[["num.steps"]]))
+      num.steps <- readline("Number of spectra in series: ")
       num.steps <- try(as.integer(num.steps))
       if (is.na(num.steps)) {
         cat("Number of spectra must be a positive integer. Value not changed!\n")
@@ -666,7 +663,7 @@ format_idx <- function(idx, max.idx = NULL) {
 #'
 #' @keywords internal
 #'
-read_numbers <- function(prompt, n.max = 1L, pattern = "[,;S]") {
+read_numbers <- function(prompt, n.max = 1L, pattern = "[,;]") {
   readline(prompt) |>
     gsub(pattern, " ", x = _) |>
     trimws() |>
