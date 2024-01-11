@@ -86,7 +86,7 @@ tune_interactive <- function(descriptor,
   repeat{
     acq.settings.string <-
       sprintf("Acq: %s = %.3gS, saturation = %.2f, tot. range = %.3g-%.3gS, HDR mult. = %s\n",
-              ifelse(tuned, "integ(??)", "integ(OK)"),
+              ifelse(tuned, "integ(OK)", "integ(??)"),
               acq.settings[["integ.time"]][1] * 1e-6,
               acq.settings[["target.margin"]],
               min(acq.settings[["tot.time.range"]]) * 1e-6,
@@ -104,7 +104,7 @@ tune_interactive <- function(descriptor,
       if (answ %in% valid.input) {
         break()
       }
-      cat("Unrecognized letter: '", answ, "'. Please, try again...\n")
+      cat("Unrecognized input: '", answ, "'. Please, try again...\n")
     }
     if (answ == "") {
       answ <- ifelse(!tuned, default.input[1], default.input[2])
@@ -280,7 +280,7 @@ protocol_interactive <- function(protocols,
 list_srs_interactive <- function(w) {
   if (is.null(w)) return(list())
   while (rOmniDriver::number_srs(w) < 1L) {
-    answ <- readline("Connect spectrometer to USB port. <enter> = try again, z = abort (-/z):")
+    answ <- readline("Connect spectrometer to USB port. <enter> = try again, z = abort (-/z): ")
     if (answ[1] %in% c("z", "Z")) {
       break()
     }
@@ -472,55 +472,61 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
     }
     # display current settings before prompt for user input
     seq.settings.string <-
-           sprintf("Seq: wait = %.3gS, boundary = %s, step = %.3gS, reps = %i \n",
+           sprintf("Seq: wait = %.3gS, boundary = %s, step-len = %.3gS, step-reps = %i \n",
                    seq.settings[["initial.delay"]],
                    seq.settings[["start.boundary"]],
                    seq.settings[["step.delay"]],
                    seq.settings[["num.steps"]])
     cat(seq.settings.string)
 
-    answ <- readline(prompt = "wait/boundary/step-len/step-reps/undo/help/GO (w/b/s/r/u/?/m-): ")
+    answ <- readline(prompt = "wait/boundary/step-len/step-reps/undo/help/GO (w/b/s/r/u/?/g-): ")
 
-    if (answ %in% c("", "m")) {
+    if (answ %in% c("", "m", "g")) {
       break()
     }
     if (answ == "?") {
       cat(help.text)
     } else if (substr(answ, 1, 1) == "w") {
-      step <- read_period("Wait before starting, new: ", n.max = 1)
+      step <- read_period("Wait before series start (period): ", n.max = 1)
       # step <- readline(sprintf("Wait = %.3gS, new: ",
       #                          seq.settings[["initial.delay"]]))
       # step <- period(step)
-      if (!is.na(step)) {
+      if (!is.na(step) && length(step)) {
         step <- as.numeric(step) # period to seconds
         seq.settings[["initial.delay"]] <- step
       } else {
-        cat("Imitial delay value not changed!\n")
+        cat("Wait value not changed!\n")
       }
     } else if (substr(answ, 1, 1) == "b") {
-      time.unit <- read_period("Start when time is divisible by:", n.max = 1)
-      if (!is.na(lubridate::period(time.unit))) {
-        seq.settings[["start.boundary"]] <- time.unit
+      time.boundary <- read_period("Time boundary for start of series (period): ",
+                                   n.max = 1,
+                                   pass.through = "none")
+      if (length(time.boundary) && !is.na(lubridate::period(time.boundary))) {
+        if (lubridate::is.period(time.boundary) && as.numeric(time.boundary) == 0) {
+          time.boundary <- "none"
+        }
+        seq.settings[["start.boundary"]] <- time.boundary
       } else {
         cat("Start-boundary Value not changed!\n")
       }
     } else if (substr(answ, 1, 1) == "s") {
-      step <- read_period("Acquisition time step: ", n.max = 1)
-      if (!is.na(step)) {
+      step <- read_period("Time-step length (period): ", n.max = 1)
+      if (length(step) && !is.na(step)) {
         step <- as.numeric(step) # period to seconds
         seq.settings$step.delay <-
           check.step.delay(step, time.division)
-        cat("Time step set to ", step, ", ", signif(seq.settings$step.delay, 3), "s\n")
+        cat("Time step = ", signif(seq.settings$step.delay, 3),
+            "s, adjusted from", step, ".\n", sep = "")
       } else {
         cat("Time step value not changed!\n")
       }
     } else if (substr(answ, 1, 1) == "r") {
-      num.steps <- readline("Number of spectra in series: ")
+      num.steps <- readline("Number of steps (1..10000): ")
       num.steps <- try(as.integer(num.steps))
       if (is.na(num.steps)) {
-        cat("Number of spectra must be a positive integer. Value not changed!\n")
+        cat("Expected a positive integer. Value not changed!\n")
       } else if (num.steps < 1L || num.steps > 10000L) {
-        warning("Number of spectra must be in range 1..10000. Value not changed!")
+        warning("Expected number within range 1..10000. Value not changed!")
       } else {
         seq.settings[["num.steps"]] <- num.steps
       }
@@ -660,13 +666,20 @@ format_idx <- function(idx, max.idx = NULL) {
 #' @param n.max integer Maximum vector length to return.
 #' @param pattern character Passed to \code{gsub()}. Characters matched are
 #' substituted by a space.
+#' @param pass.through character Vector of strings that are returned as is.
 #'
 #' @keywords internal
 #'
-read_numbers <- function(prompt, n.max = 1L, pattern = "[,;]") {
-  y <- readline(prompt)
+read_numbers <- function(prompt,
+                         n.max = 1L,
+                         pattern = "[,;]",
+                         pass.through = "") {
+  readline(prompt) |> trimws() -> y
+
   if (y == "") {
     return(numeric())
+  } else if (y %in% pass.through) {
+    return(y)
   }
 
   y |>
@@ -694,16 +707,25 @@ read_numbers <- function(prompt, n.max = 1L, pattern = "[,;]") {
 #' @param n.max integer Maximum vector length to return.
 #' @param pattern character Passed to \code{gsub()}. Characters matched are
 #' substituted by a space.
+#' @param pass.through character Vector of strings that are returned as is.
+#' @param minimum numeric Vector of length one.
 #'
 #' @return A \code{numeric} vector of lengths of time in seconds.
 #'
 #' @keywords internal
 #'
-read_seconds <- function(prompt, n.max = 1L, pattern = "[,;S]", minimum = 0) {
+read_seconds <- function(prompt,
+                         n.max = 1L,
+                         pattern = "[,;S]",
+                         pass.through = "",
+                         minimum = 0) {
   repeat {
-    y <- readline(prompt)
+    readline(prompt) |> trimws() -> y
+
     if (y == "") {
       return(numeric())
+    } else if (y %in% pass.through) {
+      return(y)
     }
 
     y |>
@@ -714,7 +736,7 @@ read_seconds <- function(prompt, n.max = 1L, pattern = "[,;S]", minimum = 0) {
 
     z <- suppressWarnings(as.numeric(z))
 
-    if (length(z) & !anyNA(z) & all(z > minimum)) {
+    if (length(z) & !anyNA(z) & all(z > minimum[1])) {
       if (length(z) > n.max) {
         message("Maximum of ", n.max, " value(s) accepted; ",
                 length(z) - n.max, " value(s) discarded!")
@@ -723,7 +745,7 @@ read_seconds <- function(prompt, n.max = 1L, pattern = "[,;S]", minimum = 0) {
       break()
     }
     message("Please, try again. Numbers or numbers followed by S; >= ",
-            minimum, "seconds")
+            minimum[1], "seconds")
   }
   z
 }
@@ -739,6 +761,7 @@ read_seconds <- function(prompt, n.max = 1L, pattern = "[,;S]", minimum = 0) {
 #' @param n.max integer Maximum vector length to return.
 #' @param pattern character Passed to \code{gsub()}. Characters matched are
 #' substituted by a space.
+#' @param pass.through character Vector of strings that are returned as is.
 #'
 #' @return A \code{period} vector of lengths of time, negative times such as
 #' -1S are interpreted as 1 second (sign is dropped).
@@ -746,11 +769,17 @@ read_seconds <- function(prompt, n.max = 1L, pattern = "[,;S]", minimum = 0) {
 #'
 #' @keywords internal
 #'
-read_period <- function(prompt, n.max = 1L, pattern = "[,;]") {
+read_period <- function(prompt,
+                        n.max = 1L,
+                        pattern = "[,;]",
+                        pass.through = "") {
   repeat {
-    y <- readline(prompt)
+    readline(prompt) |> trimws() -> y
+
     if (y == "") {
-      return(period())
+      return(lubridate::period())
+    } else if (y %in% pass.through) {
+      return(y)
     }
 
     y |>

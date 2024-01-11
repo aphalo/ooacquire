@@ -611,25 +611,24 @@ acq_irrad_interactive <-
           if (sequential.naming && file.counter > 0) {
             obj.name.prompt <-
               paste("Give a name to the spectrum (",
-                    current.base.obj.name, "#) : ", sep = "")
+                    current.base.obj.name, "#): ", sep = "")
           } else {
             obj.name.prompt <-
               "Give a name to the spectrum: "
           }
 
           repeat {
-            user.obj.name <- readline(obj.name.prompt)
-
+            readline(obj.name.prompt) |> trimws() -> user.obj.name
             if (user.obj.name == "" && current.sequential.naming) {
               # we reuse base.obj.name and keep counting
               reset.count <- FALSE
               sequential.naming <- TRUE
               user.obj.name <- base.obj.name
-            } else if (grepl("#$", user.obj.name)) {
+            } else if (grepl("#$|%$", user.obj.name)) {
               # we start the count using a new base.name
-              reset.count <- TRUE
+              reset.count <- grepl("#$", user.obj.name)
               sequential.naming <- TRUE
-              user.obj.name <- sub("#$", "", user.obj.name)
+              user.obj.name <- sub("#$|%$", "", user.obj.name)
             } else {
               # new name with no hash
               sequential.naming <- sequential.naming.required
@@ -638,7 +637,7 @@ acq_irrad_interactive <-
 
             base.obj.name <- make.names(user.obj.name)
             if (base.obj.name != user.obj.name) {
-              answ <- readline(paste("Use sanitised (base) name:", base.obj.name, " (y-/n) :"))
+              answ <- readline(paste("Use sanitised (base) name '", base.obj.name, "'? (y-/n): "))
               if (answ == "n") {
                 base.obj.name <- current.base.obj.name
                 next()
@@ -683,7 +682,7 @@ acq_irrad_interactive <-
             break()
           } else {
             # operator likely present
-            if (readline(paste("Overwrite existing: '", irrad.name, ". (y/n-) :"))[1] == "y") {
+            if (readline(paste("Overwrite existing '", irrad.name, "? (y/n-): "))[1] == "y") {
               irrad.names <- setdiff(irrad.names, irrad.name)
               raw.names <- setdiff(raw.names, raw.name)
               break()

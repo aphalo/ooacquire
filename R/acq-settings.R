@@ -196,15 +196,15 @@ set_integ_time <- function(acq.settings,
   acq.settings$rel.signal = NA_real_
 
   if (verbose) {
-    message("Relative saturation: ",
-            format(acq.settings$rel.signal, width = 10, digits = 3), " ")
-    message("Integration times (ms): ",
-            format(acq.settings$integ.time * 1e-3, nsmall = 0, width = 10, digits = 3), " ")
-    message("Numbers of scans:       ",
-            format(acq.settings$num.scans, width = 10, digits = 3), " ")
-    message("Total time (s):         ",
-            format(acq.settings$tot.time * 1e-6,
-                   digits = 3, width = 10), " ")
+    cat("Relative saturation: ",
+        format(acq.settings$rel.signal, width = 10, digits = 3), "\n")
+    cat("Integration times (s): ",
+        format(acq.settings$integ.time * 1e-6, nsmall = 0, width = 10, digits = 3), "\n")
+    cat("Numbers of scans:       ",
+        format(acq.settings$num.scans, width = 10, digits = 3), "\n")
+    cat("Total time (s):         ",
+        format(acq.settings$tot.time * 1e-6,
+               digits = 3, width = 10), "\n")
   }
   acq.settings
 }
@@ -289,7 +289,8 @@ tune_acq_settings <- function(descriptor,
                               acq.settings,
                               verbose = TRUE) {
   if (getOption("ooacquire.offline", TRUE)) {
-    warning("Package 'rOmniDriver' required to access spectrometer. Tuning skipped.")
+    warning("Package 'rOmniDriver' required to access spectrometer. Tuning skipped.",
+            call. = FALSE)
     return(acq.settings)
   }
   # old objects are missing this field, so we set it to retain old behaviour
@@ -335,7 +336,7 @@ tune_acq_settings <- function(descriptor,
   i <- 0L
   repeat {
     if (verbose) {
-      message("Integration time (ms): ", format(integ.time  * 1e-3))
+      cat("Trying integration time (s): ", format(integ.time  * 1e-6), "\n")
     }
     repeat {
       rOmniDriver::set_integration_time(descriptor$w,
@@ -358,7 +359,7 @@ tune_acq_settings <- function(descriptor,
       if (integ.time < x$min.integ.time) {
         break()
       }
-      if (verbose) message("Clipping! Trying (ms): ", format(integ.time  * 1e-3))
+      if (verbose) cat("Clipping! Trying (ms): ", format(integ.time  * 1e-3), "\n")
       rOmniDriver::set_integration_time(descriptor$w,
                                         integ.time,
                                         descriptor$sr.index,
@@ -371,9 +372,9 @@ tune_acq_settings <- function(descriptor,
       dark.counts <- nl.fun(min(raw.counts[x$pix.selector]))
       max.counts <- nl.fun(max(raw.counts[x$pix.selector]))
     }
-    if (verbose) message(paste("max.counts[", i, "]: ", format(max.counts)))
+    if (verbose) cat("max counts [", i, "]: ", format(max.counts), "\n", sep = "")
     if (max.counts < target.min.counts && integ.time < x$max.integ.time) {
-      if (verbose) message("max count <", trunc(target.min.counts))
+      if (verbose) cat("max counts <", trunc(target.min.counts), "\n", sep = "")
       # replaced round with trunc as the algorithm was sometimes overshooting
       integ.time <- trunc(integ.time *
                             (target.counts - dark.counts) /
@@ -383,8 +384,8 @@ tune_acq_settings <- function(descriptor,
     if (integ.time >= x$max.integ.time) {
       integ.time <- x$max.integ.time
       if (verbose) {
-        warning("Light level is too low for optimal performance! Using (ms): ",
-                format(integ.time * 1e-3))
+        warning("Light level is too low for optimal performance! Using (s): ",
+                format(integ.time * 1e-6), call. = FALSE)
       }
       break()
     }
@@ -393,11 +394,11 @@ tune_acq_settings <- function(descriptor,
       integ.time = x$min.integ.time
       if (verbose) {
         if (max(raw.counts[x$pix.selector]) >= descriptor$max.counts ) {
-          warning("Clipping cannot be avoided! Using (ms): ",
-                  format(integ.time * 1e-3))
+          warning("Clipping cannot be avoided! Using (s): ",
+                  format(integ.time * 1e-6), call. = FALSE)
         } else {
-          warning("Low headroom, clipping likely! Using (ms): ",
-                  format(integ.time * 1e-3))
+          warning("Low headroom, clipping likely! Using (s): ",
+                  format(integ.time * 1e-6), call. = FALSE)
         }
       }
       break()
@@ -428,15 +429,15 @@ tune_acq_settings <- function(descriptor,
   acq.settings$rel.signal = max.counts / nl.fun(descriptor$max.counts)
 
   if (verbose) {
-    message("Relative saturation: ",
-            format(acq.settings$rel.signal, width = 10, digits = 3), " ")
-    message("Integration times (ms): ",
-            format(acq.settings$integ.time * 1e-3, nsmall = 0, width = 10, digits = 3), " ")
-    message("Numbers of scans:       ",
-            format(acq.settings$num.scans, width = 10, digits = 3), " ")
-    message("Total time (s):         ",
-            format(acq.settings$tot.time * 1e-6,
-                   digits = 3, width = 10), " ")
+    cat("Relative saturation: ",
+        format(acq.settings$rel.signal, width = 10, digits = 3), "\n")
+    cat("Integration times (s): ",
+        format(acq.settings$integ.time * 1e-6, nsmall = 0, width = 10, digits = 3), "\n")
+    cat("Numbers of scans:       ",
+        format(acq.settings$num.scans, width = 10, digits = 3), "\n")
+    cat("Total time (s):         ",
+        format(acq.settings$tot.time * 1e-6,
+               digits = 3, width = 10), "\n")
   }
   acq.settings
 }

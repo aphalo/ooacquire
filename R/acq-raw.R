@@ -120,12 +120,12 @@ acq_raw_spct <- function(descriptor,
     if (x$num.scans[i] != actual.num.scans) {
       # We guard against failure to number of scans
       warning("The spectrometer has overridden the number of scans!")
-      # ensure validity of data in case of mismatche between actual setting
+      # ensure validity of data in case of mismatch between actual setting
       #   and intended setting
       x$num.scans[i] <- actual.num.scans
     }
 
-    if (verbose) message("Measurement x", acq.settings$HDR.mult[i], " ... ", appendLF = FALSE)
+    if (verbose) cat("Measurement x", acq.settings$HDR.mult[i], " ... ")
 
     # light source, e,g,, flash trigger
     if (num.exposures[i] > 0L  && !is.null(f.trigger.pulses)) {
@@ -140,7 +140,7 @@ acq_raw_spct <- function(descriptor,
       j <- j + 1L
       counts <- rOmniDriver::get_spectrum(y$w, y$sr.index, y$ch.index)
       if (!all(counts == 0) && rOmniDriver::is_spectrum_valid(y$w, y$sr.index, y$ch.index)) {
-        if (verbose) message("ready.")
+        if (verbose) cat("ready.\n")
         break()
       } else if (j > max.attempts) {
         counts <- rep_len(NA_real_, length(counts))
@@ -267,7 +267,9 @@ acq_raw_mspct <- function(descriptor,
                           ...) {
 
   if (getOption("ooacquire.offline", TRUE)) {
-    warning("Package 'rOmniDriver' required to access spectrometer. Data acquisition skipped.")
+    warning("Package 'rOmniDriver' required to access spectrometer.",
+            " Data acquisition skipped.",
+            call. = FALSE)
     return(raw_mspct())
   }
 
@@ -324,7 +326,8 @@ acq_raw_mspct <- function(descriptor,
       f.current <- NULL
     }
     if (p == "light") {
-      if (seq.settings[["start.boundary"]] == "none") {
+      if (is.character(seq.settings[["start.boundary"]]) &&
+          seq.settings[["start.boundary"]] == "none") {
         times <- lubridate::now(tzone = "UTC") +
           lubridate::milliseconds(10) +
           lubridate::seconds(steps)
@@ -346,19 +349,21 @@ acq_raw_mspct <- function(descriptor,
 
     if (verbose && p == "light") {
       if (high.speed) {
-        message("Buffered series of ", seq.settings[["num.steps"]], " starting at ",
-                strftime(times[1], format = "%H:%M:%OS", usetz = TRUE),
-               " (\"quiet\")")
+        cat("Buffered series of ", seq.settings[["num.steps"]], " starting at ",
+            strftime(times[1], format = "%H:%M:%OS", usetz = TRUE),
+            " (\"quiet\")\n")
       } else if (all(seq.settings[["step.delay"]] == 0) && length(times) > 1L) {
-        message("Fast series  of ", seq.settings[["num.steps"]], " starting at ",
-                strftime(times[1], format = "%H:%M:%OS", usetz = TRUE),
-                " (\"quiet\")")
+        cat("Fast series  of ", seq.settings[["num.steps"]], " starting at ",
+            strftime(times[1], format = "%H:%M:%OS", usetz = TRUE),
+            " (\"quiet\")\n")
       } else if (length(times) > 1L) {
-        message("Timed series of ", length(times), " from ",
-                strftime(times[1], format = "%H:%M:%OS", usetz = TRUE), " to ",
-                strftime(times[length(times)], format = "%H:%M:%OS", usetz = TRUE))
+        cat("Timed series of ", length(times), " from ",
+            strftime(times[1], format = "%H:%M:%OS", usetz = TRUE), " to ",
+            strftime(times[length(times)], format = "%H:%M:%OS", usetz = TRUE),
+            "\n")
       } else if (steps[1] > 1) {
-        message("Timed acquisition at ", strftime(times[1], format = "%H:%M:%OS", usetz = TRUE))
+        cat("Timed acquisition at ", strftime(times[1], format = "%H:%M:%OS", usetz = TRUE),
+            "\n")
       }
     }
 
@@ -429,21 +434,22 @@ acq_raw_mspct <- function(descriptor,
       unlist(photobiology::when_measured(z[light.spectra.idx])[["when.measured"]],
              use.names = FALSE)
     actual.steps <- round(diff(actual.times), 3) # rounded to millisecond
-    message("Realized series of ",
-            length(actual.times),
-            " from ",
-            strftime(actual.times[1], format = "%H:%M:%OS", usetz = TRUE),
-            " to ",
-            strftime(actual.times[length(actual.times)],
-                     format = "%H:%M:%OS", usetz = TRUE))
-    message(length(actual.steps), " time intervals (min, median, max): ",
-            paste(format(c(min(actual.steps),
-                           stats::median(actual.steps),
-                           max(actual.steps))),
-                  collapse = ", "))
-    message("Elapsed time ", format(end.time - start.time, digits = 4),
-            "; from ", strftime(start.time, format = "%H:%M:%OS", usetz = TRUE),
-            " to ",  strftime(end.time, format = "%H:%M:%OS", usetz = TRUE))
+    cat("Realized series of ",
+        length(actual.times),
+        " from ",
+        strftime(actual.times[1], format = "%H:%M:%OS", usetz = TRUE),
+        " to ",
+        strftime(actual.times[length(actual.times)],
+                 format = "%H:%M:%OS", usetz = TRUE), "\n")
+    cat(length(actual.steps), " time intervals (min, median, max): ",
+        paste(format(c(min(actual.steps),
+                       stats::median(actual.steps),
+                       max(actual.steps))),
+              collapse = ", "), "\n")
+    cat("Elapsed time ", format(end.time - start.time, digits = 4),
+        "; from ", strftime(start.time, format = "%H:%M:%OS", usetz = TRUE),
+        " to ",  strftime(end.time, format = "%H:%M:%OS", usetz = TRUE),
+        "\n")
   }
   z
 }
