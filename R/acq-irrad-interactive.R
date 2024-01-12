@@ -61,23 +61,25 @@
 #'   expressed per pulse of illumination. The acquisition of both individual
 #'   spectra and time series of spectra are supported.
 #'
+#'   A tutorial guiding on the use of this function, illustrated with diagrams,
+#'   is available at \url{https://www.r4photobiology.info/pages/acq-irrad-tutorial.html}.
+#'   A summary is provided below.
+#'
 #'   Different arguments passed to \code{interface.mode} modify which aspects
 #'   of the user interface are available through menues, without altering
 #'   the ability to control the behaviour through arguments passed to formal
 #'   parameters when calling the function (see section Interface Modes for
 #'   details).
 #'
-#'   This function can be used to acquire spectra using different protocols for
+#'   This function can acquire spectra using different protocols for
 #'   acquisition and stray light and dark corrections. The protocols are
 #'   described in the vignettes and in the help for the low-level functions
 #'   called by this function, also from this same package.
 #'
-#'   Using this function only requires an Ocean Optics spectrometer to be
-#'   connected to the computer where R is running and the OmniDriver runtime
-#'   from Ocean Insight installed. The connection to the spectrometer and
-#'   selection of channel, when relevant, is done from within this function.
+#'   Opening the connection to the spectrometer and selection of the channel,
+#'   when relevant, is done from within this function.
 #'
-#'   The irradiance calibration will be retrieved from the spectrometer memory
+#'   The irradiance calibration is retrieved from the spectrometer memory
 #'   as a last resource if not supplied in any other way. Given that the factors
 #'   are stored by Ocean Optics in a format that ignores the entrance optics,
 #'   either the effective cosine diffuser area in xxx should be passed to
@@ -89,9 +91,7 @@
 #'   Three main protocols and two variations are available by default. They
 #'   differ in the additional measurements done to correct for stray light and
 #'   dark noise and in the sequence in which they are acquired. In most
-#'   situations least one of the default protocols is suitable. If new protocols
-#'   are passed argument, each character vector must contain strings named
-#'   "light", "filter" and "dark".
+#'   situations, at least one of the default protocols is suitable.
 #'
 #'   In the case of spectral irradiance, the default is to set the integration
 #'   time automatically so that the number of counts at the highest peak is
@@ -99,12 +99,13 @@
 #'   instrument detector (retrieved from the calibration or the instrument
 #'   memory). The minimum \code{tot.time} is obtained by increasing the number
 #'   of scans. The maximum integration time supported by the spectrometer cannot
-#'   exceeded.
+#'   be exceeded but multiple scans can be averaged.
 #'
 #'   In the case of spectral fluence the default is for the integration time to
 #'   be set manually and for a message to be displayed asking for the light
 #'   pulse to be manually triggered. It is possible to override the default
-#'   function by one that triggers the light source automatically.
+#'   function by one that triggers the light source automatically when suitable
+#'   hardware is available.
 #'
 #'   Repeated measurements are converted into physical units immediately after
 #'   acquisition and saved to file on disk. Each repeated measurement can be
@@ -123,38 +124,44 @@
 #'   The \code{initial.delay} is numeric and gives a minimum delay in
 #'   seconds before the start of measurements with a default of 0s.
 #'
-#'   The \code{step.delay} is numeric and gives the delay in seconds between
+#'   The \code{step.delay} is numeric and gives the length of time between
 #'   successive "light" measurements. The value entered by the user is adjusted
-#'   based on the estimated duration of individual spectral acquisition. In most
-#'   cases a vector of length one is used as time delta in seconds. Any vector
+#'   based on the estimated duration of individual spectrum acquisition. In most
+#'   cases a vector of length one is used as time step lengths in seconds. Any vector
 #'   shorter than the number of steps will be extended with \code{rep_len()},
 #'   and the values interpreted as the time increment in seconds between the
 #'   start of successive measurements. If the length is the same as "num.steps",
 #'   and the values are monotonically increasing, they are interpreted as time
 #'   offsets from the start of the sequence. Member
 #'
-#'   The \code{start.boundary} must be set to "none", "second", "minute" or
-#'   "hour" indicating the unit to which the start of the series should be
-#'   scheduled, e.g., the next minute and 0s, for "minute".
+#'   The \code{start.boundary} must be set to a character string, wither "none",
+#'   or a number of seconds, minutes or hours indicated by a number followed by
+#'   S, M, or H (capital letters) the round value of the current time at which
+#'   the measurement event will start. For example,\code{1H} indicates that
+#'   measurements should be scheduled to start exactly at the hour, and
+#'   \code{5M} at the next time the minutes in the current time are divisible by
+#'   5.
 #'
-#'   The \code{num.steps} must be an integer between 1 and a few thousands
-#'   indicating the number of time steps in the series. The maximum value
-#'   depends on the available memory. It is possible to set \code{qty.out =
-#'   "raw"} decreasing the memory requirement as well as the processing time, in
-#'   which case the conversion to physical units must be done later "off-line".
+#'   The \code{num.steps} must be an integer between 1 and an 100000
+#'   indicating the number of time points at which spectra should be acquired
+#'   for the time series. The maximum value depends on the available memory and
+#'   in many computers 5000 spectra is a more realistic limit than 100000.
+#'   Applying corrections and applying the calibration are computation intensive,
+#'   consequently for long series is wise to set `qty.out = "raw"` to speed up
+#'   the measurement session.
 #'
 #'   Plots are produced with functions from package 'ggspectra' and respect the
-#'   default annotations set with function \code{set_annotations_default()},
-#'   default wavebands set with function \code{set_w.band_default()}, and
-#'   irradiance quantities set with \code{photon_as_default()}, and
+#'   defaults for plot annotations set in R options. The options can be easily
+#'   set with functions \code{set_annotations_default()},
+#'   \code{set_w.band_default()}, \code{photon_as_default()}, and
 #'   \code{energy_as_default()}. The ggplots are not saved as 'gg' objects as
 #'   they contain redundant copies of the spectral data. They can be easily
 #'   recreated using function \code{autoplot()} after attaching package
 #'   'ggspectra'.
 #'
-#'   The screen display of plot can be disabled, as in some cases the delay
+#'   The screen display of plots can be disabled, as in some cases the delay
 #'   introduced by rendering can be a nuisance. Alternatively, the value of
-#'   \code{plot.lines.max} can be decreased from its default.
+#'   \code{plot.lines.max} can be changes from its default.
 #'
 #' @section Interface Modes:
 #'   Mode \strong{simple} displays a simplified user interface, supporting the
@@ -173,21 +180,21 @@
 #'   of individual spectra and time series of irradiance spectra. Integration
 #'   time can adjusted automatically but also set manually.
 #'
-#'   All these modes with \strong{-attr} appended, enable a menue and dialogues
+#'   All these modes with \strong{-attr} appended, enable a menu and dialogues
 #'   that make it possible to set the values stored in attributes \code{comment}
-#'   and \code{what.measure} interactively for each data acquisition.
+#'   and \code{what.measure} interactively.
 #'
 #'   All modes support repeated measurements with unchanged acquisition settings
 #'   reusing the reference spectra ('dark' and 'filter') from the most recent
 #'   previous measurement.
 #'
-#' @section Object names:
-#' Object names entered interactively are sanitized if necessary. Sequentially
-#' numbered object names are enabled by appending "#" to the desired base name.
-#' As long as no new name is entered, the sequence continues. If a new name is
-#' entered, numbering restarts at 001 or stops depending on whether the new name
-#' ends in "#" or not. In the case of repeated measurements, sequential
-#' numbering is enforced to ensure unique names.
+#' @section Object names: Object names entered interactively are sanitized if
+#'   necessary. Sequentially numbered object names are enabled by appending "#"
+#'   to the desired base name. As long as no new name is entered, the sequence
+#'   continues. If a new name is entered, numbering restarts at 001 or stops
+#'   depending on whether the new name ends in "#" or not. In the case of
+#'   repeated measurements, sequential numbering is enforced to ensure unique
+#'   names.
 #'
 #' @section Irradiance calibration:
 #'   Calibration data needs in most cases to be imported into R and
@@ -199,23 +206,31 @@
 #'   cosine diffuser used (or the model name if from Ocean Optics) should be
 #'   supplied by the user.
 #'
-#'   The function is composed in a modular way from functions that can be
-#'   reshuffled and combined with other functions to define new variations
-#'   possibly better suited to users' needs and tastes.
-#'
 #' @return This function returns the acquired spectra through "side effects" as
 #'   each spectrum is saved, both as raw counts data and optionally as spectral
-#'   irradiance, spectral fluence or counts-per-second  spectral data in
-#'   an \code{.rda}
-#'   file as objects of the classes defined in package
+#'   irradiance, spectral fluence or counts-per-second spectral data in an
+#'   \code{.rda} (R data) file as objects of the classes defined in package
 #'   'photobiology'. Optionally, the plot for each spectrum or a time series of
 #'   spectra is saved as a \code{.pdf} file. At any time, the current group of
 #'   spectra can be saved as a collection. When a collection is created, all
 #'   recently measured spectra are saved together, decreasing the number of
-#'   files and keeping related spectra together. Summaries of the spectra in a
-#'   coleection are additionally saved to a CSV file and a plot of the spectra
-#'   saved to a \code{.pdf} file. The value returned by the function is that
-#'   from closing the connection to the spectrometer.
+#'   files and keeping related spectra in the same files. Summaries of the
+#'   spectra in a collection are additionally saved to a CSV file and a plot of
+#'   the collected spectra saved to a \code{.pdf} file.
+#'
+#'   The value returned by the function is that from closing the connection to
+#'   the spectrometer.
+#'
+#' @note The function is composed in a modular way from functions defined in
+#'   this some package, R or imported packages. The code of the function can be
+#'   reshuffled combining the functions used here with other functions to create
+#'   new variations, possibly better suited to users' needs and tastes.
+#'
+#'   A "light-weight" approach to tweaking the user interface is to implement
+#'   new modes by simply changing which of the logical flags that control the
+#'   display of menus are enabled or not. And even easier approach is to create
+#'   a simple script that passes suitable arguments to the different formal
+#'   parameters.
 #'
 #' @seealso This function calls functions \code{\link{tune_interactive}},
 #'   \code{\link{protocol_interactive}}, \code{\link{set_seq_interactive}} and
@@ -242,7 +257,7 @@ acq_irrad_interactive <-
   function(tot.time.range = if (qty.out == "fluence") 5 else c(5, 15),
            target.margin = 0.1,
            HDR.mult = if (qty.out == "fluence")
-                        c(short = 1) else c(short = 1, long = 10),
+             c(short = 1) else c(short = 1, long = 10),
            protocols = NULL,
            correction.method = NA,
            descriptors = NA,
@@ -288,9 +303,9 @@ acq_irrad_interactive <-
     }
 
     if (async.saves) {
-      message("Saving files asynchronously (non blocking, no wait)")
+      cat("Will save files asynchronously\n(not blocking data acquisitions)\n")
     } else {
-      message("Saving files synchronously (blocking, wait)")
+      cat("Will save files synchronously\n(blocking data acquisition until files are saved)\n")
     }
 
     if (is.null(getOption("digits.secs"))) {
@@ -333,7 +348,7 @@ acq_irrad_interactive <-
     } else if (inherits(protocols, "character")) {
       protocols <- default.protocols[protocols]
       if (length(protocols) == 0) {
-        stop("No protocol selected.", call. = FALSE)
+        stop("Aborting! Requested protocol is not available.", call. = FALSE)
       }
     }
 
@@ -351,9 +366,9 @@ acq_irrad_interactive <-
     # If multiple spectrometers are connected, ask which one to use
     instruments <- list_srs_interactive(w = w)
     sr.index <- choose_sr_interactive(instruments = instruments)
+    # -1L returned only if user aborts the selection
     if (sr.index < 0L) {
-      print("Aborting...")
-      message("Bye!")
+      message("Aborting at user's request!  Bye!")
       return(NULL)
     }
     # If the spectrometer has > 1 channel, ask which one to use
@@ -363,8 +378,8 @@ acq_irrad_interactive <-
     # retrieve serial number of spectrometer in use
     serial_no <- as.character(instruments[sr.index + 1L, 3])
 
-    message("Using channel ", ch.index,
-            " from spectrometer with serial number: ", serial_no)
+    cat("Using channel ", ch.index,
+        " from spectrometer with serial number: ", serial_no, "\n")
 
     # if multiple entrance optics are available, each has a different calibration
     # we validate the argument passed in the case of on spectrometer
@@ -374,10 +389,16 @@ acq_irrad_interactive <-
       } else if (entrance.optics == "dome" || grepl("^hemis", entrance.optics)) {
         entrance.optics <- "hemispherical"
       } else {
-        stop("'entrance.optics' must be one of \"cosine\" or \"hemispherical\" for MAYP11278")
+        warning("Aborting! 'entrance.optics' must be \"cosine\" or \"hemispherical\"", call. = FALSE)
+        return(NULL)
+      }
+      cat("Entrance optics \"", entrance.optics, "\" selected\n")
+      answer.entrance <- readline("Is this correct? YES/no (y-/n")
+      if (!answer.entrance %in% c("", "y")) {
+        warning("Aborting! 'entrance.optics' selection not validated by user!", call. = FALSE)
+        return(NULL)
       }
     }
-    message("Entrance optics \"", entrance.optics, "\" selected")
 
     # spectrometer-specific correction method parameters
     if (anyNA(c(descriptors[[1]], correction.method[[1]]))) {
@@ -495,7 +516,7 @@ acq_irrad_interactive <-
     if (! user.user.name == "") {
       user.name <- make.names(user.user.name)
     }
-    message("Using \"", user.name, "\" as operator's name", sep = "")
+    cat("Using \"", user.name, "\" as operator's name\n", sep = "")
     session.label <- paste("Operator: ", user.name,
                            "\nSession: ", session.name,
                            ", instrument s.n.: ", descriptor[["spectrometer.sn"]],
@@ -738,7 +759,7 @@ acq_irrad_interactive <-
                     estimated.measurement.duration > 0)
 
         cat("Duration of each repeated measurement: ",
-                signif(estimated.measurement.duration, 3), " s.\n")
+            signif(estimated.measurement.duration, 3), " s.\n")
 
         seq.settings <-
           set_seq_interactive(seq.settings = seq.settings,
@@ -974,7 +995,7 @@ acq_irrad_interactive <-
                 assign(obj.names[1], raw.mspct)
                 assign(obj.names[2], irrad.spct)
                 save(list = obj.names, file = file.name)
-              return(file.exists(file.name))
+                return(file.exists(file.name))
               },
               obj.names = obj.names,
               file.name = file.name,
@@ -1238,7 +1259,7 @@ acq_irrad_interactive <-
         get.seq.settings <- grepl("^series", interface.mode)
 
         loop.valid.answers <- c("q", "r", "m", "n")
-        loop.prompt <- "quit/repeat-/NEW-MEASUREMENT (q/r/m-): "
+        loop.prompt <- "quit/repeat/NEW-MEASUREMENT (q/r/m-): "
         repeat {
           answer2 <- readline(loop.prompt)[1]
           answer2 <- ifelse(answer2 == "", "m", answer2)
@@ -1273,7 +1294,7 @@ acq_irrad_interactive <-
               cat("Answer not recognized, please try again...")
             }
           }
-           if (answer3 == "a") {
+          if (answer3 == "a") {
             if (pending.repeats > 1L) {
               answer3 <- "n"
             } else {
@@ -1343,11 +1364,11 @@ acq_irrad_interactive <-
                       make.names(session.name),
                       ".Rda", sep = ""))
 
-    message("Data files saved during session:\n",
-            "to ", getwd(), "\n",
-            paste(file.names, collapse = ",\n"), ".", sep = "")
+    cat("Data files saved during session:\n",
+        "to ", getwd(), "\n",
+        paste(file.names, collapse = ",\n"), ".\n", sep = "")
 
-    message("Ending data acquisition...")
+    cat("Ending data acquisition...\n")
 
     # connection to spectrometer is closed using on.exit() to ensure
     # disconnection even when end of session is forced by error or by user

@@ -336,7 +336,7 @@ choose_sr_interactive <- function(instruments) {
   } else { # num.inst == 1
     sr.idx <- 1L
   }
-  print(instruments[sr.idx, ])
+  cat(instruments[sr.idx, ], "selected\n")
   sr.idx - 1L # use Omni Driver convention for indexes
 }
 
@@ -521,12 +521,12 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
         cat("Time step value not changed!\n")
       }
     } else if (substr(answ, 1, 1) == "r") {
-      num.steps <- readline("Number of steps (1..10000): ")
+      num.steps <- readline("Number of steps (1..100000): ")
       num.steps <- try(as.integer(num.steps))
       if (is.na(num.steps)) {
         cat("Expected a positive integer. Value not changed!\n")
-      } else if (num.steps < 1L || num.steps > 10000L) {
-        warning("Expected number within range 1..10000. Value not changed!")
+      } else if (num.steps < 1L || num.steps > 100000L) {
+        warning("Expected number within range 1..100000. Value not changed!")
       } else {
         seq.settings[["num.steps"]] <- num.steps
       }
