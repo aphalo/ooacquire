@@ -206,10 +206,10 @@ bleed_nas <- function(x, n = 10) {
 #'
 #' @param x cps_spct or raw_spct A spectrum measured in darkness.
 #' @param range numeric A wavelength range [nm].
-#' @param tol.margin numeric in [0..small integer] indicating the tolerance
-#'   margin as a fraction of the median counts.
+#' @param tol.margin numeric A multiplier applied to MAD, the default 1
+#'   corresponds to 1 pixel per 1000 pixels as the expected random Normal noise.
 #' @param max.hot,max.cold integer Maximum number of hot and cold pixels
-#'   accepted.
+#'   exceeding the tolerance per 1000 array pixels.
 #' @param spct.label character A character string to use in message.
 #' @param verbose logical If true a message is emitted in addition to returning
 #'   the outcome.
@@ -221,33 +221,46 @@ bleed_nas <- function(x, n = 10) {
 QC_dark <-
   function(x,
            range = NULL,
-           tol.margin = 0.5,
-           max.hot = 10,
-           max.cold = 10,
-           spct.label = "Spectrum ",
+           tol.margin = 1,
+           max.hot = 60,
+           max.cold = 20,
+           spct.label = "Spectrum",
            verbose = getOption("photobiology.verbose", default = TRUE)) {
   stopifnot(is.raw_spct(x) || is.cps_spct(x))
   if (!is.null(range)) {
     x <- clip_wl(x = x, range = range)
   }
   cols <- setdiff(colnames(x), "w.length")
+  # scales tolerance to approx. 3 SD, or P = 0.001
+  tol.margin <- tol.margin * 4.5
+
   num.hot <- 0
   num.cold <- 0
   for (col in cols) {
     if (!is.numeric(x[[col]])) next()
+    # compute the median and a weighted mad approx. 3 * SD * tol.margin
     median.cps <- stats::median(x[[col]], na.rm = TRUE)
+    wt.mad.cps <- stats::mad(x[[col]], center = median.cps,
+                             constant = tol.margin, na.rm = TRUE)
     num.hot <- max(num.hot,
-                   sum(x[[col]] > median.cps * (1 + tol.margin), na.rm = TRUE))
+                   sum(x[[col]] > median.cps + wt.mad.cps, na.rm = TRUE))
     num.cold <- max(num.cold,
-                    sum(x[[col]] < median.cps * (1 - tol.margin), na.rm = TRUE))
+                    sum(x[[col]] < median.cps - wt.mad.cps, na.rm = TRUE))
 
   }
+
+  # express as counts per 1000 pixels
+  num.hot <- round(num.hot * 1000 / length(x[[1]]))
+  num.cold <- round(num.cold * 1000 / length(x[[1]]))
   if (num.hot > max.hot || num.cold > max.cold) {
-    warning(spct.label, " failed QC: ", num.hot, " hot, ", num.cold, " cold pixels",
+    warning(spct.label, " failed QC: ", num.hot, " hot, ", num.cold, " cold per 1000 pixels",
             call. = FALSE, immediate.	= TRUE, domain = NA)
+    cat("The spectrometer is/was probably too hot...\n")
     FALSE
   } else {
-#    message(spct.label, " passed QC: ", num.hot, " hot, ", num.cold, " cold pixels")
+    if (verbose) {
+      cat(spct.label, " passed QC: ", num.hot, " hot, ", num.cold, " cold per 1000 pixels\n", sep = "")
+    }
     TRUE
   }
 }

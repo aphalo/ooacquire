@@ -775,7 +775,7 @@ acq_irrad_interactive <-
       }
 
       if (pending.repeats >= 1) {
-        cat("Pending: ", pending.repeats, " repeats.\n", sep = "")
+        cat("\nPending: ", pending.repeats, " repeats.\n", sep = "")
       }
 
       # acquire raw-counts spectra
