@@ -106,13 +106,13 @@ s_irrad_corrected.raw_mspct <-
     QC_spct <- TRUE
     if ("dark" %in% names(spct.names)) {
       QC_spct <-
-        QC_dark(x[[spct.names[["dark"]]]], max.hot = 15,
+        QC_dark(x[[spct.names[["dark"]]]],
                 spct.label = "Dark spectrum", verbose = verbose)
     }
     if ("filter" %in% names(spct.names)) {
       QC_spct <-
         QC_spct &&
-        QC_dark(x[[spct.names[["filter"]]]], max.hot = 40, range = c(NA, 400),
+        QC_dark(x[[spct.names[["filter"]]]], range = c(NA, 390),
                 spct.label = "Filter spectrum", verbose = verbose)
     }
 

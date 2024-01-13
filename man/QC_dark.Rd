@@ -7,10 +7,10 @@
 QC_dark(
   x,
   range = NULL,
-  tol.margin = 0.5,
-  max.hot = 10,
-  max.cold = 10,
-  spct.label = "Spectrum ",
+  tol.margin = 1,
+  max.hot = 60,
+  max.cold = 20,
+  spct.label = "Spectrum",
   verbose = getOption("photobiology.verbose", default = TRUE)
 )
 }
@@ -19,11 +19,11 @@ QC_dark(
 
 \item{range}{numeric A wavelength range [nm].}
 
-\item{tol.margin}{numeric in [0..small integer] indicating the tolerance
-margin as a fraction of the median counts.}
+\item{tol.margin}{numeric A multiplier applied to MAD, the default 1
+corresponds to 1 pixel per 1000 pixels as the expected random Normal noise.}
 
 \item{max.hot, max.cold}{integer Maximum number of hot and cold pixels
-accepted.}
+exceeding the tolerance per 1000 array pixels.}
 
 \item{spct.label}{character A character string to use in message.}
 

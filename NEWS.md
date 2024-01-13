@@ -19,6 +19,9 @@ ferrite beads is likely to help.**
     activities (several activity messages are shown only for long time series).
 -   Decrease the default maximum number of spectra per plot to speed up user
     interaction.
+-   Revise function `QC_dark()` to use interpretable values as arguments to
+    parameters. This is a potentially code-breaking change as the new defaults
+    can alter the sensitivity of the quality control applied to dark spectra.
 -   Update in 'photobiology' 0.11.0 improves/fixes handling of metadata.
 -   Update in 'photobiology' 0.11.1 improves the speed of plotting sampled
     time series.
