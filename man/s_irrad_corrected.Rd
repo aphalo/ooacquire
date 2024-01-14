@@ -45,7 +45,7 @@ s_irrad_corrected(x, ...)
 \item{x}{A named list of one to three vectors of file names, with names
 "light", "filter", and "dark". Or a raw_mspt object, or a raw_spct object.}
 
-\item{...}{Named argument passed to \code{photobiology::cps2irrad} which is
+\item{...}{Named arguments passed to \code{photobiology::cps2irrad} which is
 the final calculation step.}
 
 \item{time}{a \code{POSIXct} object, but if \code{NULL} the date stored in
@@ -66,7 +66,7 @@ default locale is US-centric (like R), but you can use
 like the default time zone, encoding, decimal mark, big mark, and day/month
 names.}
 
-\item{verbose}{Logical indicating the level of warnings wanted.}
+\item{verbose}{Logical indicating the level of warnings and messages wanted.}
 
 \item{spct.names}{named character vector of length three, to map names in
 \code{x} to those expected.}
