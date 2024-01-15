@@ -31,7 +31,8 @@ acq_irrad_interactive(
   user.name = Sys.info()[["user"]],
   session.name = paste(user.name, strftime(lubridate::now(tzone = "UTC"),
     "\%Y.\%b.\%d_\%H.\%M.\%S"), sep = "_"),
-  verbose = getOption("photobiology.verbose", default = FALSE)
+  verbose = getOption("photobiology.verbose", default = FALSE),
+  QC.enabled = TRUE
 )
 }
 \arguments{
@@ -102,6 +103,8 @@ folder used for output, and session and user names.}
 
 \item{verbose}{logical If TRUE additional messages are emitted, including
 report on memory usage.}
+
+\item{QC.enabled}{logical If FALSE return NA skipping QC.}
 }
 \value{
 This function returns the acquired spectra through "side effects" as
@@ -296,6 +299,15 @@ The function is composed in a modular way from functions defined in
   Ocean Optics/Ocean Insight, in this case the effective \code{area} of the
   cosine diffuser used (or the model name if from Ocean Optics) should be
   supplied by the user.
+}
+
+\section{Quality control of dark spectra}{
+
+  Disabling the quality control with \code{QC.enabled = FALSE} is necessary
+  when the "dark" reference is a measurement of ambient light instead of true
+  darkness; i.e., when the irradiance of one light source is measured as the
+  difference between background illumination and background illumination
+  plus the target light source.
 }
 
 \examples{

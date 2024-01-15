@@ -336,7 +336,8 @@ choose_sr_interactive <- function(instruments) {
   } else { # num.inst == 1
     sr.idx <- 1L
   }
-  cat(instruments[sr.idx, ], "selected\n")
+  cat("selected:\n")
+  print(instruments[sr.idx, ])
   sr.idx - 1L # use Omni Driver convention for indexes
 }
 
@@ -515,8 +516,10 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
         step <- as.numeric(step) # period to seconds
         seq.settings$step.delay <-
           check.step.delay(step, time.division)
-        cat("Time step = ", signif(seq.settings$step.delay, 3),
-            "s, adjusted from", step, ".\n", sep = "")
+        if (seq.settings$step.delay != step) {
+          cat("Time step = ", signif(seq.settings$step.delay, 3),
+              "s, adjusted from ", step, "\n", sep = "")
+        }
       } else {
         cat("Time step value not changed!\n")
       }

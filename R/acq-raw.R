@@ -411,15 +411,6 @@ acq_raw_mspct <- function(descriptor,
       }
       if (verbose && !messages.enabled) message("ready.")
     }
-    if (p == "dark") {
-      QC_dark_spct <-
-        QC_dark(z[[idx]], max.hot = 15,
-                spct.label = "Dark spectrum")
-    } else if (p == "filter") {
-      QC_filter_spct <-
-        QC_dark(z[[idx]], max.hot = 40, range = c(NA, 400),
-                spct.label = "Filter spectrum")
-    }
   }
   end.time <- lubridate::now(tzone = "UTC")
 

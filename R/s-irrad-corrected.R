@@ -205,7 +205,8 @@ s_irrad_corrected.raw_mspct <-
       }
     }
 
-    attributes(corrected.spct) <- c(attributes(corrected.spct), list(QC_dark_pass = QC_spct))
+    attributes(corrected.spct) <- c(attributes(corrected.spct),
+                                    list(QC_dark_pass = QC_spct))
     corrected.spct
   }
 
