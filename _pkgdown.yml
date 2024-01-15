@@ -213,8 +213,6 @@ navbar:
         href: articles/userguide-acquisition.html
       - text: 'Import and conversion'
         href: articles/userguide-import.html
-      - text: 'Ocean Optics calibrations'
-        href: articles/userguide-calibrations.html
     tutorials:
       text: Resources
       menu:

@@ -59,9 +59,12 @@ needed R packages, one of Temurin 8 **OpenJDK** or Oracle's Java 8
 OmniDriver runtime are all installed and working (see this package's README and
 the README of package 'rOmniDriver' for details).
 
-In this vignette we provide a tutorial on how to carry out measurements.
-Please, see the vignette *Algorithms* for the details on the
-computations.
+In this vignette we provide a brief tutorial on how to carry out measurements.
+
+The User Guide menu of the [on-line documentation](https://docs.r4photobiology.info/ooacquire/) includes in addition to the
+vignettes included in the package, two on-line only chapters: [a tutorial
+on how to measure spectral irradiance](https://www.r4photobiology.info/pages/acq-irrad-tutorial.html) 
+with 'oocquire' and a [description of the algorithms used](https://www.r4photobiology.info/pages/ooacquire-algorithms.html).
 
 The package exports both high level user-friendly functions and the
 lower level functions used to build them. What we describe here is the

@@ -25,6 +25,8 @@ ferrite beads is likely to help.**
 -   Update in 'photobiology' 0.11.0 improves/fixes handling of metadata.
 -   Update in 'photobiology' 0.11.1 improves the speed of plotting sampled
     time series.
+-   Merge and expand the computation algorithms and calibration vignettes and
+    move it [on-line](https://www.r4photobiology.info/pages/ooacquire-algorithms.html).
 
 # ooacquire 0.4.3 (2023-12-28)
 
