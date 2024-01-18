@@ -4,14 +4,14 @@ editor_options:
     wrap: 72
 ---
 
-# ooacquire 0.4.4 (2024-01-11)
+# ooacquire 0.4.4-1 (2024-01-18)
 
 **The new features allowing measurement of time series of thousands of spectra at a
 very fast rate are easily affected by glitches in the USB connection. If the
 acquisition hangs from time to time, a high quality and short USB cable with
 ferrite beads is likely to help.**
 
--   Edit menus used in in `acq_irrad_interactive()` to be narrower and more 
+-   Edit menus used in `acq_irrad_interactive()` to be narrower and more 
     informative.
 -   Improve interactive input of `numeric` and `period` values, so that bad 
     input is handled gracefully.
@@ -25,6 +25,8 @@ ferrite beads is likely to help.**
 -   Update in 'photobiology' 0.11.0 improves/fixes handling of metadata.
 -   Update in 'photobiology' 0.11.1 improves the speed of plotting sampled
     time series.
+-   Merge and expand the computation algorithms and calibration vignettes and
+    move it [on-line](https://www.r4photobiology.info/pages/ooacquire-algorithms.html).
 
 # ooacquire 0.4.3 (2023-12-28)
 

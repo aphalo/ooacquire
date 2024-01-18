@@ -213,6 +213,13 @@ bleed_nas <- function(x, n = 10) {
 #' @param spct.label character A character string to use in message.
 #' @param verbose logical If true a message is emitted in addition to returning
 #'   the outcome.
+#' @param QC.enabled logical If FALSE return NA skipping QC.
+#'
+#' @note Disabling the quality control is necessary when the "dark" reference is
+#'   a measurement of ambient light instead of true darkness; i.e., when the
+#'   irradiance of one light source is measured as the difference between
+#'   background illumination and background illuminations plus the target
+#'   light source.
 #'
 #' @return A logical value.
 #'
@@ -225,8 +232,12 @@ QC_dark <-
            max.hot = 60,
            max.cold = 20,
            spct.label = "Spectrum",
-           verbose = getOption("photobiology.verbose", default = TRUE)) {
+           verbose = getOption("photobiology.verbose", default = TRUE),
+           QC.enabled = getOption("ooacquire.qc.enabled", default = TRUE)) {
   stopifnot(is.raw_spct(x) || is.cps_spct(x))
+  if (!QC.enabled) {
+    return(NA)
+  }
   if (!is.null(range)) {
     x <- clip_wl(x = x, range = range)
   }
@@ -255,7 +266,7 @@ QC_dark <-
   if (num.hot > max.hot || num.cold > max.cold) {
     warning(spct.label, " failed QC: ", num.hot, " hot, ", num.cold, " cold per 1000 pixels",
             call. = FALSE, immediate.	= TRUE, domain = NA)
-    cat("The spectrometer is/was probably too hot...\n")
+    cat("Dark reference is not dark (=o.k.!) or spectrometer warm...\n")
     FALSE
   } else {
     if (verbose) {

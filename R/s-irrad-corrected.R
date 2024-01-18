@@ -15,8 +15,8 @@
 #'   \code{\link[readr]{locale}} to create your own locale that controls things
 #'   like the default time zone, encoding, decimal mark, big mark, and day/month
 #'   names.
-#' @param verbose Logical indicating the level of warnings wanted.
-#' @param ... Named argument passed to \code{photobiology::cps2irrad} which is
+#' @param verbose Logical indicating the level of warnings and messages wanted.
+#' @param ... Named arguments passed to \code{photobiology::cps2irrad} which is
 #'   the final calculation step.
 #'
 #' @note Currently \code{s_irrad_corrected.list} allows processing of files
@@ -145,7 +145,7 @@ s_irrad_corrected.raw_mspct <-
 
     } else {
 
-      check_spct_prev_state <- disable_check_spct()
+      check_spct_prev_state <- disable_check_spct() # avoid spurious warnings
       on.exit(set_check_spct(check_spct_prev_state), add = TRUE)
 
       check_sn_match(x, correction.method, missmatch.action = stop)
@@ -205,7 +205,8 @@ s_irrad_corrected.raw_mspct <-
       }
     }
 
-    attributes(corrected.spct) <- c(attributes(corrected.spct), list(QC_dark_pass = QC_spct))
+    attributes(corrected.spct) <- c(attributes(corrected.spct),
+                                    list(QC_dark_pass = QC_spct))
     corrected.spct
   }
 

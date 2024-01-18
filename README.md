@@ -16,10 +16,18 @@ other sources of noise.
 In sunlight, array spectrometers due to their single monochromator have
 a noise floor of three orders of magnitude, which makes it impossible to
 measure the UV-B band. With special characterization of the
-spectrometer, one of the procedures implemented improve the noise floor
+spectrometer, one of the procedures implemented improves the noise floor
 by at least one order of magnitude. With care, this allows reliable
 measurement of the spectral irradiance of sunlight at ground level
-including UV, VIS and NIR regions.
+including UV-B, UV-A, VIS and NIR regions.
+
+The User Guide menu of the [on-line
+documentation](https://docs.r4photobiology.info/ooacquire/) includes in
+addition to the vignettes included in the package, two on-line only
+chapters: [a tutorial on how to measure spectral
+irradiance](https://www.r4photobiology.info/pages/acq-irrad-tutorial.html)
+with ‘oocquire’ and a [description of the algorithms
+used](https://www.r4photobiology.info/pages/ooacquire-algorithms.html).
 
 Package **‘ooacquire’** supports most types of *Ocean Optics*
 spectrometers from former *Ocean Optics*, now *Ocean Insight*
@@ -113,9 +121,9 @@ the *OmniDriver SDP* by wrapping the Java calls in R functions of the
 same name and doing argument type conversions when needed. *OmniDriver*
 allows to change settings and acquire spectra using most Ocean Optics
 USB-connected spectrometers. *As support for some older devices has been
-discontinued in recent versions of *OmniDriver*, to use, for example,
-the formerly very popular USB2000 spectrometer, it is necessary to
-install an old version of *OmniDriver* instead of the current one.*
+discontinued in recent versions of OmniDriver*, to use, for example, the
+formerly very popular USB2000 spectrometer, it is necessary to install
+an old version of *OmniDriver* instead of the current one.
 
 ## Installation of the released version
 
@@ -230,12 +238,12 @@ instrument used and light source to be measured.
 
 ## Documentation and examples
 
-Documentation includes six vignettes in addition to help pages. The
+Documentation includes five vignettes in addition to help pages. The
 examples in the vignettes and help pages use spectral data from
 measurements done with this package as well as output files created by
 Ocean Optics’s software. These data files are in folder `exdata`.
 Scripts containing examples that can be in most cases used with only
-small changes are in folder `example-scripts` of this package.
+small edits are in folder `example-scripts` of this package.
 
 ## Examples
 
@@ -298,8 +306,8 @@ acknowledge this by citing the package according to:
 citation("ooacquire")
 #> To cite package 'ooacquire' in publications use:
 #> 
-#>   Aphalo P, Ylianttila L (2023). _ooacquire: Acquire Data from OO
-#>   Spectrometers_. R package version 0.4.3-2,
+#>   Aphalo P, Ylianttila L (2024). _ooacquire: Acquire Data from OO
+#>   Spectrometers_. R package version 0.4.3.9000,
 #>   https://github.com/aphalo/ooacquire,
 #>   <https://docs.r4photobiology.info/ooacquire/>.
 #> 
@@ -308,8 +316,8 @@ citation("ooacquire")
 #>   @Manual{,
 #>     title = {ooacquire: Acquire Data from OO Spectrometers},
 #>     author = {Pedro J. Aphalo and Lasse Ylianttila},
-#>     year = {2023},
-#>     note = {R package version 0.4.3-2, 
+#>     year = {2024},
+#>     note = {R package version 0.4.3.9000, 
 #> https://github.com/aphalo/ooacquire},
 #>     url = {https://docs.r4photobiology.info/ooacquire/},
 #>   }

@@ -205,14 +205,14 @@ navbar:
         href: articles/r4p-introduction.html
       - text: 'Introduction'
         href: articles/userguide-introduction.html
+      - text: 'Tutorial: Spectral Irradiance Measurement'
+        href: https://www.r4photobiology.info/pages/acq-irrad-tutorial.html
+      - text: 'Algorithms'
+        href: https://www.r4photobiology.info/pages/ooacquire-algorithms.html
       - text: 'Acquisition of Spectra'
         href: articles/userguide-acquisition.html
       - text: 'Import and conversion'
         href: articles/userguide-import.html
-      - text: 'Ocean Optics calibrations'
-        href: articles/userguide-calibrations.html
-      - text: 'Algorithms'
-        href: articles/userguide-algorithms.html
     tutorials:
       text: Resources
       menu:

@@ -52,6 +52,7 @@
 #'   folder used for output, and session and user names.
 #' @param verbose logical If TRUE additional messages are emitted, including
 #'   report on memory usage.
+#' @param QC.enabled logical If FALSE return NA skipping QC.
 #'
 #' @details  Function \code{acq_irrad_interactive()} supports measurement of
 #'   spectral irradiance from continuous light sources and spectral fluence
@@ -206,6 +207,13 @@
 #'   cosine diffuser used (or the model name if from Ocean Optics) should be
 #'   supplied by the user.
 #'
+#' @section Quality control of dark spectra:
+#'   Disabling the quality control with \code{QC.enabled = FALSE} is necessary
+#'   when the "dark" reference is a measurement of ambient light instead of true
+#'   darkness; i.e., when the irradiance of one light source is measured as the
+#'   difference between background illumination and background illumination
+#'   plus the target light source.
+#'
 #' @return This function returns the acquired spectra through "side effects" as
 #'   each spectrum is saved, both as raw counts data and optionally as spectral
 #'   irradiance, spectral fluence or counts-per-second spectral data in an
@@ -285,7 +293,8 @@ acq_irrad_interactive <-
                                 strftime(lubridate::now(tzone = "UTC"),
                                          "%Y.%b.%d_%H.%M.%S"),
                                 sep = "_"),
-           verbose = getOption("photobiology.verbose", default = FALSE)) {
+           verbose = getOption("photobiology.verbose", default = FALSE),
+           QC.enabled = TRUE) {
 
     if (getOption("ooacquire.offline", FALSE)) {
       warning("ooacquire off-line: Aborting...")
@@ -309,9 +318,12 @@ acq_irrad_interactive <-
     }
 
     if (is.null(getOption("digits.secs"))) {
-      old.options <- options(warn = 1, "digits.secs" = 3)
+      old.options <- options(warn = 1,
+                             "digits.secs" = 3,
+                             "ooacquire.qc.enabled" = QC.enabled)
     } else {
-      old.options <- options(warn = 1)
+      old.options <- options(warn = 1,
+                             "ooacquire.qc.enabled" = QC.enabled)
     }
     on.exit(options(old.options), add = TRUE, after = TRUE)
 
@@ -332,7 +344,7 @@ acq_irrad_interactive <-
 
     # initialize repeats counter
 
-    pending.repeats <- 1L
+    total.repeats <- pending.repeats <- 1L
     series.start <- TRUE
 
     # define measurement protocols
@@ -392,8 +404,8 @@ acq_irrad_interactive <-
         warning("Aborting! 'entrance.optics' must be \"cosine\" or \"hemispherical\"", call. = FALSE)
         return(NULL)
       }
-      cat("Entrance optics \"", entrance.optics, "\" selected\n")
-      answer.entrance <- readline("Is this correct? YES/no (y-/n")
+      cat("Entrance optics \"", entrance.optics, "\" selected\n", sep = "")
+      answer.entrance <- readline("Is this correct? YES/no (y-/n)")
       if (!answer.entrance %in% c("", "y")) {
         warning("Aborting! 'entrance.optics' selection not validated by user!", call. = FALSE)
         return(NULL)
@@ -598,9 +610,11 @@ acq_irrad_interactive <-
     sequential.naming.required <- FALSE
     clear.display <- FALSE
 
-    # initialize counter used for sequential naming
+    # initialize counters used for sequential naming and repeats
 
     file.counter <- 0
+    acq.pausing <- TRUE
+    pending.repeats <- 0
 
     # initialize default object name
 
@@ -775,7 +789,8 @@ acq_irrad_interactive <-
       }
 
       if (pending.repeats >= 1) {
-        cat("\nPending: ", pending.repeats, " repeats.\n", sep = "")
+        cat("\nRepeat ", total.repeats - pending.repeats + 1,
+            " of ", total.repeats, ".\n", sep = "")
       }
 
       # acquire raw-counts spectra
@@ -921,10 +936,10 @@ acq_irrad_interactive <-
           if (!reuse.seq.settings || pending.repeats == 1) {
             if(qty.out == "cps") {
               plot.prompt <- "fig/w.bands/discard+go/SAVE+GO (f/w/d/s-): "
-              valid.answers <-  c("f","w", "d", "s")
+              valid.answers <-  c("f","w", "d", "s", "g")
             } else {
               plot.prompt <- "fig/photons/energy/w.bands/discard+go/SAVE+GO (f/p/e/w/d/s-): "
-              valid.answers <- c("f","p", "e", "w", "d", "s")
+              valid.answers <- c("f","p", "e", "w", "d", "s", "g")
             }
             repeat {
               answer <- readline(plot.prompt)[1]
@@ -1272,42 +1287,41 @@ acq_irrad_interactive <-
 
         if (answer2 == "r") {
           repeat {
-            answer4 <- readline("Number of repeats (integer >= 1 or \"\"): ")
+            prompt <- paste("Number of repeats (integer >= 1 or \"\" = ",
+                            total.repeats, "): ")
+            answer4 <- readline(prompt)
             if (answer4 == "") {
-              answer4 <- "1"
-            }
-            pending.repeats <- try(as.integer(answer4))
-            if (!is.na(pending.repeats) && pending.repeats >= 1L) {
+              pending.repeats <- total.repeats
               break()
             } else {
-              cat("Value entered is not a number >= 1!\n")
+              pending.repeats <- try(as.integer(answer4))
+              if (!is.na(pending.repeats) && pending.repeats >= 1L) {
+                total.repeats <- pending.repeats
+                break()
+              } else {
+                cat("Value entered is not a number >= 1!\n")
+              }
             }
           }
           repeat {
-            answer3 <- readline("Repeats: no figs./with figs./pausing/AUTO- (n/f/p/a-): ")
+            answer3 <- readline("Repeats: no figs./WITH FIGS./pausing (n/f-/p): ")
             if (answer3 == "") {
-              answer3 <- "a"
+              answer3 <- "f"
             }
-            if (answer3 %in% c("n", "f", "p", "a")) {
+            if (answer3 %in% c("n", "f", "p")) {
               break()
             } else {
               cat("Answer not recognized, please try again...")
             }
           }
-          if (answer3 == "a") {
-            if (pending.repeats > 1L) {
-              answer3 <- "n"
-            } else {
-              answer3 <- "f"
-            }
-          }
           acq.pausing.always <- answer3 == "p"
+          acq.pausing <- acq.pausing.always
           clear.display <- show.figs && answer3 == "n"
           show.figs <- answer3 %in% c("p", "f")
           if (acq.pausing.always) {
-            message("Pausing between repeats")
+            cat("Pausing between repeats\n")
           } else {
-            message("Not pausing between repeats")
+            cat("Not pausing between repeats\n")
           }
           reuse.old.refs <- TRUE
           reuse.seq.settings <- pending.repeats > 1L

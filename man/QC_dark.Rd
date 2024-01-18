@@ -11,7 +11,8 @@ QC_dark(
   max.hot = 60,
   max.cold = 20,
   spct.label = "Spectrum",
-  verbose = getOption("photobiology.verbose", default = TRUE)
+  verbose = getOption("photobiology.verbose", default = TRUE),
+  QC.enabled = getOption("ooacquire.qc.enabled", default = TRUE)
 )
 }
 \arguments{
@@ -29,6 +30,8 @@ exceeding the tolerance per 1000 array pixels.}
 
 \item{verbose}{logical If true a message is emitted in addition to returning
 the outcome.}
+
+\item{QC.enabled}{logical If FALSE return NA skipping QC.}
 }
 \value{
 A logical value.
@@ -43,4 +46,11 @@ The expectation is that in a spectrum measured in the dark, to be
   long pass or short pass filter. By default the whole spectrum is included
   in the QC check, but if needed an argument can be passed to \code{range}
   to select a smaller region.
+}
+\note{
+Disabling the quality control is necessary when the "dark" reference is
+  a measurement of ambient light instead of true darkness; i.e., when the
+  irradiance of one light source is measured as the difference between
+  background illumination and background illuminations plus the target
+  light source.
 }

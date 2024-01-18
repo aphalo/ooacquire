@@ -1,4 +1,4 @@
 cd ..
-R CMD INSTALL --build --no-multiarch ooacquire_0.4.3.9000.tar.gz
+R CMD INSTALL --build --no-multiarch ooacquire_0.4.4.tar.gz
 cd ./ooacquire
 
