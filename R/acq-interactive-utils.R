@@ -139,6 +139,15 @@ tune_interactive <- function(descriptor,
       user.integ.time <- read_seconds("Integration time(s) (seconds): ", n.max = 4)
       user.integ.time <- user.integ.time * 1e6 # seconds -> microseconds
       if (length(user.integ.time) >= 1) {
+        num.integ.times <- length(unique(user.integ.time))
+        if (num.integ.times > 1) {
+          message("Resetting HDR multipliers to 1")
+          acq.settings[["HDR.mult"]] <- rep(1, num.integ.times)
+          user.integ.time <- unique(sort(user.integ.time))
+          acq.settings[["num.exposures"]] <-
+            rep_len(acq.settings[["num.exposures"]], num.integ.times)
+        }
+
         acq.settings <- set_integ_time(acq.settings = acq.settings,
                                        integ.time = user.integ.time)
         tuned <- TRUE
@@ -155,11 +164,13 @@ tune_interactive <- function(descriptor,
         cat("Request ignored: value not in 0..1 range\n")
       }
     } else if (answ == "r") {
-      tot.time.range <- read_seconds("Total time range (seconds), 1 or 2 numbers: ", n.max = 2)
-      tot.time.range <- tot.time.range * 1e6
+      tot.time.range <-
+        read_seconds("Total time range (seconds), 1 or 2 numbers: ", n.max = 2)
+      tot.time.range <- round(tot.time.range * 1e6) # integer microseconds
       if (length(tot.time.range) >= 1) {
         tot.time.range <- range(tot.time.range)
-        if (tot.time.range[1] >= 0) {
+        # ensure that the the range includes a finite positive value
+        if (tot.time.range[1] >= 0 && tot.time.range[2] > 0) {
           acq.settings[["tot.time.range"]] <- tot.time.range
           tuned <- FALSE
         } else {
@@ -739,7 +750,7 @@ read_seconds <- function(prompt,
 
     z <- suppressWarnings(as.numeric(z))
 
-    if (length(z) & !anyNA(z) & all(z > minimum[1])) {
+    if (length(z) & !anyNA(z) & all(z >= minimum[1])) {
       if (length(z) > n.max) {
         message("Maximum of ", n.max, " value(s) accepted; ",
                 length(z) - n.max, " value(s) discarded!")
