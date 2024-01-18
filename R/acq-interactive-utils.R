@@ -49,17 +49,17 @@ tune_interactive <- function(descriptor,
     )
   prompt.text2 <-
     switch(interface.mode,
-           simple = "retune/range/HDR/undo/help/GO (t/r/h/u/?/m-): ",
+           simple = "retune/range/HDR/undo/help/GO (t/r/h/u/?/g-): ",
            auto = "fixed/retune/tune/sat/range/HDR/undo/help/GO (f/t/T/s/r/h/u/?/g-): ",
-           manual = "fixed/range/HDR/undo/help/GO (f/r/h/u/?/m-): ",
+           manual = "fixed/range/HDR/undo/help/GO (f/r/h/u/?/g-): ",
            full = "fixed/retune/tune/sat/range/HDR/undo/help/GO (f/t/T/s/r/h/u/?/g-): "
     )
   valid.input <-
     switch(interface.mode,
-           simple = c("t", "r", "h", "u", "?", "m", ""),
-           auto = c("f", "t", "T", "s", "r", "h", "u", "?", "m", ""),
-           manual = c("f", "r", "h", "u", "?", "m", ""),
-           full = c("f", "t", "T", "s", "r", "h", "u", "?", "m", "")
+           simple = c("t", "r", "h", "u", "?", "m", "g", ""),
+           auto = c("f", "t", "T", "s", "r", "h", "u", "?", "m", "g", ""),
+           manual = c("f", "r", "h", "u", "?", "m", "g", ""),
+           full = c("f", "t", "T", "s", "r", "h", "u", "?", "m", "g", "")
     )
   default.input <-
     switch(interface.mode,
@@ -109,13 +109,13 @@ tune_interactive <- function(descriptor,
     if (answ == "") {
       answ <- ifelse(!tuned, default.input[1], default.input[2])
     }
-    if (answ == "m") {
+    if (answ %in% c("m", "g")) {
       break()                       ## <- exit point for loop
     }
 
     if (answ == "?") {
       cat(help.text)
-    } else if (answ == "t") {
+    } else if (answ %in% c("t", "T")) {
       answ.t <- readline("Auto-adjust integration time?, a = adjust, c = current, z = abort (a-/c/z): ")
       if (answ.t %in% c("z", "c")) {
         if (answ.t == "c") {
@@ -123,18 +123,13 @@ tune_interactive <- function(descriptor,
         }
         next()
       } else if (answ.t %in% c("a", "")) {
+      if (answ == "T") {
+        acq.settings[["integ.time"]] <- start.int.time * 1e6
+      }
       acq.settings <- tune_acq_settings(descriptor = descriptor,
                                         acq.settings = acq.settings)
       tuned <- TRUE
       }
-    } else if (answ == "T") {
-      if (readline("Auto-adjust integration time?, z = abort (-/z): ") == "z") {
-        next()
-      }
-      acq.settings[["integ.time"]] <- start.int.time * 1e6
-      acq.settings <- tune_acq_settings(descriptor = descriptor,
-                                        acq.settings = acq.settings)
-      tuned <- TRUE
     } else if (answ == "f") {
       user.integ.time <- read_seconds("Integration time(s) (seconds): ", n.max = 4)
       user.integ.time <- user.integ.time * 1e6 # seconds -> microseconds

@@ -936,10 +936,10 @@ acq_irrad_interactive <-
           if (!reuse.seq.settings || pending.repeats == 1) {
             if(qty.out == "cps") {
               plot.prompt <- "fig/w.bands/discard+go/SAVE+GO (f/w/d/s-): "
-              valid.answers <-  c("f","w", "d", "s")
+              valid.answers <-  c("f","w", "d", "s", "g")
             } else {
               plot.prompt <- "fig/photons/energy/w.bands/discard+go/SAVE+GO (f/p/e/w/d/s-): "
-              valid.answers <- c("f","p", "e", "w", "d", "s")
+              valid.answers <- c("f","p", "e", "w", "d", "s", "g")
             }
             repeat {
               answer <- readline(plot.prompt)[1]
@@ -1304,21 +1304,14 @@ acq_irrad_interactive <-
             }
           }
           repeat {
-            answer3 <- readline("Repeats: no figs./with figs./pausing/AUTO- (n/f/p/a-): ")
+            answer3 <- readline("Repeats: no figs./WITH FIGS./pausing (n/f-/p): ")
             if (answer3 == "") {
-              answer3 <- "a"
+              answer3 <- "f"
             }
-            if (answer3 %in% c("n", "f", "p", "a")) {
+            if (answer3 %in% c("n", "f", "p")) {
               break()
             } else {
               cat("Answer not recognized, please try again...")
-            }
-          }
-          if (answer3 == "a") {
-            if (pending.repeats > 1L) {
-              answer3 <- "n"
-            } else {
-              answer3 <- "f"
             }
           }
           acq.pausing.always <- answer3 == "p"
@@ -1326,9 +1319,9 @@ acq_irrad_interactive <-
           clear.display <- show.figs && answer3 == "n"
           show.figs <- answer3 %in% c("p", "f")
           if (acq.pausing.always) {
-            message("Pausing between repeats")
+            cat("Pausing between repeats\n")
           } else {
-            message("Not pausing between repeats")
+            cat("Not pausing between repeats\n")
           }
           reuse.old.refs <- TRUE
           reuse.seq.settings <- pending.repeats > 1L

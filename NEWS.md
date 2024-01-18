@@ -4,7 +4,7 @@ editor_options:
     wrap: 72
 ---
 
-# ooacquire 0.4.4 (2024-01-15)
+# ooacquire 0.4.4-1 (2024-01-18)
 
 **The new features allowing measurement of time series of thousands of spectra at a
 very fast rate are easily affected by glitches in the USB connection. If the
