@@ -4,13 +4,19 @@
 \alias{merge_cps}
 \title{Merge counts per second data}
 \usage{
-merge_cps(x, tolerance = 0.1)
+merge_cps(
+  x,
+  tolerance = 0.1,
+  verbose = getOption("photobiology.verbose", default = FALSE)
+)
 }
 \arguments{
 \item{x}{cps_spct object}
 
 \item{tolerance}{numeric Tolerance for mean deviation among cps columns as
 a fraction of one.}
+
+\item{verbose}{Logical indicating the level of warnings and messages wanted.}
 }
 \value{
 a copy of x with values replaced as needed in all counts columns

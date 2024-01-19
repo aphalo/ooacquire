@@ -14,14 +14,17 @@ ferrite beads is likely to help.**
 -   Edit menus used in `acq_irrad_interactive()` to be narrower and more 
     informative.
 -   Improve interactive input of `numeric` and `period` values, so that bad 
-    input is handled gracefully.
+    input is handled gracefully in `acq_irrad_interactive()`.
 -   Add activity messages to keep the user informed about time-consuming 
-    activities (several activity messages are shown only for long time series).
+    activities (several activity messages are shown only for long time series)
+    in `acq_irrad_interactive()`.
 -   Decrease the default maximum number of spectra per plot to speed up user
-    interaction.
+    interaction in `acq_irrad_interactive()`.
 -   Revise function `QC_dark()` to use interpretable values as arguments to
     parameters. This is a potentially code-breaking change as the new defaults
     can alter the sensitivity of the quality control applied to dark spectra.
+-   Revise function `merge_cps()` to accept a negative value as argument to
+    `tolerance` to disable merging (= splicing) using only the primary scan.
 -   Update in 'photobiology' 0.11.0 improves/fixes handling of metadata.
 -   Update in 'photobiology' 0.11.1 improves the speed of plotting sampled
     time series.
