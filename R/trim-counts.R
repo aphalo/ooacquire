@@ -116,37 +116,44 @@ merge_cps <- function(x,
   } else {
     cols <- counts.cols[order(num.exposures, decreasing = TRUE)]
   }
-  x[["cps"]] <- x[[cols[1]]]
 
-  merged <- logical(length(cols)) # set to FALSE
-  merged[1] <- TRUE
-  for (i in 2:length(cols)) {
-    to.replace.idx <- is.na(x[["cps"]])
-    if (sum(!to.replace.idx) < 30 ||
-        anyNA(x[["cps"]][x[["w.length"]] < 400])) {
-      # if there is saturation in UV we replace the whole column
-      x[["cps"]] <- x[[cols[i]]]
-      merged[i - 1] <- FALSE
-    } else {
-      # replace only clipped pixels if cps consistent across columns
-      columns.ratio <-
-          sum(x[[cols[i]]][!to.replace.idx]) / sum(x[["cps"]][!to.replace.idx])
-      if (columns.ratio > (1 - tolerance) && columns.ratio < (1 + tolerance)) {
-        x[["cps"]] <- ifelse(is.na(x[["cps"]]),
-                             x[[cols[i]]],
-                             x[["cps"]] )
-       } else {
-        message("Inconsistent cps in HDR exposures, replacing instead of merging")
-        x[["cps"]] <- x[[cols[i]]]
-        merged[i - 1] <- FALSE
+  merged <- logical(length(cols)) # allocate, filled with FALSE
+
+  if (tolerance < 0) {
+    # only the shortest integ.time or smaller num.exposures
+    merged.cps <- x[[rev(cols)[1]]]
+    merged[length(cols)] <- TRUE
+  } else {
+    merged.cps <- x[[cols[1]]]
+
+    merged[1] <- TRUE
+    for (i in 2:length(cols)) {
+      to.replace.idx <- is.na(merged.cps)
+      if (sum(!to.replace.idx) < 30 ||
+          anyNA(merged.cps[x[["w.length"]] < 400])) {
+        # if there is saturation in UV we replace the whole column
+        merged.cps <- x[[cols[i]]]
+        merged[1:(i - 1)] <- FALSE
+      } else {
+        # replace only clipped pixels if cps consistent across columns
+        columns.ratio <-
+          sum(x[[cols[i]]][!to.replace.idx]) / sum(merged.cps[!to.replace.idx])
+        if (columns.ratio > (1 - tolerance) && columns.ratio < (1 + tolerance)) {
+          merged.cps[is.na(merged.cps)] <- x[[cols[i]]][is.na(merged.cps)]
+        } else {
+          message("Inconsistent cps in HDR exposures, replacing instead of merging")
+          merged.cps <- x[[cols[i]]]
+          merged[1:(i - 1)] <- FALSE
+        }
+      }
+      merged[i] <- TRUE
+      if (!anyNA(merged.cps)) {
+        break()
       }
     }
-    merged[i] <- TRUE
-    if (!anyNA(x[["cps"]])) {
-      break()
-    }
   }
-  z <- x[ , c("w.length", "cps")]
+
+  z <- cps_spct(w.length = x[["w.length"]], cps = merged.cps)
   z <- photobiology::copy_attributes(x, z)
   attr(x = z, which = "merged.cps.cols") <- cols[merged]
   z

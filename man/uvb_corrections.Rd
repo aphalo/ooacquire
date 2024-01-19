@@ -16,7 +16,7 @@ uvb_corrections(
   inst.dark.pixs = 1:4,
   worker.fun = NULL,
   trim = 0.05,
-  hdr.tolerance = getOption("ooacquire.hdr.tolerance, default = 0.10"),
+  hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.1),
   verbose = getOption("photobiology.verbose", default = FALSE),
   ...
 )
@@ -24,7 +24,7 @@ uvb_corrections(
 slit_function_correction(
   x,
   worker.fun = NULL,
-  hdr.tolerance = getOption("ooacquire.hdr.tolerance, default = 0.10"),
+  hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.1),
   verbose = getOption("photobiology.verbose", default = FALSE),
   ...
 )

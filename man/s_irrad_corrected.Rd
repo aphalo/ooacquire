@@ -16,6 +16,7 @@ s_irrad_corrected(x, ...)
   x,
   time = NULL,
   correction.method,
+  hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.1),
   return.cps = FALSE,
   descriptor,
   locale = NULL,
@@ -27,6 +28,7 @@ s_irrad_corrected(x, ...)
   x,
   spct.names = c(light = "light", filter = "filter", dark = "dark"),
   correction.method,
+  hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.1),
   return.cps = FALSE,
   verbose = getOption("photobiology.verbose", default = FALSE),
   ...
@@ -36,6 +38,7 @@ s_irrad_corrected(x, ...)
   x,
   time = NULL,
   correction.method,
+  hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.1),
   return.cps = FALSE,
   verbose = getOption("photobiology.verbose", default = FALSE),
   ...
@@ -53,6 +56,10 @@ file is used, and if \code{NA}, date is set to NA.}
 
 \item{correction.method}{A named list of constants and functions defining the
 method to be used for stray light and dark signal corrections.}
+
+\item{hdr.tolerance}{numeric Tolerance for mean deviation among cps columns as
+a fraction of one. Used in check of HDR consistency. A negative value
+disables merging using only the data for the shortest integration time.}
 
 \item{return.cps}{logical Useful when there is no need to apply a calibration,
 such as when computing new calibration multipliers.}
