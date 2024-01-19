@@ -94,6 +94,7 @@ skip_bad_pixs <- function(x) {
 #' @param x cps_spct object
 #' @param tolerance numeric Tolerance for mean deviation among cps columns as
 #'   a fraction of one.
+#' @param verbose Logical indicating the level of warnings and messages wanted.
 #'
 #' @export
 #'
@@ -101,7 +102,8 @@ skip_bad_pixs <- function(x) {
 #'   present.
 #'
 merge_cps <- function(x,
-                      tolerance = 0.10) {
+                      tolerance = 0.10,
+                      verbose = getOption("photobiology.verbose", default = FALSE)) {
   stopifnot(is.cps_spct(x))
   counts.cols <- grep("^cps", names(x), value = TRUE)
   if (length(counts.cols) == 1) {
@@ -141,13 +143,17 @@ merge_cps <- function(x,
         if (columns.ratio > (1 - tolerance) && columns.ratio < (1 + tolerance)) {
           merged.cps[is.na(merged.cps)] <- x[[cols[i]]][is.na(merged.cps)]
         } else {
-          message("Inconsistent cps in HDR exposures, replacing instead of merging")
+          message("HDR: inconsistent CPS, replacing '",
+                   cols[i - 1], "' by '", cols[i], "' instead of splicing.")
           merged.cps <- x[[cols[i]]]
           merged[1:(i - 1)] <- FALSE
         }
       }
       merged[i] <- TRUE
       if (!anyNA(merged.cps)) {
+        if (verbose && i < length(cols)) {
+          cat("HDR: splicing completed early at", cols[i], "!\n")
+        }
         break()
       }
     }
