@@ -6,8 +6,12 @@
 #' as plots as PDF files and summaries as comma separated files.
 #'
 #' @details This function can be used to acquire spectral reflectance,
-#'   spectral tarnsmittance and/or spectral absorptance using
+#'   spectral transmittance and/or spectral absorptance using
 #'   different protocols for acquisition and stray light and dark corrections.
+#'   Depending on the optical setup, solid or liquid samples can be measured.
+#'   The kinetics of changes in optical properties can be captured as a time
+#'   series of spectra, using `interface.mode = "series"`.
+#'
 #'   The protocols are described in the vignettes and in the help for the
 #'   lower level functions called, also from this same package.
 #'
@@ -72,13 +76,20 @@
 #' @param correction.method list The method to use when applying the calibration
 #' @param descriptors list A list of instrument descriptors containing
 #'   calibration data.
-#' @param ref.value numeric or filter_spct/reflector_spct object.
 #' @param type character Type of transmittance or reflectance measured.
 #' @param stray.light.method character Used only when the correction method is
 #'   created on-the-fly.
+#' @param seq.settings named list with numeric members \code{start.boundary},
+#'   \code{initial.delay}, \code{"step.delay"} and \code{"num.steps"}.
+#' @param light.source character One of "continuous", "pulsed".
+#' @param ref.value numeric or filter_spct/reflector_spct object.
 #' @param qty.out character One of "Tfr" (spectral transmittance as a fraction
 #'   of one), "cps" (counts per second), or "raw"
 #'   (raw sensor counts).
+#' @param plot.lines.max integer Maximum number of spectra to plot as individual
+#'   lines. Random sampling is used if number of spectra exceeds
+#'   \code{plot.lines.max}.
+#' @param summary.type character One of "plant", "PAR" or "VIS".
 #' @param save.pdfs,save.summaries,save.collections logical Whether to save
 #'   plots to PDFs files or not, and collection summaries to csv files or not,
 #'   enable collections user interface or not.
@@ -87,6 +98,9 @@
 #'   enabling this feature.
 #' @param show.figs logical Default for flag enabling display plots of acquired
 #'   spectra.
+#' @param interface.mode character One of "auto", "simple", "manual", "full",
+#'   "series", "auto-attr", "simple-attr", "manual-attr", "full-atr", and
+#'   "series-attr".
 #' @param num.exposures integer Number or light pulses (flashes) per scan. Set
 #'   to \code{-1L} to indicate that the light source is continuous.
 #' @param f.trigger.pulses function Function to be called to trigger light
@@ -94,8 +108,11 @@
 #'   return \code{TRUE} on success and \code{FALSE} on failure.
 #' @param folder.name,session.name,user.name character Default name of the
 #'   folder used for output, and session and user names.
+#' @param folder.name,session.name,user.name character Default name of the
+#'   folder used for output, and session and user names.
 #' @param verbose logical If TRUE additional messages are emitted, including
 #'   report on memory usage.
+#' @param QC.enabled logical If FALSE return NA skipping QC.
 #'
 #' @export
 #'
@@ -135,21 +152,27 @@
 #'
 acq_fraction_interactive <-
   function(tot.time.range = c(5, 15),
-           target.margin = 0.2,
-           HDR.mult = c(short = 1, long = 10),
+           target.margin = 0.1,
+           HDR.mult = if (light.source == "pulsed")
+             c(short = 1) else c(short = 1, long = 10),
            protocols = NULL,
            correction.method = NA,
            descriptors = NA,
+           stray.light.method = "simple",
+           seq.settings = NULL,
+           light.source = "continuous",
            ref.value = 1,
            qty.out = "Tfr",
            type = "total",
-           stray.light.method = "simple",
+           plot.lines.max = 11,
+           summary.type = "VIS",
            save.pdfs = TRUE,
            save.summaries = !interface.mode %in% c("series", "series-attr"),
            save.collections = !interface.mode %in% c("simple", "series", "series-attr"),
            async.saves = FALSE,
            show.figs = TRUE,
-           num.exposures = ifelse(qty.out == "fluence", 1L, -1L),
+           interface.mode = ifelse(light.source == "pulsed", "manual", "auto"),
+           num.exposures = ifelse(light.source == "pulsed", 1L, -1L),
            f.trigger.pulses = f.trigger.message,
            folder.name = paste("acq", qty.out,
                                lubridate::today(tzone = "UTC"),
@@ -159,7 +182,8 @@ acq_fraction_interactive <-
                                 strftime(lubridate::now(tzone = "UTC"),
                                          "%Y.%b.%d_%H.%M.%S"),
                                 sep = "_"),
-           verbose = getOption("photobiology.verbose", default = FALSE)) {
+           verbose = getOption("photobiology.verbose", default = FALSE),
+           QC.enabled = TRUE) {
 
     if (getOption("ooacquire.offline", FALSE)) {
       warning("ooacquire off-line: Aborting...")
@@ -1240,6 +1264,7 @@ acq_fraction_interactive <-
 #'
 Tfr_summary_table <-
   function(mspct,
+           quantity = "average",
            scale.factor = 1,
            attr2tb = "when.measured",
            summary.type = "VIS",
@@ -1261,21 +1286,21 @@ Tfr_summary_table <-
                                    list(photobiologyWavebands::PAR())))
       summary.tb <-
         photobiology::transmittance(mspct,
-                                    unit.out = unit.out,
+                                    quantity = quantity,
                                     scale.factor = scale.factor,
                                     w.band = plant.wb,
                                     attr2tb = attr2tb)
     } else if (summary.type == "VIS") {
       summary.tb <-
         photobiology::transmittance(mspct,
-                                    unit.out = unit.out,
+                                    quantity  = quantity,
                                     scale.factor = scale.factor,
                                     w.band = photobiologyWavebands::VIS_bands(),
                                     attr2tb = attr2tb)
     } else { # total
       summary.tb <-
         photobiology::transmittance(mspct,
-                                    unit.out = unit.out,
+                                    quantity = quantity,
                                     scale.factor = scale.factor,
                                     w.band = NULL,
                                     attr2tb = attr2tb)

@@ -2,31 +2,37 @@
 % Please edit documentation in R/acq-fraction-interactive.R
 \name{acq_fraction_interactive}
 \alias{acq_fraction_interactive}
-\alias{acq_rfr_tfr_interactive}
 \title{Acquire spectral fraction}
 \usage{
 acq_fraction_interactive(
   tot.time.range = c(5, 15),
-  target.margin = 0.2,
-  HDR.mult = c(short = 1, long = 10),
+  target.margin = 0.1,
+  HDR.mult = if (light.source == "pulsed") c(short = 1) else c(short = 1, long = 10),
   protocols = NULL,
   correction.method = NA,
   descriptors = NA,
+  stray.light.method = "simple",
+  seq.settings = NULL,
+  light.source = "continuous",
   ref.value = 1,
   qty.out = "Tfr",
   type = "total",
-  stray.light.method = "simple",
-  save.pdfs = TRUE
-)
-
-acq_rfr_tfr_interactive(
-  tot.time.range = c(10, 15),
-  target.margin = 0.1,
-  HDR.mult = c(1, 10),
-  descriptors = NA,
-  ref.value = 1,
+  plot.lines.max = 11,
+  summary.type = "VIS",
   save.pdfs = TRUE,
-  qty.out = "Tfr"
+  save.summaries = !interface.mode \%in\% c("series", "series-attr"),
+  save.collections = !interface.mode \%in\% c("simple", "series", "series-attr"),
+  async.saves = FALSE,
+  show.figs = TRUE,
+  interface.mode = ifelse(light.source == "pulsed", "manual", "auto"),
+  num.exposures = ifelse(light.source == "pulsed", 1L, -1L),
+  f.trigger.pulses = f.trigger.message,
+  folder.name = paste("acq", qty.out, lubridate::today(tzone = "UTC"), sep = "-"),
+  user.name = Sys.info()[["user"]],
+  session.name = paste(user.name, strftime(lubridate::now(tzone = "UTC"),
+    "\%Y.\%b.\%d_\%H.\%M.\%S"), sep = "_"),
+  verbose = getOption("photobiology.verbose", default = FALSE),
+  QC.enabled = TRUE
 )
 }
 \arguments{
@@ -47,32 +53,69 @@ names of at least one member of the default list of protocols.}
 \item{descriptors}{list A list of instrument descriptors containing
 calibration data.}
 
+\item{stray.light.method}{character Used only when the correction method is
+created on-the-fly.}
+
+\item{seq.settings}{named list with numeric members \code{start.boundary},
+\code{initial.delay}, \code{"step.delay"} and \code{"num.steps"}.}
+
+\item{light.source}{character One of "continuous", "pulsed".}
+
 \item{ref.value}{numeric or filter_spct/reflector_spct object.}
 
 \item{qty.out}{character One of "Tfr" (spectral transmittance as a fraction
-of one), "irrad" (spectral irardiance), "cps" (counts per second), or "raw"
+of one), "cps" (counts per second), or "raw"
 (raw sensor counts).}
 
 \item{type}{character Type of transmittance or reflectance measured.}
 
-\item{stray.light.method}{character Used only when the correction method is
-created on-the-fly.}
+\item{plot.lines.max}{integer Maximum number of spectra to plot as individual
+lines. Random sampling is used if number of spectra exceeds
+\code{plot.lines.max}.}
 
-\item{save.pdfs}{logical Whether to save
+\item{summary.type}{character One of "plant", "PAR" or "VIS".}
+
+\item{save.pdfs, save.summaries, save.collections}{logical Whether to save
 plots to PDFs files or not, and collection summaries to csv files or not,
-enable collections user interface or not..}
+enable collections user interface or not.}
+
+\item{async.saves}{logical A flag enabling or disabling the use of concurrent
+processes to save data to files. Package 'mirai' must be installed before
+enabling this feature.}
+
+\item{show.figs}{logical Default for flag enabling display plots of acquired
+spectra.}
+
+\item{interface.mode}{character One of "auto", "simple", "manual", "full",
+"series", "auto-attr", "simple-attr", "manual-attr", "full-atr", and
+"series-attr".}
+
+\item{num.exposures}{integer Number or light pulses (flashes) per scan. Set
+to \code{-1L} to indicate that the light source is continuous.}
+
+\item{f.trigger.pulses}{function Function to be called to trigger light
+pulse(s). Should accept as its only argument the number of pulses, and
+return \code{TRUE} on success and \code{FALSE} on failure.}
+
+\item{folder.name, session.name, user.name}{character Default name of the
+folder used for output, and session and user names.}
+
+\item{verbose}{logical If TRUE additional messages are emitted, including
+report on memory usage.}
+
+\item{QC.enabled}{logical If FALSE return NA skipping QC.}
 }
 \value{
 These functions return the acquired spectra through "side effects" as
   each spectrum is saved, both as raw counts data and optionally as spectral
-  irradiance or counts-per-second  spectral data in an \code{.rda} file as
+  transmittance or counts-per-second data in an \code{.rda} file as
   objects of the classes defined in package 'photobiology'. Optionally, the
   plot for each spectrum is saved as a \code{.pdf} file. At any time, the
-  current group of spectra can be saved as a collection. When a collection
-  is created, spectral data are for several spectra are saved together.
+  current group of spectra can be saved as a collection. When a collection is
+  created, spectral data for several spectra are saved together.
   Summaries are saved to a CSV file and joint plots to a \code{.pdf} file.
-  The value returned by the function is that from closing the
-  connection to the spectrometer.
+  The value returned by the function is that from closing the connection to
+  the spectrometer.
 }
 \description{
 Interactive front-end allowing acquisition of spectral fractions using Ocean
@@ -82,8 +125,12 @@ as plots as PDF files and summaries as comma separated files.
 }
 \details{
 This function can be used to acquire spectral reflectance,
-  spectral tarnsmittance and/or spectral absorptance using
+  spectral transmittance and/or spectral absorptance using
   different protocols for acquisition and stray light and dark corrections.
+  Depending on the optical setup, solid or liquid samples can be measured.
+  The kinetics of changes in optical properties can be captured as a time
+  series of spectra, using `interface.mode = "series"`.
+
   The protocols are described in the vignettes and in the help for the
   lower level functions called, also from this same package.
 
@@ -159,9 +206,7 @@ acq_fraction_interactive()
 \seealso{
 This function calls functions \code{\link{tune_interactive}},
   \code{\link{protocol_interactive}} and
-  \code{\link{set_attributes_interactive}}. If irradiance calibration is
-  retrieved from the instrument, functions \code{\link{get_oo_descriptor}}
-  and \code{\link{oo_calib2irrad_mult}} are also called.
+  \code{\link{set_attributes_interactive}}.
 
 Other interactive acquisition functions: 
 \code{\link{acq_irrad_interactive}()}

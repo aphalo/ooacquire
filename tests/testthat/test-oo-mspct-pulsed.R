@@ -23,7 +23,7 @@ test_that("raw from pulsed to fluence works", {
     new.spct <- s_irrad_corrected(old.raw.mspct, correction.method = correction.method)
     new.spct <- trimInstrDesc(new.spct) # needed to avoid futile call to .jcall
     new.spct <- clip_wl(new.spct, range = c(315, NA))
-    print(wl_range(new.spct))
+ #   print(wl_range(new.spct))
     expect_known_value(new.spct, file = paste("ref", f, sep = "-"), update = TRUE)
   }
 })
@@ -64,7 +64,7 @@ test_that("raw from pulsed to Tfr works", {
     new.spct <- trim_wl(new.spct, range = c(400, 1000))
     new.spct <- smooth_spct(new.spct, method = "supsmu")
     enable_check_spct()
-    print(getWhenMeasured(new.spct))
+#    print(getWhenMeasured(new.spct))
     expect_known_value(new.spct, file = paste("ref", f, sep = "-"), update = TRUE)
   }
 })
