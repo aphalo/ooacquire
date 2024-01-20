@@ -15,7 +15,7 @@ filter_correction(
   flt.Tfr = 1,
   trim = 0.05,
   filter.nir.adjust = FALSE,
-  hdr.tolerance = getOption("ooacquire.hdr.tolerance, default = 0.10"),
+  hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.1),
   verbose = getOption("photobiology.verbose", default = FALSE)
 )
 
@@ -26,7 +26,7 @@ no_filter_correction(
   flt.ref.wl = NULL,
   flt.Tfr = 1,
   trim = 0,
-  hdr.tolerance = getOption("ooacquire.hdr.tolerance, default = 0.10"),
+  hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.1),
   verbose = getOption("photobiology.verbose", default = FALSE)
 )
 }

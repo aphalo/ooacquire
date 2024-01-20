@@ -7,6 +7,8 @@ rm(Nichia.horticulture.5000K.raw_mspct)
 
 load(file = "data-raw/raw-mspct-examples/sun001.spct.Rda")
 
+# load(file = "data-raw/raw-mspct-examples/sun-viikki-noon.Rda")
+
 load(file = "data-raw/raw-mspct-examples/white-LED-lamp-2min.Rda")
 
 white_LED_2min.raw_mspct <- msmsply(LED_lamp04_long.raw_spct, trimInstrDesc, fields = c("-", "w", "sr.index"))

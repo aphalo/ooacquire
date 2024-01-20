@@ -6,6 +6,9 @@
 #'   \code{x} to those expected.
 #' @param correction.method A named list of constants and functions defining the
 #'   method to be used for stray light and dark signal corrections.
+#' @param hdr.tolerance numeric Tolerance for mean deviation among cps columns as
+#'   a fraction of one. Used in check of HDR consistency. A negative value
+#'   disables merging using only the data for the shortest integration time.
 #' @param return.cps logical Useful when there is no need to apply a calibration,
 #'   such as when computing new calibration multipliers.
 #' @param descriptor A named list with a descriptor of the characteristics of
@@ -47,6 +50,7 @@ s_irrad_corrected.default <- function(x, ...) {
 s_irrad_corrected.list <- function(x,
                                    time = NULL,
                                    correction.method,
+                                   hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.10),
                                    return.cps = FALSE,
                                    descriptor,
                                    locale = NULL,
@@ -69,6 +73,7 @@ s_irrad_corrected.list <- function(x,
                                      filter = "filter",
                                      dark = "dark"),
                       correction.method = correction.method,
+                      hdr.tolerance = hdr.tolerance,
                       return.cps = return.cps,
                       verbose = verbose,
                       ...)
@@ -90,6 +95,7 @@ s_irrad_corrected.raw_mspct <-
                           filter = "filter",
                           dark = "dark"),
            correction.method,
+           hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.10),
            return.cps = FALSE,
            verbose = getOption("photobiology.verbose", default = FALSE),
            ...) {
@@ -136,6 +142,7 @@ s_irrad_corrected.raw_mspct <-
           s_irrad_corrected(x[unname(temp.spct.names)], # extraction needed because of tests
                             spct.names = temp.spct.names,
                             correction.method = correction.method,
+                            hdr.tolerance = hdr.tolerance,
                             return.cps = return.cps,
                             verbose = verbose,
                             ...)
@@ -190,6 +197,7 @@ s_irrad_corrected.raw_mspct <-
                         inst.dark.pixs = correction.method[["inst.dark.pixs"]],
                         worker.fun = worker.fun,
                         trim = correction.method[["trim"]],
+                        hdr.tolerance = hdr.tolerance,
                         verbose = verbose)
 
       if (return.cps) {
@@ -215,6 +223,7 @@ s_irrad_corrected.raw_mspct <-
 s_irrad_corrected.raw_spct <- function(x,
                                        time = NULL,
                                        correction.method,
+                                       hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.10),
                                        return.cps = FALSE,
                                        verbose = getOption("photobiology.verbose", default = FALSE),
                                        ...) {
@@ -222,6 +231,7 @@ s_irrad_corrected.raw_spct <- function(x,
   s_irrad_corrected(x = raw.mspct,
                     time = time,
                     correction.method = correction.method,
+                    hdr.tolerance = hdr.tolerance,
                     return.cps = return.cps,
                     verbose = verbose,
                     ...)

@@ -10,6 +10,7 @@
 #' @param x raw_spct object.
 #' @param ref.pixs.range integer vector of length 2.
 #' @param despike logical flag, if TRUE despiking will be attempted.
+#' @param hdr.tolerance numeric Passed as tolerance argument to merge_cps().
 #' @param ... passed to \code{photobiology::despike}.
 #'
 #' @return a cps_spct object with one spectrum preserving the metadata present in
@@ -41,6 +42,7 @@ raw2corr_cps.default <- function(x,
 raw2corr_cps.raw_spct <- function(x,
                                   ref.pixs.range = c(1, 100),
                                   despike = FALSE,
+                                  hdr.tolerance = 0.1,
                                   ...) {
   # replace bad data with NAs
   x <- trim_counts(x)
@@ -57,7 +59,7 @@ raw2corr_cps.raw_spct <- function(x,
   # convert raw counts to counts per second
   x <- raw2cps(x)
   # if bracketing was used, splice the spectra
-  x <- merge_cps(x)
+  x <- merge_cps(x, tolerance = hdr.tolerance)
   # apply slit function correction
   x <- slit_function_correction(x)
   # check for spikes and remove them

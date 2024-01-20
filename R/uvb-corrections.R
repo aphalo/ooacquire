@@ -58,7 +58,7 @@ uvb_corrections <-
            inst.dark.pixs = 1:4,
            worker.fun = NULL,
            trim = 0.05,
-           hdr.tolerance = getOption("ooacquire.hdr.tolerance, default = 0.10"),
+           hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.10),
            verbose = getOption("photobiology.verbose", default = FALSE),
            ...) {
 
@@ -84,7 +84,9 @@ uvb_corrections <-
     spct.names <- names(x)
 
     if (is.raw_mspct(x)) {
-      y <- raw2corr_cps(x, ref.pixs.range = inst.dark.pixs)
+      y <- raw2corr_cps(x,
+                        ref.pixs.range = inst.dark.pixs,
+                        hdr.tolerance = hdr.tolerance)
     } else if (is.cps_mspct(x)) {
       y <- x
     }
@@ -177,7 +179,7 @@ uvb_corrections <-
 slit_function_correction <-
   function(x,
            worker.fun = NULL,
-           hdr.tolerance = getOption("ooacquire.hdr.tolerance, default = 0.10"),
+           hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.10),
            verbose = getOption("photobiology.verbose", default = FALSE),
            ...) {
     stopifnot(is.cps_spct(x))
@@ -247,7 +249,7 @@ filter_correction <-
            flt.Tfr = 1,
            trim = 0.05,
            filter.nir.adjust = FALSE,
-           hdr.tolerance = getOption("ooacquire.hdr.tolerance, default = 0.10"),
+           hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.10),
            verbose = getOption("photobiology.verbose", default = FALSE)) {
     stopifnot(is.cps_spct(x) && is.cps_spct(flt))
     stopifnot(all(wl_range(x) == wl_range(flt)) && nrow(x) == nrow(flt))
@@ -432,7 +434,7 @@ no_filter_correction <-
            flt.ref.wl = NULL,
            flt.Tfr = 1,
            trim = 0,
-           hdr.tolerance = getOption("ooacquire.hdr.tolerance, default = 0.10"),
+           hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.10),
            verbose = getOption("photobiology.verbose", default = FALSE)) {
     stopifnot(is.null(attr(x, "straylight.corrected")) ||
                 !attr(x, "straylight.corrected"))

@@ -94,6 +94,7 @@ skip_bad_pixs <- function(x) {
 #' @param x cps_spct object
 #' @param tolerance numeric Tolerance for mean deviation among cps columns as
 #'   a fraction of one.
+#' @param verbose Logical indicating the level of warnings and messages wanted.
 #'
 #' @export
 #'
@@ -101,7 +102,8 @@ skip_bad_pixs <- function(x) {
 #'   present.
 #'
 merge_cps <- function(x,
-                      tolerance = 0.10) {
+                      tolerance = 0.10,
+                      verbose = getOption("photobiology.verbose", default = FALSE)) {
   stopifnot(is.cps_spct(x))
   counts.cols <- grep("^cps", names(x), value = TRUE)
   if (length(counts.cols) == 1) {
@@ -116,37 +118,48 @@ merge_cps <- function(x,
   } else {
     cols <- counts.cols[order(num.exposures, decreasing = TRUE)]
   }
-  x[["cps"]] <- x[[cols[1]]]
 
-  merged <- logical(length(cols)) # set to FALSE
-  merged[1] <- TRUE
-  for (i in 2:length(cols)) {
-    to.replace.idx <- is.na(x[["cps"]])
-    if (sum(!to.replace.idx) < 30 ||
-        anyNA(x[["cps"]][x[["w.length"]] < 400])) {
-      # if there is saturation in UV we replace the whole column
-      x[["cps"]] <- x[[cols[i]]]
-      merged[i - 1] <- FALSE
-    } else {
-      # replace only clipped pixels if cps consistent across columns
-      columns.ratio <-
-          sum(x[[cols[i]]][!to.replace.idx]) / sum(x[["cps"]][!to.replace.idx])
-      if (columns.ratio > (1 - tolerance) && columns.ratio < (1 + tolerance)) {
-        x[["cps"]] <- ifelse(is.na(x[["cps"]]),
-                             x[[cols[i]]],
-                             x[["cps"]] )
-       } else {
-        message("Inconsistent cps in HDR exposures, replacing instead of merging")
-        x[["cps"]] <- x[[cols[i]]]
-        merged[i - 1] <- FALSE
+  merged <- logical(length(cols)) # allocate, filled with FALSE
+
+  if (tolerance < 0) {
+    # only the shortest integ.time or smaller num.exposures
+    merged.cps <- x[[rev(cols)[1]]]
+    merged[length(cols)] <- TRUE
+  } else {
+    merged.cps <- x[[cols[1]]]
+
+    merged[1] <- TRUE
+    for (i in 2:length(cols)) {
+      to.replace.idx <- is.na(merged.cps)
+      if (sum(!to.replace.idx) < 30 ||
+          anyNA(merged.cps[x[["w.length"]] < 400])) {
+        # if there is saturation in UV we replace the whole column
+        merged.cps <- x[[cols[i]]]
+        merged[1:(i - 1)] <- FALSE
+      } else {
+        # replace only clipped pixels if cps consistent across columns
+        columns.ratio <-
+          sum(x[[cols[i]]][!to.replace.idx]) / sum(merged.cps[!to.replace.idx])
+        if (columns.ratio > (1 - tolerance) && columns.ratio < (1 + tolerance)) {
+          merged.cps[is.na(merged.cps)] <- x[[cols[i]]][is.na(merged.cps)]
+        } else {
+          message("HDR: inconsistent CPS, replacing '",
+                   cols[i - 1], "' by '", cols[i], "' instead of splicing.")
+          merged.cps <- x[[cols[i]]]
+          merged[1:(i - 1)] <- FALSE
+        }
+      }
+      merged[i] <- TRUE
+      if (!anyNA(merged.cps)) {
+        if (verbose && i < length(cols)) {
+          cat("HDR: splicing completed early at", cols[i], "!\n")
+        }
+        break()
       }
     }
-    merged[i] <- TRUE
-    if (!anyNA(x[["cps"]])) {
-      break()
-    }
   }
-  z <- x[ , c("w.length", "cps")]
+
+  z <- cps_spct(w.length = x[["w.length"]], cps = merged.cps)
   z <- photobiology::copy_attributes(x, z)
   attr(x = z, which = "merged.cps.cols") <- cols[merged]
   z
@@ -178,19 +191,26 @@ merge_cps <- function(x,
 bleed_nas <- function(x, n = 10) {
   stopifnot(is.raw_spct(x))
   counts.cols <- grep("^counts", names(x), value = TRUE)
-  # this is a "quick and dirty" algorithm that assumes that we do not need to
-  # check for NAs the first n and last n pixels of the detector array, which in
-  # practice are almost never used for anything but dark reference and so very
-  # unlikely to be exposed to an irradiance saturating their response.
-  z <- x
+  # as NAs are mostly contiguous using rle() should speed up the code
   for (i in counts.cols) {
-    for (j in n:(nrow(x) - n)) {
-      if (anyNA(x[(j-n):(j+n), i])) {
-        z[j, i] <- NA
-      }
+    if (!anyNA(x[[i]])) {
+      next()
+    }
+    rle.na <- rle(is.na(x[[i]]))
+    rle.idx <- which(rle.na$values)
+    vec.idx <- cumsum(rle.na$lengths)
+    if (vec.idx[1] < n) {
+      vec.idx[1] <- n
+    }
+    if (vec.idx[length(vec.idx)] < nrow(x) - n) {
+      vec.idx[length(vec.idx)] <- nrow(x) - n
+    }
+    for (j in rle.idx) {
+      window.bleed <- (vec.idx[j - 1] - n + 1):(vec.idx[j] + n)
+      x[window.bleed, i] <- NA
     }
   }
-  z
+  x
 }
 
 #' Quality control of dark spectra
