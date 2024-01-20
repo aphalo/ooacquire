@@ -25,6 +25,7 @@ ferrite beads is likely to help.**
     can alter the sensitivity of the quality control applied to dark spectra.
 -   Revise function `merge_cps()` to accept a negative value as argument to
     `tolerance` to disable merging (= splicing) using only the primary scan.
+-   Revise function `beekd_nas()` to improve performance (a lot).
 -   Update in 'photobiology' 0.11.0 improves/fixes handling of metadata.
 -   Update in 'photobiology' 0.11.1 improves the speed of plotting sampled
     time series.

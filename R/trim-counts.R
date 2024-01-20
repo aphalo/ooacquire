@@ -191,19 +191,26 @@ merge_cps <- function(x,
 bleed_nas <- function(x, n = 10) {
   stopifnot(is.raw_spct(x))
   counts.cols <- grep("^counts", names(x), value = TRUE)
-  # this is a "quick and dirty" algorithm that assumes that we do not need to
-  # check for NAs the first n and last n pixels of the detector array, which in
-  # practice are almost never used for anything but dark reference and so very
-  # unlikely to be exposed to an irradiance saturating their response.
-  z <- x
+  # as NAs are mostly contiguous using rle() should speed up the code
   for (i in counts.cols) {
-    for (j in n:(nrow(x) - n)) {
-      if (anyNA(x[(j-n):(j+n), i])) {
-        z[j, i] <- NA
-      }
+    if (!anyNA(x[[i]])) {
+      next()
+    }
+    rle.na <- rle(is.na(x[[i]]))
+    rle.idx <- which(rle.na$values)
+    vec.idx <- cumsum(rle.na$lengths)
+    if (vec.idx[1] < n) {
+      vec.idx[1] <- n
+    }
+    if (vec.idx[length(vec.idx)] < nrow(x) - n) {
+      vec.idx[length(vec.idx)] <- nrow(x) - n
+    }
+    for (j in rle.idx) {
+      window.bleed <- (vec.idx[j - 1] - n + 1):(vec.idx[j] + n)
+      x[window.bleed, i] <- NA
     }
   }
-  z
+  x
 }
 
 #' Quality control of dark spectra
