@@ -1234,7 +1234,7 @@ acq_fraction_interactive <-
 #'
 #' @param mspct A filter_mspct, or a filter_spct object containing spectral
 #'    transmittance for one or more sources.
-#' @param scale.factor numeric A multiplicative factor used to rescale data.
+#' @param quantity character Passed to \code{\link[photobiology]{transmittance}}.
 #' @param attr2tb character Vector with one or more of "when.measured",
 #'    "what.measured", "where.measured", "how.measured" and "comment".
 #' @param summary.type character One of "plant", "PAR" or "VIS".
@@ -1265,7 +1265,6 @@ acq_fraction_interactive <-
 Tfr_summary_table <-
   function(mspct,
            quantity = "average",
-           scale.factor = 1,
            attr2tb = "when.measured",
            summary.type = "VIS",
            digits = 3L) {
@@ -1287,21 +1286,18 @@ Tfr_summary_table <-
       summary.tb <-
         photobiology::transmittance(mspct,
                                     quantity = quantity,
-                                    scale.factor = scale.factor,
                                     w.band = plant.wb,
                                     attr2tb = attr2tb)
     } else if (summary.type == "VIS") {
       summary.tb <-
         photobiology::transmittance(mspct,
                                     quantity  = quantity,
-                                    scale.factor = scale.factor,
                                     w.band = photobiologyWavebands::VIS_bands(),
                                     attr2tb = attr2tb)
     } else { # total
       summary.tb <-
         photobiology::transmittance(mspct,
                                     quantity = quantity,
-                                    scale.factor = scale.factor,
                                     w.band = NULL,
                                     attr2tb = attr2tb)
     }
