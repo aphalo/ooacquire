@@ -342,11 +342,6 @@ acq_irrad_interactive <-
     rda.mirai <- NA
     pdf.mirai <- NA
 
-    # initialize repeats counter
-
-    total.repeats <- pending.repeats <- 1L
-    series.start <- TRUE
-
     # define measurement protocols
     default.protocols <- list(l = "light",
                               ld = c("light", "dark"),
@@ -541,7 +536,7 @@ acq_irrad_interactive <-
            how.measured = paste("Acquired with ", descriptor[["spectrometer.name"]],
                                 " (", descriptor[["spectrometer.sn"]],
                                 "), with a ", descriptor[["entrance.optics"]][["geometry"]], " diffuser",
-                                ")\nR (", paste(R.version[["major"]], R.version[["minor"]], sep = "."),
+                                "\nR (", paste(R.version[["major"]], R.version[["minor"]], sep = "."),
                                 "), 'ooacquire' (", utils::packageVersion("ooacquire"),
                                 ") in mode \"", interface.mode,
                                 "\", 'rOmniDriver' (", utils::packageVersion("rOmniDriver"),
@@ -615,6 +610,8 @@ acq_irrad_interactive <-
     file.counter <- 0
     acq.pausing <- TRUE
     pending.repeats <- 0
+    total.repeats <- 1L
+#    series.start <- TRUE
 
     # initialize default object name
 
@@ -743,6 +740,9 @@ acq_irrad_interactive <-
                                      acq.settings = settings,
                                      start.int.time = start.int.time,
                                      interface.mode = interface.mode)
+        # with new settings we start with one repeat
+        pending.repeats <- 1
+        total.repeats <- 1
         get.seq.settings <- grepl("series", interface.mode)
       }
 

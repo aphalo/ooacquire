@@ -372,19 +372,27 @@ tune_acq_settings <- function(descriptor,
       dark.counts <- nl.fun(min(raw.counts[x$pix.selector]))
       max.counts <- nl.fun(max(raw.counts[x$pix.selector]))
     }
-    if (verbose) cat("max counts [", i, "]: ", format(max.counts), "\n", sep = "")
+    if (verbose) cat("Max counts [", i, "]: ", format(max.counts), sep = "")
     if (max.counts < target.min.counts && integ.time < x$max.integ.time) {
-      if (verbose) cat("max counts <", trunc(target.min.counts), "\n", sep = "")
+      if (verbose){
+        cat(" < ", trunc(target.min.counts), " target", sep = "")
+      }
+      cat("\n")
       # replaced round with trunc as the algorithm was sometimes overshooting
       integ.time <- trunc(integ.time *
                             (target.counts - dark.counts) /
                             (max.counts - dark.counts))
+    } else {
+      if (verbose){
+        cat(" >= ", trunc(target.min.counts), " target", sep = "")
+      }
+      cat("\n")
     }
 
     if (integ.time >= x$max.integ.time) {
       integ.time <- x$max.integ.time
       if (verbose) {
-        warning("Light level is too low for optimal performance! Using (s): ",
+        warning("Light too low for optimal performance! Using (s): ",
                 format(integ.time * 1e-6), call. = FALSE)
       }
       break()
@@ -429,15 +437,15 @@ tune_acq_settings <- function(descriptor,
   acq.settings$rel.signal = max.counts / nl.fun(descriptor$max.counts)
 
   if (verbose) {
-    cat("Relative saturation: ",
-        format(acq.settings$rel.signal, width = 10, digits = 3), "\n")
+    cat("\nTUNED SETTINGS:\nRelative saturation:   ",
+        format(acq.settings$rel.signal, nsmall = 0, width = 10, digits = 3), "\n")
     cat("Integration times (s): ",
         format(acq.settings$integ.time * 1e-6, nsmall = 0, width = 10, digits = 3), "\n")
     cat("Numbers of scans:       ",
-        format(acq.settings$num.scans, width = 10, digits = 3), "\n")
+        format(acq.settings$num.scans, nsmall = 0, width = 10, digits = 3), "\n")
     cat("Total time (s):         ",
         format(acq.settings$tot.time * 1e-6,
-               digits = 3, width = 10), "\n")
+               digits = 3, nsmall = 0, width = 10), "\n")
   }
   acq.settings
 }

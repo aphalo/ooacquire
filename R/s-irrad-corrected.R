@@ -134,7 +134,17 @@ s_irrad_corrected.raw_mspct <-
       # if we have a series we use recursion for each spectrum
       corrected.mspct <- list() # a list is enough
       new.names <- gsub("^light", "time", spct.names[["light"]])
+      job.length <- length(spct.names[["light"]])
+      show.progress <- job.length > 100
+      progress.step <- job.length %/% 10
+      progress <- 0
       for (i in seq_along(spct.names[["light"]])) {
+        if (show.progress) {
+          progress <- progress + 1
+          if ((progress %% progress.step) == 0) {
+            cat(progress / job.length * 100, "%, ")
+          }
+        }
         temp.spct.names <- spct.names
         temp.spct.names[["light"]] <- spct.names[["light"]][i]
         temp.spct.names <- unlist(temp.spct.names, use.names = TRUE) # convert list into vector
