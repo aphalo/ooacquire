@@ -1,8 +1,8 @@
 Package: ooacquire
 Type: Package
 Title: Acquire Data from OO Spectrometers
-Version: 0.4.4-2
-Date: 2024-01-22
+Version: 0.4.4-3
+Date: 2024-02-02
 Authors@R:
    c(
     person("Pedro J.", "Aphalo", email = "pedro.aphalo@helsinki.fi", role = c("aut", "trl", "cre")),
@@ -44,7 +44,8 @@ Suggests:
     rstudioapi (>= 0.10),
     knitr (>= 1.45),
     rmarkdown (>= 2.25),
-    testthat (>= 3.1.4)
+    testthat (>= 3.1.4),
+    spacesXYZ (>= 1.2-1)
 LazyData: yes
 LazyLoad: yes
 ByteCompile: true

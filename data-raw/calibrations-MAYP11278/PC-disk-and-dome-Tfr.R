@@ -68,12 +68,12 @@ p0 <-
   autoplot(c(PC_filters.mspt,
              normalize(filters.mspct["Foiltek_Clear_PC"], norm = 1050)))
 
-p0.insert <- p +
+p0.insert <- p0 +
   labs(x = "", y = "") +
   theme(legend.position = "none") +
   coord_cartesian(xlim = c(370, 430))
 
-p1 <- p0 + annotate(geom = "plot", y = 0, x = 1050, label = p0.insert, vp.width = 0.5, vp.height = 0.5)
+p1 <- p0 + annotate(geom = "plot", y = 0, x = 1100, label = p0.insert, vp.width = 0.45, vp.height = 0.65)
 
 p2 <-
   autoplot(c(PC_filters.mspt["dome"],
@@ -84,5 +84,5 @@ p2.insert <- p2 +
   theme(legend.position = "none") +
   coord_cartesian(xlim = c(370, 430))
 
-p2 <- p2 + annotate(geom = "plot", y = 0, x = 1050, label = p2.insert, vp.width = 0.5, vp.height = 0.5)
+p2 <- p2 + annotate(geom = "plot", y = 0, x = 1100, label = p2.insert, vp.width = 0.45, vp.height = 0.65)
 
