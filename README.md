@@ -3,6 +3,9 @@
 
 # ooacquire <img src="man/figures/logo.png" align="right" width="120"/>
 
+[![R Universe
+vwersion](https://aphalo.r-universe.dev/badges/ooacquire)](https://aphalo.r-universe.dev/ooacquire)
+
 ## Purpose
 
 Package **‘ooacquire’** makes it possible to control, modify settings
@@ -137,18 +140,7 @@ connection of spectrometers. If spectral data will be input from files
 on disk to do computations rather than acquired from a connected
 spectrometer, installation of the OmniDriver runtime, package
 ‘rOmniDriver’ and their respective dependencies can be skipped.
-‘ooacuire’ detects their absence and switches to an “off-line” mode.*
-
-The package is not hosted in CRAN, but instead at a private “CRAN-like”
-repository. In recent versions of R an option can be set to make this
-repository visible to R, before installing this package and
-‘rOmniDriver’ as usual.
-
-``` r
-repos <- getOption("repos", default = list())
-repos[["r4photobiology"]] <- "https://r.r4photobiology.info"
-options(repos = repos)
-```
+‘ooacquire’ detects their absence and switches to an “off-line” mode.*
 
 Installation of Java/Temurin and OmniDriver should be done first.
 
@@ -163,18 +155,32 @@ Installation of Java/Temurin and OmniDriver should be done first.
 3.  Install ‘rOmniDriver’ and ‘ooacquire’ after setting the `repos`
     option, which ensures dependencies will be installed automatically.
     Once the option is set, installation is as for packages hosted at
-    CRAN. Using the menu entry in RStudio or RGui or the code below.
+    CRAN. Using the menu entry in RStudio or RGui or R prompt.
+
+The package is not hosted in CRAN, but instead at “CRAN-like” repository
+in the R-Universe serving source packages as well as Windows, OS X
+(Apple Mac) and Ubuntu binaries.
+
+In recent versions of R an option can be set to make this repository
+visible to R, before installing this package and ‘rOmniDriver’ as usual.
+
+``` r
+repos <- getOption("repos", default = list())
+repos[["r4photobiology"]] <- "https://aphalo.r-universe.dev'"
+options(repos = repos)
+```
 
 ``` r
 install.packages("ooacquire")
 ```
 
-As long as the `repos` option is set as described above, updates can be
-done as for packages hosted at CRAN. Using the menu entry in RStudio or
-RGui or the code below.
+Without setting the option, it is also possible to pass the URL in the
+call, together with the CRAN URL to ensure that dependencies are
+installed.
 
 ``` r
-update.packages()
+install.packages('ooacquire', 
+                 repos = c('https://aphalo.r-universe.dev', 'https://cloud.r-project.org'))
 ```
 
 **Steps 1 and 2 are described in the README file of ‘rOmniDriver’, which
@@ -186,12 +192,19 @@ installed before attempting to install ‘ooacquire’.**
 
 ## Installation of the under development version
 
-The latest, possibly buggy, development version can be installed from
-the Git repository at GitHub. For this we can use package ‘remotes’. As
-package’s ‘ooacquire’ although coded mainly in R but includes one
-function in C++, the build chain for R packages needs to be installed.
-In MS-Windows this is achieved by installing Rtools and in OS X and
-Linux by installing the tools needed to build R packages from sources.
+Installation from sources is also possible directly from the Git
+repository at GitHub. For this we can use package ‘remotes’ (or package
+‘pak’). **This rarely needed, except to install a non default branch or
+from a specific commit.** The repository [![:name status
+badge](https://aphalo.r-universe.dev/badges/:name)](https://aphalo.r-universe.dev/)
+is updated with no more than 1 h of lag to match default branch of each
+of the packages in GitHub that are registered.
+
+Package ‘ooacquire’ although coded mainly in R, includes one function in
+C++. Thus, build chain for R packages needs to be installed when
+installing it directly from GitHub. In MS-Windows this is achieved by
+installing Rtools and in OS X and Linux by installing the tools needed
+to build R packages from sources.
 
 Assuming that R and the build tools are installed the following steps
 should be done in sequence:
@@ -307,7 +320,7 @@ citation("ooacquire")
 #> To cite package 'ooacquire' in publications use:
 #> 
 #>   Aphalo P, Ylianttila L (2024). _ooacquire: Acquire Data from OO
-#>   Spectrometers_. R package version 0.4.3.9000,
+#>   Spectrometers_. R package version 0.4.4-2,
 #>   https://github.com/aphalo/ooacquire,
 #>   <https://docs.r4photobiology.info/ooacquire/>.
 #> 
@@ -317,7 +330,7 @@ citation("ooacquire")
 #>     title = {ooacquire: Acquire Data from OO Spectrometers},
 #>     author = {Pedro J. Aphalo and Lasse Ylianttila},
 #>     year = {2024},
-#>     note = {R package version 0.4.3.9000, 
+#>     note = {R package version 0.4.4-2, 
 #> https://github.com/aphalo/ooacquire},
 #>     url = {https://docs.r4photobiology.info/ooacquire/},
 #>   }
