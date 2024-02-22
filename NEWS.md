@@ -4,7 +4,7 @@ editor_options:
     wrap: 72
 ---
 
-# ooacquire 0.4.4-1 (2024-01-18)
+# ooacquire 0.4.4-3 (2024-02-09)
 
 **The new features allowing measurement of time series of thousands of spectra at a
 very fast rate are easily affected by glitches in the USB connection. If the
@@ -31,6 +31,7 @@ ferrite beads is likely to help.**
     time series.
 -   Merge and expand the computation algorithms and calibration vignettes and
     move it [on-line](https://www.r4photobiology.info/pages/ooacquire-algorithms.html).
+-   Track a small change in an indirect dependency on package 'spacesXYZ'.
 
 # ooacquire 0.4.3 (2023-12-28)
 

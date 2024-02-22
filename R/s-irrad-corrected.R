@@ -158,7 +158,7 @@ s_irrad_corrected.raw_mspct <-
                             ...)
       }
       # convert collection into spectrum in long form
-      corrected.spct <- rbindspct(corrected.mspct)
+      corrected.spct <- rbindspct(corrected.mspct, attrs.simplify = TRUE)
 
     } else {
 

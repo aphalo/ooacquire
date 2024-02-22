@@ -46,7 +46,8 @@ irrad_summary_table(sun.spct)
 irrad_summary_table(sun.spct, attr2tb = c("what.measured", "where.measured"))
 irrad_summary_table(sun.spct, summary.type = "plant", unit.out = "photon")
 irrad_summary_table(sun.spct, summary.type = "PAR", unit.out = "photon")
-irrad_summary_table(sun.spct, summary.type = "VIS", unit.out = "energy")
+# temporary kludge until fixed in photobiologyInOut
+# irrad_summary_table(sun.spct, summary.type = "VIS", unit.out = "energy")
 
 }
 \seealso{
