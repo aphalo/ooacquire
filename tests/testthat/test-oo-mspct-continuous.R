@@ -1,5 +1,9 @@
 context("convert raw continuous source")
 
+# set to TRUE to reset snapshots
+updating <- FALSE
+debugging <- FALSE
+
 # library(ggspectra)
 test_that("ooacquire irrad continuous MAYA", {
 
@@ -21,7 +25,13 @@ test_that("ooacquire irrad continuous MAYA", {
       )
     new.spct <- s_irrad_corrected(old.raw.mspct, correction.method = correction.method)
     new.spct <- trimInstrDesc(new.spct) # needed to avoid futile call to .jcall
-    expect_known_value(new.spct, file = paste("ref", f, sep = "-"), update = TRUE)
+    expect_known_value(irrad(new.spct), file = paste("current-refs/ref-irrad", f, sep = "-"), update = updating)
+    expect_known_value(wl_range(new.spct), file = paste("current-refs/ref-wl", f, sep = "-"), update = updating)
+    expect_known_value(peaks(new.spct, span = NULL), file = paste("current-refs/ref-peak", f, sep = "-"), update = updating)
+    expect_known_value(new.spct, file = paste("current-refs/ref", f, sep = "-"), update = updating)
+
+    if (debugging) cat(" <- ", serial.no, " file: ", f, "\n")
+
   }
 
 })
@@ -87,7 +97,14 @@ test_that("ooacquire filter continuous", {
                         range = c(450:800))
     new.spct <- trimInstrDesc(new.spct)
     enable_check_spct()
-    expect_known_value(new.spct, file = paste("ref", f, sep = "-"), update = TRUE)
+    expect_known_value(transmittance(new.spct), file = paste("current-refs/ref-tfr", f, sep = "-"), update = updating)
+    expect_known_value(summary(new.spct), file = paste("current-refs/ref-summary", f, sep = "-"), update = updating)
+    expect_known_value(wl_range(new.spct), file = paste("current-refs/ref-wl", f, sep = "-"), update = updating)
+    expect_known_value(wls_at_target(new.spct), file = paste("current-refs/ref-wls", f, sep = "-"), update = updating)
+    expect_known_value(new.spct, file = paste("current-refs/ref", f, sep = "-"), update = updating)
+
+    if (debugging) cat(" <- ", serial.no, " file: ", f, "\n")
+
   }
 })
 
