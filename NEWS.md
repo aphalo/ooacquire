@@ -4,11 +4,22 @@ editor_options:
     wrap: 72
 ---
 
-# ooacquire 0.4.4-3 (2024-02-09)
+# ooacquire 0.4.5 (2024-02-22)
 
-**The new features allowing measurement of time series of thousands of spectra at a
-very fast rate are easily affected by glitches in the USB connection. If the
-acquisition hangs from time to time, a high quality and short USB cable with
+**Improved performance for the two Maya spectrometers with slit-function
+characterization available, at the expense of very slightly different computed
+spectral irradiances (differences are at most in the 5th significant place
+of individual spectral irradiance values).**
+
+-   Update the tail correction functions to use a narrower moving window from
+    150 nm to 20 nm, with very little impact on the returned values but a 
+    sizeable reduction in execution time from 26 ms to 8 ms per spectrum.
+
+# ooacquire 0.4.4-4 (2024-02-22)
+
+**The new features allowing measurement of time series of thousands of spectra
+at a very fast rate are easily affected by glitches in the USB connection. If
+the acquisition hangs from time to time, a high quality and short USB cable with
 ferrite beads is likely to help.**
 
 -   Edit menus used in `acq_irrad_interactive()` to be narrower and more 
@@ -18,6 +29,7 @@ ferrite beads is likely to help.**
 -   Add activity messages to keep the user informed about time-consuming 
     activities (several activity messages are shown only for long time series)
     in `acq_irrad_interactive()`.
+-   Display percent progress in `s_irrad_interactive()` when used interactively.
 -   Decrease the default maximum number of spectra per plot to speed up user
     interaction in `acq_irrad_interactive()`.
 -   Revise function `QC_dark()` to use interpretable values as arguments to
@@ -26,7 +38,8 @@ ferrite beads is likely to help.**
 -   Revise function `merge_cps()` to accept a negative value as argument to
     `tolerance` to disable merging (= splicing) using only the primary scan.
 -   Revise function `beekd_nas()` to improve performance (a lot).
--   Update in 'photobiology' 0.11.0 improves/fixes handling of metadata.
+-   Updates in 'photobiology' 0.11.0 and 'photobiology' 0.11.1 improve/fix 
+    handling of metadata, especially in time series.
 -   Update in 'photobiology' 0.11.1 improves the speed of plotting sampled
     time series.
 -   Merge and expand the computation algorithms and calibration vignettes and
