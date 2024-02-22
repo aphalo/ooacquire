@@ -14,6 +14,7 @@ of individual spectral irradiance values).**
 -   Update the tail correction functions to use a narrower moving window from
     150 nm to 20 nm, with very little impact on the returned values but a 
     sizeable reduction in execution time from 26 ms to 8 ms per spectrum.
+-   Consolidate documentation of instrument data into one page per instrument.
 
 # ooacquire 0.4.4-4 (2024-02-22)
 

@@ -3,55 +3,61 @@
 \docType{data}
 \name{FLMS04133_descriptors}
 \alias{FLMS04133_descriptors}
-\title{Instrument descriptors for a Flame S spectrometer}
+\alias{FLMS04133_cal.spct}
+\alias{FLMS04133_calib_dates.df}
+\alias{FLMS04133_ylianttila.mthd}
+\alias{FLMS04133_sun.mthd}
+\alias{FLMS04133_simple.mthd}
+\alias{FLMS04133_none.mthd}
+\title{Flame S spectrometer s/n FLMS04133}
 \format{
-A list.
+Lists and data frames.
+
+An object of class \code{calibration_spct} (inherits from \code{generic_spct}, \code{spec_tbl_df}, \code{tbl_df}, \code{tbl}, \code{data.frame}) with 2048 rows and 2 columns.
+
+An object of class \code{spec_tbl_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 1 rows and 6 columns.
+
+An object of class \code{list} of length 0.
+
+An object of class \code{list} of length 0.
+
+An object of class \code{list} of length 10.
+
+An object of class \code{list} of length 10.
 }
 \usage{
 FLMS04133_descriptors
+
+FLMS04133_cal.spct
+
+FLMS04133_calib_dates.df
+
+FLMS04133_ylianttila.mthd
+
+FLMS04133_sun.mthd
+
+FLMS04133_simple.mthd
+
+FLMS04133_none.mthd
 }
 \description{
-This a list of instrument descriptors, each one containing the calibration
-data needed to read raw data acquired on different dates.
+Calibration data, descriptors and methods for correction of stray light and
+high dynamic range based on multiple integrations times per spectrum.
+}
+\note{
+Some of the method definitions are fill-ins for methods not
+  implemented. In this case no characterizations of the slit function are
+  available.
 }
 \seealso{
-Other objects containg instrument-specific data: 
-\code{\link{FLMS00416_cal.spct}},
-\code{\link{FLMS00416_calib_dates.df}},
+Other objects containing instrument-specific data: 
 \code{\link{FLMS00416_descriptors}},
-\code{\link{FLMS00416_none.mthd}},
-\code{\link{FLMS00416_simple.mthd}},
-\code{\link{FLMS00416_sun.mthd}},
-\code{\link{FLMS00416_ylianttila.mthd}},
-\code{\link{FLMS00440_cal.spct}},
 \code{\link{FLMS00440_descriptors}},
-\code{\link{FLMS00440_none.mthd}},
-\code{\link{FLMS00440_simple.mthd}},
-\code{\link{FLMS00440_sun.mthd}},
-\code{\link{FLMS00440_ylianttila.mthd}},
-\code{\link{FLMS00673_cal.spct}},
-\code{\link{FLMS00673_calib_dates.df}},
 \code{\link{FLMS00673_descriptors}},
-\code{\link{FLMS00673_none.mthd}},
-\code{\link{FLMS00673_simple.mthd}},
-\code{\link{FLMS00673_sun.mthd}},
-\code{\link{FLMS00673_ylianttila.mthd}},
-\code{\link{FLMS04133_cal.spct}},
-\code{\link{FLMS04133_calib_dates.df}},
-\code{\link{FLMS04133_none.mthd}},
-\code{\link{FLMS04133_simple.mthd}},
-\code{\link{FLMS04133_sun.mthd}},
-\code{\link{FLMS04133_ylianttila.mthd}},
 \code{\link{JAZA3098_calib_dates.df}},
-\code{\link{JAZA3098_ch1_descriptors}},
-\code{\link{JAZA3098_ch1_simple.mthd}},
-\code{\link{JAZA3098_ch1_sun.mthd}},
-\code{\link{JAZA3098_ch1_ylianttila.mthd}},
-\code{\link{JAZA3098_ch2_descriptors}},
-\code{\link{JAZA3098_ch2_none.mthd}},
-\code{\link{JAZA3098_ch2_simple.mthd}},
-\code{\link{JAZA3098_ch2_sun.mthd}},
-\code{\link{JAZA3098_ch2_ylianttila.mthd}}
+\code{\link{MAYP112785_descriptors}},
+\code{\link{MAYP11278_descriptors}},
+\code{\link{MAYP114590_descriptors}}
 }
-\concept{objects containg instrument-specific data}
+\concept{objects containing instrument-specific data}
 \keyword{datasets}

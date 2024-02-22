@@ -1,161 +1,63 @@
 
-#' Dates for which specific calibrations are valid.
+#' Jaz spectrometer s/n JAZA3098
 #'
-#' Data frame with data used to match raw spectral data to different
-#' calibrations based on the date data was acquired.
+#' Calibration data, descriptors and methods for correction of stray light and
+#' high dynamic range based on multiple integrations times per spectrum.
+#'
+#' @note Some of the method definitions are fill-ins for methods not implemented.
+#' In this case no calibration for spectral irradiance or characterizations of
+#' the slit function are available.
 #'
 #' @docType data
 #' @keywords datasets
-#' @format A list.
+#' @format Lists and data frames.
+#' @rdname JAZA3098_descriptors
+#' @aliases JAZA3098_descriptors
 #'
-#' @family objects containg instrument-specific data
+#' @family objects containing instrument-specific data
 #'
 "JAZA3098_calib_dates.df"
 
 # Channel 1 ---------------------------------------------------------------
 
-#' Instrument descriptors for a JAZ  spectrometer
-#'
-#' This a list of instrument descriptors, each one containing the calibration
-#' data needed to read raw data acquired on different dates.
-#'
-#' @docType data
-#' @keywords datasets
-#' @format A list.
-#'
-#' @family objects containg instrument-specific data
+#' @rdname JAZA3098_descriptors
 #'
 "JAZA3098_ch1_descriptors"
 
-#' Correction method definition
-#'
-#' This a list with data needed to process raw data in the example files. It
-#' contains constants and functions defining the method developed by Lasse
-#' Ylianttila.
-#'
-#' @note NOT IMPLEMENTED.
-#'
-#' @docType data
-#' @keywords datasets
-#' @format A list.
-#'
-#' @family objects containg instrument-specific data
+#' @rdname JAZA3098_descriptors
 #'
 "JAZA3098_ch1_ylianttila.mthd"
 
-#' Correction method definition
-#'
-#' This a list with data needed to process raw data in the example files. It
-#' contains constants and functions defining the method developed by Lasse
-#' Ylianttila.
-#'
-#' @note NOT IMPLEMENTED.
-#'
-#' @docType data
-#' @keywords datasets
-#' @format A list.
-#'
-#' @family objects containg instrument-specific data
+#' @rdname JAZA3098_descriptors
 #'
 "JAZA3098_ch1_sun.mthd"
 
-#' Correction method definition
-#'
-#' This a list with data needed to process raw data in the example files. It
-#' contains constants and functions defining a simple method derived from the
-#' method developed by Lasse Ylianttila.
-#'
-#' @docType data
-#' @keywords datasets
-#' @format A list.
-#'
-#' @family objects containg instrument-specific data
+#' @rdname JAZA3098_descriptors
 #'
 "JAZA3098_ch1_simple.mthd"
 
-#' Correction method definition
-#'
-#' This a list with data needed to process raw data in the example files. It
-#' contains constants and functions defining a method that applies no special
-#' corrections.
-#'
-#' @docType data
-#' @keywords datasets
-#' @format A list.
+#' @rdname JAZA3098_descriptors
 #'
 "JAZA3098_ch1_none.mthd"
 
 # Channel 2 ---------------------------------------------------------------
 
-#' Instrument descriptors for a JAZ  spectrometer
-#'
-#' This a list of instrument descriptors, each one containing the calibration
-#' data needed to read raw data acquired on different dates.
-#'
-#' @docType data
-#' @keywords datasets
-#' @format A list.
-#'
-#' @family objects containg instrument-specific data
+#' @rdname JAZA3098_descriptors
 #'
 "JAZA3098_ch2_descriptors"
 
-#' Correction method definition
-#'
-#' This a list with data needed to process raw data in the example files. It
-#' contains constants and functions defining the method developed by Lasse
-#' Ylianttila.
-#'
-#' @note NOT IMPLEMENTED.
-#'
-#' @docType data
-#' @keywords datasets
-#' @format A list.
-#'
-#' @family objects containg instrument-specific data
+#' @rdname JAZA3098_descriptors
 #'
 "JAZA3098_ch2_ylianttila.mthd"
 
-#' Correction method definition
-#'
-#' This a list with data needed to process raw data in the example files. It
-#' contains constants and functions defining the method developed by Lasse
-#' Ylianttila.
-#'
-#' @note NOT IMPLEMENTED.
-#'
-#' @docType data
-#' @keywords datasets
-#' @format A list.
-#'
-#' @family objects containg instrument-specific data
+#' @rdname JAZA3098_descriptors
 #'
 "JAZA3098_ch2_sun.mthd"
 
-#' Correction method definition
-#'
-#' This a list with data needed to process raw data in the example files. It
-#' contains constants and functions defining a simple method derived from the
-#' method developed by Lasse Ylianttila.
-#'
-#' @docType data
-#' @keywords datasets
-#' @format A list.
-#'
-#' @family objects containg instrument-specific data
+#' @rdname JAZA3098_descriptors
 #'
 "JAZA3098_ch2_simple.mthd"
 
-#' Correction method definition
-#'
-#' This a list with data needed to process raw data in the example files. It
-#' contains constants and functions defining a method that applies no special
-#' corrections.
-#'
-#' @docType data
-#' @keywords datasets
-#' @format A list.
-#'
-#' @family objects containg instrument-specific data
+#' @rdname JAZA3098_descriptors
 #'
 "JAZA3098_ch2_none.mthd"

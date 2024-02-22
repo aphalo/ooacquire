@@ -1,5 +1,9 @@
 context("convert raw pulsed source")
 
+# set to TRUE to reset snapshots
+updating <- FALSE
+debugging <- FALSE
+
 library(photobiology)
 # library(ggspectra)
 
@@ -23,9 +27,16 @@ test_that("raw from pulsed to fluence works", {
     new.spct <- s_irrad_corrected(old.raw.mspct, correction.method = correction.method)
     new.spct <- trimInstrDesc(new.spct) # needed to avoid futile call to .jcall
     new.spct <- clip_wl(new.spct, range = c(315, NA))
- #   print(wl_range(new.spct))
-    expect_known_value(new.spct, file = paste("ref", f, sep = "-"), update = TRUE)
+    expect_equal(round(wl_range(new.spct), 2), c(315.05, 898.81))
+    expect_known_value(irrad(new.spct), file = paste("current-refs/ref-fluence", f, sep = "-"), update = updating)
+    expect_known_value(summary(new.spct), file = paste("current-refs/ref-summary", f, sep = "-"), update = updating)
+    expect_known_value(wls_at_target(new.spct), file = paste("current-refs/ref-wls", f, sep = "-"), update = updating)
+    #    expect_known_value(getInstrSettings(new.spct), file = paste("ref", f, sep = "-"), update = updating)
+    expect_known_value(new.spct, file = paste("current-refs/ref", f, sep = "-"), update = updating)
+
+    if (debugging) cat(" <- ", serial.no, " file: ", f, "\n")
   }
+
 })
 
 
@@ -61,11 +72,16 @@ test_that("raw from pulsed to Tfr works", {
                                      type = "total",
                                      qty.out = "Tfr")
     new.spct <- trimInstrDesc(new.spct)
-    new.spct <- trim_wl(new.spct, range = c(400, 1000))
+    new.spct <- trim_wl(new.spct, range = c(450, 900))
+    new.spct <- clean(new.spct)
     new.spct <- smooth_spct(new.spct, method = "supsmu")
     enable_check_spct()
-#    print(getWhenMeasured(new.spct))
-    expect_known_value(new.spct, file = paste("ref", f, sep = "-"), update = TRUE)
+    expect_known_value(transmittance(new.spct), file = paste("current-refs/ref-tfr", f, sep = "-"), update = updating)
+    expect_known_value(summary(new.spct), file = paste("current-refs/ref-summary", f, sep = "-"), update = updating)
+    expect_known_value(new.spct, file = paste("current-refs/ref", f, sep = "-"), update = updating)
+
+    if (debugging) cat(" <- ", serial.no, " file: ", f, "\n")
+
   }
 })
 
