@@ -135,14 +135,23 @@ s_irrad_corrected.raw_mspct <-
       corrected.mspct <- list() # a list is enough
       new.names <- gsub("^light", "time", spct.names[["light"]])
       job.length <- length(spct.names[["light"]])
-      show.progress <- job.length > 100
-      progress.step <- job.length %/% 10
-      progress <- 0
+      show.progress <- verbose || (interactive() && job.length > 30)
+      if (show.progress) {
+        step.length <-
+          if (job.length > 1000) 20
+          else if (job.length > 100) 10
+          else 4
+        progress.step <- job.length %/% step.length
+        progress <- 0
+        cat("s_irrad_corrected(): 0%, ")
+      } else if (interactive()) {
+        cat("s_irrad_corrected(): ")
+      }
       for (i in seq_along(spct.names[["light"]])) {
         if (show.progress) {
           progress <- progress + 1
           if ((progress %% progress.step) == 0) {
-            cat(progress / job.length * 100, "%, ")
+            cat(progress / job.length * 100, "%, ", sep = "")
           }
         }
         temp.spct.names <- spct.names
@@ -159,7 +168,9 @@ s_irrad_corrected.raw_mspct <-
       }
       # convert collection into spectrum in long form
       corrected.spct <- rbindspct(corrected.mspct, attrs.simplify = TRUE)
-
+      if (interactive()) {
+        cat("ready!\n")
+      }
     } else {
 
       check_spct_prev_state <- disable_check_spct() # avoid spurious warnings

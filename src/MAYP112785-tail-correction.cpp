@@ -19,7 +19,7 @@ using namespace std;
 // [[Rcpp::export]]
 List MAYP112785_tail_correction(NumericVector w_length, NumericVector cts_second) {
 
-    const int window_width = 300L;
+    const int window_width = 40L; // 40 pixs, approx. +-10 nm
 
     vector<double> wl = Rcpp::as< vector<double> >(w_length);
     vector<double> cs = Rcpp::as< vector<double> >(cts_second);
