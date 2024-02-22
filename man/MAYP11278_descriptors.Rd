@@ -3,37 +3,54 @@
 \docType{data}
 \name{MAYP11278_descriptors}
 \alias{MAYP11278_descriptors}
-\title{Instrument descriptors for a Maya2000 Pro  spectrometer}
+\alias{MAYP11278_calib_dates.df}
+\alias{MAYP11278_ylianttila.mthd}
+\alias{MAYP11278_short_flt_ref.mthd}
+\alias{MAYP11278_sun.mthd}
+\alias{MAYP11278_simple.mthd}
+\title{Maya2000 Pro  spectrometer s/n MAYP11278}
 \format{
-A list.
+Lists and data frames.
+
+An object of class \code{spec_tbl_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 9 rows and 8 columns.
+
+An object of class \code{list} of length 10.
+
+An object of class \code{list} of length 10.
+
+An object of class \code{list} of length 10.
+
+An object of class \code{list} of length 10.
 }
 \usage{
 MAYP11278_descriptors
+
+MAYP11278_calib_dates.df
+
+MAYP11278_ylianttila.mthd
+
+MAYP11278_short_flt_ref.mthd
+
+MAYP11278_sun.mthd
+
+MAYP11278_simple.mthd
 }
 \description{
 List of instrument descriptors, each one containing the calibration
 data needed to convert raw data acquired on different dates. Calibration
-data from STUK's non-ionising radiation laboratory.
+data from STUK's non-ionising radiation laboratory. Correction method
+algorithms for stray light and slit function by Lasse Ylianttila, and
+variations by Pedro J. Aphalo..
 }
 \seealso{
 Other objects containing instrument-specific data: 
-\code{\link{MAYP112785_calib_dates.df}},
+\code{\link{FLMS00416_descriptors}},
+\code{\link{FLMS00440_descriptors}},
+\code{\link{FLMS00673_descriptors}},
+\code{\link{FLMS04133_descriptors}},
+\code{\link{JAZA3098_calib_dates.df}},
 \code{\link{MAYP112785_descriptors}},
-\code{\link{MAYP112785_simple.mthd}},
-\code{\link{MAYP112785_sun.mthd}},
-\code{\link{MAYP112785_ylianttila.mthd}},
-\code{\link{MAYP11278_calib_dates.df}},
-\code{\link{MAYP11278_short_flt_ref.mthd}},
-\code{\link{MAYP11278_simple.mthd}},
-\code{\link{MAYP11278_sun.mthd}},
-\code{\link{MAYP11278_ylianttila.mthd}},
-\code{\link{MAYP114590_cal.spct}},
-\code{\link{MAYP114590_calib_dates.df}},
-\code{\link{MAYP114590_descriptors}},
-\code{\link{MAYP114590_none.mthd}},
-\code{\link{MAYP114590_simple.mthd}},
-\code{\link{MAYP114590_sun.mthd}},
-\code{\link{MAYP114590_ylianttila.mthd}}
+\code{\link{MAYP114590_descriptors}}
 }
 \concept{objects containing instrument-specific data}
 \keyword{datasets}

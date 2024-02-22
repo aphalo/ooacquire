@@ -3,37 +3,63 @@
 \docType{data}
 \name{MAYP114590_descriptors}
 \alias{MAYP114590_descriptors}
-\title{Instrument descriptors for a Maya2000 Pro  spectrometer}
+\alias{MAYP114590_cal.spct}
+\alias{MAYP114590_calib_dates.df}
+\alias{MAYP114590_ylianttila.mthd}
+\alias{MAYP114590_sun.mthd}
+\alias{MAYP114590_simple.mthd}
+\alias{MAYP114590_none.mthd}
+\title{Maya2000 Pro spectrometer s/n MAYP114590}
 \format{
-A list.
+Lists and data frames.
+
+An object of class \code{calibration_spct} (inherits from \code{generic_spct}, \code{spec_tbl_df}, \code{tbl_df}, \code{tbl}, \code{data.frame}) with 2068 rows and 2 columns.
+
+An object of class \code{spec_tbl_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 1 rows and 6 columns.
+
+An object of class \code{list} of length 0.
+
+An object of class \code{list} of length 0.
+
+An object of class \code{list} of length 10.
+
+An object of class \code{list} of length 10.
 }
 \usage{
 MAYP114590_descriptors
+
+MAYP114590_cal.spct
+
+MAYP114590_calib_dates.df
+
+MAYP114590_ylianttila.mthd
+
+MAYP114590_sun.mthd
+
+MAYP114590_simple.mthd
+
+MAYP114590_none.mthd
 }
 \description{
 List of instrument descriptors, each one containing the calibration
-data needed to convert raw data acquired on different dates. Calibration data
-from Ocean Optics (currently Ocean Insight).
+data needed to convert raw data acquired on different dates. Calibration
+data from STUK's non-ionising radiation laboratory. Correction method
+algorithms for stray light and slit function by Lasse Ylianttila, and
+variations by Pedro J. Aphalo..
+}
+\note{
+Some of the method definitions are fill-ins for methods not implemented.
+In this case no characterization of the slit function is available.
 }
 \seealso{
 Other objects containing instrument-specific data: 
-\code{\link{MAYP112785_calib_dates.df}},
+\code{\link{FLMS00416_descriptors}},
+\code{\link{FLMS00440_descriptors}},
+\code{\link{FLMS00673_descriptors}},
+\code{\link{FLMS04133_descriptors}},
+\code{\link{JAZA3098_calib_dates.df}},
 \code{\link{MAYP112785_descriptors}},
-\code{\link{MAYP112785_simple.mthd}},
-\code{\link{MAYP112785_sun.mthd}},
-\code{\link{MAYP112785_ylianttila.mthd}},
-\code{\link{MAYP11278_calib_dates.df}},
-\code{\link{MAYP11278_descriptors}},
-\code{\link{MAYP11278_short_flt_ref.mthd}},
-\code{\link{MAYP11278_simple.mthd}},
-\code{\link{MAYP11278_sun.mthd}},
-\code{\link{MAYP11278_ylianttila.mthd}},
-\code{\link{MAYP114590_cal.spct}},
-\code{\link{MAYP114590_calib_dates.df}},
-\code{\link{MAYP114590_none.mthd}},
-\code{\link{MAYP114590_simple.mthd}},
-\code{\link{MAYP114590_sun.mthd}},
-\code{\link{MAYP114590_ylianttila.mthd}}
+\code{\link{MAYP11278_descriptors}}
 }
 \concept{objects containing instrument-specific data}
 \keyword{datasets}
