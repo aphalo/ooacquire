@@ -320,7 +320,7 @@ citation("ooacquire")
 #> To cite package 'ooacquire' in publications use:
 #> 
 #>   Aphalo P, Ylianttila L (2024). _ooacquire: Acquire Data from OO
-#>   Spectrometers_. R package version 0.4.4-2,
+#>   Spectrometers_. R package version 0.4.4-3,
 #>   https://github.com/aphalo/ooacquire,
 #>   <https://docs.r4photobiology.info/ooacquire/>.
 #> 
@@ -330,7 +330,7 @@ citation("ooacquire")
 #>     title = {ooacquire: Acquire Data from OO Spectrometers},
 #>     author = {Pedro J. Aphalo and Lasse Ylianttila},
 #>     year = {2024},
-#>     note = {R package version 0.4.4-2, 
+#>     note = {R package version 0.4.4-3, 
 #> https://github.com/aphalo/ooacquire},
 #>     url = {https://docs.r4photobiology.info/ooacquire/},
 #>   }
