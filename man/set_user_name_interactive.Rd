@@ -7,7 +7,7 @@
 set_user_name_interactive(user.name = NULL)
 }
 \arguments{
-\item{used.name}{character Default name of the folder.}
+\item{user.name}{character Default name of the folder.}
 }
 \description{
 Enter values for "user supplied" name.

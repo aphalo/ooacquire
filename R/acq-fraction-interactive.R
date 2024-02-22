@@ -272,6 +272,7 @@ acq_fraction_interactive <-
     cat("Using channel ", ch.index,
         " from spectrometer with serial number: ", serial_no, "\n")
 
+    available.protocols <- names(protocols)
     if (anyNA(c(descriptors[[1]], correction.method[[1]]))) {
       descriptor <-
         switch(serial_no,
@@ -323,6 +324,8 @@ acq_fraction_interactive <-
       descriptor <- which_descriptor(descriptors = descriptors)
       stopifnot(exists("spectrometer.name", descriptor))
     }
+
+    default.protocol <- ifelse("rsd" %in% available.protocols, "rsd", available.protocols[1])
 
     # jwrapper and spectrometer indexes have to be set to current ones if
     # descriptor was not acquired from the spectrometer in the current session

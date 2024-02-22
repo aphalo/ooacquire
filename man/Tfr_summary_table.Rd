@@ -6,7 +6,7 @@
 \usage{
 Tfr_summary_table(
   mspct,
-  scale.factor = 1,
+  quantity = "average",
   attr2tb = "when.measured",
   summary.type = "VIS",
   digits = 3L
@@ -16,7 +16,7 @@ Tfr_summary_table(
 \item{mspct}{A filter_mspct, or a filter_spct object containing spectral
 transmittance for one or more sources.}
 
-\item{scale.factor}{numeric A multiplicative factor used to rescale data.}
+\item{quantity}{character Passed to \code{\link[photobiology]{transmittance}}.}
 
 \item{attr2tb}{character Vector with one or more of "when.measured",
 "what.measured", "where.measured", "how.measured" and "comment".}
