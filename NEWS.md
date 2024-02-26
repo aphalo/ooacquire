@@ -4,7 +4,7 @@ editor_options:
     wrap: 72
 ---
 
-# ooacquire 0.4.5 (2024-02-22)
+# ooacquire 0.4.5 (2024-02-26)
 
 **Improved performance for the two Maya spectrometers with slit-function
 characterization available, at the expense of very slightly different computed
