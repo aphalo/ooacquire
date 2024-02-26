@@ -11,9 +11,12 @@
 #'   disables merging using only the data for the shortest integration time.
 #' @param return.cps logical Useful when there is no need to apply a calibration,
 #'   such as when computing new calibration multipliers.
+#' @param trim.descriptor logical If \code{TRUE} the spectrometer calibration
+#'   constants, pixel wavelengths, slit-function "tail-correction"
+#'   function code and other calibration-related information is deleted.
 #' @param descriptor A named list with a descriptor of the characteristics of
 #'   the spectrometer (if serial number does not agree an error is triggered).
-#' @param locale	The locale controls defaults that vary from place to place. The
+#' @param locale The locale controls defaults that vary from place to place. The
 #'   default locale is US-centric (like R), but you can use
 #'   \code{\link[readr]{locale}} to create your own locale that controls things
 #'   like the default time zone, encoding, decimal mark, big mark, and day/month
@@ -30,6 +33,10 @@
 #'   Only "light" is mandatory. Data should be raw counts, either corrected for
 #'   detector non-linearity or not. All three spectra should be acquired using
 #'   the same instrument settings to achieve good accuracy.
+#'
+#'   Enabling \code{trim.descriptor} ensures that the data objects are
+#'   free of references to code in 'ooacquire', which is crucial for the
+#'   portability of the spectral data.
 #'
 #' @family functions for conversion of raw-counts data
 #'
@@ -52,6 +59,7 @@ s_irrad_corrected.list <- function(x,
                                    correction.method,
                                    hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.10),
                                    return.cps = FALSE,
+                                   trim.descriptor = !return.cps,
                                    descriptor,
                                    locale = NULL,
                                    verbose = getOption("photobiology.verbose", default = FALSE),
@@ -75,6 +83,7 @@ s_irrad_corrected.list <- function(x,
                       correction.method = correction.method,
                       hdr.tolerance = hdr.tolerance,
                       return.cps = return.cps,
+                      trim.descriptor = trim.descriptor,
                       verbose = verbose,
                       ...)
 
@@ -97,6 +106,7 @@ s_irrad_corrected.raw_mspct <-
            correction.method,
            hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.10),
            return.cps = FALSE,
+           trim.descriptor = !return.cps,
            verbose = getOption("photobiology.verbose", default = FALSE),
            ...) {
 
@@ -163,6 +173,7 @@ s_irrad_corrected.raw_mspct <-
                             correction.method = correction.method,
                             hdr.tolerance = hdr.tolerance,
                             return.cps = return.cps,
+                            trim.descriptor = trim.descriptor,
                             verbose = verbose,
                             ...)
       }
@@ -234,6 +245,11 @@ s_irrad_corrected.raw_mspct <-
       }
     }
 
+    if (trim.descriptor) {
+      # delete calibration data and remove dependency on 'ooacquire'
+      trimInstrDesc(corrected.spct)
+    }
+
     attributes(corrected.spct) <- c(attributes(corrected.spct),
                                     list(QC_dark_pass = QC_spct))
     corrected.spct
@@ -246,6 +262,7 @@ s_irrad_corrected.raw_spct <- function(x,
                                        correction.method,
                                        hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.10),
                                        return.cps = FALSE,
+                                       trim.descriptor = !return.cps,
                                        verbose = getOption("photobiology.verbose", default = FALSE),
                                        ...) {
   raw.mspct <- raw_mspct(list(light = x))
@@ -254,6 +271,7 @@ s_irrad_corrected.raw_spct <- function(x,
                     correction.method = correction.method,
                     hdr.tolerance = hdr.tolerance,
                     return.cps = return.cps,
+                    trim.descriptor = trim.descriptor,
                     verbose = verbose,
                     ...)
 }

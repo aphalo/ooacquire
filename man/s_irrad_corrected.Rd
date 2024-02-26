@@ -18,6 +18,7 @@ s_irrad_corrected(x, ...)
   correction.method,
   hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.1),
   return.cps = FALSE,
+  trim.descriptor = !return.cps,
   descriptor,
   locale = NULL,
   verbose = getOption("photobiology.verbose", default = FALSE),
@@ -30,6 +31,7 @@ s_irrad_corrected(x, ...)
   correction.method,
   hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.1),
   return.cps = FALSE,
+  trim.descriptor = !return.cps,
   verbose = getOption("photobiology.verbose", default = FALSE),
   ...
 )
@@ -40,6 +42,7 @@ s_irrad_corrected(x, ...)
   correction.method,
   hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.1),
   return.cps = FALSE,
+  trim.descriptor = !return.cps,
   verbose = getOption("photobiology.verbose", default = FALSE),
   ...
 )
@@ -63,6 +66,10 @@ disables merging using only the data for the shortest integration time.}
 
 \item{return.cps}{logical Useful when there is no need to apply a calibration,
 such as when computing new calibration multipliers.}
+
+\item{trim.descriptor}{logical If \code{TRUE} the spectrometer calibration
+constants, pixel wavelengths, slit-function "tail-correction"
+function code and other calibration-related information is deleted.}
 
 \item{descriptor}{A named list with a descriptor of the characteristics of
 the spectrometer (if serial number does not agree an error is triggered).}
@@ -101,6 +108,10 @@ Currently \code{s_irrad_corrected.list} allows processing of files
   Only "light" is mandatory. Data should be raw counts, either corrected for
   detector non-linearity or not. All three spectra should be acquired using
   the same instrument settings to achieve good accuracy.
+
+  Enabling \code{trim.descriptor} ensures that the data objects are
+  free of references to code in 'ooacquire', which is crucial for the
+  portability of the spectral data.
 }
 \seealso{
 Other functions for conversion of raw-counts data: 
