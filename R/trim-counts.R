@@ -137,9 +137,19 @@ merge_cps <- function(x,
         merged.cps <- x[[cols[i]]]
         merged[1:(i - 1)] <- FALSE
       } else {
+        # compute the ratio only from high-signal pixels as we are interested
+        # in detecting changes in irradiance
+        cps.qtl <- stats:: quantile(x[[cols[i]]], probs = c(0.75, 0.9),
+                                    names = FALSE, na.rm = TRUE)
+        ratio.idx <- !is.na(x[[cols[i]]]) & !to.replace.idx &
+          x[[cols[i]]] > cps.qtl[1] & x[[cols[i]]] < cps.qtl[2]
+        if (sum(ratio.idx) > 40) {
+          columns.ratio <-
+            sum(x[[cols[i]]][ratio.idx]) / sum(merged.cps[ratio.idx])
+        } else {
+          columns.ratio <- 1
+        }
         # replace only clipped pixels if cps consistent across columns
-        columns.ratio <-
-          sum(x[[cols[i]]][!to.replace.idx]) / sum(merged.cps[!to.replace.idx])
         if (columns.ratio > (1 - tolerance) && columns.ratio < (1 + tolerance)) {
           merged.cps[is.na(merged.cps)] <- x[[cols[i]]][is.na(merged.cps)]
         } else {

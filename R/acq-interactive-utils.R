@@ -104,7 +104,7 @@ tune_interactive <- function(descriptor,
       if (answ %in% valid.input) {
         break()
       }
-      cat("Unrecognized input: '", answ, "'. Please, try again...\n")
+      cat("Unrecognized input: '", answ, "'. Please, try again...\n", sep = "")
     }
     if (answ == "") {
       answ <- ifelse(!tuned, default.input[1], default.input[2])
@@ -475,7 +475,7 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
     if (seq.settings$step.delay < measurement.duration &&
         seq.settings$step.delay != 0) {
       seq.settings$step.delay <- signif(minimum.step.delay * 1.01, 3)
-      cat("'step.delay' too short! Reset to ", seq.settings$step.delay, " s.\n")
+      cat("'step.delay' too short! Reset to ", seq.settings$step.delay, " s.\n", sep = "")
     }
     # display current settings before prompt for user input
     seq.settings.string <-
@@ -592,7 +592,7 @@ set_folder_interactive <- function(folder.name = NULL) {
     folder.name <- "."
   }
 
-  cat("Current folder: '", current.folder, "'.\n")
+  cat("Current folder: '", current.folder, "'.\n", sep = "")
 
   folder.name.prompt <-
     paste("Output folder (<path to folder>/./\"", folder.name, "\"-): ", sep = "")
@@ -604,7 +604,7 @@ set_folder_interactive <- function(folder.name = NULL) {
     cat("Folder does not exist, creating it...\n")
     # we ask for a different folder name until success
     while (!dir.create(folder.name)) {
-      cat("Failure! Unable to create folder: ", folder.name)
+      cat("Failure! Unable to create folder: ", folder.name, sep = "")
       folder.name <- readline("Output folder (<path to folder>/.-): ")
       if (folder.name == "") {
         folder.name  <- "."

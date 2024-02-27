@@ -386,7 +386,7 @@ acq_irrad_interactive <-
     serial_no <- as.character(instruments[sr.index + 1L, 3])
 
     cat("Using channel ", ch.index,
-        " from spectrometer with serial number: ", serial_no, "\n")
+        " from spectrometer with serial number: ", serial_no, "\n", sep = "")
 
     # if multiple entrance optics are available, each has a different calibration
     # we validate the argument passed in the case of on spectrometer
@@ -773,7 +773,7 @@ acq_irrad_interactive <-
                     estimated.measurement.duration > 0)
 
         cat("Duration of each repeated measurement: ",
-            signif(estimated.measurement.duration, 3), " s.\n")
+            signif(estimated.measurement.duration, 3), " s.\n", sep = "")
 
         seq.settings <-
           set_seq_interactive(seq.settings = seq.settings,
@@ -810,6 +810,9 @@ acq_irrad_interactive <-
             }
           }
         } else {
+          if (pending.repeats == total.repeats) {
+            readline(paste("Acquire LIGHT reading(s): g = GO (g-):"))[1]
+          }
           raw.mspct <- acq_raw_mspct(descriptor = descriptor,
                                      acq.settings = settings,
                                      seq.settings = seq.settings,
@@ -840,13 +843,20 @@ acq_irrad_interactive <-
 
       # combine spectra if needed
       if (reuse.old.refs) {
+        cat("Retrieving ", paste(names(old.refs.mpsct), collapse = " and "),
+            " spectrum/a ... ", sep = "")
         # we add old refs to new light data
         raw.mspct <- c(old.refs.mpsct, raw.mspct)
+        cat("ready!\n")
       } else {
         # we save old references for possible reuse
         refs.selector <- grep("dark|filter", protocol, value = TRUE)
         if (length(refs.selector)) {
+          cat("Cacheing ", paste(names(raw.mspct)[refs.selector],
+                                 collapse = " and "),
+              " spectrum/a ... ", sep = "")
           old.refs.mpsct <- raw.mspct[refs.selector]
+          cat("ready!\n")
         } else {
           old.refs.mpsct <- raw_mspct() # empty object
         }
@@ -869,6 +879,7 @@ acq_irrad_interactive <-
                                         correction.method = correction.method,
                                         return.cps = qty.out == "cps")
 
+        cat('Adding metadata ... ')
         photobiology::setHowMeasured(irrad.spct, user.attrs$how.measured)
 
         if (user.attrs$what.measured == "") {
@@ -1378,11 +1389,11 @@ acq_irrad_interactive <-
                       make.names(session.name),
                       ".Rda", sep = ""))
 
-    cat("Data files saved during session:\n",
-        "to ", getwd(), "\n",
+    cat("Files saved during this session to folder:\n",
+        getwd(), "\n",
         paste(file.names, collapse = ",\n"), ".\n", sep = "")
 
-    cat("Ending data acquisition...\n")
+    cat("Ending data acquisition session ...\n")
 
     # connection to spectrometer is closed using on.exit() to ensure
     # disconnection even when end of session is forced by error or by user
