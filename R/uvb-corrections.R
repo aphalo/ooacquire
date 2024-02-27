@@ -199,9 +199,12 @@ slit_function_correction <-
 
     if (is.null(worker.fun)) {
       if (verbose) {
-        warning("Skipping slit function tail correction: no function available.")
+        warning("Skipping slit-function tail correction: no function available.")
       }
       return(x)
+    }
+    if (verbose) {
+      message("Applying slit-function tail correction.")
     }
 
     # check number of cps columns and merge if needed

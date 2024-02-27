@@ -61,8 +61,6 @@ raw2corr_cps.raw_spct <-
     x <- raw2cps(x)
     # if bracketing was used, splice the spectra
     x <- merge_cps(x, tolerance = hdr.tolerance)
-    # apply slit function correction
-    x <- slit_function_correction(x)
     # check for spikes and remove them
     if (despike) {
       spike.wls <- photobiology::spikes(x, ...)[["w.length"]]
@@ -89,5 +87,3 @@ raw2corr_cps.raw_mspct <- function(x,
           despike = despike,
           ...)
 }
-
-
