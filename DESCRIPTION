@@ -2,7 +2,7 @@ Package: ooacquire
 Type: Package
 Title: Acquire Data from OO Spectrometers
 Version: 0.4.4.9000
-Date: 2024-02-22
+Date: 2024-02-27
 Authors@R:
    c(
     person("Pedro J.", "Aphalo", email = "pedro.aphalo@helsinki.fi", role = c("aut", "trl", "cre")),
@@ -19,7 +19,7 @@ License: GPL (>= 2)
 Depends:
     R (>= 4.2.0),
     lubridate (>= 1.9.0),
-    photobiology (>= 0.11.0.9004),
+    photobiology (>= 0.11.1),
     ggspectra (>= 0.3.12)
 Imports:
     grDevices,
