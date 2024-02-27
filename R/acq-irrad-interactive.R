@@ -874,10 +874,13 @@ acq_irrad_interactive <-
           cat("Computing ", qty.out, " ... ", sep = "")
         }
 
-        irrad.spct <- s_irrad_corrected(x = raw.mspct,
-                                        spct.names = spct.names,
-                                        correction.method = correction.method,
-                                        return.cps = qty.out == "cps")
+        irrad.spct <-
+          s_irrad_corrected(x = raw.mspct,
+                            spct.names = spct.names,
+                            correction.method = correction.method,
+                            hdr.tolerance = getOption("ooacquire.hdr.tolerance",
+                                                      default = 0.05),
+                            return.cps = qty.out == "cps")
 
         cat('Adding metadata ... ')
         photobiology::setHowMeasured(irrad.spct, user.attrs$how.measured)

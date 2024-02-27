@@ -39,40 +39,41 @@ raw2corr_cps.default <- function(x,
 #'
 #' @export
 #'
-raw2corr_cps.raw_spct <- function(x,
-                                  ref.pixs.range = c(1, 100),
-                                  despike = FALSE,
-                                  hdr.tolerance = 0.1,
-                                  ...) {
-  # replace bad data with NAs
-  x <- trim_counts(x)
-  x <- bleed_nas(x)
-  x <- skip_bad_pixs(x)
-  # linearize detector counts
-  x <- linearize_counts(x)
-  # remove dark signal
-  # using selected pixels of the detector array
-  if (length(ref.pixs.range) >= 2) {
-    ref.wls.range <- unlist(x[range(ref.pixs.range), "w.length"])
-    x <- fshift(x, range = ref.wls.range)
-  }
-  # convert raw counts to counts per second
-  x <- raw2cps(x)
-  # if bracketing was used, splice the spectra
-  x <- merge_cps(x, tolerance = hdr.tolerance)
-  # apply slit function correction
-  x <- slit_function_correction(x)
-  # check for spikes and remove them
-  if (despike) {
-    spike.wls <- photobiology::spikes(x, ...)[["w.length"]]
-    if (length(spike.wls) > 0) {
-      warning("Despiking as spikes were detected at: ",
-              paste(round(spike.wls, digits = 0), collapse = ", "), " nm.")
-      x <- photobiology::despike(x, ...) # may need to adjust arguments
+raw2corr_cps.raw_spct <-
+  function(x,
+           ref.pixs.range = c(1, 100),
+           despike = FALSE,
+           hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
+           ...) {
+    # replace bad data with NAs
+    x <- trim_counts(x)
+    x <- bleed_nas(x)
+    x <- skip_bad_pixs(x)
+    # linearize detector counts
+    x <- linearize_counts(x)
+    # remove dark signal
+    # using selected pixels of the detector array
+    if (length(ref.pixs.range) >= 2) {
+      ref.wls.range <- unlist(x[range(ref.pixs.range), "w.length"])
+      x <- fshift(x, range = ref.wls.range)
     }
+    # convert raw counts to counts per second
+    x <- raw2cps(x)
+    # if bracketing was used, splice the spectra
+    x <- merge_cps(x, tolerance = hdr.tolerance)
+    # apply slit function correction
+    x <- slit_function_correction(x)
+    # check for spikes and remove them
+    if (despike) {
+      spike.wls <- photobiology::spikes(x, ...)[["w.length"]]
+      if (length(spike.wls) > 0) {
+        warning("Despiking as spikes were detected at: ",
+                paste(round(spike.wls, digits = 0), collapse = ", "), " nm.")
+        x <- photobiology::despike(x, ...) # may need to adjust arguments
+      }
+    }
+    x
   }
-  x
-}
 
 #' @describeIn raw2corr_cps raw_spct method
 #'
