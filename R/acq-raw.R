@@ -125,7 +125,7 @@ acq_raw_spct <- function(descriptor,
       x$num.scans[i] <- actual.num.scans
     }
 
-    if (verbose) cat("Measurement x", acq.settings$HDR.mult[i], " ... ")
+    if (verbose) cat("Measurement x", acq.settings$HDR.mult[i], " ... ", sep = "")
 
     # light source, e,g,, flash trigger
     if (num.exposures[i] > 0L  && !is.null(f.trigger.pulses)) {
@@ -351,19 +351,19 @@ acq_raw_mspct <- function(descriptor,
       if (high.speed) {
         cat("Buffered series of ", seq.settings[["num.steps"]], " starting at ",
             strftime(times[1], format = "%H:%M:%OS", usetz = TRUE),
-            " (\"quiet\")\n")
+            " (\"quiet\")\n", sep = "")
       } else if (all(seq.settings[["step.delay"]] == 0) && length(times) > 1L) {
         cat("Fast series  of ", seq.settings[["num.steps"]], " starting at ",
             strftime(times[1], format = "%H:%M:%OS", usetz = TRUE),
-            " (\"quiet\")\n")
+            " (\"quiet\")\n", sep = "")
       } else if (length(times) > 1L) {
         cat("Timed series of ", length(times), " from ",
             strftime(times[1], format = "%H:%M:%OS", usetz = TRUE), " to ",
             strftime(times[length(times)], format = "%H:%M:%OS", usetz = TRUE),
-            "\n")
+            "\n", sep = "")
       } else if (steps[1] > 1) {
         cat("Timed acquisition at ", strftime(times[1], format = "%H:%M:%OS", usetz = TRUE),
-            "\n")
+            "\n", sep = "")
       }
     }
 
@@ -431,16 +431,16 @@ acq_raw_mspct <- function(descriptor,
         strftime(actual.times[1], format = "%H:%M:%OS", usetz = TRUE),
         " to ",
         strftime(actual.times[length(actual.times)],
-                 format = "%H:%M:%OS", usetz = TRUE), "\n")
+                 format = "%H:%M:%OS", usetz = TRUE), "\n", sep = "")
     cat(length(actual.steps), " time intervals (min, median, max): ",
         paste(format(c(min(actual.steps),
                        stats::median(actual.steps),
                        max(actual.steps))),
-              collapse = ", "), "\n")
+              collapse = ", "), "\n", sep = "")
     cat("Elapsed time ", format(end.time - start.time, digits = 4),
         "; from ", strftime(start.time, format = "%H:%M:%OS", usetz = TRUE),
         " to ",  strftime(end.time, format = "%H:%M:%OS", usetz = TRUE),
-        "\n")
+        "\n", sep = "")
   }
   z
 }
