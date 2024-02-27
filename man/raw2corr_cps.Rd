@@ -15,7 +15,7 @@ raw2corr_cps(x, ref.pixs.range, ...)
   x,
   ref.pixs.range = c(1, 100),
   despike = FALSE,
-  hdr.tolerance = 0.1,
+  hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
   ...
 )
 

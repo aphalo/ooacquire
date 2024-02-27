@@ -6,7 +6,7 @@
 \usage{
 merge_cps(
   x,
-  tolerance = 0.1,
+  tolerance = 0.05,
   verbose = getOption("photobiology.verbose", default = FALSE)
 )
 }
@@ -27,17 +27,25 @@ In a \code{cps_spct} object with multiple columns of CPS data, each acquired
 using a different integration time, merge columns into a single column.
 }
 \details{
-Pixels affected directly or by neighbourhood by clipping, should be
-set to \code{NA} before passing the spectrum as argument to this function.
-Starting from the variable corresponding to the longest integration time, NA
-values are replaced by cps values from the next shorter integration. The
-procedure is repeated until no \code{NA} remains or until no shorter
-integration time data are available.
+Pixels affected directly, or by neighbourhood, by clipping, should
+  be set to \code{NA} in each variable of CPS values, before passing the
+  spectrum as argument to parameter \code{x} of this function.
 
-When measuring daylight different exposures for HDR are taken sequentially,
-and if light conditions change rapidly the cps values may be inconsistent. If
-the mean ratio of cps values is outside plus/minus the tolerance, instead of
-merging, the data for the longer of the two exposures is discarded instead of
-merged (or spliced) with the longer exposure, in which case a message is
-emitted.
+  The merging of the CPS variables starts from the one corresponding to the
+  longest integration time, expected to contain the largest number of NA
+  values, by replacing NA values by cps values from the variable
+  corresponding to the next shorter integration. The procedure is repeated
+  until no \code{NA} remains or until no shorter integration time data are
+  available. \emph{The process stops when all NAs have been replaced, and,
+  even when available, CPS values for unnecesarilly short integration times
+  discarded.}
+
+  When measuring daylight different exposures for HDR are taken sequentially,
+  and if light conditions change rapidly the cps values may be inconsistent.
+  If the mean ratio of cps values is outside plus/minus the tolerance,
+  instead of merging, the data for the longer of the two exposures is
+  discarded instead of merged (or spliced) with the longer exposure, in which
+  case a message is emitted. Ratio is computed after discarding low signal
+  pixels as these readings are affected by noise, distorting the ratio when
+  the light source-spectrum has only narrow peaks of emission.
 }

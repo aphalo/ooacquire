@@ -58,7 +58,7 @@ uvb_corrections <-
            inst.dark.pixs = 1:4,
            worker.fun = NULL,
            trim = 0.05,
-           hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.10),
+           hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
            verbose = getOption("photobiology.verbose", default = FALSE),
            ...) {
 
@@ -179,7 +179,7 @@ uvb_corrections <-
 slit_function_correction <-
   function(x,
            worker.fun = NULL,
-           hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.10),
+           hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
            verbose = getOption("photobiology.verbose", default = FALSE),
            ...) {
     stopifnot(is.cps_spct(x))
@@ -199,9 +199,12 @@ slit_function_correction <-
 
     if (is.null(worker.fun)) {
       if (verbose) {
-        warning("Skipping slit function tail correction: no function available.")
+        warning("Skipping slit-function tail correction: no function available.")
       }
       return(x)
+    }
+    if (verbose) {
+      message("Applying slit-function tail correction.")
     }
 
     # check number of cps columns and merge if needed
