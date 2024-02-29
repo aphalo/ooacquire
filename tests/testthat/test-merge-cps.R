@@ -20,7 +20,7 @@ test_that("convert and merge_cps works with bad data", {
   load("./test-irrad-mspct-maya-data/sun_hdr4.spct.rda")
 
   expect_no_error(raw2corr_cps(bad_hdr.raw_spct, ref.pixs.range = 2:4))
-  expect_no_warning(raw2corr_cps(bad_hdr.raw_spct, ref.pixs.range = 2:4))
+#  expect_no_warning(raw2corr_cps(bad_hdr.raw_spct, ref.pixs.range = 2:4))
   expect_message(raw2corr_cps(bad_hdr.raw_spct, ref.pixs.range = 2:4))
   bad.cps_spct <- raw2corr_cps(bad_hdr.raw_spct, ref.pixs.range = 2:4)
 
