@@ -173,7 +173,7 @@ R-Universe serving source packages as well as Windows, OS X (Apple Mac) and
 Ubuntu binaries.
 
 In recent versions of R an option can be set to make this
-repository visible to R, before installing this package and
+repository visible to R before installing this package and
 'rOmniDriver' as usual.
 
 ```{r, eval=FALSE}
@@ -191,7 +191,8 @@ together with the CRAN URL to ensure that dependencies are installed.
 
 ```{r, eval=FALSE}
 install.packages('ooacquire', 
-                 repos = c('https://aphalo.r-universe.dev', 'https://cloud.r-project.org'))
+                 repos = c('https://aphalo.r-universe.dev', 
+                           'https://cloud.r-project.org'))
 ```
 
 **Steps 1 and 2 are described in the README file of 'rOmniDriver', which

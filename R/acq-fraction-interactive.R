@@ -6,8 +6,12 @@
 #' as plots as PDF files and summaries as comma separated files.
 #'
 #' @details This function can be used to acquire spectral reflectance,
-#'   spectral tarnsmittance and/or spectral absorptance using
+#'   spectral transmittance and/or spectral absorptance using
 #'   different protocols for acquisition and stray light and dark corrections.
+#'   Depending on the optical setup, solid or liquid samples can be measured.
+#'   The kinetics of changes in optical properties can be captured as a time
+#'   series of spectra, using `interface.mode = "series"`.
+#'
 #'   The protocols are described in the vignettes and in the help for the
 #'   lower level functions called, also from this same package.
 #'
@@ -57,9 +61,7 @@
 #'
 #' @seealso This function calls functions \code{\link{tune_interactive}},
 #'   \code{\link{protocol_interactive}} and
-#'   \code{\link{set_attributes_interactive}}. If irradiance calibration is
-#'   retrieved from the instrument, functions \code{\link{get_oo_descriptor}}
-#'   and \code{\link{oo_calib2irrad_mult}} are also called.
+#'   \code{\link{set_attributes_interactive}}.
 #'
 #' @family interactive acquisition functions
 #'
@@ -74,16 +76,43 @@
 #' @param correction.method list The method to use when applying the calibration
 #' @param descriptors list A list of instrument descriptors containing
 #'   calibration data.
-#' @param ref.value numeric or filter_spct/reflector_spct object.
 #' @param type character Type of transmittance or reflectance measured.
 #' @param stray.light.method character Used only when the correction method is
 #'   created on-the-fly.
+#' @param seq.settings named list with numeric members \code{start.boundary},
+#'   \code{initial.delay}, \code{"step.delay"} and \code{"num.steps"}.
+#' @param light.source character One of "continuous", "pulsed".
+#' @param ref.value numeric or filter_spct/reflector_spct object.
 #' @param qty.out character One of "Tfr" (spectral transmittance as a fraction
-#'   of one), "irrad" (spectral irardiance), "cps" (counts per second), or "raw"
+#'   of one), "cps" (counts per second), or "raw"
 #'   (raw sensor counts).
-#' @param save.pdfs logical Whether to save
+#' @param plot.lines.max integer Maximum number of spectra to plot as individual
+#'   lines. Random sampling is used if number of spectra exceeds
+#'   \code{plot.lines.max}.
+#' @param summary.type character One of "plant", "PAR" or "VIS".
+#' @param save.pdfs,save.summaries,save.collections logical Whether to save
 #'   plots to PDFs files or not, and collection summaries to csv files or not,
-#'   enable collections user interface or not..
+#'   enable collections user interface or not.
+#' @param async.saves logical A flag enabling or disabling the use of concurrent
+#'   processes to save data to files. Package 'mirai' must be installed before
+#'   enabling this feature.
+#' @param show.figs logical Default for flag enabling display plots of acquired
+#'   spectra.
+#' @param interface.mode character One of "auto", "simple", "manual", "full",
+#'   "series", "auto-attr", "simple-attr", "manual-attr", "full-atr", and
+#'   "series-attr".
+#' @param num.exposures integer Number or light pulses (flashes) per scan. Set
+#'   to \code{-1L} to indicate that the light source is continuous.
+#' @param f.trigger.pulses function Function to be called to trigger light
+#'   pulse(s). Should accept as its only argument the number of pulses, and
+#'   return \code{TRUE} on success and \code{FALSE} on failure.
+#' @param folder.name,session.name,user.name character Default name of the
+#'   folder used for output, and session and user names.
+#' @param folder.name,session.name,user.name character Default name of the
+#'   folder used for output, and session and user names.
+#' @param verbose logical If TRUE additional messages are emitted, including
+#'   report on memory usage.
+#' @param QC.enabled logical If FALSE return NA skipping QC.
 #'
 #' @export
 #'
@@ -100,14 +129,14 @@
 #'
 #' @return These functions return the acquired spectra through "side effects" as
 #'   each spectrum is saved, both as raw counts data and optionally as spectral
-#'   irradiance or counts-per-second  spectral data in an \code{.rda} file as
+#'   transmittance or counts-per-second data in an \code{.rda} file as
 #'   objects of the classes defined in package 'photobiology'. Optionally, the
 #'   plot for each spectrum is saved as a \code{.pdf} file. At any time, the
-#'   current group of spectra can be saved as a collection. When a collection
-#'   is created, spectral data are for several spectra are saved together.
+#'   current group of spectra can be saved as a collection. When a collection is
+#'   created, spectral data for several spectra are saved together.
 #'   Summaries are saved to a CSV file and joint plots to a \code{.pdf} file.
-#'   The value returned by the function is that from closing the
-#'   connection to the spectrometer.
+#'   The value returned by the function is that from closing the connection to
+#'   the spectrometer.
 #'
 #' @examples
 #' # please, see also the example scripts installed with the package
@@ -123,37 +152,101 @@
 #'
 acq_fraction_interactive <-
   function(tot.time.range = c(5, 15),
-           target.margin = 0.2,
-           HDR.mult = c(short = 1, long = 10),
+           target.margin = 0.1,
+           HDR.mult = if (light.source == "pulsed")
+             c(short = 1) else c(short = 1, long = 10),
            protocols = NULL,
            correction.method = NA,
            descriptors = NA,
+           stray.light.method = "simple",
+           seq.settings = NULL,
+           light.source = "continuous",
            ref.value = 1,
            qty.out = "Tfr",
            type = "total",
-           stray.light.method = "simple",
-           save.pdfs = TRUE) {
+           plot.lines.max = 11,
+           summary.type = "VIS",
+           save.pdfs = TRUE,
+           save.summaries = !interface.mode %in% c("series", "series-attr"),
+           save.collections = !interface.mode %in% c("simple", "series", "series-attr"),
+           async.saves = FALSE,
+           show.figs = TRUE,
+           interface.mode = ifelse(light.source == "pulsed", "manual", "auto"),
+           num.exposures = ifelse(light.source == "pulsed", 1L, -1L),
+           f.trigger.pulses = f.trigger.message,
+           folder.name = paste("acq", qty.out,
+                               lubridate::today(tzone = "UTC"),
+                               sep = "-"),
+           user.name = Sys.info()[["user"]],
+           session.name = paste(user.name,
+                                strftime(lubridate::now(tzone = "UTC"),
+                                         "%Y.%b.%d_%H.%M.%S"),
+                                sep = "_"),
+           verbose = getOption("photobiology.verbose", default = FALSE),
+           QC.enabled = TRUE) {
 
-    old.value <- options(warn = 1)
-    on.exit(options(old.value), add = TRUE, after = TRUE)
-
-    if (getOption("ooacquire.offline", TRUE)) {
-      warning("ooacquire off-line: data acquisition not possible")
-      message("Aborting...")
-      return(FALSE)
+    if (getOption("ooacquire.offline", FALSE)) {
+      warning("ooacquire off-line: Aborting...")
+      return()
     }
+
+    if (is.null(async.saves)) {
+      # in the future NULL could be a dynamic default dependent of file size
+      async.saves <- FALSE
+    }
+
+    if (async.saves && !requireNamespace("mirai", quietly = TRUE)) {
+      message("Ignoring 'async.saves = TRUE' as package 'mirai' is not installed")
+      async.saves <- FALSE
+    }
+
+    if (async.saves) {
+      cat("Will save files asynchronously\n(not blocking data acquisitions)\n")
+    } else {
+      cat("Will save files synchronously\n(blocking data acquisition until files are saved)\n")
+    }
+
+    if (is.null(getOption("digits.secs"))) {
+      old.options <- options(warn = 1, "digits.secs" = 3)
+    } else {
+      old.options <- options(warn = 1)
+    }
+    on.exit(options(old.options), add = TRUE, after = TRUE)
+
+    if (is.null(getOption("digits.secs"))) {
+      old.options <- options(warn = 1, "digits.secs" = 3)
+    } else {
+      old.options <- options(warn = 1)
+    }
+    on.exit(options(old.options), add = TRUE, after = TRUE)
 
     dyn.range <- 1e3
 
+    # validate qty.out
+    qty.out <- tolower(qty.out)
     stopifnot(qty.out %in% c("Tfr", "Rfr", "raw"))
 
+    # initialize repeats counter
+
+    pending.repeats <- 1L
+    series.start <- TRUE
+
     # define measurement protocols
-    if (length(protocols) == 0L) {
-      protocols <- list(rsd = c("reference", "sample", "dark"),
-                        rs = c("reference", "sample"))
+    default.protocols <- list(rsd = c("reference", "sample", "dark"),
+                              rs = c("reference", "sample"))
+
+    if (length(protocols) == 0) {
+      protocols <- default.protocols
+    } else if (inherits(protocols, "character")) {
+      protocols <- default.protocols[protocols]
+      if (length(protocols) == 0) {
+        stop("Aborting! Requested protocol is not available.", call. = FALSE)
+      }
     }
 
     w <- start_session()
+    on.exit(end_session(w),
+            add = TRUE) # ensure session is always closed!
 
     # Transfer focus to console (e.g., from editor pane)
     if (requireNamespace("rstudioapi", quietly = TRUE) &&
@@ -161,152 +254,468 @@ acq_fraction_interactive <-
       rstudioapi::executeCommand('activateConsole')
     }
 
+    # If multiple spectrometers are connected, ask which one to use
     instruments <- list_srs_interactive(w = w)
     sr.index <- choose_sr_interactive(instruments = instruments)
+    # -1L returned only if user aborts the selection
     if (sr.index < 0L) {
-      cat("Aborting...\n")
-      end_session(w = w)
-      message("Bye!")
+      message("Aborting at user's request!  Bye!")
+      return(NULL)
     }
+    # If the spectrometer has > 1 channel, ask which one to use
     ch.index <- choose_ch_interactive(instruments = instruments,
                                       sr.index = sr.index)
 
+    # retrieve serial number of spectrometer in use
     serial_no <- as.character(instruments[sr.index + 1L, 3])
 
-    message("Using channel ", ch.index + 1L,
-            " from spectrometer with serial number: ", serial_no)
+    cat("Using channel ", ch.index,
+        " from spectrometer with serial number: ", serial_no, "\n")
 
+    available.protocols <- names(protocols)
     if (anyNA(c(descriptors[[1]], correction.method[[1]]))) {
       descriptor <-
         switch(serial_no,
-               MAYP11278 = which_descriptor(descriptors = ooacquire::MAYP11278_descriptors),
+               MAYP11278 = which_descriptor(descriptors = ooacquire::MAYP11278_descriptors,
+                                            entrance.optics = "cosine"),
                MAYP112785 = which_descriptor(descriptors = ooacquire::MAYP112785_descriptors),
+               MAYP114590 = which_descriptor(descriptors = ooacquire::MAYP114590_descriptors),
+               FLMS04133 = which_descriptor(descriptors = ooacquire::FLMS04133_descriptors),
+               FLMS00673 = which_descriptor(descriptors = ooacquire::FLMS00673_descriptors),
+               FLMS00440 = which_descriptor(descriptors = ooacquire::FLMS00440_descriptors),
+               FLMS00416 = which_descriptor(descriptors = ooacquire::FLMS00416_descriptors),
                JAZA3098 =
-               { if (ch.index == 0L) {
-                 ooacquire::JAZA3098_ch1_descriptors[[1]]
-               } else {
-                 ooacquire::JAZA3098_ch2_descriptors[[1]]
+                 {
+                   if (ch.index == 0L) {
+                     ooacquire::JAZA3098_ch1_descriptors[[1]]
+                   } else {
+                     ooacquire::JAZA3098_ch2_descriptors[[1]]
+                   }
+                 },
+               { # default for no match to serial_no
+                 cat("No instrument descriptor found, retrieving it from the spectrometer\n")
+                 get_oo_descriptor(w, sr.index = sr.index, ch.index = ch.index)
                }
-               },
-               get_oo_descriptor(w, sr.index = sr.index, ch.index = ch.index)
         )
 
       correction.method <-
         switch(serial_no,
                MAYP11278 = ooacquire::MAYP11278_ylianttila.mthd,
                MAYP112785 = ooacquire::MAYP112785_ylianttila.mthd,
+               MAYP114590 = ooacquire::MAYP114590_simple.mthd,
+               FLMS04133 = ooacquire::FLMS04133_none.mthd,
+               FLMS00673 = ooacquire::FLMS00673_none.mthd,
+               FLMS00440 = ooacquire::FLMS00440_none.mthd,
+               FLMS00416 = ooacquire::FLMS00416_none.mthd,
                JAZA3098 =
-               { if (ch.index == 0L) {
-                 ooacquire::JAZA3098_ch1_none.mthd
-               } else {
-                 ooacquire::JAZA3098_ch2_none.mthd
-               }
+               {
+                 if (ch.index == 0L) {
+                   ooacquire::JAZA3098_ch1_none.mthd
+                 } else {
+                   ooacquire::JAZA3098_ch2_none.mthd
+                 }
                },
                new_correction_method(descriptor,
                                      stray.light.method = stray.light.method)
         )
 
     } else {
+      # we need a wavelength calibration, usually available in descriptor
       descriptor <- which_descriptor(descriptors = descriptors)
       stopifnot(exists("spectrometer.name", descriptor))
     }
 
-    # needed only for descriptors retrieved from data
+    default.protocol <- ifelse("rsd" %in% available.protocols, "rsd", available.protocols[1])
+
+    # jwrapper and spectrometer indexes have to be set to current ones if
+    # descriptor was not acquired from the spectrometer in the current session
     descriptor[["w"]] <- w
     descriptor[["sr.index"]] <- sr.index
     descriptor[["ch.index"]] <- ch.index
 
-    if (anyNA(c(descriptor[[1]], correction.method[[1]]))) {
-      stop("No callibration data found")
+    if (length(descriptor) < 10 || length(correction.method) < 5) {
+      stop("No spectrometer data found")
     }
 
-    # We still check serial numbers, really needed only for user supplied descriptors
+    # acquisition overheads, important for time series
+    if (!grepl("^series", interface.mode)) {
+      acq.overhead <- NA_real_ # safeguard as it should not be used
+    } else if (grepl("^MAY", serial_no)) {
+      acq.overhead <- 1e-3 # 1 ms
+    } else if (grepl("^FLM", serial_no)) {
+      acq.overhead <- 1e-3 # 1 ms
+    } else if (grepl("^USB", serial_no)) {
+      acq.overhead <- 0.1 # 100 ms slow
+    } else {
+      acq.overhead <- 50e-3 # 50 ms, just in case
+    }
+
+    # check serial numbers, really needed only for user supplied descriptors
     descriptor.inst <- get_oo_descriptor(w)
     stopifnot(descriptor[["spectrometer.sn"]] == descriptor.inst[["spectrometer.sn"]])
-
 
     # Before continuing we check that wavelength calibration is available
     stopifnot(length(descriptor[["wavelengths"]]) == descriptor[["num.pixs"]])
 
-    # We get metadata from user
-
-    utils::flush.console()
-    user.session.name <- readline("Session's name: ")
-    session.name <- make.names(user.session.name)
-    if (user.session.name == "") {
-      session.name <- make.names(lubridate::now(tzone = "UTC"))
+    session.name <- make.names(session.name) # validate argument passed in call
+    session.prompt <- paste("Session's name (<string>/\"", session.name, "\"-): ", sep = "")
+    user.session.name <- readline(session.prompt)
+    if (! user.session.name == "") {
+      session.name <- make.names(user.session.name)
+      if (user.session.name == "") {
+        session.name <- make.names(format(lubridate::now(tzone = "UTC")))
+      }
+      if (session.name != user.session.name) {
+        message("Using sanitised/generated name: '", session.name, "'.", sep = "")
+      }
     }
-    if (session.name != user.session.name) {
-      message("Using sanitised/generated name: '", session.name, "'.", sep = "")
-    }
 
-    utils::flush.console()
-    session.label <- paste("Operator: ", readline("Operator's name: "),
+    user.name <- make.names(user.name) # validate argument passed in call
+    user.name.prompt <- paste("Operator's name (<string>/\"", user.name, "\"-): ", sep = "")
+    user.user.name <- readline(user.name.prompt)
+    if (! user.user.name == "") {
+      user.name <- make.names(user.user.name)
+    }
+    cat("Using \"", user.name, "\" as operator's name\n", sep = "")
+    session.label <- paste("Operator: ", user.name,
                            "\nSession: ", session.name,
                            ", instrument s.n.: ", descriptor[["spectrometer.sn"]],
                            sep = "")
 
-    user.attrs <- list(what.measured = "",
-                       comment.text = "")
+    # set default for metadata attributes
+    user.attrs <-
+      list(what.measured = "",
+           comment.text = "",
+           how.measured = paste("Acquired with ", descriptor[["spectrometer.name"]],
+                                " (", descriptor[["spectrometer.sn"]],
+                                "), with a ", descriptor[["entrance.optics"]][["geometry"]], " diffuser",
+                                ")\nR (", paste(R.version[["major"]], R.version[["minor"]], sep = "."),
+                                "), 'ooacquire' (", utils::packageVersion("ooacquire"),
+                                ") in mode \"", interface.mode,
+                                "\", 'rOmniDriver' (", utils::packageVersion("rOmniDriver"),
+                                ") and OmniDriver (", rOmniDriver::get_api_version(w), ").",
+                                sep = ""))
 
-    folder.name <- set_folder_interactive()
+    folder.name <- set_folder_interactive(folder.name)
 
+    # set working directory of current session
     oldwd <- setwd(folder.name)
     on.exit(setwd(oldwd), add = TRUE)
     on.exit(message("Folder reset to: ", getwd(), "\nBye!"), add = TRUE)
-    message("Files will be saved to '", folder.name, "'", sep="")
 
-    protocol <- protocol_interactive(protocols = protocols)
+    # ask user to choose protocol only if needed
+    if (length(protocols) > 1) {
+      protocol <- protocol_interactive(protocols = protocols,
+                                       default = default.protocol)
+    } else {
+      protocol <- protocols[[default.protocol]]
+    }
 
     start.int.time <- 1 # seconds
 
+    # set default data acquisition settings based of call arguments
+
+    num.scans <- min(max(tot.time.range) %/% start.int.time, 1L)
+
     settings <- acq_settings(descriptor = descriptor,
                              integ.time = start.int.time,
+                             num.scans = num.scans,
                              target.margin = target.margin,
                              tot.time.range = tot.time.range,
                              HDR.mult = HDR.mult)
 
+    if (is.null(seq.settings)) {
+      seq.settings <- list(start.boundary = "none",
+                           initial.delay = 0,
+                           step.delay = 0,
+                           num.steps = 1L)
+    } else if (!setequal(names(seq.settings),
+                         c("start.boundary", "initial.delay", "step.delay", "num.steps"))) {
+      warning("Missing or wrong member names in 'seq.settings': ignoring!")
+      seq.settings <- list(start.boundary = "second",
+                           initial.delay = 0.1,
+                           step.delay = 0,
+                           num.steps = 1L)
+    }
+
+    # initialize lists to collect names from current session
+
+    filter.names <- character()
+    raw.names <- character()
+    file.names <- character()
+
+    # initialize interface logic flags
+
+    reuse.old.refs <- FALSE # none yet available
+    reuse.seq.settings <- FALSE
+    reset.count <- TRUE
+    get.obj.name <- TRUE
+    get.seq.settings <- grepl("^series", interface.mode)
+    sequential.naming <- FALSE
+    sequential.naming.required <- FALSE
+    clear.display <- FALSE
+
+    # initialize counter used for sequential naming
+
+    file.counter <- 0
+
+    # initialize default object name
+
+    base.obj.name <- "ooacq_#"
+
     # save current value as starting value for next iteration
 
-    repeat {
-      repeat{
-        obj.name <- make.names(readline("Give a name to the spectrum: "))
-        if (length(obj.name) > 0 && !exists(obj.name)) break()
-        cat("A valid and unique name is required, please try again...\n")
+    repeat { # main loop for UI
+
+      # forcing memory garbage collection could help avoid random delays
+      # during time-series acquisition
+      gc.data <- gc(full = TRUE)
+      if (verbose) {
+        print(gc.data)
       }
 
-      settings <- tune_interactive(descriptor = descriptor, acq.settings = settings)
+      if (clear.display) {
+        # clear plot viewer panel of RStudio
+        print(ggplot2::ggplot() +
+                ggplot2::ggtitle("Display of plots disabled") +
+                ggplot2::theme_minimal())
+        clear.display <- FALSE
+      }
 
-      raw.mspct <- acq_raw_mspct(descriptor = descriptor,
-                                 acq.settings = settings,
-                                 protocol = protocol,
-                                 user.label = obj.name)
+      repeat{ # obtain a valid object name from user
+
+        if (get.obj.name) {
+          current.sequential.naming <- sequential.naming
+          current.base.obj.name <- base.obj.name
+          if (sequential.naming && file.counter > 0) {
+            obj.name.prompt <-
+              paste("Give a name to the spectrum (",
+                    current.base.obj.name, "#): ", sep = "")
+          } else {
+            obj.name.prompt <-
+              "Give a name to the spectrum: "
+          }
+
+          repeat {
+            readline(obj.name.prompt) |> trimws() -> user.obj.name
+            if (user.obj.name == "" && current.sequential.naming) {
+              # we reuse base.obj.name and keep counting
+              reset.count <- FALSE
+              sequential.naming <- TRUE
+              user.obj.name <- base.obj.name
+            } else if (grepl("#$|%$", user.obj.name)) {
+              # we start the count using a new base.name
+              reset.count <- grepl("#$", user.obj.name)
+              sequential.naming <- TRUE
+              user.obj.name <- sub("#$|%$", "", user.obj.name)
+            } else {
+              # new name with no hash
+              sequential.naming <- sequential.naming.required
+              reset.count <- TRUE
+            }
+
+            base.obj.name <- make.names(user.obj.name)
+            if (base.obj.name != user.obj.name) {
+              answ <- readline(paste("Use sanitised (base) name '", base.obj.name, "'? (y-/n): "))
+              if (answ == "n") {
+                base.obj.name <- current.base.obj.name
+                next()
+              }
+            }
+            break()
+          }
+        }
+
+        # sequential object and file naming
+
+        if (sequential.naming) {
+          if (reset.count) {
+            file.counter <- 1
+            reset.count <- FALSE
+          } else {
+            file.counter <- file.counter + 1
+          }
+        } else {
+          file.counter <- 0
+        }
+
+        if (sequential.naming) {
+          obj.name <- paste(base.obj.name, formatC(file.counter, width = 3, flag = "0"), sep = "")
+        } else {
+          obj.name <- base.obj.name
+        }
+
+        # generate object names from base name
+
+        filter.name <- paste(obj.name, "spct", sep = ".")
+        raw.name <- paste(obj.name, "raw_mspct", sep = ".")
+        file.name <- paste(obj.name, "spct.Rda", sep = ".")
+
+        # although base name is known valid, the name may be already in use
+        if ((filter.name %in% filter.names) || file.exists(file.name)) {
+          if (sequential.naming && reuse.seq.settings) {
+            # likely running unattended
+            cat("Overwriting existing: '", filter.name, "'.", sep = "")
+            filter.names <- setdiff(filter.names, filter.name)
+            raw.names <- setdiff(raw.names, raw.name)
+            break()
+          } else {
+            # operator likely present
+            if (readline(paste("Overwrite existing '", filter.name, "? (y/n-): "))[1] == "y") {
+              filter.names <- setdiff(filter.names, filter.name)
+              raw.names <- setdiff(raw.names, raw.name)
+              break()
+            }
+          }
+        } else {
+          break()
+        }
+        print("A valid and unique name is required. Please try again...")
+
+      }  # obtain a valid object name from user
+
+      # user input of metadata for attributes "comment" and "what.measured"
+      if (grepl("-attr", interface.mode)) {
+        user.attrs <- set_attributes_interactive(user.attrs)
+      }
+
+      # adjust acquisition settings
+      if (!reuse.old.refs) {
+        # using previous dark and filter spectra is possible only with
+        # same settings
+        settings <- tune_interactive(descriptor = descriptor,
+                                     acq.settings = settings,
+                                     start.int.time = start.int.time,
+                                     interface.mode = interface.mode)
+        get.seq.settings <- grepl("series", interface.mode)
+      }
+
+      # time series settings
+      if (get.seq.settings) {
+
+        # Estimate time needed for measuring one spectrum
+        if (length(settings$HDR.mult) > 1) { # acq settings once per integ time value
+          estimated.measurement.duration <-
+            sum(settings$integ.time * settings$num.scans * 1e-6) +
+            acq.overhead * length(settings$HDR.mult) + # number of HDR acquisitions
+            sum(0.66 * settings$integ.time * 1e-6) # worse case overhead due to restart
+        } else if (length(settings$HDR.mult) == 1) { # no need to change acq settings
+          if (settings$num.scans > 1) {
+            estimated.measurement.duration <-
+              settings$integ.time * settings$num.scans * 1e-6 + acq.overhead
+          } else if (settings$num.scans == 1) { # buffered high speed acquisition
+            estimated.measurement.duration <-
+              settings$integ.time * 1e-6 # no overhead
+          } else {
+            estimated.measurement.duration <- NA_real_
+          }
+        }
+
+        stopifnot("Estimated measurement duration is not finite" =
+                    is.finite(estimated.measurement.duration),
+                  "Estimated measurement duration <= 0" =
+                    estimated.measurement.duration > 0)
+
+        cat("Duration of each repeated measurement: ",
+            signif(estimated.measurement.duration, 3), " s.\n")
+
+        seq.settings <-
+          set_seq_interactive(seq.settings = seq.settings,
+                              measurement.duration = estimated.measurement.duration,
+                              minimum.step.delay = ifelse(length(settings$HDR.mult) == 1L,
+                                                          0,
+                                                          estimated.measurement.duration),
+                              time.division = ifelse(length(settings$HDR.mult) == 1L,
+                                                     settings$integ.time * 1e-6, # -> seconds
+                                                     0))
+        get.seq.settings <- FALSE
+
+      }
+
+      if (pending.repeats >= 1) {
+        cat("\nPending: ", pending.repeats, " repeats.\n", sep = "")
+      }
+
+      # acquire raw-counts spectra
+      if (reuse.old.refs) { # acquire only sample spectra
+        if (acq.pausing) {
+          raw.mspct <- acq_raw_mspct(descriptor = descriptor,
+                                     acq.settings = settings,
+                                     seq.settings = seq.settings,
+                                     protocol = "sample",
+                                     pause.fun = NULL,
+                                     f.trigger.pulses = f.trigger.pulses,
+                                     user.label = obj.name)
+          if (pending.repeats > 1) {
+            answer.abort <- readline(prompt = "Abort pending repeats? yes/NO (y/n-): ")
+            if (answer.abort %in% c("y", "z")) {
+              pending.repeats <- 1
+            }
+          }
+        } else {
+          raw.mspct <- acq_raw_mspct(descriptor = descriptor,
+                                     acq.settings = settings,
+                                     seq.settings = seq.settings,
+                                     protocol = "sample",
+                                     pause.fun = function(...) {TRUE},
+                                     f.trigger.pulses = f.trigger.pulses,
+                                     user.label = obj.name)
+        }
+      } else { # acquire all spectra needed for protocol
+        raw.mspct <- acq_raw_mspct(descriptor = descriptor,
+                                   acq.settings = settings,
+                                   seq.settings = seq.settings,
+                                   protocol = protocol,
+                                   pause.fun = NULL, # default
+                                   f.trigger.pulses = f.trigger.pulses,
+                                   user.label = obj.name)
+      }
 
       if (length(raw.mspct) == 0) {
-        next()
+        message("Failure: no data acquired!")
+        if (reuse.seq.settings) {
+          # avoid endless looping when unattended
+          break()
+        } else {
+          next()
+        }
       }
 
-      raw.name <- paste(obj.name, "raw_spct", sep = ".")
-      assign(raw.name, raw.mspct)
-
-      file.name <- paste(obj.name, "Rda", sep = ".")
-
-      if (qty.out == "raw") {
-        fig <- ggplot2::autoplot(raw.mspct[["sample"]], annotations = c("-", "title*")) +
-          ggplot2::labs(title = raw.name,
-                        subtitle = paste(photobiology::getWhenMeasured(raw.mspct[["sample"]]), " UTC, ",
-                                         session.label, sep = ""),
-                        caption = paste("ooacquire", utils::packageVersion("ooacquire"))) +
-          ggplot2::theme_bw()
-        print(fig)
-        save(list = raw.name, file = file.name)
+      # combine spectra if needed
+      if (reuse.old.refs) {
+        # we add old refs to new sample data
+        raw.mspct <- c(old.refs.mpsct, raw.mspct)
       } else {
-        filter.spct <- s_fraction_corrected(raw.mspct,
+        # we save old references for possible reuse
+        refs.selector <- grep("dark|reference", protocol, value = TRUE)
+        if (length(refs.selector)) {
+          old.refs.mpsct <- raw.mspct[refs.selector]
+        } else {
+          old.refs.mpsct <- raw_mspct() # empty object
+        }
+      }
+
+      # convert into physical units, display and save to file
+      if (qty.out != "raw") {
+        # for series measurements we can have multiple "sample" raw spectra
+        spct.names <-
+          list(sample = grep("^sample", names(raw.mspct), value = TRUE),
+               filter = "reference",
+               dark = "dark")
+
+        if (length(raw.mspct) > 10L) {
+          cat("Computing ", qty.out, " ... ", sep = "")
+        }
+
+        filter.spct <- s_fraction_corrected(x = raw.mspct,
+                                            spct.names = spct.names,
                                             type = type,
+                                            reference.value = 1,
                                             correction.method = correction.method,
-                                            qty.out = qty.out,
                                             dyn.range = dyn.range,
-                                            ref.value = ref.value)
+                                            qty.out = qty.out,
+                                            ref.value = ref.value,
+                                            verbose = verbose)
 
         if (length(user.attrs$what.measured) > 0) {
           photobiology::setWhatMeasured(filter.spct, user.attrs$what.measured)
@@ -314,332 +723,591 @@ acq_fraction_interactive <-
           photobiology::setWhatMeasured(filter.spct, obj.name)
         }
 
-        if (length(user.attrs$comment.text) > 0) {
-          comment(filter.spct) <- paste(comment(filter.spct), user.attrs$comment.text, sep = "\n")
+        if (user.attrs$comment.text != "") {
+          comment(filter.spct) <-
+            paste(comment(filter.spct), user.attrs$comment.text, sep = "\n")
         }
 
-        filter.name <- paste(obj.name, "spct", sep = ".")
-        assign(filter.name, filter.spct)
-        save(list = c(raw.name, filter.name), file = file.name)
+        if (length(raw.mspct) > 10L) {
+          cat("ready.\n")
+        }
 
+        # prepare plot invariants
+        if (plot.lines.max < getMultipleWl(filter.spct)) {
+          title.text <- paste(what_measured(filter.spct)[[1L]],
+                              " (n = ", plot.lines.max,
+                              "/", getMultipleWl(filter.spct),
+                              ")",
+                              sep = "")
+          plot.spct <- pull_sample(filter.spct, size = plot.lines.max)
+        } else {
+          title.text <- paste(what_measured(filter.spct)[[1L]],
+                              " (n = ", getMultipleWl(filter.spct), ")",
+                              sep = "")
+          plot.spct <- filter.spct
+        }
+
+        # display plot, allowing user to tweak it
         repeat {
-          fig <- ggplot2::autoplot(filter.spct, annotations = c("-", "title*")) +
-            ggplot2::labs(title = filter.name,
-                          subtitle = paste(photobiology::getWhenMeasured(filter.spct), " UTC, ",
-                                           session.label, sep = ""),
-                          caption = paste("ooacquire", utils::packageVersion("ooacquire"))) +
+          if (length(plot.spct) > 10L) {
+            cat("Building plot ... ")
+          }
+          fig <- ggplot2::autoplot(plot.spct,
+                                   annotations = c("-", "colour.guide"),
+                                   geom = ifelse(getMultipleWl(plot.spct) == 1,
+                                                 "spct", "line")) +
+            ggplot2::labs(title = title.text,
+                          subtitle = when_measured(plot.spct)[[1L]],
+                          caption = how_measured(plot.spct)[[1L]]) +
+            ggplot2::theme(legend.position = "bottom") +
             ggplot2::theme_bw()
-          print(fig)
-          utils::flush.console()
-          answer <- readline("Change wavebands/discard/save and continue (/w/d/-): ")
-          switch(substr(answer, 1, 1),
-                 # p = {options(photobiology.radiation.unit = "photon"); next()},
-                 # e = {options(photobiology.radiation.unit = "energy"); next()},
-                 w = {answer1 <- readline("Set plot wavebands to: UV+PAR, plants, visible, total, default (u/p/v/t/-)")
-                 switch(substr(answer1, 1, 1),
-                        u = options(photobiology.plot.bands =
-                                      c(photobiologyWavebands::UV_bands(),
-                                        list(photobiologyWavebands::PAR()))),
-                        p = options(photobiology.plot.bands =
-                                      photobiologyWavebands::Plant_bands()),
-                        v = options(photobiology.plot.bands =
-                                      photobiologyWavebands::VIS_bands()),
-                        t = options(photobiology.plot.bands =
-                                      list(photobiology::new_waveband(
-                                        photobiology::wl_min(filter.spct),
-                                        photobiology::wl_max(filter.spct),
-                                        wb.name = "Total"))),
-                        options(photobiology.plot.bands = NULL))
-                 next()},
-                 d = break()
-          )
+          if (length(raw.mspct) > 10L) {
+            cat("ready.\n")
+          }
+
+          if (show.figs) {
+            print(fig)
+          } else {
+            if (clear.display) {
+              # clear plot viewer panel of RStudio
+              print(ggplot2::ggplot() +
+                      ggplot2::ggtitle("Display of plots disabled") +
+                      ggplot2::theme_minimal())
+              clear.display <- FALSE
+            }
+          }
+
+          # user interaction and display of plot only if at end of measurement
+          # to avoid delays
+          if (!reuse.seq.settings || pending.repeats == 1) {
+            plot.prompt <- "fig/w.bands/discard+go/SAVE+GO (f/w/d/s-): "
+            valid.answers <-  c("f","w", "d", "s")
+            repeat {
+              answer <- readline(plot.prompt)[1]
+              answer <- ifelse(answer == "", "s", answer)
+              if (answer %in% valid.answers) {
+                break()
+              } else {
+                print("Answer not recognized, please try again...")
+              }
+            }
+            switch(answer,
+                   f = {clear.display <- show.figs; show.figs <- !show.figs; next()},
+                   w = {
+                     repeat {
+                       utils::flush.console()
+                       answer1 <-
+                         tolower(
+                           readline("Bands: UV+PhR/UV+PAR/plants/VIS/TOT/DEFAULT (u/a/p/v/t/d-): ")
+                         )[1]
+                       answer1 <- ifelse(answer1 == "", "d", answer1)
+                       if (answer1 %in% c("u", "a", "p", "v", "t", "d")) {
+                         break()
+                       } else {
+                         print("Answer not recognized. Please try again...")
+                       }
+                     }
+                     switch(answer1,
+                            u = options(photobiology.plot.bands =
+                                          c(photobiologyWavebands::UV_bands(),
+                                            list(photobiologyWavebands::PhR()))),
+                            a = options(photobiology.plot.bands =
+                                          c(photobiologyWavebands::UV_bands(),
+                                            list(photobiologyWavebands::PAR()))),
+                            p = options(photobiology.plot.bands =
+                                          photobiologyWavebands::Plant_bands()),
+                            v = options(photobiology.plot.bands =
+                                          photobiologyWavebands::VIS_bands()),
+                            t = options(photobiology.plot.bands =
+                                          list(photobiology::new_waveband(
+                                            photobiology::wl_min(filter.spct),
+                                            photobiology::wl_max(filter.spct),
+                                            wb.name = "Total"))),
+                            options(photobiology.plot.bands = NULL))
+                     next()},
+                   d = break() # exit loop early, discarding acquired data
+            )
+          }
+
+          # update lists of objects and files created during current session
+          # since start or most recent saving of a collection.
+          raw.names <- c(raw.names, raw.name)
+          file.names <- c(file.names, file.name)
+          filter.names <- c(filter.names, filter.name)
+
+          # "rename" temporary objects
+          assign(raw.name, raw.mspct)
+          assign(filter.name, filter.spct)
+          obj.names <- c(raw.name, filter.name)
+
+          # save objects to files on disk
+          if (async.saves && !mirai::unresolved(rda.mirai)) {
+            # non-blocking
+            cat("Saving files asynchronously ...\n")
+            rda.mirai <-
+              mirai::mirai({
+                assign(obj.names[1], raw.mspct)
+                assign(obj.names[2], filter.spct)
+                save(list = obj.names, file = file.name)
+                return(file.exists(file.name))
+              },
+              obj.names = obj.names,
+              file.name = file.name,
+              raw.mspct = raw.mspct,
+              filter.spct = filter.spct,
+              .timeout = 60000 # 60 s
+              )
+          } else {
+            # fall back to main process
+            cat("Saving files ... ")
+            save(list = obj.names, file = file.name)
+            cat("ready\n")
+          }
+
+          # save plots to files on disk
+          if (save.pdfs) {
+            pdf.name <- paste(obj.name, "spct.pdf", sep = ".")
+            if (async.saves && !mirai::unresolved(pdf.mirai)) {
+              pdf.mirai <- mirai::mirai({
+                grDevices::pdf(file = pdf.name, width = 8, height = 6)
+                print(fig)
+                grDevices::dev.off()
+                return(file.exists(pdf.name))
+              },
+              pdf.name = pdf.name,
+              fig = fig,
+              .timeout = 120000 # 120 s
+              )
+            } else {
+              grDevices::pdf(file = pdf.name, width = 8, height = 6)
+              print(fig)
+              grDevices::dev.off()
+            }
+          }
           break()
         }
-      }
-      if (save.pdfs) {
-        pdf.name <- paste(filter.name, "pdf", sep = ".")
-        grDevices::pdf(file = pdf.name, width = 8, height = 6)
-        print(fig)
-        grDevices::dev.off()
+
+      } else { # qty.out == "raw"
+
+        # currently no plotting!
+        if (!reuse.seq.settings || pending.repeats == 1) {
+          raw.prompt <- "discard/SAVE+NEXT (d/s-): "
+          valid.answers <-  c("d", "s")
+          repeat {
+            answer <- readline(raw.prompt)[1]
+            answer <- ifelse(answer == "", "s", answer)
+            if (answer %in% valid.answers) {
+              break()
+            } else {
+              print("Answer not recognized, please try again...")
+            }
+          }
+
+          # save raw-counts data to file on disk
+          if (answer == "s") {
+            raw.names <- c(raw.names, raw.name)
+            file.names <- c(file.names, file.name)
+
+            assign(raw.name, raw.mspct)
+
+            if (async.saves && !mirai::unresolved(rda.mirai)) {
+              cat("Saving files asynchronously\n")
+              rda.mirai <- mirai::mirai({
+                assign(raw.name, raw.mspct)
+                save(list = raw.name, file = file.name)
+                return(file.exists(file.name))
+              },
+              .args = list(raw.name, file.name, raw.mspct),
+              .timeout = 60000) # 1 min
+            } else {
+              cat("Saving files ... ")
+              save(list = raw.name, file = file.name)
+              cat("ready\n")
+            }
+          }
+        }
       }
 
-      utils::flush.console()
-      user.input <- readline("Next, change protocol, quit (-/p/q): ")
+      # make collection from all spectra acquired since start of session or last
+      # saving of a collection
+      if (pending.repeats == 0 && (save.collections || save.summaries)) {
 
-      if (user.input == "") {
-        next()
-      } else if (substr(user.input, 1, 1) == "p") {
-        protocol <- protocol_interactive(protocols)
-      } else if (substr(user.input, 1, 1) == "q") {
-        break()
+        repeat {
+          answer.collect <-
+            readline("collect and/or summarize? yes/NO (y/n-): ")[1]
+          if (answer.collect %in% c("n", "")) {
+            collect.and.save <- FALSE
+            break()
+          } else if (answer.collect == "y") {
+            collect.and.save <- TRUE
+            break()
+          } else {
+            print("Answer not recognized. Please try again...")
+          }
+        }
+
+        # Construct collection object and create plot of collection
+        if (collect.and.save) {
+          message("Quantity \"", qty.out, "\" spectra to collect: ",
+                  paste(filter.names, collapse = ", "))
+          message("Raw objects to collect: ",
+                  paste(raw.names, collapse = ", "), sep = " ")
+          user.collection.name <- readline("Name of the collection?: ")
+          collection.name <- make.names(paste("collection ",
+                                              user.collection.name, sep = ""))
+          if (user.collection.name == "") {
+            collection.name <- make.names(paste("collection ",
+                                                lubridate::now(tzone = "UTC"), sep = ""))
+          }
+          if (collection.name != user.collection.name) {
+            message("Using sanitised/generated name: '",
+                    collection.name, "'.", sep = "")
+          }
+          collection.title <- readline("Title for plot?: ")
+          if (collection.title == "") {
+            collection.title <- collection.name
+          }
+
+          # name of the Rda file used to save the collection
+          collection.file.name <- paste(collection.name, "Rda", sep = ".")
+          # collection.objects used to collect all R objects to be saved to the Rda file
+          collection.objects <- character()
+
+          if (qty.out != "raw") {
+            # construct collection of computed spectra, needed for summaries
+            # even when not saved to file on disk!
+            collection.mspct <-
+              switch(qty.out,
+                     fluence = photobiology::source_mspct(mget(filter.names)),
+                     filter = photobiology::source_mspct(mget(filter.names)),
+                     cps =   photobiology::cps_mspct(mget(filter.names)))
+
+            # plot collection and summaries
+            if (plot.lines.max < getMultipleWl(filter.spct)) {
+              collection.title <- paste(collection.title,
+                                        " (sample of ", plot.lines.max, ")",
+                                        sep = "")
+            } else {
+              collection.title <- paste(collection.title,
+                                        " (n = ", getMultipleWl(filter.spct), ")",
+                                        sep = "")
+            }
+
+            # create plot
+            # if too many spectra to plot, draw a random sample of the maximum size
+            collection.fig <-
+              ggplot2::autoplot(pull_sample(collection.mspct, plot.lines.max),
+                                annotations =
+                                  c("-", "peaks", "colour.guide", "summaries")) +
+              ggplot2::labs(title = collection.title,
+                            subtitle = session.label,
+                            caption = how_measured(collection.mspct[[1L]])) +
+              ggplot2::theme(legend.position = "bottom")
+            print(collection.fig)
+            rm(collection.title)
+
+            # save plot to file on disk
+            if (save.pdfs) {
+              collection.pdf.name <- paste(collection.name, "pdf", sep = ".")
+              grDevices::pdf(file = collection.pdf.name, onefile = TRUE,
+                             width = 11, height = 7, paper = "a4r")
+              print(collection.fig)
+              grDevices::dev.off()
+              rm(collection.pdf.name)
+            }
+            rm(collection.fig)
+
+            # create table of summaries from the spectra in the collection
+            if (save.summaries) {
+              contents.collection.name <-
+                paste(collection.name, "contents.tb", sep = ".")
+              assign(contents.collection.name, summary(collection.mspct))
+              collection.objects <- c(collection.objects, contents.collection.name)
+
+              if (qty.out %in% "Tfr") {
+                last.summary.type <- summary.type
+                repeat{
+                  valid.answers <- c("plant", "PAR", "VIS")
+                  summary.type <- readline(paste("Change summary type from \"",
+                                                 last.summary.type, "\"? (", "): ",
+                                                 paste(valid.answers, collapse = "/", sep = ""),
+                                                 ": ", sep = ""))[1]
+                  if (summary.type == "") {
+                    summary.type <- last.summary.type
+                  }
+                  if (summary.type %in% valid.answers) {
+                    break()
+                  } else {
+                    print("Answer not recognized. Please try again...")
+                  }
+                }
+                summary.tb <-
+                  Tfr_summary_table(mspct = collection.mspct)
+
+                # save summary table to file on disk
+                if (!is.null(summary.tb) && is.data.frame(summary.tb)) {
+                  readr::write_delim(summary.tb,
+                                     file =  paste(collection.name, "csv", sep = "."),
+                                     delim = readr::locale()$grouping_mark)
+                  summary.collection.name <- paste(collection.name, "summary.tb", sep = ".")
+                  # "rename" data frame with summaries
+                  assign(summary.collection.name, summary.tb)
+                  collection.objects <- c(collection.objects, summary.collection.name)
+                } else {
+                  message("Computation of summaries failed!")
+                }
+              }
+            }
+
+            # create collection of raw-counts spectra and save all collections
+            if (save.collections) {
+              # "rename" temporary objects
+              filter.collection.name <- paste(collection.name, qty.out, "mspct", sep = ".")
+              assign(filter.collection.name, collection.mspct)
+              collection.objects <- c(collection.objects, filter.collection.name)
+
+              raw.collection.name <- paste(collection.name, "raw", "lst", sep = ".")
+              assign(raw.collection.name, mget(raw.names))
+              collection.objects <- c(collection.objects, raw.collection.name)
+
+              # save collections to files on disk
+              retrying <- FALSE
+              repeat {
+                save(list = collection.objects, file = collection.file.name, precheck = TRUE)
+                if (file.exists(collection.file.name)) {
+                  message("Collection objects saved to file '",
+                          collection.file.name, "'.", sep = "")
+                  # save file name to report at end of session
+                  file.names <- c(file.names, collection.file.name)
+                  # remove saved objects and the list with their names
+                  rm(list = collection.objects)
+                  rm(collection.objects)
+                  # reset the lists of names for next collection
+                  filter.names <- character()
+                  raw.names <- character()
+                  message("Object lists reset")
+                  break()
+                } else {
+                  if (retrying) {
+                    message("Saving of the collection to file failed again! (Aborting)")
+                    break()
+                  }
+                  message("Saving of the collection to file failed! (Trying again)")
+                  retrying <- TRUE
+                }
+              }
+            }
+          }
+        }
       }
+
+      # whole-measurement repeats remaining to be done
+      pending.repeats <- pending.repeats - 1L
+
+      if (pending.repeats >= 1) {
+        get.obj.name <- FALSE
+        acq.pausing <- acq.pausing.always
+      } else {
+        get.obj.name <- TRUE
+        acq.pausing <- TRUE
+
+        get.seq.settings <- grepl("^series", interface.mode)
+
+        loop.valid.answers <- c("q", "r", "m", "n")
+        loop.prompt <- "quit/repeat/NEW-MEASUREMENT (q/r/m-): "
+        repeat {
+          answer2 <- readline(loop.prompt)[1]
+          answer2 <- ifelse(answer2 == "", "m", answer2)
+          if (answer2 %in% loop.valid.answers) {
+            break()
+          } else {
+            print("Answer not recognized. Please try again...")
+          }
+        }
+
+        if (answer2 == "r") {
+          repeat {
+            answer4 <- readline("Number of repeats (integer >= 1 or \"\"): ")
+            if (answer4 == "") {
+              answer4 <- "1"
+            }
+            pending.repeats <- try(as.integer(answer4))
+            if (!is.na(pending.repeats) && pending.repeats >= 1L) {
+              break()
+            } else {
+              cat("Value entered is not a number >= 1!\n")
+            }
+          }
+          repeat {
+            answer3 <- readline("Repeats: no figs./with figs./pausing/AUTO- (n/f/p/a-): ")
+            if (answer3 == "") {
+              answer3 <- "a"
+            }
+            if (answer3 %in% c("n", "f", "p", "a")) {
+              break()
+            } else {
+              cat("Answer not recognized, please try again...")
+            }
+          }
+          if (answer3 == "a") {
+            if (pending.repeats > 1L) {
+              answer3 <- "n"
+            } else {
+              answer3 <- "f"
+            }
+          }
+          acq.pausing.always <- answer3 == "p"
+          clear.display <- show.figs && answer3 == "n"
+          show.figs <- answer3 %in% c("p", "f")
+          if (acq.pausing.always) {
+            message("Pausing between repeats")
+          } else {
+            message("Not pausing between repeats")
+          }
+          reuse.old.refs <- TRUE
+          reuse.seq.settings <- pending.repeats > 1L
+          sequential.naming.required <- pending.repeats > 1L
+          answer2 <- "m"
+        } else {
+          acq.pausing.always <- FALSE
+          reuse.old.refs <- FALSE
+          reuse.seq.settings <- FALSE
+          sequential.naming.required <- FALSE
+          pending.repeats <- 1
+        }
+
+        if (answer2 == "q") {
+          break() # out of UI main loop
+        } else if (!reuse.old.refs) {
+          repeat {
+            answer5 <- readline("Change protocol? yes/NO (y/n-): ")[1]
+            answer5 <- ifelse(answer5 == "", "n", answer5)
+            if (answer5 %in% c("n", "y")) {
+              break()
+            } else {
+              print("Answer not recognized, please try again...")
+            }
+          }
+          if (answer5 == "y") {
+            protocol <- protocol_interactive(protocols)
+          }
+        }
+
+      }
+
+    } # end of main UI loop
+
+    # Wait for all files to be saved (needed? but anyway a  reassuring)
+    if (async.saves && (mirai::unresolved(rda.mirai) || mirai::unresolved(pdf.mirai))) {
+      cat("Saving files ")
+      while (mirai::unresolved(rda.mirai) || mirai::unresolved(pdf.mirai)) {
+        cat(".")
+        Sys.sleep(0.25)
+      }
+      cat("\n")
     }
-    cat("Ending...\n")
 
-    # clean up is done using 'on.exit()'
+    # report on asynchronous file saving
+    # (if and only if persistent daemons are created!)
+    # if (async.saves && mirai::status()$connections) {
+    #   print(mirai::status()$daemons)
+    # }
+
+    # save list of all file saved during session
+    save(file.names,
+         file = paste("files4session-",
+                      make.names(session.name),
+                      ".Rda", sep = ""))
+
+    cat("Data files saved during session:\n",
+        "to ", getwd(), "\n",
+        paste(file.names, collapse = ",\n"), ".\n", sep = "")
+
+    cat("Ending data acquisition...\n")
+
+    # connection to spectrometer is closed using on.exit() to ensure
+    # disconnection even when end of session is forced by error or by user
+
   }
 
-
-# simple fraction interactive ---------------------------------------------
-
-#' @rdname acq_fraction_interactive
+#' Summarize spectral transmittance
+#'
+#' Compute transmittance by waveband of interest to plants' and human visual
+#' responses to light.
+#'
+#' @param mspct A filter_mspct, or a filter_spct object containing spectral
+#'    transmittance for one or more sources.
+#' @param quantity character Passed to \code{\link[photobiology]{transmittance}}.
+#' @param attr2tb character Vector with one or more of "when.measured",
+#'    "what.measured", "where.measured", "how.measured" and "comment".
+#' @param summary.type character One of "plant", "PAR" or "VIS".
+#' @param digits integer The number of significant digits in the output.
+#'
+#' @details This function calls different functions from package 'photobiology'
+#'    and returns a typical set of summaries.
+#'
+#' @return A tibble with one row per spectrum and one column per
+#'    summary quantity and attribute and a column with the names of the spectra.
 #'
 #' @export
 #'
-acq_rfr_tfr_interactive <-
-  function(tot.time.range = c(10, 15),
-           target.margin = 0.1,
-           HDR.mult = c(1, 10),
-           descriptors = NA,
-           ref.value = 1,
-           save.pdfs = TRUE,
-           qty.out = "Tfr") {
+#' @seealso See the documentation for functions
+#'   \code{\link[photobiology]{transmittance}},
+#'   \code{\link[photobiology]{add_attr2tb}}
+#'   and \code{\link[base]{signif}} which are called to build
+#'   the summary table.
+#'
+#' @examples
+#'
+#' Tfr_summary_table(yellow_gel.spct)
+#' Tfr_summary_table(yellow_gel.spct, attr2tb = c("what.measured", "where.measured"))
+#' Tfr_summary_table(yellow_gel.spct, summary.type = "plant")
+#' Tfr_summary_table(yellow_gel.spct, summary.type = "PAR")
+#' Tfr_summary_table(yellow_gel.spct, summary.type = "VIS")
+#'
+Tfr_summary_table <-
+  function(mspct,
+           quantity = "average",
+           attr2tb = "when.measured",
+           summary.type = "VIS",
+           digits = 3L) {
 
-    old.value <- options(warn = 1)
-    on.exit(options(old.value), add = TRUE, after = TRUE)
-
-    # define measurement protocols
-    protocols <- list(rsd = c("reference", "sample", "dark"),
-                      rs = c("reference", "sample"))
-
-    w <- start_session()
-    on.exit(end_session(w))
-
-    instruments <- list_srs_interactive(w = w)
-    sr.index <- choose_sr_interactive(instruments = instruments)
-    if (sr.index < 0L) {
-      cat("Aborting...\n")
-      end_session(w = w)
-      message("Bye!")
+    # handle also single spectra
+    if (is.generic_spct(mspct)) {
+      mspct <- generic_mspct(list(mspct), class = class(mspct)[1])
+    }
+    if (any(unname(sapply(mspct, getMultipleWl)) > 1)) {
+      mspct <- subset2mspct(mspct)
     }
 
-    # needs interactive swapping
-    rfr.ch.index <- 0L
-    tfr.ch.index <- 1L
-
-    serial_no <- as.character(instruments[sr.index + 1L, 3])
-
-    message("Channels: ", rfr.ch.index, "for Rfr, and ", tfr.ch.index,
-            " for Tfr; ",
-            "spectrometer with s.n.: ", serial_no)
-
-    rfr.descriptor <- ooacquire::JAZA3098_ch1_descriptors[[1]]
-    tfr.descriptor <- ooacquire::JAZA3098_ch2_descriptors[[1]]
-
-    # needed only for descriptors retrieved from data
-    rfr.descriptor[["w"]] <- w
-    rfr.descriptor[["sr.index"]] <- sr.index
-    rfr.descriptor[["ch.index"]] <- rfr.ch.index
-
-    tfr.descriptor[["w"]] <- w
-    tfr.descriptor[["sr.index"]] <- sr.index
-    tfr.descriptor[["ch.index"]] <- tfr.ch.index
-
-    # We still check serial numbers, really needed only for user supplied descriptors
-    descriptor.inst <- get_oo_descriptor(w)
-    stopifnot(rfr.descriptor[["spectrometer.sn"]] == descriptor.inst[["spectrometer.sn"]])
-
-    # Before continuing we check that wavelength calibration is available
-    stopifnot(length(rfr.descriptor[["wavelengths"]]) == rfr.descriptor[["num.pixs"]])
-    stopifnot(length(tfr.descriptor[["wavelengths"]]) == tfr.descriptor[["num.pixs"]])
-
-    utils::flush.console()
-    session.label <- paste("operator: ", readline("Operator's name: "),
-                           ", instrument s.n.: ", rfr.descriptor[["spectrometer.sn"]],
-                           sep = "")
-
-    utils::flush.console()
-    folder.name <- readline("Enter folder name (use '/' instead of '\'): ")
-    if (length(folder.name == 0)) {
-      folder.name <- "."
+    if (summary.type %in% c("plant", "PAR")) {
+      plant.wb <- switch(summary.type,
+                         PAR = c(photobiologyWavebands::UV_bands("CIE"),
+                                 list(photobiologyWavebands::PAR())),
+                         plant = c(photobiologyWavebands::Plant_bands(),
+                                   list(photobiologyWavebands::PAR())))
+      summary.tb <-
+        photobiology::transmittance(mspct,
+                                    quantity = quantity,
+                                    w.band = plant.wb,
+                                    attr2tb = attr2tb)
+    } else if (summary.type == "VIS") {
+      summary.tb <-
+        photobiology::transmittance(mspct,
+                                    quantity  = quantity,
+                                    w.band = photobiologyWavebands::VIS_bands(),
+                                    attr2tb = attr2tb)
+    } else { # total
+      summary.tb <-
+        photobiology::transmittance(mspct,
+                                    quantity = quantity,
+                                    w.band = NULL,
+                                    attr2tb = attr2tb)
     }
-    # need to add folder.name sanitation
-    if (!file.exists(folder.name)) {
-      message("Folder does not exist, creating it...")
-      dir.create(folder.name)
-    }
-    oldwd <- setwd(folder.name)
-    on.exit(setwd(oldwd))
-    on.exit(message("Folder reset to: ", getwd(), "\nBye!"), add = TRUE)
-    message("Files will be saved to '", folder.name, "'", sep="")
 
-    protocol <- protocol_interactive(protocols = protocols)
+    selector <- unname(sapply(summary.tb, is.numeric))
+    summary.tb[ , selector] <- signif(summary.tb[ , selector], digits = digits)
 
-    start.int.time <- 0.5 # seconds
-
-    rfr.settings <-
-      acq_settings(rfr.descriptor,
-                   start.int.time,
-                   target.margin = target.margin,
-                   tot.time.range = tot.time.range,
-                   HDR.mult = HDR.mult)
-
-    tfr.settings <-
-      acq_settings(tfr.descriptor,
-                   start.int.time,
-                   target.margin = target.margin,
-                   tot.time.range = tot.time.range,
-                   HDR.mult = HDR.mult)
-
-    # save current value as starting value for next iteration
-
-    repeat {
-      repeat{
-        utils::flush.console()
-        obj.name <- readline("Give a name to the spectrum: ")
-        if (length(obj.name) > 0 && !exists(obj.name)) break()
-        cat("A valid and unique name is required, please try again...\n")
-      }
-      rfr.raw.name <- paste(obj.name, "rfr_raw_spct", sep = ".")
-      tfr.raw.name <- paste(obj.name, "tfr_raw_spct", sep = ".")
-      rfr.name <- paste(obj.name, "rfr_spct", sep = ".")
-      tfr.name <- paste(obj.name, "tfr_spct", sep = ".")
-      spct.name <- paste(obj.name, "spct", sep = ".")
-      file.name <- paste(obj.name, "Rda", sep = ".")
-      pdf.name <- paste(obj.name, "pdf", sep = ".")
-
-      cat("REFLECTANCE:\n")
-      rfr.settings <- tune_interactive(descriptor = rfr.descriptor,
-                                       acq.settings = rfr.settings)
-
-      rfr.raw.mspct <- acq_raw_mspct(descriptor = rfr.descriptor,
-                                     acq.settings = rfr.settings,
-                                     protocol = protocol,
-                                     user.label = spct.name)
-
-      if (length(rfr.raw.mspct) == 0) {
-        next()
-      }
-
-      assign(rfr.raw.name, rfr.raw.mspct)
-
-      cat("TRANSMITANCE:\n")
-      tfr.settings <- tune_interactive(descriptor = tfr.descriptor,
-                                       acq.settings = tfr.settings)
-
-      tfr.raw.mspct <- acq_raw_mspct(descriptor = tfr.descriptor,
-                                     acq.settings = tfr.settings,
-                                     protocol = protocol,
-                                     user.label = spct.name)
-
-      if (length(tfr.raw.mspct) == 0) {
-        next()
-      }
-
-      assign(tfr.raw.name, tfr.raw.mspct)
-
-      # processing
-
-      if (qty.out == "raw") {
-        save(list = c(rfr.raw.name, tfr.raw.name),
-             file = file.name)
-      } else {
-        # reflectance
-        rfr.raw.mspct %>%
-          photobiology::msmsply(trim_counts) %>%
-          photobiology::msmsply(linearize_counts) %>%
-          raw2cps() %>%
-          photobiology::msmsply(merge_cps) -> rfr.cps.mspct
-
-        photobiology::cps2Rfr(rfr.cps.mspct$sample,
-                              rfr.cps.mspct$reference,
-                              rfr.cps.mspct$dark) -> rfr.spct
-
-        assign(rfr.name, rfr.spct)
-
-        # transmitance
-        tfr.raw.mspct %>%
-          photobiology::msmsply(trim_counts) %>%
-          photobiology::msmsply(linearize_counts) %>%
-          raw2cps() %>%
-          photobiology::msmsply(merge_cps) -> tfr.cps.mspct
-
-        photobiology::cps2Tfr(tfr.cps.mspct$sample,
-                              tfr.cps.mspct$reference,
-                              tfr.cps.mspct$dark) -> tfr.spct
-
-        assign(tfr.name, tfr.spct)
-
-        object.spct <-
-          photobiology::object_spct(w.length = rfr.spct[["w.length"]],
-                                    Rfr = rfr.spct[["Rfr"]],
-                                    Tfr = tfr.spct[["Tfr"]],
-                                    Rfr.type = "total",
-                                    Tfr.type = "total",
-                                    comment = obj.name)
-
-        object.spct <-
-          photobiology::copy_attributes(rfr.spct, object.spct,
-                                        c("what_measured", "when_measured", "instr_desc"))
-
-        object.spct <- photobiology::clip_wl(object.spct)
-
-        assign(spct.name, object.spct)
-
-        save(list = c(rfr.raw.name, tfr.raw.name, spct.name, rfr.name, tfr.name),
-             file = file.name)
-
-        repeat {
-          fig1 <- ggplot2::autoplot(rfr.spct, range = c(280, 850), annotations = c("-", "title*")) +
-            ggplot2::labs(title = spct.name,
-                          subtitle = paste(photobiology::getWhenMeasured(rfr.spct), " UTC, ",
-                                           session.label, sep = ""),
-                          caption = paste("ooacquire", utils::packageVersion("ooacquire"))) +
-            ggplot2::theme_bw()
-          fig2 <- ggplot2::autoplot(tfr.spct, range = c(280, 850), annotations = c("-", "title*")) +
-            ggplot2::labs(title = spct.name,
-                          subtitle = paste(photobiology::getWhenMeasured(tfr.spct), " UTC, ",
-                                           session.label, sep = ""),
-                          caption = paste("ooacquire", utils::packageVersion("ooacquire"))) +
-            ggplot2::theme_bw()
-
-          print(ggspectra::multiplot(fig1, fig2))
-
-          utils::flush.console()
-          answer <- readline("Change wavebands/discard/save and continue (/w/d/-): ")
-          switch(answer,
-                 # p = {options(photobiology.radiation.unit = "photon"); next()},
-                 # e = {options(photobiology.radiation.unit = "energy"); next()},
-                 w = {answer1 <- readline("Set plot wavebands: UV+PAR, plants, visible, total, default (u/p/v/t/-)")
-                 switch(answer1,
-                        u = options(photobiology.plot.bands =
-                                      c(photobiologyWavebands::UV_bands(),
-                                        list(photobiologyWavebands::PAR()))),
-                        p = options(photobiology.plot.bands =
-                                      photobiologyWavebands::Plant_bands()),
-                        v = options(photobiology.plot.bands =
-                                      photobiologyWavebands::VIS_bands()),
-                        t = options(photobiology.plot.bands =
-                                      list(photobiology::new_waveband(
-                                        photobiology::wl_min(object.spct),
-                                        photobiology::wl_max(object.spct),
-                                        wb.name = "Total"))),
-                        options(photobiology.plot.bands = NULL))
-                 next()},
-                 d = break()
-          )
-          break()
-        }
-      }
-      if (save.pdfs) {
-        grDevices::pdf(file = pdf.name, width = 8, height = 6, onefile = TRUE)
-        print(fig1)
-        print(fig2)
-        grDevices::dev.off()
-      }
-
-      utils::flush.console()
-      user.input <- readline("NEXT/change protocol/quit (n-/p/q): ")
-
-      if (user.input[1] == "") {
-        next()
-      } else if (user.input[1] == "p") {
-        protocol <- protocol_interactive(protocols)
-      } else if (user.input[1] == "q") {
-        break()
-      }
-    }
-    cat("Ending...\n")
-
-    # clean up is done using 'on.exit()'
+    summary.tb
   }
+

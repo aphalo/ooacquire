@@ -77,6 +77,6 @@ list_instruments <- function(w) {
 #' @export
 #'
 end_session <- function(w) {
-  message("Clossing connection to ", rOmniDriver::number_srs(w), " spectrometer(s)")
+  message("Closing connection to ", rOmniDriver::number_srs(w), " spectrometer(s)")
   rOmniDriver::srs_close(w)
 }

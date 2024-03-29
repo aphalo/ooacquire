@@ -116,7 +116,7 @@ tune_interactive <- function(descriptor,
     if (answ == "?") {
       cat(help.text)
     } else if (answ %in% c("t", "T")) {
-      answ.t <- readline("Auto-adjust integration time?, a = adjust, c = current, z = abort (a-/c/z): ")
+      answ.t <- readline("Auto-adjust integration time? ADJUST/current/abort (a-/c/z): ")
       if (answ.t %in% c("z", "c")) {
         if (answ.t == "c") {
           tuned <- TRUE
@@ -619,6 +619,63 @@ set_folder_interactive <- function(folder.name = NULL) {
   folder.name
 }
 
+
+#' Interactively get user name to set
+#'
+#' Enter values for "user supplied" name.
+#'
+#' @param user.name character Default name of the folder.
+#'
+#' @details Validate user name, and allow user to change the default.
+#'
+#' @family interactive acquisition utility functions
+#'
+#' @export
+#'
+set_user_name_interactive <- function(user.name = NULL) {
+  # validate argument passed in call
+  user.name <- make.names(user.name)
+  user.name.prompt <-
+    paste("Operator's name (<string>/\"", user.name, "\"-): ", sep = "")
+  user.user.name <- readline(user.name.prompt)
+  if (! user.user.name == "") {
+    user.name <- make.names(user.user.name)
+  }
+  cat("Using \"", user.name, "\" as operator's name\n", sep = "")
+  user.name
+}
+
+#' Interactively get session name to set
+#'
+#' Enter values for "session" name.
+#'
+#' @param session.name character Default name of the folder.
+#'
+#' @details Validate seesionr name, and allow user to change the default.
+#'
+#'
+#' @family interactive acquisition utility functions
+#'
+#' @export
+#'
+# metadata: get session name and user name from user, offering defaults
+set_session_name_interactive <- function(session.name = NULL) {
+  session.name <- make.names(session.name) # validate argument passed in call
+  session.prompt <- paste("Session's name (<string>/\"", session.name, "\"-): ", sep = "")
+  user.session.name <- readline(session.prompt)
+  if (! user.session.name == "") {
+    session.name <- make.names(user.session.name)
+    if (user.session.name == "") {
+      session.name <- make.names(format(lubridate::now(tzone = "UTC")))
+    }
+    if (session.name != user.session.name) {
+      message("Using sanitised/generated name: '", session.name, "'.", sep = "")
+    }
+  }
+  session.name
+}
+
+
 #' Manual trigger pulses request
 #'
 #' This function is used by default. It prints a message asking the operator
@@ -804,7 +861,8 @@ read_period <- function(prompt,
       }
       break()
     }
-    message("Please, try again. Numbers followed by S, M, or H.\n6S = 6 seconds, 10M12S = 10 minutes 12 seconds.")
+    message("Please, try again. Numbers followed by S, M, or H.\n",
+            "6S = 6 seconds, 10M12S = 10 minutes 12 seconds.")
   }
   z
 }
