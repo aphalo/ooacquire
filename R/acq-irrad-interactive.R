@@ -831,7 +831,7 @@ acq_irrad_interactive <-
         # we save old references for possible reuse
         refs.selector <- grep("dark|filter", protocol, value = TRUE)
         if (length(refs.selector)) {
-          cat("Cacheing ", paste(names(raw.mspct)[refs.selector],
+          cat("Cacheing ", paste(refs.selector,
                                  collapse = " and "),
               " spectrum/a ... ", sep = "")
           old.refs.mpsct <- raw.mspct[refs.selector]
