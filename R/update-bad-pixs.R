@@ -16,8 +16,8 @@
 #' acquired. Recomputing of physical quantities from raw counts normally reuses
 #' the embedded calibration data. Function \code{update_bad_pixs()} makes it
 #' possible to update the embedded bad pixels information before recomputing
-#' derived quantities. This function can be applied only to \code{raw_spct}
-#' objects created with functions from package 'ooacquire'.
+#' derived quantities. This function can be applied only to
+#' \code{raw_spct} objects created with functions from package 'ooacquire'.
 #'
 #' With defaults arguments for formal parameters \code{bad.pixs} and
 #' \code{action}, the \code{bad.pixs} field of the descriptor is updated to
@@ -102,8 +102,8 @@ update_bad_pixs <- function(x,
 #'
 #' @param x raw_spct or raw_mspct object with attribute \code{instr.desc} set.
 #'
-#' @return a copy of \code{x} possibly with an updated \code{instr.desc}
-#'   attribute embedded.
+#' @return a copy of \code{x} possibly with an updated
+#'   \code{instr.desc} attribute embedded.
 #'
 #' @export
 #'

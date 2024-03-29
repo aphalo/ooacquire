@@ -27,6 +27,8 @@ reference:
     - set_seq_interactive
     - tune_interactive
     - f.trigger.message
+    - set_session_name_interactive
+    - set_user_name_interactive
 
   - subtitle: Low level functions
     desc: Low level functions useful for development of both of user defined scripts and interactive functions.
@@ -67,6 +69,7 @@ reference:
     desc: Utility functions for reading raw-counts and metadata from output files from **OceanView**, **SpectraSuite**, Raspberry Pi software and the inbuilt-firmware of the Jaz modular spectrometer.
     contents:
     - irrad_summary_table
+    - Tfr_summary_table
     - map_oofile_header_rows
     - oofile_data_rows
     - set_oo_ssdata_settings
