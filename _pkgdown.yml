@@ -49,6 +49,8 @@ reference:
     - hs_acq_raw_mspct
     - check_sn_match
     - QC_dark
+    - rm_jwrapper
+    - update_bad_pixs
 
   - title: Data import from text files
   - subtitle: Read data
