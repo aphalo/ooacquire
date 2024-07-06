@@ -301,6 +301,7 @@ acq_irrad_interactive <-
       return()
     }
 
+    ## Multiple processes for asynchronous file saving
     if (is.null(async.saves)) {
       # in the future NULL could be a dynamic default dependent of file size
       async.saves <- FALSE
@@ -317,6 +318,11 @@ acq_irrad_interactive <-
       cat("Will save files synchronously\n(blocking data acquisition until files are saved)\n")
     }
 
+    # initialize mirai
+    rda.mirai <- NA
+    pdf.mirai <- NA
+
+    # set R options
     if (is.null(getOption("digits.secs"))) {
       old.options <- options(warn = 1,
                              "digits.secs" = 3,
@@ -337,10 +343,6 @@ acq_irrad_interactive <-
     # validate qty.out
     qty.out <- tolower(qty.out)
     stopifnot(qty.out %in% c("irrad", "fluence", "cps", "raw"))
-
-    # initialize mirai
-    rda.mirai <- NA
-    pdf.mirai <- NA
 
     # define measurement protocols
     default.protocols <- list(l = "light",
@@ -492,6 +494,7 @@ acq_irrad_interactive <-
 
     # check that wavelength calibration is available
     stopifnot(length(descriptor[["wavelengths"]]) == descriptor[["num.pixs"]])
+
     # check for valid calibration multipliers
     if (length(descriptor[["inst.calib"]][["irrad.mult"]]) != descriptor[["num.pixs"]] ||
         anyNA(descriptor[["inst.calib"]][["irrad.mult"]])) {
@@ -502,28 +505,9 @@ acq_irrad_interactive <-
       }
     }
 
-    # metadata: get session name and user name from user, offering defaults
-
-    session.name <- make.names(session.name) # validate argument passed in call
-    session.prompt <- paste("Session's name (<string>/\"", session.name, "\"-): ", sep = "")
-    user.session.name <- readline(session.prompt)
-    if (! user.session.name == "") {
-      session.name <- make.names(user.session.name)
-      if (user.session.name == "") {
-        session.name <- make.names(format(lubridate::now(tzone = "UTC")))
-      }
-      if (session.name != user.session.name) {
-        message("Using sanitised/generated name: '", session.name, "'.", sep = "")
-      }
-    }
-
-    user.name <- make.names(user.name) # validate argument passed in call
-    user.name.prompt <- paste("Operator's name (<string>/\"", user.name, "\"-): ", sep = "")
-    user.user.name <- readline(user.name.prompt)
-    if (! user.user.name == "") {
-      user.name <- make.names(user.user.name)
-    }
-    cat("Using \"", user.name, "\" as operator's name\n", sep = "")
+    # session and user IDs
+    session.name <- set_session_name_interactive(session.name)
+    user.name <- set_user_name_interactive(user.name)
     session.label <- paste("Operator: ", user.name,
                            "\nSession: ", session.name,
                            ", instrument s.n.: ", descriptor[["spectrometer.sn"]],
@@ -543,16 +527,13 @@ acq_irrad_interactive <-
                                 ") and OmniDriver (", rOmniDriver::get_api_version(w), ").",
                                 sep = ""))
 
+    # set working directory for current session
     folder.name <- set_folder_interactive(folder.name)
-
-    # set working directory of current session
-
     oldwd <- setwd(folder.name)
     on.exit(setwd(oldwd), add = TRUE)
     on.exit(message("Folder reset to: ", getwd(), "\nBye!"), add = TRUE)
 
     # ask user to choose protocol only if needed
-
     if (length(protocols) > 1) {
       protocol <- protocol_interactive(protocols = protocols,
                                        default = default.protocol)
@@ -560,12 +541,9 @@ acq_irrad_interactive <-
       protocol <- protocols[[default.protocol]]
     }
 
-    start.int.time <- 0.01 # seconds
-
     # set default data acquisition settings based of call arguments
-
+    start.int.time <- 0.01 # seconds
     num.scans <- min(max(tot.time.range) %/% start.int.time, 1L)
-
     settings <- acq_settings(descriptor = descriptor,
                              integ.time = start.int.time,
                              num.scans = num.scans,
@@ -574,6 +552,7 @@ acq_irrad_interactive <-
                              HDR.mult = HDR.mult,
                              num.exposures = num.exposures)
 
+    # set default sequential settings for time series
     if (is.null(seq.settings)) {
       seq.settings <- list(start.boundary = "none",
                            initial.delay = 0,
@@ -588,14 +567,20 @@ acq_irrad_interactive <-
                            num.steps = 1L)
     }
 
-    # initialize lists to collect names from current session
+    # initialize counters used for sequential naming and repeats
+    total.repeats <- 1L
+    pending.repeats <- 0L
+    series.start <- TRUE
+    file.counter <- 0L
+    seq.name.digits <- 3L
+    acq.pausing <- TRUE
 
+    # initialize lists to collect names from current session
     irrad.names <- character()
     raw.names <- character()
     file.names <- character()
 
     # initialize interface logic flags
-
     reuse.old.refs <- FALSE # none yet available
     reuse.seq.settings <- FALSE
     reset.count <- TRUE
@@ -605,18 +590,8 @@ acq_irrad_interactive <-
     sequential.naming.required <- FALSE
     clear.display <- FALSE
 
-    # initialize counters used for sequential naming and repeats
-
-    file.counter <- 0
-    acq.pausing <- TRUE
-    pending.repeats <- 0
-    total.repeats <- 1L
-#    series.start <- TRUE
-
     # initialize default object name
-
     base.obj.name <- "ooacq_#"
-
 
     repeat { # main loop for UI
 
@@ -693,7 +668,11 @@ acq_irrad_interactive <-
         }
 
         if (sequential.naming) {
-          obj.name <- paste(base.obj.name, formatC(file.counter, width = 3, flag = "0"), sep = "")
+          # increase width of seq numbers if needed
+          seq.name.digits <- max(seq.name.digits, ceiling(log10(file.counter + 1)))
+          obj.name <- paste(base.obj.name,
+                            formatC(file.counter, width = seq.name.digits, flag = "0"),
+                            sep = "")
         } else {
           obj.name <- base.obj.name
         }
@@ -754,7 +733,7 @@ acq_irrad_interactive <-
           estimated.measurement.duration <-
             sum(settings$integ.time * settings$num.scans * 1e-6) +
             acq.overhead * length(settings$HDR.mult) + # number of HDR acquisitions
-            sum(0.66 * settings$integ.time * 1e-6) # worse case overhead due to restart
+            sum(2 * settings$integ.time * 1e-6) # worse case overhead due to restart
         } else if (length(settings$HDR.mult) == 1) { # no need to change acq settings
           if (settings$num.scans > 1) {
             estimated.measurement.duration <-
@@ -804,7 +783,7 @@ acq_irrad_interactive <-
                                      f.trigger.pulses = f.trigger.pulses,
                                      user.label = obj.name)
           if (pending.repeats > 1) {
-            answer.abort <- readline(prompt = "Abort pending repeats? yes/NO (y/n-): ")
+            answer.abort <- readline(prompt = "Skip pending repeats? yes/NO (y/n-): ")
             if (answer.abort %in% c("y", "z")) {
               pending.repeats <- 1
             }
@@ -852,7 +831,7 @@ acq_irrad_interactive <-
         # we save old references for possible reuse
         refs.selector <- grep("dark|filter", protocol, value = TRUE)
         if (length(refs.selector)) {
-          cat("Cacheing ", paste(names(raw.mspct)[refs.selector],
+          cat("Cacheing ", paste(refs.selector,
                                  collapse = " and "),
               " spectrum/a ... ", sep = "")
           old.refs.mpsct <- raw.mspct[refs.selector]
@@ -1051,7 +1030,7 @@ acq_irrad_interactive <-
               },
               pdf.name = pdf.name,
               fig = fig,
-              .timeout = 120000 # 120 s
+              .timeout = 60000 # 60 s
               )
             } else {
               grDevices::pdf(file = pdf.name, width = 8, height = 6)

@@ -2,16 +2,20 @@ library(photobiology)
 
 load(file = "data-raw/raw-mspct-examples/Nichia.horticulture.5000K.spct.Rda")
 
-white_LED.raw_mspct <- Nichia.horticulture.5000K.raw_mspct
+white_LED.raw_mspct <- update_bad_pixs(Nichia.horticulture.5000K.raw_mspct)
+
 rm(Nichia.horticulture.5000K.raw_mspct)
 
 load(file = "data-raw/raw-mspct-examples/sun001.spct.Rda")
+
+sun001.raw_mspct <- update_bad_pixs(sun001.raw_mspct)
 
 # load(file = "data-raw/raw-mspct-examples/sun-viikki-noon.Rda")
 
 load(file = "data-raw/raw-mspct-examples/white-LED-lamp-2min.Rda")
 
 white_LED_2min.raw_mspct <- msmsply(LED_lamp04_long.raw_spct, trimInstrDesc, fields = c("-", "w", "sr.index"))
+white_LED_2min.raw_mspct <- update_bad_pixs(white_LED_2min.raw_mspct)
 
 white_LED_2min.raw_mspct <-
   msmsply(white_LED_2min.raw_mspct,
@@ -23,6 +27,7 @@ rm(LED_lamp04_long.raw_spct, LED_lamp04_long.spct)
 load(file = "data-raw/raw-mspct-examples/halogen-lamp.Rda")
 
 halogen.raw_mspct <- msmsply(Halogen.raw_spct, trimInstrDesc, fields = c("-", "w", "sr.index"))
+halogen.raw_mspct <- update_bad_pixs(halogen.raw_mspct)
 
 halogen.raw_mspct <-
   msmsply(halogen.raw_mspct,
@@ -34,6 +39,7 @@ rm(Halogen.raw_spct, Halogen.spct)
 load(file = "data-raw/raw-mspct-examples/flash-AD200.Rda")
 
 xenon_flash.raw_mspct <- obj.reference.1.8.raw_mspct
+xenon_flash.raw_mspct <- update_bad_pixs(xenon_flash.raw_mspct)
 
 settings <- getInstrSettings(xenon_flash.raw_mspct[["light"]])
 settings <- ooacquire:::set_num_exposures(settings, 1L)
@@ -50,12 +56,14 @@ rm(obj.reference.1.8.raw_mspct, obj.reference.1.8.spct)
 load(file = "data-raw/raw-mspct-examples/Heliopan695.Rda")
 
 red_filter.raw_mspct <- msmsply(Heliopan695.raw_spct, trimInstrDesc, fields = c("-", "w", "sr.index"))
+red_filter.raw_mspct <- update_bad_pixs(red_filter.raw_mspct)
 
 rm(Heliopan695.raw_spct, Heliopan695.spct)
 
 load(file = "data-raw/raw-mspct-examples/UQG_Blue.spct.Rda")
 
 blue_filter.raw_mspct <- msmsply(UQG_Blue.raw_spct, trimInstrDesc, fields = c("-", "w", "sr.index"))
+blue_filter.raw_mspct <- update_bad_pixs(blue_filter.raw_mspct)
 
 rm(UQG_Blue.raw_spct)
 

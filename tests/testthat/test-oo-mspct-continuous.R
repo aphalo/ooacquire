@@ -36,6 +36,40 @@ test_that("ooacquire irrad continuous MAYA", {
 
 })
 
+# library(ggspectra)
+test_that("ooacquire irrad continuous MAYA update bad pixs", {
+
+  rm(list = ls(pattern = "*"))
+
+  files <- list.files("test-irrad-mspct-maya-data", pattern = "*.[Rr]da")
+  #  print(files)
+  for (f in files) {
+    load(paste("test-irrad-mspct-maya-data", f, sep = "/"))
+    old.raw.mspct <- get(sub("spct.[Rr]da", "raw_mspct", f))
+    updated.raw.mspct <- update_bad_pixs(old.raw.mspct)
+    serial.no <- getInstrDesc(updated.raw.mspct[[1]])$spectrometer.sn
+    correction.method <-
+      switch(serial.no,
+             MAYP11278 = ooacquire::MAYP11278_ylianttila.mthd,
+             MAYP112785 = ooacquire::MAYP112785_ylianttila.mthd,
+             MAYP114590 = ooacquire::MAYP114590_simple.mthd,
+             new_correction_method(descriptor,
+                                   stray.light.method = NA)
+      )
+    new.spct <- s_irrad_corrected(updated.raw.mspct, correction.method = correction.method)
+    new.spct <- trimInstrDesc(new.spct) # needed to avoid futile call to .jcall
+    expect_known_value(irrad(new.spct), file = paste("current-refs/ref-updated-irrad", f, sep = "-"), update = updating)
+    expect_known_value(wl_range(new.spct), file = paste("current-refs/ref-wl", f, sep = "-"), update = FALSE)
+    expect_known_value(peaks(new.spct, span = NULL), file = paste("current-refs/ref-peak", f, sep = "-"), update = FALSE)
+    expect_known_value(new.spct, file = paste("current-refs/ref-updated", f, sep = "-"), update = updating)
+
+    if (debugging) cat(" <- ", serial.no, " file: ", f, "\n")
+
+  }
+
+})
+
+
 # Should be enabled after a few suitable files are added for the tests.
 # test_that("ooacquire irrad continuous FLAME-S", {
 #

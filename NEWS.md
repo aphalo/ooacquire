@@ -4,7 +4,12 @@ editor_options:
     wrap: 72
 ---
 
-# ooacquire 0.4.5 (2024-02-26)
+# ooacquire 0.4.6 (2024-03-29)
+
+-   Add function `update_bad_pixs()`.
+-   Extend validity of 2023 calibrations of MAYP11278 to two years.
+
+# ooacquire 0.4.5 (2024-02-27)
 
 **Improved performance for the two Maya spectrometers with slit-function
 characterization available, at the expense of very slightly different computed
