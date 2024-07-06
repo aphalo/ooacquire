@@ -52,6 +52,6 @@ ByteCompile: true
 LinkingTo: Rcpp
 URL: https://docs.r4photobiology.info/ooacquire/, https://github.com/aphalo/ooacquire
 BugReports: https://github.com/aphalo/ooacquire/issues
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Encoding: UTF-8
 VignetteBuilder: knitr
