@@ -9,3 +9,5 @@ acq-irrad*
 inst-not/fluence*
 inst-not/irrad*
 inst-not/series*
+
+inst-not/yoct-relay-tests/
