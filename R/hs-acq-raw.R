@@ -130,13 +130,13 @@ hs_acq_raw_mspct <- function(descriptor,
   # setup memory buffer
   rOmniDriver::highSpdAcq_allocate_buffer(y$w, y$sr.index, num.spectra)
 
-  if (verbose) message("Acquiring ", num.spectra, " spectra ... ", appendLF = FALSE)
-
   # concurrent measurements, e.g., trigger camera once
   # concurrent measurements, e.g., enable sensor or camera
   if (!is.null(f.trigger.on)) {
     f.trigger.on(n = abs(num.exposures[i]))
   }
+
+  if (verbose) message("Acquiring ", num.spectra, " spectra ... ", appendLF = FALSE)
 
   # start acquisition
   start.time <- lubridate::now(tzone = "UTC")

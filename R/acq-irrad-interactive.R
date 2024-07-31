@@ -49,6 +49,8 @@
 #'   called immediately before and immediately after a measurement, and any
 #'   initialization code needed before a repeat. See \code{\link{acq_raw_spct}}
 #'   for details.
+#' @param triggers.enabled character vector Names of protocol steps during which
+#'   trigger functions should be called.
 #' @param folder.name,session.name,user.name character Default name of the
 #'   folder used for output, and session and user names.
 #' @param verbose logical If TRUE additional messages are emitted, including
@@ -288,6 +290,7 @@ acq_irrad_interactive <-
            f.trigger.init = NULL,
            f.trigger.on = f.trigger.message,
            f.trigger.off = NULL,
+           triggers.enabled = ifelse(qty.out == "fluence", c("light", "filter"), character()),
            folder.name = paste("acq", qty.out,
                                lubridate::today(tzone = "UTC"),
                                sep = "-"),
@@ -299,12 +302,36 @@ acq_irrad_interactive <-
            verbose = getOption("photobiology.verbose", default = FALSE),
            QC.enabled = TRUE) {
 
+    ## Is the driver available?
     if (getOption("ooacquire.offline", FALSE)) {
       warning("ooacquire off-line: Aborting...")
       return()
     }
 
-    ## Multiple processes for asynchronous file saving
+    ## Session settings
+    # session and user IDs
+    session.name <- set_session_name_interactive(session.name)
+    user.name <- set_user_name_interactive(user.name)
+    session.label <- paste("Operator: ", user.name,
+                           "\nSession: ", session.name,
+                           ", instrument s.n.: ", descriptor[["spectrometer.sn"]],
+                           sep = "")
+
+    # set working directory for current session
+    folder.name <- set_folder_interactive(folder.name)
+    oldwd <- setwd(folder.name)
+    on.exit(setwd(oldwd), add = TRUE)
+    on.exit(message("Folder reset to: ", getwd(), "\nBye!"), add = TRUE)
+
+    # load saved settings
+    if (file.exists("./.acq-irrad-settings.Rda")) {
+      modif.time <- file.mtime("./.acq-irrad-settings.Rda")
+      if (readline("Load saved settings? (y/n)") == "y") {
+        load("./.acq-irrad-settings.Rda")
+      }
+    }
+
+    ## Asynchronous file saving
     if (is.null(async.saves)) {
       # in the future NULL could be a dynamic default dependent of file size
       async.saves <- FALSE
@@ -325,7 +352,7 @@ acq_irrad_interactive <-
     rda.mirai <- NA
     pdf.mirai <- NA
 
-    # set R options
+    ## set R options
     if (is.null(getOption("digits.secs"))) {
       old.options <- options(warn = 1,
                              "digits.secs" = 3,
@@ -336,6 +363,7 @@ acq_irrad_interactive <-
     }
     on.exit(options(old.options), add = TRUE, after = TRUE)
 
+    ## Validate arguments
     # validate interface mode
     interface.mode <- tolower(interface.mode)
     if (!gsub("-attr$", "", interface.mode) %in%
@@ -364,7 +392,7 @@ acq_irrad_interactive <-
       }
     }
 
-    # connect to spectrometer
+    ## connect to spectrometer
     w <- start_session()
     on.exit(end_session(w),
             add = TRUE) # ensure session is always closed!
@@ -508,14 +536,6 @@ acq_irrad_interactive <-
       }
     }
 
-    # session and user IDs
-    session.name <- set_session_name_interactive(session.name)
-    user.name <- set_user_name_interactive(user.name)
-    session.label <- paste("Operator: ", user.name,
-                           "\nSession: ", session.name,
-                           ", instrument s.n.: ", descriptor[["spectrometer.sn"]],
-                           sep = "")
-
     # set default for metadata attributes
     user.attrs <-
       list(what.measured = "",
@@ -529,12 +549,6 @@ acq_irrad_interactive <-
                                 "\", 'rOmniDriver' (", utils::packageVersion("rOmniDriver"),
                                 ") and OmniDriver (", rOmniDriver::get_api_version(w), ").",
                                 sep = ""))
-
-    # set working directory for current session
-    folder.name <- set_folder_interactive(folder.name)
-    oldwd <- setwd(folder.name)
-    on.exit(setwd(oldwd), add = TRUE)
-    on.exit(message("Folder reset to: ", getwd(), "\nBye!"), add = TRUE)
 
     # ask user to choose protocol only if needed
     if (length(protocols) > 1) {
@@ -788,6 +802,7 @@ acq_irrad_interactive <-
                                      pause.fun = NULL,
                                      f.trigger.on = f.trigger.on,
                                      f.trigger.off = f.trigger.off,
+                                     triggers.enabled = intersect(protocol, triggers.enabled),
                                      user.label = obj.name)
           if (pending.repeats > 1) {
             answer.abort <- readline(prompt = "Skip pending repeats? yes/NO (y/n-): ")
@@ -806,6 +821,7 @@ acq_irrad_interactive <-
                                      pause.fun = function(...) {TRUE},
                                      f.trigger.on = f.trigger.on,
                                      f.trigger.off = f.trigger.off,
+                                     triggers.enabled = intersect(protocol, triggers.enabled),
                                      user.label = obj.name)
         }
       } else { # acquire all spectra needed for protocol
@@ -816,6 +832,7 @@ acq_irrad_interactive <-
                                    pause.fun = NULL, # default
                                    f.trigger.on = f.trigger.on,
                                    f.trigger.off = f.trigger.off,
+                                   triggers.enabled = intersect(protocol, triggers.enabled),
                                    user.label = obj.name)
       }
 

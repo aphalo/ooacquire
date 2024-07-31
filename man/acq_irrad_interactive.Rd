@@ -29,6 +29,7 @@ acq_irrad_interactive(
   f.trigger.init = NULL,
   f.trigger.on = f.trigger.message,
   f.trigger.off = NULL,
+  triggers.enabled = ifelse(qty.out == "fluence", "light", character()),
   folder.name = paste("acq", qty.out, lubridate::today(tzone = "UTC"), sep = "-"),
   user.name = Sys.info()[["user"]],
   session.name = paste(user.name, strftime(lubridate::now(tzone = "UTC"),
@@ -100,6 +101,9 @@ to \code{-1L} to indicate that the light source is continuous.}
 called immediately before and immediately after a measurement, and any
 initialization code needed before a repeat. See \code{\link{acq_raw_spct}}
 for details.}
+
+\item{triggers.enabled}{character vector Names of protocol steps during which
+trigger functions should be called.}
 
 \item{folder.name, session.name, user.name}{character Default name of the
 folder used for output, and session and user names.}

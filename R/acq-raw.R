@@ -158,14 +158,15 @@ acq_raw_spct <- function(descriptor,
       x$num.scans[i] <- actual.num.scans
     }
 
-    if (verbose) cat("Measurement x", acq.settings$HDR.mult[i], " ... ", sep = "")
-
     # light source, e,g,, flash trigger
     # concurrent measurements, e.g., trigger camera once
     # concurrent measurements, e.g., enable sensor or camera
     if (num.exposures[i] != 0L  && !is.null(f.trigger.on)) {
-      f.trigger.on(n = abs(num.exposures[i]))
+      target.delay <- max(0, (x$num.scans[i] * x$integ.time[i] - 0.05) / 2) # max 1/20 s shutter speed
+      f.trigger.on(n = num.exposures[i], delay = target.delay)
     }
+
+    if (verbose) cat("Measurement x", acq.settings$HDR.mult[i], " ... ", sep = "")
 
     # the USB2000 occasionally returns zero counts (timing problem?)
     # or data could be corrupted, in which case we retry
@@ -272,6 +273,8 @@ acq_raw_spct <- function(descriptor,
 #' @param f.trigger.on,f.trigger.off function Functions to be called
 #'   immediately before and immediately after a measurement. See
 #'   \code{\link{acq_raw_spct}} for details.
+#' @param triggers.enabled character vector Names of protocol steps during which
+#'   trigger functions should be called.
 #' @param seq.settings list with members "initial.delay", "step,delay" numeric
 #'   values in seconds, "num.steps" integer.
 #' @param protocol vector of character strings.
@@ -296,6 +299,7 @@ acq_raw_mspct <- function(descriptor,
                           acq.settings,
                           f.trigger.on = f.trigger.message,
                           f.trigger.off = NULL,
+                          triggers.enabled = character(),
                           seq.settings = list(initial.delay = 0,
                                               start.boundary = "none",
                                               step.delay = 0,
@@ -361,7 +365,7 @@ acq_raw_mspct <- function(descriptor,
         return(raw_mspct())
       }
     }
-    if (p != "dark") {
+    if (p %in% triggers.enabled) {
       if (is.function(f.trigger.on)) {
         f.on.current <- f.trigger.on
       } else {
@@ -372,6 +376,9 @@ acq_raw_mspct <- function(descriptor,
       } else {
         f.off.current <- NULL
       }
+    } else {
+      f.on.current <- NULL
+      f.off.current <- NULL
     }
     if (p == "light") {
       if (is.character(seq.settings[["start.boundary"]]) &&

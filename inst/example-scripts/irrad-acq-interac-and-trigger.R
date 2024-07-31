@@ -48,7 +48,7 @@
 # acquisition. Alternatively, one can record a video overlaping the time during
 # which a spectrum was acquired.
 #
-# Perfect synchronization is not possible as the spectrometer returns the most
+# Perfect synchronization is not possible as the spectrometer invisibles the most
 # recent spectrum measured with the current settings, which will be in most
 # cases one started before the computer requested it. In addition, because of
 # what looks like competition for USB access between the spectrometer and the
@@ -90,19 +90,21 @@ yocto.trigger.init <- function() {
   Relay <<- yocto_relay$YRelay$FindRelay("RELAY1")
 }
 
-yocto.trigger.on <- function(n = NA, delay = 0, duration = Inf) {
-  stopifnot("Only 'delay = 0' supported" = delay == 0,
-            "Only 'duration = Inf' supported" = duration == Inf)
+## ON and OFF functions
+# too short a time between OFF and ON may not trigger a camera
+yocto.trigger.on <- function(n = NA, delay = 0.01, duration = 3600) {
   count.down <- 10
   while(count.down && !Relay$isOnline()) {
     count.down <- count.down - 1L
     Sys.sleep(0.002)
   }
   if (Relay$isOnline()) {
-    Relay$set_state(Relay$STATE_B)
+    Relay$delayedPulse(as.integer(delay * 1000), as.integer(duration * 1000))
     message("Relay ON")
+    invisible(TRUE)
   } else {
     message("Relay is off-line!")
+    invisible(FALSE)
   }
 }
 
@@ -116,11 +118,15 @@ yocto.trigger.off <- function(n = NA, delay = 0) {
   if (Relay$isOnline()) {
     Relay$set_state(Relay$STATE_A)
     message("Relay OFF")
+    invisible(TRUE)
   } else {
     message("Relay is off-line!")
+    invisible(FALSE)
   }
 }
 
+## Delayed pulse function ensures pulse is long enough
+# shutter release is reliable in fast succession
 yocto.trigger.pulse <- function(n = NA, delay = 0.01, duration = 0.01) {
   stopifnot("Delay must be > 0" = delay >= 0,
             "Duration must be > 0" = delay >= 0)
@@ -132,16 +138,23 @@ yocto.trigger.pulse <- function(n = NA, delay = 0.01, duration = 0.01) {
   if (Relay$isOnline()) {
     Relay$delayedPulse(as.integer(delay * 1000), as.integer(duration * 1000))
     message("Relay pulsed ON and OFF")
+    invisible(TRUE)
   } else {
     message("Relay is off-line!")
+    invisible(FALSE)
   }
 }
 
 # test that camera shutter is triggered correctly
 yocto.trigger.init()
 yocto.trigger.on()
+yocto.trigger.on(delay = 2)
 yocto.trigger.off()
 yocto.trigger.pulse()
+
+acq_irrad_interactive()
+
+acq_irrad_interactive(qty.out = "fluence")
 
 acq_irrad_interactive(qty.out = "irrad",
                       f.trigger.init = yocto.trigger.init,

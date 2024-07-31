@@ -7,7 +7,7 @@ editor_options:
 # ooacquire 0.4.7 (2024-07-31)
 
 -   Rename parameter `f.trigger.flashes` to `f.trigger.on` and add parameters
-`f.trigger.off` and `f.trigger.init`.
+`f.trigger.off` and `f.trigger.init`, `triggers.enabled`.
 -   Add YoctoRelay example script.
 
 # ooacquire 0.4.6 (2024-03-29)

@@ -9,6 +9,7 @@ acq_raw_mspct(
   acq.settings,
   f.trigger.on = f.trigger.message,
   f.trigger.off = NULL,
+  triggers.enabled = character(),
   seq.settings = list(initial.delay = 0, start.boundary = "none", step.delay = 0,
     num.steps = 1L),
   protocol = c("light", "filter", "dark"),
@@ -28,6 +29,9 @@ or \code{retune_acq_settings()} or \code{acq_settings()}.}
 \item{f.trigger.on, f.trigger.off}{function Functions to be called
 immediately before and immediately after a measurement. See
 \code{\link{acq_raw_spct}} for details.}
+
+\item{triggers.enabled}{character vector Names of protocol steps during which
+trigger functions should be called.}
 
 \item{seq.settings}{list with members "initial.delay", "step,delay" numeric
 values in seconds, "num.steps" integer.}
