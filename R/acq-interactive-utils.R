@@ -698,9 +698,9 @@ f.trigger.message <- function(n = 1L, delay = 0) {
   n <- as.integer(n)
   if (n < 1L) return(TRUE)
   if (n == 1L) {
-    cat("Trigger the flash once!!")
+    cat("Trigger the flash once!!\n")
   } else {
-    cat("Trigger the flash", n, "times!!")
+    cat("Trigger the flash", n, "times!!\n")
   }
   return(TRUE)
 }

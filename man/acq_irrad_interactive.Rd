@@ -29,7 +29,7 @@ acq_irrad_interactive(
   f.trigger.init = NULL,
   f.trigger.on = f.trigger.message,
   f.trigger.off = NULL,
-  triggers.enabled = ifelse(qty.out == "fluence", "light", character()),
+  triggers.enabled = ifelse(qty.out == "fluence", c("light", "filter"), character()),
   folder.name = paste("acq", qty.out, lubridate::today(tzone = "UTC"), sep = "-"),
   user.name = Sys.info()[["user"]],
   session.name = paste(user.name, strftime(lubridate::now(tzone = "UTC"),

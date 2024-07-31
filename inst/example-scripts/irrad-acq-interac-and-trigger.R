@@ -93,6 +93,10 @@ yocto.trigger.init <- function() {
 ## ON and OFF functions
 # too short a time between OFF and ON may not trigger a camera
 yocto.trigger.on <- function(n = NA, delay = 0.01, duration = 3600) {
+  if (duration > 3600) { # 1 h
+    warning("Long duration of ", duration, "S reset to 3600S.")
+    duration <- 3600
+  }
   count.down <- 10
   while(count.down && !Relay$isOnline()) {
     count.down <- count.down - 1L
@@ -128,8 +132,12 @@ yocto.trigger.off <- function(n = NA, delay = 0) {
 ## Delayed pulse function ensures pulse is long enough
 # shutter release is reliable in fast succession
 yocto.trigger.pulse <- function(n = NA, delay = 0.01, duration = 0.01) {
-  stopifnot("Delay must be > 0" = delay >= 0,
-            "Duration must be > 0" = delay >= 0)
+  stopifnot("Delay must be >= 0" = delay >= 0,
+            "Duration must be >= 0" = duration >= 0)
+  if (duration > 3600) { # 1 h
+    warning("Long duration of ", duration, "S reset to 3600S.")
+    duration <- 3600
+  }
   count.down <- 10
   while(count.down && !Relay$isOnline()) {
     count.down <- count.down - 1L
@@ -151,23 +159,30 @@ yocto.trigger.on()
 yocto.trigger.on(delay = 2)
 yocto.trigger.off()
 yocto.trigger.pulse()
+yocto.trigger.pulse(duration = 0.5)
+yocto.trigger.pulse(delay = 0.5)
 
-acq_irrad_interactive()
+acq_irrad_interactive(folder.name = "./inst-not/yoct-relay-tests")
 
-acq_irrad_interactive(qty.out = "fluence")
+acq_irrad_interactive(folder.name = "./inst-not/yoct-relay-tests",
+                      qty.out = "fluence")
 
-acq_irrad_interactive(qty.out = "irrad",
+acq_irrad_interactive(folder.name = "./inst-not/yoct-relay-tests",
+                      qty.out = "irrad",
                       f.trigger.init = yocto.trigger.init,
                       f.trigger.on = yocto.trigger.on,
-                      f.trigger.off = yocto.trigger.off)
+                      f.trigger.off = yocto.trigger.off,
+                      triggers.enabled = "light")
 
-acq_irrad_interactive(qty.out = "irrad",
+acq_irrad_interactive(folder.name = "./inst-not/yoct-relay-tests",
+                      qty.out = "irrad",
                       f.trigger.init = yocto.trigger.init,
-                      f.trigger.on = yocto.trigger.pulse)
+                      f.trigger.on = yocto.trigger.pulse,
+                      triggers.enabled = "light")
 
 # half minute of measurements every 2 seconds
-acq_irrad_interactive(interface.mode = "series",
-                      folder.name = "./inst-not/series",
+acq_irrad_interactive(folder.name = "./inst-not/yoct-relay-tests",
+                      interface.mode = "series",
                       tot.time.range = 1,
                       target.margin = .1,
                       qty.out = "irrad",
@@ -181,5 +196,6 @@ acq_irrad_interactive(interface.mode = "series",
                       f.trigger.on = yocto.trigger.pulse)
 
 
-acq_irrad_interactive(qty.out = "fluence",
+acq_irrad_interactive(folder.name = "./inst-not/yoct-relay-tests",
+                      qty.out = "fluence",
                       f.trigger.on = yocto.trigger.pulse)

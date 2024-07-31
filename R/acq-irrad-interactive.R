@@ -308,29 +308,6 @@ acq_irrad_interactive <-
       return()
     }
 
-    ## Session settings
-    # session and user IDs
-    session.name <- set_session_name_interactive(session.name)
-    user.name <- set_user_name_interactive(user.name)
-    session.label <- paste("Operator: ", user.name,
-                           "\nSession: ", session.name,
-                           ", instrument s.n.: ", descriptor[["spectrometer.sn"]],
-                           sep = "")
-
-    # set working directory for current session
-    folder.name <- set_folder_interactive(folder.name)
-    oldwd <- setwd(folder.name)
-    on.exit(setwd(oldwd), add = TRUE)
-    on.exit(message("Folder reset to: ", getwd(), "\nBye!"), add = TRUE)
-
-    # load saved settings
-    if (file.exists("./.acq-irrad-settings.Rda")) {
-      modif.time <- file.mtime("./.acq-irrad-settings.Rda")
-      if (readline("Load saved settings? (y/n)") == "y") {
-        load("./.acq-irrad-settings.Rda")
-      }
-    }
-
     ## Asynchronous file saving
     if (is.null(async.saves)) {
       # in the future NULL could be a dynamic default dependent of file size
@@ -535,6 +512,21 @@ acq_irrad_interactive <-
         qty.out = "cps"
       }
     }
+
+    ## Session settings
+    # session and user IDs
+    session.name <- set_session_name_interactive(session.name)
+    user.name <- set_user_name_interactive(user.name)
+    session.label <- paste("Operator: ", user.name,
+                           "\nSession: ", session.name,
+                           ", instrument s.n.: ", descriptor[["spectrometer.sn"]],
+                           sep = "")
+
+    # set working directory for current session
+    folder.name <- set_folder_interactive(folder.name)
+    oldwd <- setwd(folder.name)
+    on.exit(setwd(oldwd), add = TRUE)
+    on.exit(message("Folder reset to: ", getwd(), "\nBye!"), add = TRUE)
 
     # set default for metadata attributes
     user.attrs <-
