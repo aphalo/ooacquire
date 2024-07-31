@@ -103,9 +103,9 @@
 #'   "series-attr".
 #' @param num.exposures integer Number or light pulses (flashes) per scan. Set
 #'   to \code{-1L} to indicate that the light source is continuous.
-#' @param f.trigger.pulses function Function to be called to trigger light
-#'   pulse(s). Should accept as its only argument the number of pulses, and
-#'   return \code{TRUE} on success and \code{FALSE} on failure.
+#' @param f.trigger.on,f.trigger.off function Functions to be called
+#'   immediately before and immediately after a measurement. See
+#'   \code{\link{acq_raw_spct}} for details.
 #' @param folder.name,session.name,user.name character Default name of the
 #'   folder used for output, and session and user names.
 #' @param folder.name,session.name,user.name character Default name of the
@@ -173,7 +173,8 @@ acq_fraction_interactive <-
            show.figs = TRUE,
            interface.mode = ifelse(light.source == "pulsed", "manual", "auto"),
            num.exposures = ifelse(light.source == "pulsed", 1L, -1L),
-           f.trigger.pulses = f.trigger.message,
+           f.trigger.on = f.trigger.message,
+           f.trigger.off = NULL,
            folder.name = paste("acq", qty.out,
                                lubridate::today(tzone = "UTC"),
                                sep = "-"),
@@ -644,7 +645,8 @@ acq_fraction_interactive <-
                                      seq.settings = seq.settings,
                                      protocol = "sample",
                                      pause.fun = NULL,
-                                     f.trigger.pulses = f.trigger.pulses,
+                                     f.trigger.on = f.trigger.on,
+                                     f.trigger.off = f.trigger.off,
                                      user.label = obj.name)
           if (pending.repeats > 1) {
             answer.abort <- readline(prompt = "Abort pending repeats? yes/NO (y/n-): ")
@@ -658,7 +660,8 @@ acq_fraction_interactive <-
                                      seq.settings = seq.settings,
                                      protocol = "sample",
                                      pause.fun = function(...) {TRUE},
-                                     f.trigger.pulses = f.trigger.pulses,
+                                     f.trigger.on = f.trigger.on,
+                                     f.trigger.off = f.trigger.off,
                                      user.label = obj.name)
         }
       } else { # acquire all spectra needed for protocol
@@ -667,7 +670,8 @@ acq_fraction_interactive <-
                                    seq.settings = seq.settings,
                                    protocol = protocol,
                                    pause.fun = NULL, # default
-                                   f.trigger.pulses = f.trigger.pulses,
+                                   f.trigger.on = f.trigger.on,
+                                   f.trigger.off = f.trigger.off,
                                    user.label = obj.name)
       }
 

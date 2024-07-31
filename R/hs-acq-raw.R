@@ -9,9 +9,9 @@
 #' @param num.spectra integer Number of individual spectra to acquire.
 #' @param base.name character The name given to individual spectra is formed
 #'   by this string followed by a sequential numeric index.
-#' @param f.trigger.pulses function Function to be called to trigger an
-#'   action. Should accept as its only argument the number of pulses, and
-#'   return \code{TRUE} on success and \code{FALSE} on failure.
+#' @param f.trigger.on,f.trigger.off function Functions to be called
+#'   immediately before and immediately after a measurement. See
+#'   \code{\link{acq_raw_spct}} for details.
 #' @param what.measured value used to set attribute.
 #' @param where.measured data.frame with at least columns "lon" and "lat"
 #'   compatible with value returned by \code{ggmap::geocode()}.
@@ -38,7 +38,8 @@ hs_acq_raw_mspct <- function(descriptor,
                              acq.settings,
                              num.spectra = 100L,
                              base.name = NULL,
-                             f.trigger.pulses = f.trigger.message,
+                             f.trigger.on = f.trigger.message,
+                             f.trigger.off = NULL,
                              what.measured = NA,
                              where.measured = data.frame(lon = NA_real_, lat = NA_real_),
                              set.all = TRUE,
@@ -54,6 +55,17 @@ hs_acq_raw_mspct <- function(descriptor,
       length(x$tot.time) > 1L ||
       length(x$rel.signal) > 1L) {
     stop("No HDR possible at high speed.")
+  }
+
+  num.exposures <- x$num.exposures
+  if (length(num.exposures) > 1) {
+    x <- set_num_exposures(x, num.exposures[1L])
+  }
+
+  num.exposures <- x$num.exposures
+  if (length(num.exposures) > 1) {
+    num.exposures <- num.exposures[1]
+
   }
 
   y <- descriptor
@@ -120,11 +132,22 @@ hs_acq_raw_mspct <- function(descriptor,
 
   if (verbose) message("Acquiring ", num.spectra, " spectra ... ", appendLF = FALSE)
 
+  # concurrent measurements, e.g., trigger camera once
+  # concurrent measurements, e.g., enable sensor or camera
+  if (!is.null(f.trigger.on)) {
+    f.trigger.on(n = abs(num.exposures[i]))
+  }
+
   # start acquisition
   start.time <- lubridate::now(tzone = "UTC")
   rOmniDriver::highSpdAcq_start_acquisition(y$w, y$sr.index)
 
   if (verbose) message("ready.")
+
+  # concurrent measurements, e.g., disable sensor or camera
+  if (!is.null(f.trigger.off)) {
+    f.trigger.off()
+  }
 
   # retrieve actual number of spectra acquired
   actual.num.spectra <-

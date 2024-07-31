@@ -7,7 +7,8 @@
 acq_raw_mspct(
   descriptor,
   acq.settings,
-  f.trigger.pulses = f.trigger.message,
+  f.trigger.on = f.trigger.message,
+  f.trigger.off = NULL,
   seq.settings = list(initial.delay = 0, start.boundary = "none", step.delay = 0,
     num.steps = 1L),
   protocol = c("light", "filter", "dark"),
@@ -24,9 +25,9 @@ acq_raw_mspct(
 \item{acq.settings}{list as returned by functions \code{tune_acq_settings()}
 or \code{retune_acq_settings()} or \code{acq_settings()}.}
 
-\item{f.trigger.pulses}{function Function to be called to trigger light
-pulse(s). Should accept as its only argument the number of pulses, and
-return \code{TRUE} on sucess and \code{FALSE} on failure.}
+\item{f.trigger.on, f.trigger.off}{function Functions to be called
+immediately before and immediately after a measurement. See
+\code{\link{acq_raw_spct}} for details.}
 
 \item{seq.settings}{list with members "initial.delay", "step,delay" numeric
 values in seconds, "num.steps" integer.}

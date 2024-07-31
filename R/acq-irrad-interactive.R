@@ -45,9 +45,10 @@
 #'   "series-attr".
 #' @param num.exposures integer Number or light pulses (flashes) per scan. Set
 #'   to \code{-1L} to indicate that the light source is continuous.
-#' @param f.trigger.pulses function Function to be called to trigger light
-#'   pulse(s). Should accept as its only argument the number of pulses, and
-#'   return \code{TRUE} on success and \code{FALSE} on failure.
+#' @param f.trigger.on,f.trigger.off,f.trigger.init function Functions to be
+#'   called immediately before and immediately after a measurement, and any
+#'   initialization code needed before a repeat. See \code{\link{acq_raw_spct}}
+#'   for details.
 #' @param folder.name,session.name,user.name character Default name of the
 #'   folder used for output, and session and user names.
 #' @param verbose logical If TRUE additional messages are emitted, including
@@ -284,7 +285,9 @@ acq_irrad_interactive <-
            show.figs = TRUE,
            interface.mode = ifelse(qty.out == "fluence", "manual", "auto"),
            num.exposures = ifelse(qty.out == "fluence", 1L, -1L),
-           f.trigger.pulses = f.trigger.message,
+           f.trigger.init = NULL,
+           f.trigger.on = f.trigger.message,
+           f.trigger.off = NULL,
            folder.name = paste("acq", qty.out,
                                lubridate::today(tzone = "UTC"),
                                sep = "-"),
@@ -772,6 +775,9 @@ acq_irrad_interactive <-
             " of ", total.repeats, ".\n", sep = "")
       }
 
+      if (!is.null(f.trigger.init)) {
+        f.trigger.init()
+      }
       # acquire raw-counts spectra
       if (reuse.old.refs) { # acquire only light spectra
         if (acq.pausing) {
@@ -780,7 +786,8 @@ acq_irrad_interactive <-
                                      seq.settings = seq.settings,
                                      protocol = "light",
                                      pause.fun = NULL,
-                                     f.trigger.pulses = f.trigger.pulses,
+                                     f.trigger.on = f.trigger.on,
+                                     f.trigger.off = f.trigger.off,
                                      user.label = obj.name)
           if (pending.repeats > 1) {
             answer.abort <- readline(prompt = "Skip pending repeats? yes/NO (y/n-): ")
@@ -797,7 +804,8 @@ acq_irrad_interactive <-
                                      seq.settings = seq.settings,
                                      protocol = "light",
                                      pause.fun = function(...) {TRUE},
-                                     f.trigger.pulses = f.trigger.pulses,
+                                     f.trigger.on = f.trigger.on,
+                                     f.trigger.off = f.trigger.off,
                                      user.label = obj.name)
         }
       } else { # acquire all spectra needed for protocol
@@ -806,7 +814,8 @@ acq_irrad_interactive <-
                                    seq.settings = seq.settings,
                                    protocol = protocol,
                                    pause.fun = NULL, # default
-                                   f.trigger.pulses = f.trigger.pulses,
+                                   f.trigger.on = f.trigger.on,
+                                   f.trigger.off = f.trigger.off,
                                    user.label = obj.name)
       }
 

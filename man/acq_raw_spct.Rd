@@ -7,7 +7,8 @@
 acq_raw_spct(
   descriptor,
   acq.settings,
-  f.trigger.pulses = f.trigger.message,
+  f.trigger.on = f.trigger.message,
+  f.trigger.off = NULL,
   what.measured = NA,
   where.measured = data.frame(lon = NA_real_, lat = NA_real_),
   set.all = TRUE,
@@ -19,9 +20,8 @@ acq_raw_spct(
 
 \item{acq.settings}{list as returned by functions \code{tune_acq_settings}.}
 
-\item{f.trigger.pulses}{function Function to be called to trigger light
-pulse(s). Should accept as its only argument the number of pulses, and
-return \code{TRUE} on sucess and \code{FALSE} on failure.}
+\item{f.trigger.on, f.trigger.off}{function Functions to be called
+immediately before and immediately after a measurement.}
 
 \item{what.measured}{value used to set attribute.}
 
@@ -44,6 +44,39 @@ Take one spectral measurement which depending on the settings can consist
 in multiple raw spectra meant to represent a SINGLE observation after
 conversion into calibrated data, such as in the case of bracketing of
 integration time for HDR.
+}
+\details{
+This function acquires one raw-detector-counts spectrum from a spectrometer,
+using the \code{descriptor} to connect to the spectrum and retrieve the
+valid range for settings. The settings in \code{acq.settings} are first
+sent to the spectrometer and the values retrieved in case the spectrometer
+has overridden the requested settings. Subsequently a spectrum, possibly
+obtained by averaging multiple spectra in the spectrometer is acquired, and
+the spectrometer queried on whether data are valid or not.
+
+Function \code{acq_raw_spct()} can optionally call two functions, one at the
+start of the measurement and another one after it ends. \code{f.trigger.on()}
+can be used for example when measuring the output from a xenon flash lamp, to
+trigger a given number of light flashes. In other cases \code{f.trigger.on()}
+and \code{f.trigger.off()} can be used together to start and end a concurrent
+measurement or any other action using a relay controlled by code in a
+function defined by the user.
+
+The functions passed as arguments to \code{f.trigger.on()} and
+\code{f.trigger.off()} should return very quickly when called, so as not to
+disturb the timing of the measurements of spectra as these start only after
+\code{f.trigger.on()} returns to the caller.
+
+The first formal parameter of \code{f.trigger.on()} should handle as input
+an integer value indicating the number of events to trigger and a second
+argument giving the delay in seconds between pulses. Of course the arguments
+can be ignored if not needed, but should accepted. \code{f.trigger.off()}
+currently expects no arguments. Example scripts are provided for YoctoPuce
+USB modules.
+
+The default function, displays a message asking the user to manually trigger
+the flash a number of times that depends on the settings in
+\code{acq.settings}.
 }
 \seealso{
 \code{\link{acq_raw_mspct}} which can be used to acquire multiple
