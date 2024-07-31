@@ -693,13 +693,14 @@ set_session_name_interactive <- function(session.name = NULL) {
 #'
 #' @export
 #'
-f.trigger.message <- function(n = 1L) {
+f.trigger.message <- function(n = 1L, delay = 0) {
+  Sys.sleep(delay)
   n <- as.integer(n)
   if (n < 1L) return(TRUE)
   if (n == 1L) {
-    cat("Trigger the flash once!!")
+    cat("Trigger the flash once!!\n")
   } else {
-    cat("Trigger the flash", n, "times!!")
+    cat("Trigger the flash", n, "times!!\n")
   }
   return(TRUE)
 }

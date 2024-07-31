@@ -10,8 +10,8 @@ rm_jwrapper(x)
 \item{x}{raw_spct or raw_mspct object with attribute \code{instr.desc} set.}
 }
 \value{
-a copy of \code{x} possibly with an updated \code{instr.desc}
-  attribute embedded.
+a copy of \code{x} possibly with an updated
+  \code{instr.desc} attribute embedded.
 }
 \description{
 Clean up left-behind wrappers used to communicate with Java code using

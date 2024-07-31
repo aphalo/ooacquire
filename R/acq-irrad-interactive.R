@@ -45,9 +45,12 @@
 #'   "series-attr".
 #' @param num.exposures integer Number or light pulses (flashes) per scan. Set
 #'   to \code{-1L} to indicate that the light source is continuous.
-#' @param f.trigger.pulses function Function to be called to trigger light
-#'   pulse(s). Should accept as its only argument the number of pulses, and
-#'   return \code{TRUE} on success and \code{FALSE} on failure.
+#' @param f.trigger.on,f.trigger.off,f.trigger.init function Functions to be
+#'   called immediately before and immediately after a measurement, and any
+#'   initialization code needed before a repeat. See \code{\link{acq_raw_spct}}
+#'   for details.
+#' @param triggers.enabled character vector Names of protocol steps during which
+#'   trigger functions should be called.
 #' @param folder.name,session.name,user.name character Default name of the
 #'   folder used for output, and session and user names.
 #' @param verbose logical If TRUE additional messages are emitted, including
@@ -284,7 +287,10 @@ acq_irrad_interactive <-
            show.figs = TRUE,
            interface.mode = ifelse(qty.out == "fluence", "manual", "auto"),
            num.exposures = ifelse(qty.out == "fluence", 1L, -1L),
-           f.trigger.pulses = f.trigger.message,
+           f.trigger.init = NULL,
+           f.trigger.on = f.trigger.message,
+           f.trigger.off = NULL,
+           triggers.enabled = ifelse(qty.out == "fluence", c("light", "filter"), character()),
            folder.name = paste("acq", qty.out,
                                lubridate::today(tzone = "UTC"),
                                sep = "-"),
@@ -296,12 +302,13 @@ acq_irrad_interactive <-
            verbose = getOption("photobiology.verbose", default = FALSE),
            QC.enabled = TRUE) {
 
+    ## Is the driver available?
     if (getOption("ooacquire.offline", FALSE)) {
       warning("ooacquire off-line: Aborting...")
       return()
     }
 
-    ## Multiple processes for asynchronous file saving
+    ## Asynchronous file saving
     if (is.null(async.saves)) {
       # in the future NULL could be a dynamic default dependent of file size
       async.saves <- FALSE
@@ -322,7 +329,7 @@ acq_irrad_interactive <-
     rda.mirai <- NA
     pdf.mirai <- NA
 
-    # set R options
+    ## set R options
     if (is.null(getOption("digits.secs"))) {
       old.options <- options(warn = 1,
                              "digits.secs" = 3,
@@ -333,6 +340,7 @@ acq_irrad_interactive <-
     }
     on.exit(options(old.options), add = TRUE, after = TRUE)
 
+    ## Validate arguments
     # validate interface mode
     interface.mode <- tolower(interface.mode)
     if (!gsub("-attr$", "", interface.mode) %in%
@@ -361,7 +369,7 @@ acq_irrad_interactive <-
       }
     }
 
-    # connect to spectrometer
+    ## connect to spectrometer
     w <- start_session()
     on.exit(end_session(w),
             add = TRUE) # ensure session is always closed!
@@ -505,6 +513,7 @@ acq_irrad_interactive <-
       }
     }
 
+    ## Session settings
     # session and user IDs
     session.name <- set_session_name_interactive(session.name)
     user.name <- set_user_name_interactive(user.name)
@@ -512,6 +521,12 @@ acq_irrad_interactive <-
                            "\nSession: ", session.name,
                            ", instrument s.n.: ", descriptor[["spectrometer.sn"]],
                            sep = "")
+
+    # set working directory for current session
+    folder.name <- set_folder_interactive(folder.name)
+    oldwd <- setwd(folder.name)
+    on.exit(setwd(oldwd), add = TRUE)
+    on.exit(message("Folder reset to: ", getwd(), "\nBye!"), add = TRUE)
 
     # set default for metadata attributes
     user.attrs <-
@@ -526,12 +541,6 @@ acq_irrad_interactive <-
                                 "\", 'rOmniDriver' (", utils::packageVersion("rOmniDriver"),
                                 ") and OmniDriver (", rOmniDriver::get_api_version(w), ").",
                                 sep = ""))
-
-    # set working directory for current session
-    folder.name <- set_folder_interactive(folder.name)
-    oldwd <- setwd(folder.name)
-    on.exit(setwd(oldwd), add = TRUE)
-    on.exit(message("Folder reset to: ", getwd(), "\nBye!"), add = TRUE)
 
     # ask user to choose protocol only if needed
     if (length(protocols) > 1) {
@@ -772,6 +781,9 @@ acq_irrad_interactive <-
             " of ", total.repeats, ".\n", sep = "")
       }
 
+      if (!is.null(f.trigger.init)) {
+        f.trigger.init()
+      }
       # acquire raw-counts spectra
       if (reuse.old.refs) { # acquire only light spectra
         if (acq.pausing) {
@@ -780,7 +792,9 @@ acq_irrad_interactive <-
                                      seq.settings = seq.settings,
                                      protocol = "light",
                                      pause.fun = NULL,
-                                     f.trigger.pulses = f.trigger.pulses,
+                                     f.trigger.on = f.trigger.on,
+                                     f.trigger.off = f.trigger.off,
+                                     triggers.enabled = intersect(protocol, triggers.enabled),
                                      user.label = obj.name)
           if (pending.repeats > 1) {
             answer.abort <- readline(prompt = "Skip pending repeats? yes/NO (y/n-): ")
@@ -797,7 +811,9 @@ acq_irrad_interactive <-
                                      seq.settings = seq.settings,
                                      protocol = "light",
                                      pause.fun = function(...) {TRUE},
-                                     f.trigger.pulses = f.trigger.pulses,
+                                     f.trigger.on = f.trigger.on,
+                                     f.trigger.off = f.trigger.off,
+                                     triggers.enabled = intersect(protocol, triggers.enabled),
                                      user.label = obj.name)
         }
       } else { # acquire all spectra needed for protocol
@@ -806,7 +822,9 @@ acq_irrad_interactive <-
                                    seq.settings = seq.settings,
                                    protocol = protocol,
                                    pause.fun = NULL, # default
-                                   f.trigger.pulses = f.trigger.pulses,
+                                   f.trigger.on = f.trigger.on,
+                                   f.trigger.off = f.trigger.off,
+                                   triggers.enabled = intersect(protocol, triggers.enabled),
                                    user.label = obj.name)
       }
 

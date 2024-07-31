@@ -26,7 +26,8 @@ acq_fraction_interactive(
   show.figs = TRUE,
   interface.mode = ifelse(light.source == "pulsed", "manual", "auto"),
   num.exposures = ifelse(light.source == "pulsed", 1L, -1L),
-  f.trigger.pulses = f.trigger.message,
+  f.trigger.on = f.trigger.message,
+  f.trigger.off = NULL,
   folder.name = paste("acq", qty.out, lubridate::today(tzone = "UTC"), sep = "-"),
   user.name = Sys.info()[["user"]],
   session.name = paste(user.name, strftime(lubridate::now(tzone = "UTC"),
@@ -93,9 +94,9 @@ spectra.}
 \item{num.exposures}{integer Number or light pulses (flashes) per scan. Set
 to \code{-1L} to indicate that the light source is continuous.}
 
-\item{f.trigger.pulses}{function Function to be called to trigger light
-pulse(s). Should accept as its only argument the number of pulses, and
-return \code{TRUE} on success and \code{FALSE} on failure.}
+\item{f.trigger.on, f.trigger.off}{function Functions to be called
+immediately before and immediately after a measurement. See
+\code{\link{acq_raw_spct}} for details.}
 
 \item{folder.name, session.name, user.name}{character Default name of the
 folder used for output, and session and user names.}

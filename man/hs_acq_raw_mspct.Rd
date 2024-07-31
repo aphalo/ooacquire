@@ -9,7 +9,8 @@ hs_acq_raw_mspct(
   acq.settings,
   num.spectra = 100L,
   base.name = NULL,
-  f.trigger.pulses = f.trigger.message,
+  f.trigger.on = f.trigger.message,
+  f.trigger.off = NULL,
   what.measured = NA,
   where.measured = data.frame(lon = NA_real_, lat = NA_real_),
   set.all = TRUE,
@@ -27,9 +28,9 @@ hs_acq_raw_mspct(
 \item{base.name}{character The name given to individual spectra is formed
 by this string followed by a sequential numeric index.}
 
-\item{f.trigger.pulses}{function Function to be called to trigger an
-action. Should accept as its only argument the number of pulses, and
-return \code{TRUE} on success and \code{FALSE} on failure.}
+\item{f.trigger.on, f.trigger.off}{function Functions to be called
+immediately before and immediately after a measurement. See
+\code{\link{acq_raw_spct}} for details.}
 
 \item{what.measured}{value used to set attribute.}
 

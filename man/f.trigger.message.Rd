@@ -4,7 +4,7 @@
 \alias{f.trigger.message}
 \title{Manual trigger pulses request}
 \usage{
-f.trigger.message(n = 1L)
+f.trigger.message(n = 1L, delay = 0)
 }
 \arguments{
 \item{n}{integer Number of pulses (flashes) to trigger per call.}

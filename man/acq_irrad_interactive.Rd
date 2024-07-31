@@ -26,7 +26,10 @@ acq_irrad_interactive(
   show.figs = TRUE,
   interface.mode = ifelse(qty.out == "fluence", "manual", "auto"),
   num.exposures = ifelse(qty.out == "fluence", 1L, -1L),
-  f.trigger.pulses = f.trigger.message,
+  f.trigger.init = NULL,
+  f.trigger.on = f.trigger.message,
+  f.trigger.off = NULL,
+  triggers.enabled = ifelse(qty.out == "fluence", c("light", "filter"), character()),
   folder.name = paste("acq", qty.out, lubridate::today(tzone = "UTC"), sep = "-"),
   user.name = Sys.info()[["user"]],
   session.name = paste(user.name, strftime(lubridate::now(tzone = "UTC"),
@@ -94,9 +97,13 @@ spectra.}
 \item{num.exposures}{integer Number or light pulses (flashes) per scan. Set
 to \code{-1L} to indicate that the light source is continuous.}
 
-\item{f.trigger.pulses}{function Function to be called to trigger light
-pulse(s). Should accept as its only argument the number of pulses, and
-return \code{TRUE} on success and \code{FALSE} on failure.}
+\item{f.trigger.on, f.trigger.off, f.trigger.init}{function Functions to be
+called immediately before and immediately after a measurement, and any
+initialization code needed before a repeat. See \code{\link{acq_raw_spct}}
+for details.}
+
+\item{triggers.enabled}{character vector Names of protocol steps during which
+trigger functions should be called.}
 
 \item{folder.name, session.name, user.name}{character Default name of the
 folder used for output, and session and user names.}

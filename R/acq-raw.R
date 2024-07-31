@@ -7,14 +7,46 @@
 #'
 #' @param descriptor list as returned by function \code{get_oo_descriptor}.
 #' @param acq.settings list as returned by functions \code{tune_acq_settings}.
-#' @param f.trigger.pulses function Function to be called to trigger light
-#'   pulse(s). Should accept as its only argument the number of pulses, and
-#'   return \code{TRUE} on sucess and \code{FALSE} on failure.
+#' @param f.trigger.on,f.trigger.off function Functions to be called
+#'   immediately before and immediately after a measurement.
 #' @param what.measured value used to set attribute.
 #' @param where.measured data.frame with at least columns "lon" and "lat"
 #'   compatible with value returned by \code{ggmap::geocode()}.
 #' @param set.all logical resend or not all instrument settings.
 #' @param verbose logical to enable or disable warnings.
+#'
+#' @details
+#' This function acquires one raw-detector-counts spectrum from a spectrometer,
+#' using the \code{descriptor} to connect to the spectrum and retrieve the
+#' valid range for settings. The settings in \code{acq.settings} are first
+#' sent to the spectrometer and the values retrieved in case the spectrometer
+#' has overridden the requested settings. Subsequently a spectrum, possibly
+#' obtained by averaging multiple spectra in the spectrometer is acquired, and
+#' the spectrometer queried on whether data are valid or not.
+#'
+#' Function \code{acq_raw_spct()} can optionally call two functions, one at the
+#' start of the measurement and another one after it ends. \code{f.trigger.on()}
+#' can be used for example when measuring the output from a xenon flash lamp, to
+#' trigger a given number of light flashes. In other cases \code{f.trigger.on()}
+#' and \code{f.trigger.off()} can be used together to start and end a concurrent
+#' measurement or any other action using a relay controlled by code in a
+#' function defined by the user.
+#'
+#' The functions passed as arguments to \code{f.trigger.on()} and
+#' \code{f.trigger.off()} should return very quickly when called, so as not to
+#' disturb the timing of the measurements of spectra as these start only after
+#' \code{f.trigger.on()} returns to the caller.
+#'
+#' The first formal parameter of \code{f.trigger.on()} should handle as input
+#' an integer value indicating the number of events to trigger and a second
+#' argument giving the delay in seconds between pulses. Of course the arguments
+#' can be ignored if not needed, but should accepted. \code{f.trigger.off()}
+#' currently expects no arguments. Example scripts are provided for YoctoPuce
+#' USB modules.
+#'
+#' The default function, displays a message asking the user to manually trigger
+#' the flash a number of times that depends on the settings in
+#' \code{acq.settings}.
 #'
 #' @family raw-counts-spectra acquisition functions
 #'
@@ -31,7 +63,8 @@
 #'
 acq_raw_spct <- function(descriptor,
                          acq.settings,
-                         f.trigger.pulses = f.trigger.message,
+                         f.trigger.on = f.trigger.message,
+                         f.trigger.off = NULL,
                          what.measured = NA,
                          where.measured = data.frame(lon = NA_real_, lat = NA_real_),
                          set.all = TRUE,
@@ -125,12 +158,16 @@ acq_raw_spct <- function(descriptor,
       x$num.scans[i] <- actual.num.scans
     }
 
-    if (verbose) cat("Measurement x", acq.settings$HDR.mult[i], " ... ", sep = "")
-
     # light source, e,g,, flash trigger
-    if (num.exposures[i] > 0L  && !is.null(f.trigger.pulses)) {
-      f.trigger.pulses(num.exposures[i])
+    # concurrent measurements, e.g., trigger camera once
+    # concurrent measurements, e.g., enable sensor or camera
+    if (num.exposures[i] != 0  && !is.null(f.trigger.on)) {
+#      target.delay <- max(0, (x$num.scans[i] * x$integ.time[i] - 0.05) / 2) # max 1/20 s shutter speed
+      target.delay <- 0.01
+      f.trigger.on(n = num.exposures[i], delay = target.delay)
     }
+
+    if (verbose) cat("Measurement x", acq.settings$HDR.mult[i], " ... ", sep = "")
 
     # the USB2000 occasionally returns zero counts (timing problem?)
     # or data could be corrupted, in which case we retry
@@ -155,6 +192,11 @@ acq_raw_spct <- function(descriptor,
     }
 
     z[[counts.name]] <- counts
+
+    # concurrent measurements, e.g., disable sensor or camera
+    if (!is.null(f.trigger.off)) {
+      f.trigger.off()
+    }
 
   }
 
@@ -229,9 +271,11 @@ acq_raw_spct <- function(descriptor,
 #' @param descriptor list as returned by function \code{get_oo_descriptor()}.
 #' @param acq.settings list as returned by functions \code{tune_acq_settings()}
 #'   or \code{retune_acq_settings()} or \code{acq_settings()}.
-#' @param f.trigger.pulses function Function to be called to trigger light
-#'   pulse(s). Should accept as its only argument the number of pulses, and
-#'   return \code{TRUE} on sucess and \code{FALSE} on failure.
+#' @param f.trigger.on,f.trigger.off function Functions to be called
+#'   immediately before and immediately after a measurement. See
+#'   \code{\link{acq_raw_spct}} for details.
+#' @param triggers.enabled character vector Names of protocol steps during which
+#'   trigger functions should be called.
 #' @param seq.settings list with members "initial.delay", "step,delay" numeric
 #'   values in seconds, "num.steps" integer.
 #' @param protocol vector of character strings.
@@ -254,7 +298,9 @@ acq_raw_spct <- function(descriptor,
 #'
 acq_raw_mspct <- function(descriptor,
                           acq.settings,
-                          f.trigger.pulses = f.trigger.message,
+                          f.trigger.on = f.trigger.message,
+                          f.trigger.off = NULL,
+                          triggers.enabled = character(),
                           seq.settings = list(initial.delay = 0,
                                               start.boundary = "none",
                                               step.delay = 0,
@@ -320,10 +366,20 @@ acq_raw_mspct <- function(descriptor,
         return(raw_mspct())
       }
     }
-    if (p != "dark" && is.function(f.trigger.pulses)) {
-      f.current <- f.trigger.pulses
+    if (p %in% triggers.enabled) {
+      if (is.function(f.trigger.on)) {
+        f.on.current <- f.trigger.on
+      } else {
+        f.on.current <- NULL
+      }
+      if (is.function(f.trigger.off)) {
+        f.off.current <- f.trigger.off
+      } else {
+        f.off.current <- NULL
+      }
     } else {
-      f.current <- NULL
+      f.on.current <- NULL
+      f.off.current <- NULL
     }
     if (p == "light") {
       if (is.character(seq.settings[["start.boundary"]]) &&
@@ -372,7 +428,8 @@ acq_raw_mspct <- function(descriptor,
       zz <- hs_acq_raw_mspct(descriptor = descriptor,
                              acq.settings = acq.settings,
                              num.spectra = length(times),
-                             f.trigger.pulses = f.current,
+                             f.trigger.on = f.on.current,
+                             f.trigger.off = f.off.current,
                              what.measured = paste(p, " HS: ", user.label, sep = ""),
                              where.measured = where.measured,
                              verbose = TRUE,
@@ -404,7 +461,8 @@ acq_raw_mspct <- function(descriptor,
         z[[idx]] <-
           acq_raw_spct(descriptor = descriptor,
                        acq.settings = acq.settings,
-                       f.trigger.pulses = f.current,
+                       f.trigger.on = f.on.current,
+                       f.trigger.off = f.off.current,
                        what.measured = paste(z.names[[i]], ": ", user.label, sep = ""),
                        where.measured = where.measured,
                        verbose = messages.enabled)
