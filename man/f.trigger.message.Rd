@@ -2,18 +2,20 @@
 % Please edit documentation in R/acq-interactive-utils.R
 \name{f.trigger.message}
 \alias{f.trigger.message}
-\title{Manual trigger pulses request}
+\title{Manual trigger request}
 \usage{
 f.trigger.message(n = 1L, delay = 0)
 }
 \arguments{
 \item{n}{integer Number of pulses (flashes) to trigger per call.}
+
+\item{delay}{numeric Time in seconds to wait before displaying the message.}
 }
 \description{
 This function is used by default. It prints a message asking the operator
-to manually trigger the flash. A more elaborate function, using specific
-hardware can be used to automatically trigger the light source, or to
-enable hard triggering of the light source by the spectrometer itself.
+to manually trigger a flash. A more elaborate function, using specific
+hardware can be used to automatically trigger a light source or some other
+synchronized event such as releasing the shutter of a camera.
 }
 \note{
 When using this function, set an integration time that gives enough
@@ -21,6 +23,9 @@ When using this function, set an integration time that gives enough
   integration.
 }
 \seealso{
+\code{\link[base]{Sys.sleep}} for a description of the variation
+  in the effective duration of the \code{delay}.
+
 Other interactive acquisition utility functions: 
 \code{\link{choose_ch_interactive}()},
 \code{\link{choose_sr_interactive}()},

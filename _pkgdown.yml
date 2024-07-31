@@ -1,6 +1,9 @@
 destination: ../docs/ooacquire
 url: https://docs.r4photobiology.info/ooacquire/
 
+template:
+  bootstrap: 5
+
 reference:
   - title: Package overview
     contents:
