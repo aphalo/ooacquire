@@ -676,20 +676,24 @@ set_session_name_interactive <- function(session.name = NULL) {
 }
 
 
-#' Manual trigger pulses request
+#' Manual trigger request
 #'
 #' This function is used by default. It prints a message asking the operator
-#' to manually trigger the flash. A more elaborate function, using specific
-#' hardware can be used to automatically trigger the light source, or to
-#' enable hard triggering of the light source by the spectrometer itself.
+#' to manually trigger a flash. A more elaborate function, using specific
+#' hardware can be used to automatically trigger a light source or some other
+#' synchronized event such as releasing the shutter of a camera.
 #'
 #' @note When using this function, set an integration time that gives enough
 #'   time for the manual triggering of the flash to reliably fall within the
 #'   integration.
 #'
+#' @seealso \code{\link[base]{Sys.sleep}} for a description of the variation
+#'   in the effective duration of the \code{delay}.
+#'
 #' @family interactive acquisition utility functions
 #'
 #' @param n integer Number of pulses (flashes) to trigger per call.
+#' @param delay numeric Time in seconds to wait before displaying the message.
 #'
 #' @export
 #'
