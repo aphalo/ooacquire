@@ -304,6 +304,40 @@ Insight
 News about updates are regularly posted at
 (<https://www.r4photobiology.info/>).
 
+## Folder Structure
+
+The folder structure of the Git repository is shown below. Folders
+`pkgdown`, `inst-not`, `data-raw` and `tests-scripts-interactive` are
+not included in the built package. Folder `data-raw` also contains raw
+calibration data and R scripts used to convert them into the objects
+included in folder `data`. Folder `tests-scripts-interactive` contains R
+scripts used to test data acquisition with specific spectrometers used
+during development. Other folders are the usual ones for R packages:
+`src` contains C++ code sources based on R package ‘Rcpp’, folder
+`packadown` contains bitmaps and other files used in the HTML version of
+the documentation, and folder `test` files implementing unit tests for
+functions and objects that do not require special hardware, i.e.,
+spectrometers, for execution.
+
+    oacquire
+    ├── .github 
+    ├── data
+    ├─┬ data-raw
+    │ └── <calibration data in original format and scripts>
+    ├─┬ inst
+    │ ├── example-scrips
+    │ └── extdata
+    ├─┬ inst-not
+    │ └── <example data not included in package build>
+    ├── man 
+    ├── pkgdown
+    ├── R
+    ├── src
+    ├── test-scripts-interactive
+    ├─┬ tests
+    │ └── testthat
+    └── vignettes
+
 ## Contributing
 
 Please report bugs and request new features at
@@ -320,7 +354,7 @@ citation("ooacquire")
 #> To cite package 'ooacquire' in publications use:
 #> 
 #>   Aphalo P, Ylianttila L (2024). _ooacquire: Acquire Data from OO
-#>   Spectrometers_. R package version 0.4.4.9000,
+#>   Spectrometers_. R package version 0.4.6,
 #>   https://github.com/aphalo/ooacquire,
 #>   <https://docs.r4photobiology.info/ooacquire/>.
 #> 
@@ -330,7 +364,7 @@ citation("ooacquire")
 #>     title = {ooacquire: Acquire Data from OO Spectrometers},
 #>     author = {Pedro J. Aphalo and Lasse Ylianttila},
 #>     year = {2024},
-#>     note = {R package version 0.4.4.9000, 
+#>     note = {R package version 0.4.6, 
 #> https://github.com/aphalo/ooacquire},
 #>     url = {https://docs.r4photobiology.info/ooacquire/},
 #>   }
