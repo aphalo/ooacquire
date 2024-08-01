@@ -781,9 +781,11 @@ acq_irrad_interactive <-
             " of ", total.repeats, ".\n", sep = "")
       }
 
+      # call trigger- or measurement initialization function
       if (!is.null(f.trigger.init)) {
         f.trigger.init()
       }
+
       # acquire raw-counts spectra
       if (reuse.old.refs) { # acquire only light spectra
         if (acq.pausing) {
@@ -1367,7 +1369,7 @@ acq_irrad_interactive <-
 
     } # end of main UI loop
 
-    # Wait for all files to be saved (needed? but anyway a  reassuring)
+    # Wait for all files to be saved (needed? but anyway reassuring)
     if (async.saves && (mirai::unresolved(rda.mirai) || mirai::unresolved(pdf.mirai))) {
       cat("Saving files ")
       while (mirai::unresolved(rda.mirai) || mirai::unresolved(pdf.mirai)) {

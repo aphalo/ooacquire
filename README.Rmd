@@ -51,6 +51,9 @@ and *Java* need both to be installed before data acquisition is
 possible. The runtime itself and its documentation can be downloaded at
 <https://www.oceaninsight.com/support/software-downloads/>.
 
+**Ocean Insight has discontinued support for _OmniDriver_!** This means that
+the runtime can no longer be downloaded from Ocean Optics support site.
+
 ## Warning!
 
 Under MS-Windows with RStudio, package 'RJava' is not compatible with R

@@ -103,9 +103,12 @@
 #'   "series-attr".
 #' @param num.exposures integer Number or light pulses (flashes) per scan. Set
 #'   to \code{-1L} to indicate that the light source is continuous.
-#' @param f.trigger.on,f.trigger.off function Functions to be called
-#'   immediately before and immediately after a measurement. See
-#'   \code{\link{acq_raw_spct}} for details.
+#' @param f.trigger.on,f.trigger.off,f.trigger.init function Functions to be
+#'   called immediately before and immediately after a measurement, and any
+#'   initialization code needed before a repeat. See \code{\link{acq_raw_spct}}
+#'   for details.
+#' @param triggers.enabled character vector Names of protocol steps during which
+#'   trigger functions should be called.
 #' @param folder.name,session.name,user.name character Default name of the
 #'   folder used for output, and session and user names.
 #' @param folder.name,session.name,user.name character Default name of the
@@ -173,8 +176,10 @@ acq_fraction_interactive <-
            show.figs = TRUE,
            interface.mode = ifelse(light.source == "pulsed", "manual", "auto"),
            num.exposures = ifelse(light.source == "pulsed", 1L, -1L),
+           f.trigger.init = NULL,
            f.trigger.on = f.trigger.message,
            f.trigger.off = NULL,
+           triggers.enabled = c("sample", "reference"),
            folder.name = paste("acq", qty.out,
                                lubridate::today(tzone = "UTC"),
                                sep = "-"),
@@ -186,11 +191,13 @@ acq_fraction_interactive <-
            verbose = getOption("photobiology.verbose", default = FALSE),
            QC.enabled = TRUE) {
 
+    ## Is the driver available?
     if (getOption("ooacquire.offline", FALSE)) {
       warning("ooacquire off-line: Aborting...")
       return()
     }
 
+    ## Asynchronous file saving
     if (is.null(async.saves)) {
       # in the future NULL could be a dynamic default dependent of file size
       async.saves <- FALSE
@@ -207,13 +214,11 @@ acq_fraction_interactive <-
       cat("Will save files synchronously\n(blocking data acquisition until files are saved)\n")
     }
 
-    if (is.null(getOption("digits.secs"))) {
-      old.options <- options(warn = 1, "digits.secs" = 3)
-    } else {
-      old.options <- options(warn = 1)
-    }
-    on.exit(options(old.options), add = TRUE, after = TRUE)
+    # initialize mirai
+    rda.mirai <- NA
+    pdf.mirai <- NA
 
+    ## set R options
     if (is.null(getOption("digits.secs"))) {
       old.options <- options(warn = 1, "digits.secs" = 3)
     } else {
@@ -223,8 +228,15 @@ acq_fraction_interactive <-
 
     dyn.range <- 1e3
 
+    ## Validate arguments
+    # validate interface mode
+    interface.mode <- tolower(interface.mode)
+    if (!gsub("-attr$", "", interface.mode) %in%
+        c("auto", "simple", "manual", "full", "series")) {
+      stop("Invalid argument for 'interface.mode', aborting.", call. = FALSE)
+    }
+
     # validate qty.out
-    qty.out <- tolower(qty.out)
     stopifnot(qty.out %in% c("Tfr", "Rfr", "raw"))
 
     # initialize repeats counter
@@ -245,6 +257,7 @@ acq_fraction_interactive <-
       }
     }
 
+    ## connect to spectrometer
     w <- start_session()
     on.exit(end_session(w),
             add = TRUE) # ensure session is always closed!
@@ -273,7 +286,6 @@ acq_fraction_interactive <-
     cat("Using channel ", ch.index,
         " from spectrometer with serial number: ", serial_no, "\n")
 
-    available.protocols <- names(protocols)
     if (anyNA(c(descriptors[[1]], correction.method[[1]]))) {
       descriptor <-
         switch(serial_no,
@@ -301,8 +313,8 @@ acq_fraction_interactive <-
 
       correction.method <-
         switch(serial_no,
-               MAYP11278 = ooacquire::MAYP11278_ylianttila.mthd,
-               MAYP112785 = ooacquire::MAYP112785_ylianttila.mthd,
+               MAYP11278 = ooacquire::MAYP11278_simple.mthd,
+               MAYP112785 = ooacquire::MAYP112785_simple.mthd,
                MAYP114590 = ooacquire::MAYP114590_simple.mthd,
                FLMS04133 = ooacquire::FLMS04133_none.mthd,
                FLMS00673 = ooacquire::FLMS00673_none.mthd,
@@ -326,6 +338,8 @@ acq_fraction_interactive <-
       stopifnot(exists("spectrometer.name", descriptor))
     }
 
+    # default protocols are available for most spectrometers
+    available.protocols <- names(protocols)
     default.protocol <- ifelse("rsd" %in% available.protocols, "rsd", available.protocols[1])
 
     # jwrapper and spectrometer indexes have to be set to current ones if
@@ -355,33 +369,23 @@ acq_fraction_interactive <-
     descriptor.inst <- get_oo_descriptor(w)
     stopifnot(descriptor[["spectrometer.sn"]] == descriptor.inst[["spectrometer.sn"]])
 
-    # Before continuing we check that wavelength calibration is available
+    # check that wavelength calibration is available
     stopifnot(length(descriptor[["wavelengths"]]) == descriptor[["num.pixs"]])
 
-    session.name <- make.names(session.name) # validate argument passed in call
-    session.prompt <- paste("Session's name (<string>/\"", session.name, "\"-): ", sep = "")
-    user.session.name <- readline(session.prompt)
-    if (! user.session.name == "") {
-      session.name <- make.names(user.session.name)
-      if (user.session.name == "") {
-        session.name <- make.names(format(lubridate::now(tzone = "UTC")))
-      }
-      if (session.name != user.session.name) {
-        message("Using sanitised/generated name: '", session.name, "'.", sep = "")
-      }
-    }
-
-    user.name <- make.names(user.name) # validate argument passed in call
-    user.name.prompt <- paste("Operator's name (<string>/\"", user.name, "\"-): ", sep = "")
-    user.user.name <- readline(user.name.prompt)
-    if (! user.user.name == "") {
-      user.name <- make.names(user.user.name)
-    }
-    cat("Using \"", user.name, "\" as operator's name\n", sep = "")
+    ## Session settings
+    # session and user IDs
+    session.name <- set_session_name_interactive(session.name)
+    user.name <- set_user_name_interactive(user.name)
     session.label <- paste("Operator: ", user.name,
                            "\nSession: ", session.name,
                            ", instrument s.n.: ", descriptor[["spectrometer.sn"]],
                            sep = "")
+
+    # set working directory for current session
+    folder.name <- set_folder_interactive(folder.name)
+    oldwd <- setwd(folder.name)
+    on.exit(setwd(oldwd), add = TRUE)
+    on.exit(message("Folder reset to: ", getwd(), "\nBye!"), add = TRUE)
 
     # set default for metadata attributes
     user.attrs <-
@@ -397,13 +401,6 @@ acq_fraction_interactive <-
                                 ") and OmniDriver (", rOmniDriver::get_api_version(w), ").",
                                 sep = ""))
 
-    folder.name <- set_folder_interactive(folder.name)
-
-    # set working directory of current session
-    oldwd <- setwd(folder.name)
-    on.exit(setwd(oldwd), add = TRUE)
-    on.exit(message("Folder reset to: ", getwd(), "\nBye!"), add = TRUE)
-
     # ask user to choose protocol only if needed
     if (length(protocols) > 1) {
       protocol <- protocol_interactive(protocols = protocols,
@@ -412,19 +409,18 @@ acq_fraction_interactive <-
       protocol <- protocols[[default.protocol]]
     }
 
-    start.int.time <- 1 # seconds
-
     # set default data acquisition settings based of call arguments
-
+    start.int.time <- 1 # seconds
     num.scans <- min(max(tot.time.range) %/% start.int.time, 1L)
-
     settings <- acq_settings(descriptor = descriptor,
                              integ.time = start.int.time,
                              num.scans = num.scans,
                              target.margin = target.margin,
                              tot.time.range = tot.time.range,
-                             HDR.mult = HDR.mult)
+                             HDR.mult = HDR.mult,
+                             num.exposures = num.exposures)
 
+    # set default sequential settings for time series
     if (is.null(seq.settings)) {
       seq.settings <- list(start.boundary = "none",
                            initial.delay = 0,
@@ -439,14 +435,20 @@ acq_fraction_interactive <-
                            num.steps = 1L)
     }
 
-    # initialize lists to collect names from current session
+    # initialize counters used for sequential naming and repeats
+    total.repeats <- 1L
+    pending.repeats <- 0L
+    series.start <- TRUE
+    file.counter <- 0L
+    seq.name.digits <- 3L
+    acq.pausing <- TRUE
 
+    # initialize lists to collect names from current session
     filter.names <- character()
     raw.names <- character()
     file.names <- character()
 
     # initialize interface logic flags
-
     reuse.old.refs <- FALSE # none yet available
     reuse.seq.settings <- FALSE
     reset.count <- TRUE
@@ -456,12 +458,7 @@ acq_fraction_interactive <-
     sequential.naming.required <- FALSE
     clear.display <- FALSE
 
-    # initialize counter used for sequential naming
-
-    file.counter <- 0
-
     # initialize default object name
-
     base.obj.name <- "ooacq_#"
 
     # save current value as starting value for next iteration
@@ -588,6 +585,9 @@ acq_fraction_interactive <-
                                      acq.settings = settings,
                                      start.int.time = start.int.time,
                                      interface.mode = interface.mode)
+        # with new settings we start with one repeat
+        pending.repeats <- 1
+        total.repeats <- 1
         get.seq.settings <- grepl("series", interface.mode)
       }
 
@@ -634,7 +634,13 @@ acq_fraction_interactive <-
       }
 
       if (pending.repeats >= 1) {
-        cat("\nPending: ", pending.repeats, " repeats.\n", sep = "")
+        cat("\nRepeat ", total.repeats - pending.repeats + 1,
+            " of ", total.repeats, ".\n", sep = "")
+      }
+
+      # call trigger- or measurement initialization function
+      if (!is.null(f.trigger.init)) {
+        f.trigger.init()
       }
 
       # acquire raw-counts spectra
@@ -647,14 +653,18 @@ acq_fraction_interactive <-
                                      pause.fun = NULL,
                                      f.trigger.on = f.trigger.on,
                                      f.trigger.off = f.trigger.off,
+                                     triggers.enabled = intersect(protocol, triggers.enabled),
                                      user.label = obj.name)
           if (pending.repeats > 1) {
-            answer.abort <- readline(prompt = "Abort pending repeats? yes/NO (y/n-): ")
+            answer.abort <- readline(prompt = "Skip pending repeats? yes/NO (y/n-): ")
             if (answer.abort %in% c("y", "z")) {
               pending.repeats <- 1
             }
           }
         } else {
+          if (pending.repeats == total.repeats) {
+            readline(paste("Acquire SAMPLE reading(s): g = GO (g-):"))[1]
+          }
           raw.mspct <- acq_raw_mspct(descriptor = descriptor,
                                      acq.settings = settings,
                                      seq.settings = seq.settings,
@@ -662,6 +672,7 @@ acq_fraction_interactive <-
                                      pause.fun = function(...) {TRUE},
                                      f.trigger.on = f.trigger.on,
                                      f.trigger.off = f.trigger.off,
+                                     triggers.enabled = intersect(protocol, triggers.enabled),
                                      user.label = obj.name)
         }
       } else { # acquire all spectra needed for protocol
@@ -672,6 +683,7 @@ acq_fraction_interactive <-
                                    pause.fun = NULL, # default
                                    f.trigger.on = f.trigger.on,
                                    f.trigger.off = f.trigger.off,
+                                   triggers.enabled = intersect(protocol, triggers.enabled),
                                    user.label = obj.name)
       }
 
@@ -687,13 +699,20 @@ acq_fraction_interactive <-
 
       # combine spectra if needed
       if (reuse.old.refs) {
-        # we add old refs to new sample data
+        cat("Retrieving ", paste(names(old.refs.mpsct), collapse = " and "),
+            " spectrum/a ... ", sep = "")
+        # we add old refs to new light data
         raw.mspct <- c(old.refs.mpsct, raw.mspct)
+        cat("ready!\n")
       } else {
         # we save old references for possible reuse
         refs.selector <- grep("dark|reference", protocol, value = TRUE)
         if (length(refs.selector)) {
+          cat("Cacheing ", paste(refs.selector,
+                                 collapse = " and "),
+              " spectrum/a ... ", sep = "")
           old.refs.mpsct <- raw.mspct[refs.selector]
+          cat("ready!\n")
         } else {
           old.refs.mpsct <- raw_mspct() # empty object
         }
@@ -704,7 +723,7 @@ acq_fraction_interactive <-
         # for series measurements we can have multiple "sample" raw spectra
         spct.names <-
           list(sample = grep("^sample", names(raw.mspct), value = TRUE),
-               filter = "reference",
+               reference = "reference",
                dark = "dark")
 
         if (length(raw.mspct) > 10L) {
@@ -721,10 +740,13 @@ acq_fraction_interactive <-
                                             ref.value = ref.value,
                                             verbose = verbose)
 
-        if (length(user.attrs$what.measured) > 0) {
-          photobiology::setWhatMeasured(filter.spct, user.attrs$what.measured)
-        } else {
+        cat('Adding metadata ... ')
+        photobiology::setHowMeasured(filter.spct, user.attrs$how.measured)
+
+        if (user.attrs$what.measured == "") {
           photobiology::setWhatMeasured(filter.spct, obj.name)
+        } else {
+          photobiology::setWhatMeasured(filter.spct, user.attrs$what.measured)
         }
 
         if (user.attrs$comment.text != "") {
@@ -785,7 +807,7 @@ acq_fraction_interactive <-
           # to avoid delays
           if (!reuse.seq.settings || pending.repeats == 1) {
             plot.prompt <- "fig/w.bands/discard+go/SAVE+GO (f/w/d/s-): "
-            valid.answers <-  c("f","w", "d", "s")
+            valid.answers <-  c("f","w", "d", "s", "g")
             repeat {
               answer <- readline(plot.prompt)[1]
               answer <- ifelse(answer == "", "s", answer)
@@ -880,7 +902,7 @@ acq_fraction_interactive <-
               },
               pdf.name = pdf.name,
               fig = fig,
-              .timeout = 120000 # 120 s
+              .timeout = 60000 # 60 s
               )
             } else {
               grDevices::pdf(file = pdf.name, width = 8, height = 6)
@@ -1131,33 +1153,31 @@ acq_fraction_interactive <-
 
         if (answer2 == "r") {
           repeat {
-            answer4 <- readline("Number of repeats (integer >= 1 or \"\"): ")
+            prompt <- paste("Number of repeats (integer >= 1 or \"\" = ",
+                            total.repeats, "): ")
+            answer4 <- readline(prompt)
             if (answer4 == "") {
-              answer4 <- "1"
-            }
-            pending.repeats <- try(as.integer(answer4))
-            if (!is.na(pending.repeats) && pending.repeats >= 1L) {
+              pending.repeats <- total.repeats
               break()
             } else {
-              cat("Value entered is not a number >= 1!\n")
+              pending.repeats <- try(as.integer(answer4))
+              if (!is.na(pending.repeats) && pending.repeats >= 1L) {
+                total.repeats <- pending.repeats
+                break()
+              } else {
+                cat("Value entered is not a number >= 1!\n")
+              }
             }
           }
           repeat {
-            answer3 <- readline("Repeats: no figs./with figs./pausing/AUTO- (n/f/p/a-): ")
+            answer3 <- readline("Repeats: no figs./WITH FIGS./pausing (n/f-/p): ")
             if (answer3 == "") {
-              answer3 <- "a"
+              answer3 <- "f"
             }
-            if (answer3 %in% c("n", "f", "p", "a")) {
+            if (answer3 %in% c("n", "f", "p")) {
               break()
             } else {
               cat("Answer not recognized, please try again...")
-            }
-          }
-          if (answer3 == "a") {
-            if (pending.repeats > 1L) {
-              answer3 <- "n"
-            } else {
-              answer3 <- "f"
             }
           }
           acq.pausing.always <- answer3 == "p"
@@ -1201,7 +1221,7 @@ acq_fraction_interactive <-
 
     } # end of main UI loop
 
-    # Wait for all files to be saved (needed? but anyway a  reassuring)
+    # Wait for all files to be saved (needed? but anyway reassuring)
     if (async.saves && (mirai::unresolved(rda.mirai) || mirai::unresolved(pdf.mirai))) {
       cat("Saving files ")
       while (mirai::unresolved(rda.mirai) || mirai::unresolved(pdf.mirai)) {
@@ -1223,11 +1243,11 @@ acq_fraction_interactive <-
                       make.names(session.name),
                       ".Rda", sep = ""))
 
-    cat("Data files saved during session:\n",
-        "to ", getwd(), "\n",
+    cat("Files saved during this session to folder:\n",
+        getwd(), "\n",
         paste(file.names, collapse = ",\n"), ".\n", sep = "")
 
-    cat("Ending data acquisition...\n")
+    cat("Ending data acquisition session ...\n")
 
     # connection to spectrometer is closed using on.exit() to ensure
     # disconnection even when end of session is forced by error or by user
