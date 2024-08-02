@@ -22,7 +22,7 @@ irrad.spct <-
                                                   MAYP11278_descriptors),
                     correction.method = MAYP11278_ylianttila.mthd)
 
-## ---- fig.height=5, fig.width=7-----------------------------------------------
+## ----fig.height=5, fig.width=7------------------------------------------------
 autoplot(irrad.spct)
 
 ## -----------------------------------------------------------------------------
@@ -33,13 +33,13 @@ cps.spct <-
                     correction.method = MAYP11278_ylianttila.mthd,
                     return.cps = TRUE)
 
-## ---- fig.height=5, fig.width=7-----------------------------------------------
+## ----fig.height=5, fig.width=7------------------------------------------------
 autoplot(cps.spct)
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  cal.spct <- read_oo_caldata("oo-calibration/xxxx")
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  cal.multipliers <- oo_calib2irrad_mult(cal.spct,
 #                                         diff.type = "CC-3")
 

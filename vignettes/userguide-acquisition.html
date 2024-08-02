@@ -12,7 +12,7 @@
 
 <meta name="author" content="Pedro J. Aphalo" />
 
-<meta name="date" content="2024-01-15" />
+<meta name="date" content="2024-08-02" />
 
 <title>Acquisition of Spectra</title>
 
@@ -51,7 +51,7 @@ overflow: visible;
 </style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -339,9 +339,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 <h1 class="title toc-ignore">Acquisition of Spectra</h1>
-<h3 class="subtitle"><code>ooacquire</code> 0.4.4</h3>
+<h3 class="subtitle"><code>ooacquire</code> 0.5.0</h3>
 <h4 class="author">Pedro J. Aphalo</h4>
-<h4 class="date">2024-01-15</h4>
+<h4 class="date">2024-08-02</h4>
 
 
 <div id="TOC">
@@ -945,7 +945,9 @@ arguments.</p>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>                      <span class="at">descriptors =</span> ooacquire<span class="sc">::</span>MAYP11278_descriptors)</span></code></pre></div>
 <p>In this case, this corresponds to a spectrometer whose data are
 available in the package and recognized automatically. Thus is
-equivalent to accepting all defaults as below.</p>
+equivalent to accepting all defaults as below. The defaults are dynamic,
+based on the serial number of the spectrometer unit that is
+attached.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">acq_irrad_interactive</span>()</span></code></pre></div>
 <p>However, for this spectrometer additional correction methods are
 available. Two calibrations with different entrance optics are
@@ -1282,26 +1284,36 @@ each individual pulse is an exposure event, and for example, we trigger
 five flashes per spectrometer integration (or “scan”), we would set
 <code>num.exposures = 5</code>.</p>
 <p>By default the user is prompted to manually trigger a pulse. However,
-when triggering of pulses can be automated, a function accepting as only
-argument the number of pulses can be passed as argument to parameter
-<code>f.trigger.pulses</code>. <strong>It is important to be aware that
-multitasking if used, must be implemented in the function passed as
-argument. For automation, the pulse trigger function should return to
-the caller before the pulses are triggered and the train of pulses start
-with enough delay for the integration to be started before them. This
-can be implemented in R code using package ‘mirai’ or as a delay
-implemented in the hardware or software used to trigger the flash of
-light in the source.</strong></p>
+when triggering of pulses can be automated, a function accepting
+arguments for number of pulses to parameter <code>n</code> (the number
+of pulses), a delay in seconds to <code>delay</code> and a pulse length
+in seconds to <code>duration</code> can be passed as argument to
+parameter <code>f.trigger.on</code>. Of these currently only
+<code>n</code> is implemented, and for future compatibility arguments
+for <code>delay</code> and <code>duration</code> must be accepted, and
+possibly ignored. <strong>It is important to be aware that multitasking
+if used, must be implemented in the function passed as argument. For
+automation, the pulse trigger function should return to the caller
+before the pulses are triggered and the train of pulses start with
+enough delay for the integration to be started before them. This can be
+implemented in R code using package ‘mirai’ or as a delay implemented in
+the hardware or software used to trigger the flash of light in the
+source.</strong></p>
 </div>
 <div id="spectral-transmittance-absorptance-and-reflectance" class="section level3">
 <h3>Spectral transmittance, absorptance and reflectance</h3>
-<p><strong>Several features available in
-<code>acq_irrad_interactive()</code> have not been yet implemented in
-function <code>acq_fraction_interactive</code>.</strong></p>
+<p><strong>All features available in
+<code>acq_irrad_interactive()</code> have now been implemented in
+function <code>acq_fraction_interactive()</code>. This means that series
+of spectra can be acquired to measure the dynamics of chemical reactions
+and repeats can be used to measure several samples reusing the same dark
+and reference spectra. It is also possible to use the HDR feature to
+improve the noise to signal ratio. Trigger functions work as in
+<code>acq_irrad_interactive()</code>.</strong></p>
 <p>A single function can be used for the acquisition of data where the
 quantities of interest are expressed relative to a reference. This is
 the case for transmittance, reflectance and absorptance. The same
-parameters as discussed for <code>acq_irrad_interactive()</code> iare
+parameters as discussed for <code>acq_irrad_interactive()</code> are
 available in function <code>acq_fraction_interactive()</code>. We will
 here describe three additional parameters only present in this function.
 The first one is <code>ref.value</code> which needs to be supplied if
@@ -1315,17 +1327,13 @@ reflectance of very dark objects, it might be convenient to use a grey
 reference instead of a white reference). For a reference with 97%
 reflectance across the whole range of wavelengths of interest one would
 use.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="fu">acq_fraction_interactive</span>(<span class="at">ref.value =</span> <span class="fl">0.97</span>,</span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>                         <span class="at">correction.method =</span> ooacquire<span class="sc">::</span>MAYP11278_ylianttila.mthd,</span>
-<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>                         <span class="at">descriptors =</span> ooacquire<span class="sc">::</span>MAYP11278_descriptors)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="fu">acq_fraction_interactive</span>(<span class="at">ref.value =</span> <span class="fl">0.97</span>)</span></code></pre></div>
 <p>Parameters <code>qty.out</code> and <code>type</code> determine the
 class of object and the quantity stored in the returned objects. If the
 optical set-up used is for measuring specular spectral reflectance, we
 use the following code. This information will also be used when plotting
 the data.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">acq_fraction_interactive</span>(<span class="at">qty.out =</span> <span class="st">&quot;Rfr&quot;</span>, <span class="at">type =</span> <span class="st">&quot;specular&quot;</span>,</span>
-<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>                         <span class="at">correction.method =</span> ooacquire<span class="sc">::</span>MAYP11278_ylianttila.mthd,</span>
-<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>                         <span class="at">descriptors =</span> ooacquire<span class="sc">::</span>MAYP11278_descriptors)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">acq_fraction_interactive</span>(<span class="at">qty.out =</span> <span class="st">&quot;Rfr&quot;</span>, <span class="at">type =</span> <span class="st">&quot;specular&quot;</span>)</span></code></pre></div>
 <p>Wen using <em>light sources with pulsed emission</em> we start a
 session by calling function
 <code>acq_fraction_pulsed_interactive()</code> instead of
@@ -1342,9 +1350,9 @@ pulses.</p>
 above, although useful in many cases, are meant also as examples. In
 cases of routine measurements one could simplify menus by removing
 entries that are not needed, or even converting the functions to
-non-interactive, and possibly adding support for scheduled sequences of
-spectral data acquisitions. This should be fairly simple, not requiring
-advanced knowledge of the R language as we export the lower level
+non-interactive, and possibly enhancing support for scheduled sequences
+of spectral data acquisitions. This should be fairly simple, not
+requiring advanced knowledge of the R language as we export lower level
 functions that can be used as building blocks for new variations. It
 should be even possible to use these functions to develop a user
 interface based of package ‘shinny’.</p>
@@ -1352,10 +1360,13 @@ interface based of package ‘shinny’.</p>
 <div id="using-scripts" class="section level2">
 <h2>Using scripts</h2>
 <p>It is also possibly to combine lower level functions using R scripts
-instead of through writing higher level R functions from them. Several
-example scripts are included with the package. I recommend that you open
-them, and save them to your own working directory before sourcing them
-or editing them.</p>
+instead of through writing higher level R functions that call them.
+Several example scripts are included with the package, including scripts
+based on low level functions and scripts that demonstrate different ways
+of using the interactive functions, including in combination with
+trigger functions.</p>
+<p>I recommend that you open these example scripts, and save them to
+your own working directory before sourcing them or editing them.</p>
 <p>You will need first to locate where in your computer’s file system
 the ‘ooacquire’ package is installed, and where the file you are
 interested in is, and to copy it to your own workspace. Here we copy the

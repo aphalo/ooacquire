@@ -409,7 +409,7 @@ getInstrSettings(irrad01.spct)
 
 As for irradiance, transmittance estimates are affected by dark electrical noise, dynamic range and stray light. Random electrical and thermal noise can be averaged out by repeated measurement. Dynamic range depends both on the noise floor and on the resolution of the analogue to digital conversion electronics of the instrument. A way to increase the effective dynamic range is bracketing integration time and splicing/merging the resulting spectra. This is what in digital photography is called HDR or high dynamic range images obtained by merging sets of images obtained at a series of different exposure values. In addition to improved optical design, stray light can be corrected for if it is possible to measure it by itself. This can be achieved by use of an optical filter that transmits radiation of wavelengths causing stray light, but that blocks radiation of wavelengths we are interested in. An additional correction that can be applied is for the slit function of the instrument. The slit function describes how a single wavelength peak (e.g.\ similar to a laser beam) broadens at the array detector.
 
-Which corrections are needed and which make little difference depends on the type of instrument, the characteristics of the sample being measured and of the light source and the region of the spectrum we are interested in. Consequently, depending on the circumstances we may want to use different measurement protocols. The high-level functions in the package "guess" the protocol from the set of file names or set of spectra passed as argument. For irradiance calculations three named members are recognized as different measurements in a protocol: `"sample"`, `"reference"`, `"filter"`,  and `"dark"`, each of these can be bracketed for integration time. In the case of file names for any of these three members, a vector of file names, is interpreted as a bracketed measurement. In the case of collections of spectra, `raw_spct`  with multiple `counts` columns are interpreted as bracketed. Of course, at least a `"sampel"` and `"reference"` members are required as input. If either or both are missing an empty `filter_spct` object is returned.
+Which corrections are needed and which make little difference depends on the type of instrument, the characteristics of the sample being measured and of the light source and the region of the spectrum we are interested in. Consequently, depending on the circumstances we may want to use different measurement protocols. The high-level functions in the package "guess" the protocol from the set of file names or set of spectra passed as argument. For transmittance and reflectance calculations, three named members are recognized as different measurements in a protocol: `"sample"`, `"reference"`,  and `"dark"`, each of these can be bracketed for integration time. In the case of file names for any of these three members, a vector of file names, is interpreted as a bracketed measurement. In the case of collections of spectra, `raw_spct`  with multiple `counts` columns are interpreted as bracketed. Of course, at least `"sample"` and `"reference"` members are required as input. If either or both are missing an empty `filter_spct` object is returned.
 
 | Protocol  | `sample` spct   | `reference` spct   | `filter` spct    | `dark` spct     | signal range | speed |
 |:----------|-----------------|--------------------|------------------|-----------------|--------------|--------------|-------|
@@ -419,7 +419,7 @@ Which corrections are needed and which make little difference depends on the typ
 | (corrected) | short        | short         | short        | short       | < 1e3        | 1/5   |
 | (cor. brkt) | short + long  | short + long | short + long  | short      | < 5e3        | 1/55   |
 
-The last two protocols, using a `"filter"` measurement seem unlikely to be useful in practice, but I intend to do some tests in the future to test this.
+The last two protocols, using a `"filter"` measurement seem unlikely to be useful in practice, but I intend to do some tests in the future to test this. Function `acq_fraction_interactive()` currently implements only the `nornal` protocol with and without bracketing.
 
 ### Examples
 
@@ -451,13 +451,14 @@ tfr01.spct <-
 ```{r}
 tfr01.spct
 ```
-
 ```{r, fig.height=5, fig.width=7}
 autoplot(tfr01.spct)
 ```
 
+The light source used does not emit enough light across the whole range of wavelengths that the spectrometer measures. Values for many wavelengths are replaced by NA's based on the expected noise, but still some out-of-range transmittance value trigger warnings. We can "clip" the spectrum to avoid them.
+
 ```{r}
-tfr01.spct <- clip_wl(tfr01.spct, range = c(355, 1100))
+tfr01.spct <- clip_wl(tfr01.spct, range = c(450, 1100))
 ```
 
 ```{r, fig.height=5, fig.width=7}
@@ -538,7 +539,7 @@ Data provide by Ocean Optics in calibration files is expressed independently of 
 
 ## High level functions
 
-## Definig new protocols
+## Defining new protocols
 
 You can compose from simple functions different measurement protocols and data processing sequences. This is the reason why they have been designed as a set of small functions, each one doing a single operation.
 

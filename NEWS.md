@@ -4,7 +4,7 @@ editor_options:
     wrap: 72
 ---
 
-# ooacquire 0.5.0 (2024-08-01)
+# ooacquire 0.5.0 (2024-08-02)
 
 **Updates to interactive acquisition of spectra. Main improvement is in the
 triggering of events synchronised with spectral data acquisition. The changes

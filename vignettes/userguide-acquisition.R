@@ -63,14 +63,10 @@ library(ooacquire)
 #  acq_irrad_interactive(qty.out = "fluence")
 
 ## ----eval=sr.online-----------------------------------------------------------
-#  acq_fraction_interactive(ref.value = 0.97,
-#                           correction.method = ooacquire::MAYP11278_ylianttila.mthd,
-#                           descriptors = ooacquire::MAYP11278_descriptors)
+#  acq_fraction_interactive(ref.value = 0.97)
 
 ## ----eval=sr.online-----------------------------------------------------------
-#  acq_fraction_interactive(qty.out = "Rfr", type = "specular",
-#                           correction.method = ooacquire::MAYP11278_ylianttila.mthd,
-#                           descriptors = ooacquire::MAYP11278_descriptors)
+#  acq_fraction_interactive(qty.out = "Rfr", type = "specular")
 
 ## ----eval=FALSE---------------------------------------------------------------
 #  filepath <- system.file("example-scripts", "irrad-acq-interac.R", package="ooacquire")

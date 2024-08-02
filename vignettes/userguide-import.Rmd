@@ -58,7 +58,21 @@ spectrometers. To use the functions with your own data, in most cases you will
 need to either import calibration data as provided by Ocean Optics or manually
 add the calibration from other sources.
 
-## Importing raw counts from files
+## Importing raw counts from R files
+
+Functions `acq_irrad_interactive()` and `acq_fraction_interactive` save the
+spectral data as R objects. They always save the raw counts and by default also
+the spectra in calibrated physical units. One file is saved for each data
+acquisition event and the stored R objects of classes from package 
+'photobiology' can be loaded into an R session using function `load()`. As
+for text files described below, to use 'ooacquire' to work with these files
+there is no requirement of the OmniDriver driver to be installed.
+
+The raw counts file can be converted to physical units with the same methods as
+described below for text files, passing as argument an object of class
+`raw_mspct` instead of a list of file names.
+
+## Importing raw counts from text files
 
 The files output by most instruments and software from Ocean Optics include a header with metadata describing the instrument settings used for acquisition. In many case this information is enough, together with a calibration, for expression in physical units such as irradiance. The same measuring protocols are supported as for direct data acquisition as long as the necessary raw counts from the different measurements are available.
 

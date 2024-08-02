@@ -173,7 +173,7 @@ tfr01.spct
 autoplot(tfr01.spct)
 
 ## -----------------------------------------------------------------------------
-tfr01.spct <- clip_wl(tfr01.spct, range = c(355, 1100))
+tfr01.spct <- clip_wl(tfr01.spct, range = c(450, 1100))
 
 ## ----fig.height=5, fig.width=7------------------------------------------------
 autoplot(tfr01.spct, unit.out = "photon", w.band = VIS_bands())
