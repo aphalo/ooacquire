@@ -40,6 +40,29 @@ and *Java* need both to be installed before data acquisition is
 possible. The runtime itself and its documentation can be downloaded at
 <https://www.oceaninsight.com/support/software-downloads/>.
 
+## Discontinuation of OmniDriver by Ocean Optics
+
+**Ocean Insight has discontinued support for *OmniDriver* in mid 2024!**
+This means that the runtime can no longer be downloaded from Ocean
+Optics support site. If you already have an installer file for
+OmniDriver, package ‘rOmniDriver’ can be still used. Package ‘ooacquire’
+can be installed without installing OmniDriver, but only off-line
+processing of spectra and import of spectral data from files obtained
+with other software from OceanOptics remains enabled. All functions that
+connect to spectrometer hardware are disabled in the absence of an
+installed OmniDriver driver.
+
+Not only the last release but also previous releases of OmniDriver are
+supported by ‘rOmniDriver’. I will investigate if SeaBreeze can be used
+as a replacement for OmniDriver through a new package replacing
+‘rOmniDriver’. Basic functionality seems to be well supported, but fast
+buffered acquisition of spectra does not seem to be supported. On the
+other hand, SeaBreeze is open source and written in C++. The Python
+version should be the easiest to use but can be expected to be slower. I
+will most likely try to support the Python library at least, as it is
+compatible with more spectrometers, including the only one I have
+unrestricted access to: an old USB2000.
+
 ## Warning!
 
 Under MS-Windows with RStudio, package ‘RJava’ is not compatible with R
@@ -147,11 +170,12 @@ Installation of Java/Temurin and OmniDriver should be done first.
 1.  **Temurin 8 OpenJDK**, **Corretto 8 OpenJDK**, or **Java 8 JDK**
     (Java Open development kit). *The Java run-time is not enough!*
     Temurin OpenJDK and Corretto OpenJDK are free distributions, in
-    contrast to Oracle’s Java 8, which has some restrictions and is less
+    contrast Oracle’s Java 8 JDK, has some restrictions and is less
     frequently updated.
-2.  **rOmniDriver run-time** from Ocean Optics which is a free download.
-    It is the same installer as for the non-free SDP, but if run-time is
-    selected during installation no key/password are asked for.
+2.  **rOmniDriver run-time** from Ocean Optics which was until recently
+    a free download but has been discontinued. It is the same installer
+    as for the non-free SDP, but if run-time is selected during
+    installation no key/password are asked for.
 3.  Install ‘rOmniDriver’ and ‘ooacquire’ after setting the `repos`
     option, which ensures dependencies will be installed automatically.
     Once the option is set, installation is as for packages hosted at
@@ -162,7 +186,7 @@ in the R-Universe serving source packages as well as Windows, OS X
 (Apple Mac) and Ubuntu binaries.
 
 In recent versions of R an option can be set to make this repository
-visible to R, before installing this package and ‘rOmniDriver’ as usual.
+visible to R before installing this package and ‘rOmniDriver’ as usual.
 
 ``` r
 repos <- getOption("repos", default = list())
@@ -180,7 +204,8 @@ installed.
 
 ``` r
 install.packages('ooacquire', 
-                 repos = c('https://aphalo.r-universe.dev', 'https://cloud.r-project.org'))
+                 repos = c('https://aphalo.r-universe.dev', 
+                           'https://cloud.r-project.org'))
 ```
 
 **Steps 1 and 2 are described in the README file of ‘rOmniDriver’, which
@@ -214,10 +239,10 @@ should be done in sequence:
     Temurin OpenJDK and Corretto OpenJDK are free distributions, in
     contrast to Oracle’s Java 8, which has some restrictions and is less
     frequently updated.
-2.  Install the **rOmniDriver run-time** from Ocean Optics which is a
-    free download. It is the same installer as for the non-free SDP, but
-    if run-time is selected during installation no key/password are
-    asked for.
+2.  **rOmniDriver run-time** from Ocean Optics which was until recently
+    a free download but has been discontinued. It is the same installer
+    as for the non-free SDP, but if run-time is selected during
+    installation no key/password are asked for.
 3.  Install the **R packages** ‘photobiology’, ‘photobiologyInOut’,
     ‘ggspectra’ ‘rJava’ and ‘tidyverse’, all available from CRAN.
 4.  Install ‘rOmniDriver’ from GitHub.
@@ -354,7 +379,7 @@ citation("ooacquire")
 #> To cite package 'ooacquire' in publications use:
 #> 
 #>   Aphalo P, Ylianttila L (2024). _ooacquire: Acquire Data from OO
-#>   Spectrometers_. R package version 0.4.6,
+#>   Spectrometers_. R package version 0.4.6.9001,
 #>   https://github.com/aphalo/ooacquire,
 #>   <https://docs.r4photobiology.info/ooacquire/>.
 #> 
@@ -364,7 +389,7 @@ citation("ooacquire")
 #>     title = {ooacquire: Acquire Data from OO Spectrometers},
 #>     author = {Pedro J. Aphalo and Lasse Ylianttila},
 #>     year = {2024},
-#>     note = {R package version 0.4.6, 
+#>     note = {R package version 0.4.6.9001, 
 #> https://github.com/aphalo/ooacquire},
 #>     url = {https://docs.r4photobiology.info/ooacquire/},
 #>   }

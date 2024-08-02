@@ -4,10 +4,20 @@ editor_options:
     wrap: 72
 ---
 
-# ooacquire 0.4.7 (2024-07-31)
+# ooacquire 0.5.0 (2024-08-01)
+
+**Updates to interactive acquisition of spectra. Main improvement is in the
+triggering of events synchronised with spectral data acquisition. The changes
+to the triggers UI is code breaking except when using defaults. Code unrelated
+to the use of triggers is not affected.**
 
 -   Rename parameter `f.trigger.flashes` to `f.trigger.on` and add parameters
-`f.trigger.off` and `f.trigger.init`, `triggers.enabled`.
+`f.trigger.off` and `f.trigger.init`, `triggers.enabled` to both
+`acq_irrad_interactive()` and `acq_fraction_interactive()`.
+-   Update functions `acq_raw_spct()`, `acq_raw_mspct()``and `hs_acq_raw_mspct()`
+to support `f.trigger.on`, `f.trigger.off` and ``triggers.enabled`.
+-   Update function `acq_fraction_interactive()` to be in sync with all updates
+to `acq_irrad_interactive()`.
 -   Add YoctoRelay example script.
 
 # ooacquire 0.4.6 (2024-03-29)

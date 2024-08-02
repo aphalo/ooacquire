@@ -4,7 +4,6 @@
 ^.Rhistory$
 ^inst-not$
 ^data-raw$
-^garbage$
 ^pkgdown$
 ^_pkgdown\.yml$
 ^.*\.sh$

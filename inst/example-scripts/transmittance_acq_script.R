@@ -1,4 +1,4 @@
-# Using an spectrometer with two channels
+# Using a spectrometer with two channels
 # Tested with a Jaz spectrometer
 
 library(r4photobiology)
