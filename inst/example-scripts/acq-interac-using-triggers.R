@@ -138,10 +138,10 @@ yocto.trigger.pulse <- function(n = NA, delay = 0.01, duration = 0.01) {
     warning("Long duration of ", duration, "S reset to 3600S.")
     duration <- 3600
   }
-  count.down <- 10
+  count.down <- 50
   while(count.down && !Relay$isOnline()) {
     count.down <- count.down - 1L
-    Sys.sleep(0.002)
+    Sys.sleep(0.01)
   }
   if (Relay$isOnline()) {
     Relay$delayedPulse(as.integer(delay * 1000), as.integer(duration * 1000))

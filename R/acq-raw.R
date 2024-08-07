@@ -163,8 +163,8 @@ acq_raw_spct <- function(descriptor,
     # concurrent measurements, e.g., enable sensor or camera
     if (num.exposures[i] != 0  && !is.null(f.trigger.on)) {
 #      target.delay <- max(0, (x$num.scans[i] * x$integ.time[i] - 0.05) / 2) # max 1/20 s shutter speed
-      target.delay <- 0.01
-      f.trigger.on(n = num.exposures[i], delay = target.delay)
+#      target.delay <- 0.05
+      f.trigger.on(n = num.exposures[i]) # , delay = target.delay
     }
 
     if (verbose) cat("Measurement x", acq.settings$HDR.mult[i], " ... ", sep = "")
