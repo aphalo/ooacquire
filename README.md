@@ -302,6 +302,45 @@ autoplot(one_file.spct, unit.out = "photon", range = c(300, 850))
 
 ![](man/figures/README-example-1-1.png)<!-- -->
 
+## Example scripts
+
+The package includes several example scripts, with some of then
+containing multiple examples of how functions can be used to acquire
+data from spectrometers. users will most likely edit local copies of
+these files as the need arises. The list of files can be obtained as
+shown below.
+
+``` r
+scripts.path <- system.file("example-scripts", package = "ooacquire")
+scripts.files <- list.files(scripts.path, full.names = FALSE)
+cat(paste(scripts.files, collapse = "\n"))
+#> acq-interac-using-triggers.R
+#> fluence-acq-interac-acq-options.R
+#> irrad-acq-interac-acq-options.R
+#> irrad-acq-interac-ui-options.R
+#> irrad-acq-script-FLMS.R
+#> irrad-acq-script-Luke.R
+#> irrad-acq-script.R
+#> irrad-acq-series-tests.R
+#> irrad-acq-timeseries.R
+#> irrad-files.R
+#> linearization_test_script.R
+#> measure-detector-non-linearity.R
+#> transmittance-acq-interac-flash.R
+#> transmittance-acq-interac.R
+#> transmittance_acq_script.R
+```
+
+All files (as shown), or the files of interest, can be copied to the
+currently active folder (as shown), or to any folder path, once the
+paths to the files are obtained as shown below passing
+`full.names = TRUE` in the call to `list.files()`.
+
+``` r
+scripts.filepaths <- list.files(scripts.path, full.names = TRUE)
+file.copy(from = scripts.filepaths, to = ".")
+```
+
 ## Non-commercial status
 
 Packages **‘rOmniDriver’** and **‘ooacquire’** are both open source and
@@ -379,7 +418,7 @@ citation("ooacquire")
 #> To cite package 'ooacquire' in publications use:
 #> 
 #>   Aphalo P, Ylianttila L (2024). _ooacquire: Acquire Data from OO
-#>   Spectrometers_. R package version 0.4.6.9001,
+#>   Spectrometers_. R package version 0.5.0,
 #>   https://github.com/aphalo/ooacquire,
 #>   <https://docs.r4photobiology.info/ooacquire/>.
 #> 
@@ -389,7 +428,7 @@ citation("ooacquire")
 #>     title = {ooacquire: Acquire Data from OO Spectrometers},
 #>     author = {Pedro J. Aphalo and Lasse Ylianttila},
 #>     year = {2024},
-#>     note = {R package version 0.4.6.9001, 
+#>     note = {R package version 0.5.0, 
 #> https://github.com/aphalo/ooacquire},
 #>     url = {https://docs.r4photobiology.info/ooacquire/},
 #>   }

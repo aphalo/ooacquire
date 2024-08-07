@@ -307,6 +307,23 @@ one_file.spct <-
 autoplot(one_file.spct, unit.out = "photon", range = c(300, 850))
 ```
 
+## Example scripts
+
+The package includes several example scripts, with some of then containing multiple examples of how functions can be used to acquire data from spectrometers. users will most likely edit local copies of these files as the need arises. The list of files can be obtained as shown below. 
+
+```{r scripts-1, message = FALSE}
+scripts.path <- system.file("example-scripts", package = "ooacquire")
+scripts.files <- list.files(scripts.path, full.names = FALSE)
+cat(paste(scripts.files, collapse = "\n"))
+```
+
+All files (as shown), or the files of interest, can be copied to the currently active folder (as shown), or to any folder path, once the paths to the files are obtained as shown below passing `full.names = TRUE` in the call to `list.files()`.
+
+```{r, eval = FALSE}
+scripts.filepaths <- list.files(scripts.path, full.names = TRUE)
+file.copy(from = scripts.filepaths, to = ".")
+```
+
 ## Non-commercial status
 
 Packages **'rOmniDriver'** and **'ooacquire'** are both open source and
