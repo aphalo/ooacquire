@@ -4,6 +4,14 @@ editor_options:
     wrap: 72
 ---
 
+# ooacquire 0.5.1 (2024-08-20)
+
+Minor update to make it easier to syncronyse acquisition of spectra and other
+events using trigger functions.
+
+- Update default arguments of `acq_irrad_interactive()`.
+- Update example script `acq-interac-using-triggers.R`.
+
 # ooacquire 0.5.0 (2024-08-02)
 
 **Updates to interactive acquisition of spectra. Main improvement is in the
