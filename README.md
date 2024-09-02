@@ -34,11 +34,10 @@ used](https://www.r4photobiology.info/pages/ooacquire-algorithms.html).
 
 Package **‘ooacquire’** supports most types of *Ocean Optics*
 spectrometers from former *Ocean Optics*, now *Ocean Insight*
-(<https://www.oceaninsight.com/>). The free runtime of the [*OmniDriver
-SDP*](https://www.oceaninsight.com/products/software/drivers/omnidriver-and-spam/)
-and *Java* need both to be installed before data acquisition is
-possible. The runtime itself and its documentation can be downloaded at
-<https://www.oceaninsight.com/support/software-downloads/>.
+(<https://www.oceanoptics.com/>). The free runtime of the *OmniDriver
+SDP* is no longer supported by Ocean Optics and, thus, no longer
+available. The free runtime of the *OmniDriver SDP* and *Java* need both
+to be installed before data acquisition is possible.
 
 ## Discontinuation of OmniDriver by Ocean Optics
 
@@ -418,7 +417,7 @@ citation("ooacquire")
 #> To cite package 'ooacquire' in publications use:
 #> 
 #>   Aphalo P, Ylianttila L (2024). _ooacquire: Acquire Data from OO
-#>   Spectrometers_. R package version 0.5.0,
+#>   Spectrometers_. R package version 0.5.1,
 #>   https://github.com/aphalo/ooacquire,
 #>   <https://docs.r4photobiology.info/ooacquire/>.
 #> 
@@ -428,7 +427,7 @@ citation("ooacquire")
 #>     title = {ooacquire: Acquire Data from OO Spectrometers},
 #>     author = {Pedro J. Aphalo and Lasse Ylianttila},
 #>     year = {2024},
-#>     note = {R package version 0.5.0, 
+#>     note = {R package version 0.5.1, 
 #> https://github.com/aphalo/ooacquire},
 #>     url = {https://docs.r4photobiology.info/ooacquire/},
 #>   }
