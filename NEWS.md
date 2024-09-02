@@ -4,9 +4,15 @@ editor_options:
     wrap: 72
 ---
 
+# ooacquire 0.5.1-1 (2024-09-02)
+
+- Unit tests updated to 'photobiology' (>= 0.11.3) and this version is now a
+requirement. No other code changes, just update to saved expected values
+returned by `summary()` in tests.
+
 # ooacquire 0.5.1 (2024-08-20)
 
-Minor update to make it easier to syncronyse acquisition of spectra and other
+Minor update to make it easier to synchronise acquisition of spectra and other
 events using trigger functions.
 
 - Update default arguments of `acq_irrad_interactive()`.
