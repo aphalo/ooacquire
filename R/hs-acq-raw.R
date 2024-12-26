@@ -39,7 +39,7 @@ hs_acq_raw_mspct <- function(descriptor,
                              num.spectra = 100L,
                              base.name = NULL,
                              f.trigger.on = f.trigger.message,
-                             f.trigger.off = NULL,
+                             f.trigger.off = NA,
                              what.measured = NA,
                              where.measured = data.frame(lon = NA_real_, lat = NA_real_),
                              set.all = TRUE,
@@ -132,7 +132,7 @@ hs_acq_raw_mspct <- function(descriptor,
 
   # concurrent measurements, e.g., trigger camera once
   # concurrent measurements, e.g., enable sensor or camera
-  if (!is.null(f.trigger.on)) {
+  if (is.function(f.trigger.on)) {
     f.trigger.on(n = abs(num.exposures[i]))
   }
 
@@ -145,7 +145,7 @@ hs_acq_raw_mspct <- function(descriptor,
   if (verbose) message("ready.")
 
   # concurrent measurements, e.g., disable sensor or camera
-  if (!is.null(f.trigger.off)) {
+  if (is.function(f.trigger.off)) {
     f.trigger.off()
   }
 

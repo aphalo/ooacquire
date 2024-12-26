@@ -64,7 +64,7 @@
 acq_raw_spct <- function(descriptor,
                          acq.settings,
                          f.trigger.on = f.trigger.message,
-                         f.trigger.off = NULL,
+                         f.trigger.off = NA,
                          what.measured = NA,
                          where.measured = data.frame(lon = NA_real_, lat = NA_real_),
                          set.all = TRUE,
@@ -161,7 +161,7 @@ acq_raw_spct <- function(descriptor,
     # light source, e,g,, flash trigger
     # concurrent measurements, e.g., trigger camera once
     # concurrent measurements, e.g., enable sensor or camera
-    if (num.exposures[i] != 0  && !is.null(f.trigger.on)) {
+    if (num.exposures[i] != 0  && is.function(f.trigger.on)) {
 #      target.delay <- max(0, (x$num.scans[i] * x$integ.time[i] - 0.05) / 2) # max 1/20 s shutter speed
 #      target.delay <- 0.05
       f.trigger.on(n = num.exposures[i]) # , delay = target.delay
@@ -194,7 +194,7 @@ acq_raw_spct <- function(descriptor,
     z[[counts.name]] <- counts
 
     # concurrent measurements, e.g., disable sensor or camera
-    if (!is.null(f.trigger.off)) {
+    if (is.function(f.trigger.off)) {
       f.trigger.off()
     }
 
@@ -299,7 +299,7 @@ acq_raw_spct <- function(descriptor,
 acq_raw_mspct <- function(descriptor,
                           acq.settings,
                           f.trigger.on = f.trigger.message,
-                          f.trigger.off = NULL,
+                          f.trigger.off = NA,
                           triggers.enabled = character(),
                           seq.settings = list(initial.delay = 0,
                                               start.boundary = "none",
@@ -311,6 +311,8 @@ acq_raw_mspct <- function(descriptor,
                           pause.fun = NULL,
                           verbose = TRUE,
                           ...) {
+
+  force(f.trigger.off)
 
   if (getOption("ooacquire.offline", TRUE)) {
     warning("Package 'rOmniDriver' required to access spectrometer.",
@@ -370,16 +372,16 @@ acq_raw_mspct <- function(descriptor,
       if (is.function(f.trigger.on)) {
         f.on.current <- f.trigger.on
       } else {
-        f.on.current <- NULL
+        f.on.current <- NA
       }
       if (is.function(f.trigger.off)) {
         f.off.current <- f.trigger.off
       } else {
-        f.off.current <- NULL
+        f.off.current <- NA
       }
     } else {
-      f.on.current <- NULL
-      f.off.current <- NULL
+      f.on.current <- NA
+      f.off.current <- NA
     }
     if (p == "light") {
       if (is.character(seq.settings[["start.boundary"]]) &&

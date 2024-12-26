@@ -10,7 +10,7 @@ hs_acq_raw_mspct(
   num.spectra = 100L,
   base.name = NULL,
   f.trigger.on = f.trigger.message,
-  f.trigger.off = NULL,
+  f.trigger.off = NA,
   what.measured = NA,
   where.measured = data.frame(lon = NA_real_, lat = NA_real_),
   set.all = TRUE,

@@ -287,9 +287,9 @@ acq_irrad_interactive <-
            show.figs = TRUE,
            interface.mode = ifelse(qty.out == "fluence", "manual", "auto"),
            num.exposures = ifelse(qty.out == "fluence", 1L, -1L),
-           f.trigger.init = NULL,
-           f.trigger.on = ifelse(qty.out == "fluence", f.trigger.message, NULL),
-           f.trigger.off = NULL,
+           f.trigger.init = NA,
+           f.trigger.on = ifelse(qty.out == "fluence", f.trigger.message, NA),
+           f.trigger.off = NA,
            triggers.enabled = c("light", "filter"),
            folder.name = paste("acq", qty.out,
                                lubridate::today(tzone = "UTC"),
@@ -302,6 +302,7 @@ acq_irrad_interactive <-
            verbose = getOption("photobiology.verbose", default = FALSE),
            QC.enabled = TRUE) {
 
+    force(f.trigger.on)
     ## Is the driver available?
     if (getOption("ooacquire.offline", FALSE)) {
       warning("ooacquire off-line: Aborting...")
@@ -782,7 +783,7 @@ acq_irrad_interactive <-
       }
 
       # call trigger- or measurement initialization function
-      if (!is.null(f.trigger.init)) {
+      if (is.function(f.trigger.init)) {
         f.trigger.init()
       }
 

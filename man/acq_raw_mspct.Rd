@@ -8,7 +8,7 @@ acq_raw_mspct(
   descriptor,
   acq.settings,
   f.trigger.on = f.trigger.message,
-  f.trigger.off = NULL,
+  f.trigger.off = NA,
   triggers.enabled = character(),
   seq.settings = list(initial.delay = 0, start.boundary = "none", step.delay = 0,
     num.steps = 1L),

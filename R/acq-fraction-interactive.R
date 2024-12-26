@@ -176,9 +176,9 @@ acq_fraction_interactive <-
            show.figs = TRUE,
            interface.mode = ifelse(light.source == "pulsed", "manual", "auto"),
            num.exposures = ifelse(light.source == "pulsed", 1L, -1L),
-           f.trigger.init = NULL,
+           f.trigger.init = NA,
            f.trigger.on = f.trigger.message,
-           f.trigger.off = NULL,
+           f.trigger.off = NA,
            triggers.enabled = c("sample", "reference"),
            folder.name = paste("acq", qty.out,
                                lubridate::today(tzone = "UTC"),
@@ -639,7 +639,7 @@ acq_fraction_interactive <-
       }
 
       # call trigger- or measurement initialization function
-      if (!is.null(f.trigger.init)) {
+      if (is.function(f.trigger.init)) {
         f.trigger.init()
       }
 
