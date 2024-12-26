@@ -67,8 +67,43 @@ library(yoctopuce)
 
 init_yoctopuce("yocto_relay")
 
-yocto.trigger.init <- function() {
-  Relay <<- yocto_relay$YRelay$FindRelay("RELAY1")
+## ON and OFF functions
+# too short a time between OFF and ON may not trigger a camera
+yocto.trigger.on <- function(n = NA, delay = 0.01, duration = 3600) {
+  if (duration > 3600) { # 1 h
+    warning("Long duration of ", duration, "S reset to 3600S.")
+    duration <- 3600
+  }
+  count.down <- 50
+  while(count.down && !Relay$isOnline()) {
+    count.down <- count.down - 1L
+    Sys.sleep(0.01)
+  }
+  if (Relay$isOnline()) {
+    Relay$delayedPulse(as.integer(delay * 1000), as.integer(duration * 1000))
+    message("Relay ON")
+    invisible(TRUE)
+  } else {
+    message("Relay is off-line!")
+    invisible(FALSE)
+  }
+}
+
+yocto.trigger.off <- function(n = NA, delay = 0) {
+  stopifnot("Only 'delay = 0' supported" = delay == 0)
+  count.down <- 50
+  while(count.down && !Relay$isOnline()) {
+    count.down <- count.down - 1L
+    Sys.sleep(0.01)
+  }
+  if (Relay$isOnline()) {
+    Relay$set_state(Relay$STATE_A)
+    message("Relay OFF")
+    invisible(TRUE)
+  } else {
+    message("Relay is off-line!")
+    invisible(FALSE)
+  }
 }
 
 ## Delayed pulse function ensures pulse is long enough
@@ -95,9 +130,20 @@ yocto.trigger.pulse <- function(n = NA, delay = 0.001, duration = 0.001) {
   }
 }
 
+yocto.trigger.reset <- function() {
+  Relay <<- yocto_relay$YRelay$FindRelay("RELAY1")
+  # force relaay to off state
+  yocto.trigger.off()
+}
+
 # test that camera shutter is triggered correctly
-yocto.trigger.init()
-yocto.trigger.pulse(duration = 0.1)
+yocto.trigger.reset()
+yocto.trigger.on()
+yocto.trigger.on(delay = 2)
+yocto.trigger.off()
+yocto.trigger.pulse()
+yocto.trigger.pulse(duration = 0.5)
+yocto.trigger.pulse(delay = 0.5)
 
 # acq_irrad_interactive(folder.name = "./inst-not/yocto-relay-tests")
 #
@@ -110,8 +156,16 @@ yocto.trigger.pulse(duration = 0.1)
 
 acq_irrad_interactive(folder.name = "./inst-not/yocto-relay-tests",
                       qty.out = "irrad",
-                      f.trigger.init = yocto.trigger.init,
-                      f.trigger.on = yocto.trigger.pulse)
+                      f.trigger.init = yocto.trigger.reset,
+                      f.trigger.on = yocto.trigger.on,
+                      f.trigger.off = yocto.trigger.off,
+                      triggers.enabled = "light")
+
+acq_irrad_interactive(folder.name = "./inst-not/yoct-relay-tests",
+                      qty.out = "irrad",
+                      f.trigger.init = yocto.trigger.reset,
+                      f.trigger.on = yocto.trigger.pulse,
+                      triggers.enabled = "light")
 
 # half minute of measurements every 2 seconds
 acq_irrad_interactive(folder.name = "./inst-not/yocto-relay-tests",
