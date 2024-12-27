@@ -4,6 +4,15 @@ editor_options:
     wrap: 72
 ---
 
+# ooacquire 0.5.2 (2024-12-xx)
+
+- Errors under R (== 4.4.2) and 'photobiology' (>= 0.11.4) when acquiring
+spectra interactively. The problem was related to parameters in the interactive
+acquisition functions that expect function definitions as arguments. Fixed by
+replacing `NULL` with `NA` as default values and changing internal tests. This
+change does not affect user code or the user interface of the affected
+functions.
+
 # ooacquire 0.5.1-1 (2024-09-02)
 
 - Unit tests updated to 'photobiology' (>= 0.11.3) and this version is now a
