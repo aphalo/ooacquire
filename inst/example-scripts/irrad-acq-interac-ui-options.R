@@ -4,13 +4,10 @@ library(lubridate)
 photon_as_default()
 acq_irrad_interactive(qty.out = "irrad",
                       save.pdfs = TRUE,
-                      save.summaries = FALSE,
-                      save.collections = FALSE,
+                      save.summaries = TRUE,
+                      save.collections = TRUE,
                       interface.mode = "auto-attr",
-                      folder.name = sprintf("./LEDs-%s", lubridate::today()),
-                      session.name =
-                        make.names(paste(Sys.info()[["user"]], lubridate::now())),
-                      user.name = Sys.info()[["user"]])
+                      folder.name = sprintf("./inst-not/TEST-%s", lubridate::today()))
 
 # example of tweaks to default user interface; not settable interactively!!
 #
@@ -21,9 +18,9 @@ acq_irrad_interactive(qty.out = "irrad",
 #
 # save.pdfs decides if plots of the spectra are saved as pdf files [TRUE or FALSE]
 #
-# save.summaries decides if summaries from collections are saved as .csv files [TRUE or FALSE]
-#
 # save.collections decides if the menu options to save collections of spectra are displayed
+#
+# save.summaries decides if summaries from collections are saved as .csv files [TRUE or FALSE]
 #
 # interface.mode decides which menu options are shown
 #    "auto" -> full interface

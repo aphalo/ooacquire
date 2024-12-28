@@ -309,7 +309,7 @@ QC_dark <-
   if (num.hot > max.hot || num.cold > max.cold) {
     warning(spct.label, " failed QC: ", num.hot, " hot, ", num.cold, " cold per 1000 pixels",
             call. = FALSE, immediate.	= TRUE, domain = NA)
-    cat("Dark reference is not dark (=o.k.!) or spectrometer warm...\n")
+    cat("\"Dark\" reference not measured in darkness (=o.k.?) or spectrometer too warm (=bad data!)\n")
     FALSE
   } else {
     if (verbose) {

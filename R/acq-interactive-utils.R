@@ -561,11 +561,13 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
 set_attributes_interactive <- function(user.attrs = list(what.measured = "",
                                                          comment.text = "")) {
   repeat{
-    user.input <- readline(prompt = "w = what.measured, c = comment (w/c/-): ")
+    cat("Current 'what.measured': '", user.attrs$what.measured, "'.\n", sep = "")
+    cat("Current 'comment': '", user.attrs$comment.text, "'.\n", sep = "")
+    user.input <- readline(prompt = "Replace 'what.measured' or 'comment', or go (w/c/g-): ")
     if (substr(user.input, 1, 1) == "w") {
-      user.attrs$what.measured <- readline("Set 'what.measured': ")
+      user.attrs$what.measured <- readline("New 'what.measured' or clear (<text>/-): ")
     } else if (substr(user.input, 1, 1) == "c") {
-      user.attrs$comment.text <- readline("Set 'comment': ")
+      user.attrs$comment.text <- readline("New 'comment' or clear (<text>/-): ")
     } else {
       break()
     }

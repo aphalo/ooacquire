@@ -6,12 +6,29 @@ editor_options:
 
 # ooacquire 0.5.2 (2024-12-xx)
 
-- Errors under R (== 4.4.2) and 'photobiology' (>= 0.11.4) when acquiring
-spectra interactively. The problem was related to parameters in the interactive
-acquisition functions that expect function definitions as arguments. Fixed by
-replacing `NULL` with `NA` as default values and changing internal tests. This
-change does not affect user code or the user interface of the affected
-functions.
+_Two major bug fixed, although neither of them affected the quality of the
+spectral data._ The bugs were likely introduced in version 0.5.1 or 0.5.0. I
+find surprising that the first one at least slipped through testing. However, I
+do the testing of the interactive data-acquisition functions manually and I need
+access to a spectrometer for this. The unit tests check the data conversion and
+file reading functions.
+
+- Bug fixed: Error triggered when acquiring spectra interactively. The problem
+was related to parameters in the interactive acquisition functions that expect
+function definitions as arguments. Fixed by replacing `NULL` with `NA` as
+default values and changing internal tests. This change does not affect user
+code or the user interface of the affected functions.
+- Bug fixed: menus for collections and summaries not displayed.
+- Improved: entry of metadata and comments. Added possibility of replacing or
+adding 'what.measured' and 'comment' metadata to the spectra when the plot is 
+displayed. The plot is subsequently refreshed as for other settings in the
+same menu, using the updated metadata.
+- Improved: The currently set metadata are displayed above the menu where they
+can be changed. As before, the values are reused for the next spectrum unless
+modified.
+- Changed: Time in plot subtitle now uses the local timezone. Fractions of 
+seconds are rounded according to R option `digits.secs` if set and to the
+millisecond otherwise.
 
 # ooacquire 0.5.1-1 (2024-09-02)
 

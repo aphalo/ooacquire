@@ -150,18 +150,18 @@ Function \code{acq_irrad_interactive()} supports measurement of
   A summary is provided below.
 
   Different arguments passed to \code{interface.mode} modify which aspects
-  of the user interface are available through menues, without altering
+  of the user interface are available through menus, without altering
   the ability to control the behaviour through arguments passed to formal
   parameters when calling the function (see section Interface Modes for
   details).
 
   This function can acquire spectra using different protocols for
-  acquisition and stray light and dark corrections. The protocols are
+  acquisition and for stray light and dark corrections. The protocols are
   described in the vignettes and in the help for the low-level functions
   called by this function, also from this same package.
 
   Opening the connection to the spectrometer and selection of the channel,
-  when relevant, is done from within this function.
+  when relevant, is done interactively from within this function.
 
   The irradiance calibration is retrieved from the spectrometer memory
   as a last resource if not supplied in any other way. Given that the factors
@@ -216,9 +216,9 @@ Function \code{acq_irrad_interactive()} supports measurement of
   and the values interpreted as the time increment in seconds between the
   start of successive measurements. If the length is the same as "num.steps",
   and the values are monotonically increasing, they are interpreted as time
-  offsets from the start of the sequence. Member
+  offsets from the start of the sequence.
 
-  The \code{start.boundary} must be set to a character string, wither "none",
+  The \code{start.boundary} must be set to a character string, with "none",
   or a number of seconds, minutes or hours indicated by a number followed by
   S, M, or H (capital letters) the round value of the current time at which
   the measurement event will start. For example,\code{1H} indicates that
@@ -245,19 +245,24 @@ Function \code{acq_irrad_interactive()} supports measurement of
 
   The screen display of plots can be disabled, as in some cases the delay
   introduced by rendering can be a nuisance. Alternatively, the value of
-  \code{plot.lines.max} can be changes from its default.
+  \code{plot.lines.max} can be changes from its default to change the
+  maximum number of spectra displayed. If the number of spectra available
+  for plotting exceeds the limit, a random sample of spectra of size
+  \code{plot.lines.max} is displayed, on screen and in PDF files.
 }
 \note{
 The function is composed in a modular way from functions defined in
-  this some package, R or imported packages. The code of the function can be
-  reshuffled combining the functions used here with other functions to create
-  new variations, possibly better suited to users' needs and tastes.
+  this same package, R or imported from other R packages. The code of the
+  function can be reshuffled combining the functions used here with other
+  functions to create new variations, possibly better suited to users'
+  specific needs and tastes.
 
   A "light-weight" approach to tweaking the user interface is to implement
   new modes by simply changing which of the logical flags that control the
-  display of menus are enabled or not. And even easier approach is to create
-  a simple script that passes suitable arguments to the different formal
-  parameters.
+  display of menus are enabled or not in a wrapper function. And even easier
+  approach is to create a simple script that passes suitable arguments to the
+  different formal parameters of this function. Example scripts are included
+  in the package in the folder \code{extdata/example-scripts/}.
 }
 \section{Interface Modes}{
 
@@ -310,7 +315,7 @@ The function is composed in a modular way from functions defined in
 
 \section{Quality control of dark spectra}{
 
-  Disabling the quality control with \code{QC.enabled = FALSE} is necessary
+  Disabling the quality control with \code{QC.enabled = FALSE} is useful when
   when the "dark" reference is a measurement of ambient light instead of true
   darkness; i.e., when the irradiance of one light source is measured as the
   difference between background illumination and background illumination
@@ -321,7 +326,7 @@ The function is composed in a modular way from functions defined in
 # please, see also the example scripts installed with the package
 
 \dontrun{
-# requires an Ocean Optics spectrometer to be connected via USB
+# requires an Ocean Optics spectrometer connected via USB
 
 acq_irrad_interactive()
 acq_irrad_interactive(qty.out = "cps")
