@@ -58,6 +58,7 @@ Other interactive acquisition utility functions:
 \code{\link{set_folder_interactive}()},
 \code{\link{set_session_name_interactive}()},
 \code{\link{set_user_name_interactive}()},
+\code{\link{set_wlrange_interactive}()},
 \code{\link{tune_interactive}()}
 }
 \concept{interactive acquisition utility functions}

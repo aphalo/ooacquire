@@ -98,6 +98,7 @@
 #'   enabling this feature.
 #' @param show.figs logical Default for flag enabling display plots of acquired
 #'   spectra.
+#' @param figs.theme character One of "built.in", "ggplot2.current", or "current".
 #' @param interface.mode character One of "auto", "simple", "manual", "full",
 #'   "series", "auto-attr", "simple-attr", "manual-attr", "full-atr", and
 #'   "series-attr".
@@ -171,9 +172,11 @@ acq_fraction_interactive <-
            summary.type = "VIS",
            save.pdfs = TRUE,
            save.summaries = !interface.mode %in% c("series", "series-attr"),
-           save.collections = !interface.mode %in% c("simple", "series", "series-attr"),
+           save.collections =
+             !interface.mode %in% c("simple", "series", "series-attr"),
            async.saves = FALSE,
            show.figs = TRUE,
+           figs.theme = "built.in",
            interface.mode = ifelse(light.source == "pulsed", "manual", "auto"),
            num.exposures = ifelse(light.source == "pulsed", 1L, -1L),
            f.trigger.init = NA,
@@ -185,11 +188,22 @@ acq_fraction_interactive <-
                                sep = "-"),
            user.name = Sys.info()[["user"]],
            session.name = paste(user.name,
-                                strftime(lubridate::now(tzone = "UTC"),
-                                         "%Y.%b.%d_%H.%M.%S"),
+                                strftime(lubridate::now(tzone = ""),
+                                         "%Y_%m_%d.%H%M"),
                                 sep = "_"),
            verbose = getOption("photobiology.verbose", default = FALSE),
            QC.enabled = TRUE) {
+
+    ## ggplot default themes
+    # A dark theme option used only for the screen would be useful
+    if (figs.theme == "built.in") {
+      screen.theme <- pdf.theme <-
+        list(ggplot2::theme_bw(), ggplot2::theme(legend.position = "bottom"))
+    } else if (figs.theme %in% c("ggplot2.current", "current")) {
+      # adding an empty list to a gg object is of no consequence, and without
+      # a explicit theme added, the theme set as current is used.
+      screen.theme <- pdf.theme <- list()
+    }
 
     ## Is the driver available?
     if (getOption("ooacquire.offline", FALSE)) {
@@ -204,14 +218,16 @@ acq_fraction_interactive <-
     }
 
     if (async.saves && !requireNamespace("mirai", quietly = TRUE)) {
-      message("Ignoring 'async.saves = TRUE' as package 'mirai' is not installed")
+      message("Ignoring 'async.saves = TRUE' as ",
+              "package 'mirai' is not installed")
       async.saves <- FALSE
     }
 
     if (async.saves) {
       cat("Will save files asynchronously\n(not blocking data acquisitions)\n")
     } else {
-      cat("Will save files synchronously\n(blocking data acquisition until files are saved)\n")
+      cat("Will save files synchronously\n(blocking data acquisition ",
+          "until files are saved)\n")
     }
 
     # initialize mirai
@@ -226,6 +242,7 @@ acq_fraction_interactive <-
     }
     on.exit(options(old.options), add = TRUE, after = TRUE)
 
+    # assumed dynamic range of the spectrometer
     dyn.range <- 1e3
 
     ## Validate arguments
@@ -237,6 +254,13 @@ acq_fraction_interactive <-
     }
 
     # validate qty.out
+    if (qty.out == "transmittance")
+      qty.out <- "Tfr"
+    else if (qty.out == "reflectance")
+      qty.out <- "Rfr"
+    else if (qty.out == "counts")
+        qty.out <- "raw"
+
     stopifnot(qty.out %in% c("Tfr", "Rfr", "raw"))
 
     # initialize repeats counter
@@ -246,7 +270,9 @@ acq_fraction_interactive <-
 
     # define measurement protocols
     default.protocols <- list(rsd = c("reference", "sample", "dark"),
-                              rs = c("reference", "sample"))
+                              dsr = rev(c("reference", "sample", "dark")),
+                              rs = c("reference", "sample"),
+                              sr = rev(c("reference", "sample")))
 
     if (length(protocols) == 0) {
       protocols <- default.protocols
@@ -286,31 +312,42 @@ acq_fraction_interactive <-
     cat("Using channel ", ch.index,
         " from spectrometer with serial number: ", serial_no, "\n")
 
+    # for relative measurements we need only a wavelength calibration and
+    # a linearisation function to correct the raw detector counts
     if (anyNA(c(descriptors[[1]], correction.method[[1]]))) {
       descriptor <-
         switch(serial_no,
-               MAYP11278 = which_descriptor(descriptors = ooacquire::MAYP11278_descriptors,
-                                            entrance.optics = "cosine"),
-               MAYP112785 = which_descriptor(descriptors = ooacquire::MAYP112785_descriptors),
-               MAYP114590 = which_descriptor(descriptors = ooacquire::MAYP114590_descriptors),
-               FLMS04133 = which_descriptor(descriptors = ooacquire::FLMS04133_descriptors),
-               FLMS00673 = which_descriptor(descriptors = ooacquire::FLMS00673_descriptors),
-               FLMS00440 = which_descriptor(descriptors = ooacquire::FLMS00440_descriptors),
-               FLMS00416 = which_descriptor(descriptors = ooacquire::FLMS00416_descriptors),
-               JAZA3098 =
-                 {
-                   if (ch.index == 0L) {
-                     ooacquire::JAZA3098_ch1_descriptors[[1]]
-                   } else {
-                     ooacquire::JAZA3098_ch2_descriptors[[1]]
-                   }
-                 },
-               { # default for no match to serial_no
-                 cat("No instrument descriptor found, retrieving it from the spectrometer\n")
-                 get_oo_descriptor(w, sr.index = sr.index, ch.index = ch.index)
-               }
+          MAYP11278 =
+            which_descriptor(descriptors = ooacquire::MAYP11278_descriptors,
+                             entrance.optics = "cosine"),
+          MAYP112785 =
+            which_descriptor(descriptors = ooacquire::MAYP112785_descriptors),
+          MAYP114590 =
+            which_descriptor(descriptors = ooacquire::MAYP114590_descriptors),
+          FLMS04133 =
+            which_descriptor(descriptors = ooacquire::FLMS04133_descriptors),
+          FLMS00673 =
+            which_descriptor(descriptors = ooacquire::FLMS00673_descriptors),
+          FLMS00440 =
+            which_descriptor(descriptors = ooacquire::FLMS00440_descriptors),
+          FLMS00416 =
+            which_descriptor(descriptors = ooacquire::FLMS00416_descriptors),
+          JAZA3098 =
+            {
+              if (ch.index == 0L) {
+                ooacquire::JAZA3098_ch1_descriptors[[1]]
+              } else {
+                ooacquire::JAZA3098_ch2_descriptors[[1]]
+              }
+            },
+          { # default for no match to serial_no
+            cat("No instrument descriptor found, ",
+                "retrieving it from the spectrometer\n")
+            get_oo_descriptor(w, sr.index = sr.index, ch.index = ch.index)
+          }
         )
 
+      # straylight correction methods, currently only a simple one used
       correction.method <-
         switch(serial_no,
                MAYP11278 = ooacquire::MAYP11278_simple.mthd,
@@ -340,7 +377,8 @@ acq_fraction_interactive <-
 
     # default protocols are available for most spectrometers
     available.protocols <- names(protocols)
-    default.protocol <- ifelse("rsd" %in% available.protocols, "rsd", available.protocols[1])
+    default.protocol <-
+      ifelse("rsd" %in% available.protocols, "rsd", available.protocols[1])
 
     # jwrapper and spectrometer indexes have to be set to current ones if
     # descriptor was not acquired from the spectrometer in the current session
@@ -367,10 +405,12 @@ acq_fraction_interactive <-
 
     # check serial numbers, really needed only for user supplied descriptors
     descriptor.inst <- get_oo_descriptor(w)
-    stopifnot(descriptor[["spectrometer.sn"]] == descriptor.inst[["spectrometer.sn"]])
+    stopifnot(descriptor[["spectrometer.sn"]] ==
+                descriptor.inst[["spectrometer.sn"]])
 
     # check that wavelength calibration is available
-    stopifnot(length(descriptor[["wavelengths"]]) == descriptor[["num.pixs"]])
+    stopifnot(length(descriptor[["wavelengths"]]) ==
+                descriptor[["num.pixs"]])
 
     ## Session settings
     # session and user IDs
@@ -378,7 +418,8 @@ acq_fraction_interactive <-
     user.name <- set_user_name_interactive(user.name)
     session.label <- paste("Operator: ", user.name,
                            "\nSession: ", session.name,
-                           ", instrument s.n.: ", descriptor[["spectrometer.sn"]],
+                           ", instrument s.n.: ",
+                           descriptor[["spectrometer.sn"]],
                            sep = "")
 
     # set working directory for current session
@@ -410,7 +451,7 @@ acq_fraction_interactive <-
     }
 
     # set default data acquisition settings based of call arguments
-    start.int.time <- 1 # seconds
+    start.int.time <- 0.1 # seconds
     num.scans <- min(max(tot.time.range) %/% start.int.time, 1L)
     settings <- acq_settings(descriptor = descriptor,
                              integ.time = start.int.time,
@@ -427,7 +468,8 @@ acq_fraction_interactive <-
                            step.delay = 0,
                            num.steps = 1L)
     } else if (!setequal(names(seq.settings),
-                         c("start.boundary", "initial.delay", "step.delay", "num.steps"))) {
+                         c("start.boundary", "initial.delay",
+                           "step.delay", "num.steps"))) {
       warning("Missing or wrong member names in 'seq.settings': ignoring!")
       seq.settings <- list(start.boundary = "second",
                            initial.delay = 0.1,
@@ -453,6 +495,7 @@ acq_fraction_interactive <-
     reuse.seq.settings <- FALSE
     reset.count <- TRUE
     get.obj.name <- TRUE
+    get.attributes <- grepl("-attr$", interface.mode)
     get.seq.settings <- grepl("^series", interface.mode)
     sequential.naming <- FALSE
     sequential.naming.required <- FALSE
@@ -514,7 +557,8 @@ acq_fraction_interactive <-
 
             base.obj.name <- make.names(user.obj.name)
             if (base.obj.name != user.obj.name) {
-              answ <- readline(paste("Use sanitised (base) name '", base.obj.name, "'? (y-/n): "))
+              answ <- readline(paste("Use sanitised (base) name '",
+                                     base.obj.name, "'? (y-/n): "))
               if (answ == "n") {
                 base.obj.name <- current.base.obj.name
                 next()
@@ -538,7 +582,13 @@ acq_fraction_interactive <-
         }
 
         if (sequential.naming) {
-          obj.name <- paste(base.obj.name, formatC(file.counter, width = 3, flag = "0"), sep = "")
+          # increase width of seq numbers if needed
+          seq.name.digits <-
+            max(seq.name.digits, ceiling(log10(file.counter + 1)))
+          obj.name <-
+            paste(base.obj.name,
+                  formatC(file.counter, width = seq.name.digits, flag = "0"),
+                  sep = "")
         } else {
           obj.name <- base.obj.name
         }
@@ -559,7 +609,8 @@ acq_fraction_interactive <-
             break()
           } else {
             # operator likely present
-            if (readline(paste("Overwrite existing '", filter.name, "? (y/n-): "))[1] == "y") {
+            if (readline(paste("Overwrite existing '", filter.name,
+                               "? (y/n-): "))[1] == "y") {
               filter.names <- setdiff(filter.names, filter.name)
               raw.names <- setdiff(raw.names, raw.name)
               break()
@@ -572,8 +623,15 @@ acq_fraction_interactive <-
 
       }  # obtain a valid object name from user
 
+      if (total.repeats > 1) {
+        cat("\nRepeat ", total.repeats - pending.repeats + 1,
+            " of ", total.repeats, ".\n", sep = "")
+      } else {
+        cat("\nNew acquisition.\n")
+      }
+
       # user input of metadata for attributes "comment" and "what.measured"
-      if (grepl("-attr", interface.mode)) {
+      if (get.attributes && grepl("-attr", interface.mode)) {
         user.attrs <- set_attributes_interactive(user.attrs)
       }
 
@@ -588,23 +646,24 @@ acq_fraction_interactive <-
         # with new settings we start with one repeat
         pending.repeats <- 1
         total.repeats <- 1
-        get.seq.settings <- grepl("series", interface.mode)
+        get.seq.settings <- grepl("^series", interface.mode)
+        get.attributes <-  grepl("-attr$", interface.mode)
       }
 
       # time series settings
       if (get.seq.settings) {
 
         # Estimate time needed for measuring one spectrum
-        if (length(settings$HDR.mult) > 1) { # acq settings once per integ time value
+        if (length(settings$HDR.mult) > 1) { # sets integ. time multiple times
           estimated.measurement.duration <-
             sum(settings$integ.time * settings$num.scans * 1e-6) +
-            acq.overhead * length(settings$HDR.mult) + # number of HDR acquisitions
-            sum(0.66 * settings$integ.time * 1e-6) # worse case overhead due to restart
-        } else if (length(settings$HDR.mult) == 1) { # no need to change acq settings
+            acq.overhead * length(settings$HDR.mult) + # number of HDR acq.
+            sum(0.66 * settings$integ.time * 1e-6) # worse case overhead
+        } else if (length(settings$HDR.mult) == 1) { # free running 1 integ time
           if (settings$num.scans > 1) {
             estimated.measurement.duration <-
               settings$integ.time * settings$num.scans * 1e-6 + acq.overhead
-          } else if (settings$num.scans == 1) { # buffered high speed acquisition
+          } else if (settings$num.scans == 1) { # buffered high speed acq.
             estimated.measurement.duration <-
               settings$integ.time * 1e-6 # no overhead
           } else {
@@ -621,21 +680,17 @@ acq_fraction_interactive <-
             signif(estimated.measurement.duration, 3), " s.\n")
 
         seq.settings <-
-          set_seq_interactive(seq.settings = seq.settings,
-                              measurement.duration = estimated.measurement.duration,
-                              minimum.step.delay = ifelse(length(settings$HDR.mult) == 1L,
-                                                          0,
-                                                          estimated.measurement.duration),
-                              time.division = ifelse(length(settings$HDR.mult) == 1L,
-                                                     settings$integ.time * 1e-6, # -> seconds
-                                                     0))
+          set_seq_interactive(
+            seq.settings = seq.settings,
+            measurement.duration = estimated.measurement.duration,
+            minimum.step.delay = ifelse(length(settings$HDR.mult) == 1L,
+                                        0,
+                                        estimated.measurement.duration),
+            time.division = ifelse(length(settings$HDR.mult) == 1L,
+                                   settings$integ.time * 1e-6, # -> seconds
+                                   0))
         get.seq.settings <- FALSE
 
-      }
-
-      if (pending.repeats >= 1) {
-        cat("\nRepeat ", total.repeats - pending.repeats + 1,
-            " of ", total.repeats, ".\n", sep = "")
       }
 
       # call trigger- or measurement initialization function
@@ -699,13 +754,15 @@ acq_fraction_interactive <-
 
       # combine spectra if needed
       if (reuse.old.refs) {
-        cat("Retrieving ", paste(names(old.refs.mpsct), collapse = " and "),
-            " spectrum/a ... ", sep = "")
-        # we add old refs to new light data
-        raw.mspct <- c(old.refs.mpsct, raw.mspct)
-        cat("ready!\n")
+        if (length(old.refs.mpsct) >= 1) {
+          cat("Retrieving ", paste(names(old.refs.mpsct), collapse = " and "),
+              " spectrum/a ... ", sep = "")
+          # we add old refs to new sample data
+          raw.mspct <- c(old.refs.mpsct, raw.mspct)
+          cat("ready!\n")
+        }
       } else {
-        # we save old references for possible reuse
+        # we save new reference and dark for possible reuse
         refs.selector <- grep("dark|reference", protocol, value = TRUE)
         if (length(refs.selector)) {
           cat("Cacheing ", paste(refs.selector,
@@ -730,15 +787,16 @@ acq_fraction_interactive <-
           cat("Computing ", qty.out, " ... ", sep = "")
         }
 
-        filter.spct <- s_fraction_corrected(x = raw.mspct,
-                                            spct.names = spct.names,
-                                            type = type,
-                                            reference.value = 1,
-                                            correction.method = correction.method,
-                                            dyn.range = dyn.range,
-                                            qty.out = qty.out,
-                                            ref.value = ref.value,
-                                            verbose = verbose)
+        filter.spct <-
+          s_fraction_corrected(x = raw.mspct,
+                               spct.names = spct.names,
+                               type = type,
+                               reference.value = 1,
+                               correction.method = correction.method,
+                               dyn.range = dyn.range,
+                               qty.out = qty.out,
+                               ref.value = ref.value,
+                               verbose = verbose)
 
         cat('Adding metadata ... ')
         photobiology::setHowMeasured(filter.spct, user.attrs$how.measured)
@@ -749,9 +807,11 @@ acq_fraction_interactive <-
           photobiology::setWhatMeasured(filter.spct, user.attrs$what.measured)
         }
 
+        comment.text.root <-
+          comment(filter.spct) # saved in case user replaces comment.text
         if (user.attrs$comment.text != "") {
           comment(filter.spct) <-
-            paste(comment(filter.spct), user.attrs$comment.text, sep = "\n")
+            paste(comment.text.root, user.attrs$comment.text, sep = "\n")
         }
 
         if (length(raw.mspct) > 10L) {
@@ -759,7 +819,7 @@ acq_fraction_interactive <-
         }
 
         # prepare plot invariants
-        if (plot.lines.max < getMultipleWl(filter.spct)) {
+        if (getMultipleWl(filter.spct) > plot.lines.max) {
           title.text <- paste(what_measured(filter.spct)[[1L]],
                               " (n = ", plot.lines.max,
                               "/", getMultipleWl(filter.spct),
@@ -775,7 +835,7 @@ acq_fraction_interactive <-
 
         # display plot, allowing user to tweak it
         repeat {
-          if (length(plot.spct) > 10L) {
+          if (length(raw.mspct) > 10L) {
             cat("Building plot ... ")
           }
           fig <- ggplot2::autoplot(plot.spct,
@@ -783,22 +843,21 @@ acq_fraction_interactive <-
                                    geom = ifelse(getMultipleWl(plot.spct) == 1,
                                                  "spct", "line")) +
             ggplot2::labs(title = title.text,
-                          subtitle = when_measured(plot.spct)[[1L]],
-                          caption = how_measured(plot.spct)[[1L]]) +
-            ggplot2::theme(legend.position = "bottom") +
-            ggplot2::theme_bw()
+                          subtitle = format(when_measured(plot.spct)[[1L]],
+                                            tz = ""),
+                          caption = how_measured(plot.spct)[[1L]])
           if (length(raw.mspct) > 10L) {
             cat("ready.\n")
           }
 
           if (show.figs) {
-            print(fig)
+            print(fig + screen.theme)
           } else {
             if (clear.display) {
               # clear plot viewer panel of RStudio
               print(ggplot2::ggplot() +
                       ggplot2::ggtitle("Display of plots disabled") +
-                      ggplot2::theme_minimal())
+                      ggplot2::theme_void())
               clear.display <- FALSE
             }
           }
@@ -806,8 +865,10 @@ acq_fraction_interactive <-
           # user interaction and display of plot only if at end of measurement
           # to avoid delays
           if (!reuse.seq.settings || pending.repeats == 1) {
-            plot.prompt <- "fig/w.bands/discard+go/SAVE+GO (f/w/d/s-): "
-            valid.answers <-  c("f","w", "d", "s", "g")
+            plot.prompt <-
+              "fig/w.bands/range/attr/discard+go/SAVE+GO (f/w/r/a/d/s-): "
+            valid.answers <-
+              c("f","w", "r", "a", "d", "s", "g")
             repeat {
               answer <- readline(plot.prompt)[1]
               answer <- ifelse(answer == "", "s", answer)
@@ -818,13 +879,16 @@ acq_fraction_interactive <-
               }
             }
             switch(answer,
-                   f = {clear.display <- show.figs; show.figs <- !show.figs; next()},
+                   f = {
+                     clear.display <- show.figs; show.figs <- !show.figs;
+                     next()},
                    w = {
                      repeat {
                        utils::flush.console()
                        answer1 <-
                          tolower(
-                           readline("Bands: UV+PhR/UV+PAR/plants/VIS/TOT/DEFAULT (u/a/p/v/t/d-): ")
+                           readline(paste0("Bands: UV+PhR/UV+PAR/plants/VIS/",
+                                    "TOT/DEFAULT (u/a/p/v/t/d-): "))
                          )[1]
                        answer1 <- ifelse(answer1 == "", "d", answer1)
                        if (answer1 %in% c("u", "a", "p", "v", "t", "d")) {
@@ -834,24 +898,67 @@ acq_fraction_interactive <-
                        }
                      }
                      switch(answer1,
-                            u = options(photobiology.plot.bands =
-                                          c(photobiologyWavebands::UV_bands(),
-                                            list(photobiologyWavebands::PhR()))),
-                            a = options(photobiology.plot.bands =
-                                          c(photobiologyWavebands::UV_bands(),
-                                            list(photobiologyWavebands::PAR()))),
-                            p = options(photobiology.plot.bands =
-                                          photobiologyWavebands::Plant_bands()),
-                            v = options(photobiology.plot.bands =
-                                          photobiologyWavebands::VIS_bands()),
-                            t = options(photobiology.plot.bands =
-                                          list(photobiology::new_waveband(
-                                            photobiology::wl_min(filter.spct),
-                                            photobiology::wl_max(filter.spct),
-                                            wb.name = "Total"))),
+                            u = options(
+                              photobiology.plot.bands =
+                                c(photobiologyWavebands::UV_bands(),
+                                  list(photobiologyWavebands::PhR()))),
+                            a = options(
+                              photobiology.plot.bands =
+                                c(photobiologyWavebands::UV_bands(),
+                                  list(photobiologyWavebands::PAR()))),
+                            p = options(
+                              photobiology.plot.bands =
+                                photobiologyWavebands::Plant_bands()),
+                            v = options(
+                              photobiology.plot.bands =
+                                photobiologyWavebands::VIS_bands()),
+                            t = options(
+                              photobiology.plot.bands =
+                                list(photobiology::new_waveband(
+                                  photobiology::wl_min(filter.spct),
+                                  photobiology::wl_max(filter.spct),
+                                  wb.name = "Total"))),
                             options(photobiology.plot.bands = NULL))
                      next()},
-                   d = break() # exit loop early, discarding acquired data
+                   a = { # allow metadata attributes to be replaced
+                     user.attrs <- set_attributes_interactive(user.attrs)
+                     # object to be saved to file
+                     photobiology::what_measured(filter.spct) <-
+                       user.attrs$what.measured
+                     comment(filter.spct) <-
+                       paste(comment.text.root, user.attrs$comment.text,
+                             sep = "\n")
+                     # object to plot, possibly containing a subset of spectra
+                     # metadata update needed for non-default annotations
+                     photobiology::what_measured(plot.spct) <-
+                       user.attrs$what.measured
+                     comment(plot.spct) <-
+                       paste(comment.text.root, user.attrs$comment.text,
+                             sep = "\n")
+                     # Update plot title text
+                     if (getMultipleWl(filter.spct) > plot.lines.max) {
+                       title.text <-
+                         paste(what_measured(filter.spct)[[1L]],
+                               " (n = ", plot.lines.max,
+                               "/", getMultipleWl(filter.spct),
+                               ")",
+                               sep = "")
+                     } else {
+                       title.text <-
+                         paste(what_measured(filter.spct)[[1L]],
+                               " (n = ", getMultipleWl(filter.spct), ")",
+                               sep = "")
+                     }
+                     next()},
+                   r = { # set R option "ggspectra.wlrange"
+                     set_wlrange_interactive(
+                       photobiology::wl_range(filter.spct))
+                     next()},
+                   d = { # clear plot of discarded spectrum
+                     print(ggplot2::ggplot() +
+                             ggplot2::ggtitle("Spectrum discarded") +
+                             ggplot2::theme_void())
+                     break()} # exit loop early, discarding acquired data
             )
           }
 
@@ -896,17 +1003,18 @@ acq_fraction_interactive <-
             if (async.saves && !mirai::unresolved(pdf.mirai)) {
               pdf.mirai <- mirai::mirai({
                 grDevices::pdf(file = pdf.name, width = 8, height = 6)
-                print(fig)
+                print(fig + pdf.theme)
                 grDevices::dev.off()
                 return(file.exists(pdf.name))
               },
               pdf.name = pdf.name,
               fig = fig,
+              pdf.theme = pdf.theme,
               .timeout = 60000 # 60 s
               )
             } else {
               grDevices::pdf(file = pdf.name, width = 8, height = 6)
-              print(fig)
+              print(fig + pdf.theme)
               grDevices::dev.off()
             }
           }
@@ -956,7 +1064,7 @@ acq_fraction_interactive <-
 
       # make collection from all spectra acquired since start of session or last
       # saving of a collection
-      if (pending.repeats == 0 && (save.collections || save.summaries)) {
+      if (pending.repeats <= 1L && (save.collections || save.summaries)) {
 
         repeat {
           answer.collect <-
@@ -978,25 +1086,40 @@ acq_fraction_interactive <-
                   paste(filter.names, collapse = ", "))
           message("Raw objects to collect: ",
                   paste(raw.names, collapse = ", "), sep = " ")
-          user.collection.name <- readline("Name of the collection?: ")
-          collection.name <- make.names(paste("collection ",
-                                              user.collection.name, sep = ""))
-          if (user.collection.name == "") {
-            collection.name <- make.names(paste("collection ",
-                                                lubridate::now(tzone = "UTC"), sep = ""))
-          }
-          if (collection.name != user.collection.name) {
-            message("Using sanitised/generated name: '",
-                    collection.name, "'.", sep = "")
+          repeat {
+            user.collection.name <- readline("Name of the collection?: ")
+            # name of the R object holding the collection
+            if (user.collection.name == "") {
+              cat("No name supplied, creating one...\n")
+              collection.name <-
+                paste("collection",
+                      format(lubridate::now(tzone = ""),
+                             format = "%Y_%m_%d.%H%M",
+                             tz = "UTC"), sep = ".")
+            } else {
+              collection.name <-
+                make.names(paste("collection ",
+                                 user.collection.name, sep = ""))
+            }
+            # name of the Rda file used to save the collection
+            collection.file.name <- paste(collection.name, "Rda", sep = ".")
+            if (file.exists(collection.file.name)) {
+              cat("A file with name '", collection.file.name,
+                  "' already exists. Please, try again...\n")
+              next()
+            }
+            if (collection.name != user.collection.name) {
+              message("Using sanitised/generated name: '",
+                      collection.name, "'.", sep = "")
+            }
+            break()
           }
           collection.title <- readline("Title for plot?: ")
           if (collection.title == "") {
             collection.title <- collection.name
           }
 
-          # name of the Rda file used to save the collection
-          collection.file.name <- paste(collection.name, "Rda", sep = ".")
-          # collection.objects used to collect all R objects to be saved to the Rda file
+          # names of collection.objects used to collect R objects to be saved
           collection.objects <- character()
 
           if (qty.out != "raw") {
@@ -1009,35 +1132,39 @@ acq_fraction_interactive <-
                      cps =   photobiology::cps_mspct(mget(filter.names)))
 
             # plot collection and summaries
-            if (plot.lines.max < getMultipleWl(filter.spct)) {
-              collection.title <- paste(collection.title,
-                                        " (sample of ", plot.lines.max, ")",
-                                        sep = "")
+            if (length(collection.mspct) > plot.lines.max) {
+              collection.title <-
+                paste(collection.title,
+                      " (", plot.lines.max, " out of n = ",
+                      length(collection.mspct), ")",
+                      sep = "")
             } else {
-              collection.title <- paste(collection.title,
-                                        " (n = ", getMultipleWl(filter.spct), ")",
-                                        sep = "")
+              collection.title <-
+                paste(collection.title,
+                      " (n = ", length(collection.mspct), ")",
+                      sep = "")
             }
 
             # create plot
-            # if too many spectra to plot, draw a random sample of the maximum size
+            # if too many spectra to plot, draw a random sample
             collection.fig <-
-              ggplot2::autoplot(pull_sample(collection.mspct, plot.lines.max),
-                                annotations =
-                                  c("-", "peaks", "colour.guide", "summaries")) +
-              ggplot2::labs(title = collection.title,
-                            subtitle = session.label,
-                            caption = how_measured(collection.mspct[[1L]])) +
-              ggplot2::theme(legend.position = "bottom")
-            print(collection.fig)
+              ggplot2::autoplot(
+                pull_sample(collection.mspct, plot.lines.max),
+                annotations = c("-", "peaks", "colour.guide", "summaries")) +
+              ggplot2::labs(
+                title = collection.title,
+                subtitle = session.label,
+                caption = how_measured(collection.mspct[[1L]]))
+            print(collection.fig + screen.theme)
             rm(collection.title)
 
             # save plot to file on disk
             if (save.pdfs) {
-              collection.pdf.name <- paste(collection.name, "pdf", sep = ".")
+              collection.pdf.name <-
+                paste(collection.name, "pdf", sep = ".")
               grDevices::pdf(file = collection.pdf.name, onefile = TRUE,
                              width = 11, height = 7, paper = "a4r")
-              print(collection.fig)
+              print(collection.fig + pdf.theme)
               grDevices::dev.off()
               rm(collection.pdf.name)
             }
@@ -1048,16 +1175,19 @@ acq_fraction_interactive <-
               contents.collection.name <-
                 paste(collection.name, "contents.tb", sep = ".")
               assign(contents.collection.name, summary(collection.mspct))
-              collection.objects <- c(collection.objects, contents.collection.name)
+              collection.objects <-
+                c(collection.objects, contents.collection.name)
 
               if (qty.out %in% "Tfr") {
                 last.summary.type <- summary.type
                 repeat{
                   valid.answers <- c("plant", "PAR", "VIS")
-                  summary.type <- readline(paste("Change summary type from \"",
-                                                 last.summary.type, "\"? (", "): ",
-                                                 paste(valid.answers, collapse = "/", sep = ""),
-                                                 ": ", sep = ""))[1]
+                  summary.type <-
+                    readline(paste("Change summary type from \"",
+                                   last.summary.type, "\"? (", "): ",
+                                   paste(valid.answers, collapse = "/",
+                                         sep = ""),
+                                   ": ", sep = ""))[1]
                   if (summary.type == "") {
                     summary.type <- last.summary.type
                   }
@@ -1072,13 +1202,16 @@ acq_fraction_interactive <-
 
                 # save summary table to file on disk
                 if (!is.null(summary.tb) && is.data.frame(summary.tb)) {
-                  readr::write_delim(summary.tb,
-                                     file =  paste(collection.name, "csv", sep = "."),
-                                     delim = readr::locale()$grouping_mark)
-                  summary.collection.name <- paste(collection.name, "summary.tb", sep = ".")
+                  readr::write_delim(
+                    summary.tb,
+                    file =  paste(collection.name, "csv", sep = "."),
+                    delim = readr::locale()$grouping_mark)
+                  summary.collection.name <-
+                    paste(collection.name, "summary.tb", sep = ".")
                   # "rename" data frame with summaries
                   assign(summary.collection.name, summary.tb)
-                  collection.objects <- c(collection.objects, summary.collection.name)
+                  collection.objects <-
+                    c(collection.objects, summary.collection.name)
                 } else {
                   message("Computation of summaries failed!")
                 }
@@ -1088,18 +1221,23 @@ acq_fraction_interactive <-
             # create collection of raw-counts spectra and save all collections
             if (save.collections) {
               # "rename" temporary objects
-              filter.collection.name <- paste(collection.name, qty.out, "mspct", sep = ".")
+              filter.collection.name <-
+                paste(collection.name, qty.out, "mspct", sep = ".")
               assign(filter.collection.name, collection.mspct)
-              collection.objects <- c(collection.objects, filter.collection.name)
+              collection.objects <-
+                c(collection.objects, filter.collection.name)
 
-              raw.collection.name <- paste(collection.name, "raw", "lst", sep = ".")
+              raw.collection.name <-
+                paste(collection.name, "raw", "lst", sep = ".")
               assign(raw.collection.name, mget(raw.names))
-              collection.objects <- c(collection.objects, raw.collection.name)
+              collection.objects <-
+                c(collection.objects, raw.collection.name)
 
               # save collections to files on disk
               retrying <- FALSE
               repeat {
-                save(list = collection.objects, file = collection.file.name, precheck = TRUE)
+                save(list = collection.objects,
+                     file = collection.file.name, precheck = TRUE)
                 if (file.exists(collection.file.name)) {
                   message("Collection objects saved to file '",
                           collection.file.name, "'.", sep = "")
@@ -1115,10 +1253,12 @@ acq_fraction_interactive <-
                   break()
                 } else {
                   if (retrying) {
-                    message("Saving of the collection to file failed again! (Aborting)")
+                    message("Saving of the collection to file failed again! ",
+                            "(Aborting)")
                     break()
                   }
-                  message("Saving of the collection to file failed! (Trying again)")
+                  message("Saving of the collection to file failed! ",
+                          "(Trying again)")
                   retrying <- TRUE
                 }
               }
@@ -1132,9 +1272,11 @@ acq_fraction_interactive <-
 
       if (pending.repeats >= 1) {
         get.obj.name <- FALSE
+        get.attributes <- acq.pausing.always && grepl("-attr$", interface.mode)
         acq.pausing <- acq.pausing.always
       } else {
         get.obj.name <- TRUE
+        get.attributes <- grepl("-attr$", interface.mode)
         acq.pausing <- TRUE
 
         get.seq.settings <- grepl("^series", interface.mode)
@@ -1181,6 +1323,7 @@ acq_fraction_interactive <-
             }
           }
           acq.pausing.always <- answer3 == "p"
+          acq.pausing <- acq.pausing.always
           clear.display <- show.figs && answer3 == "n"
           show.figs <- answer3 %in% c("p", "f")
           if (acq.pausing.always) {
@@ -1252,6 +1395,9 @@ acq_fraction_interactive <-
     # connection to spectrometer is closed using on.exit() to ensure
     # disconnection even when end of session is forced by error or by user
 
+    # active folder is restored using on.exit() to ensure
+
+    # R options settings not restored!
   }
 
 #' Summarize spectral transmittance

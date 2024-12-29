@@ -29,16 +29,17 @@ irradiance for one or more sources.}
 \item{digits}{integer The number of significant digits in the output.}
 }
 \value{
-A tibble with one row per spectrum and one column per
-   summary quantity and attribute and a column with the names of the spectra.
+A tibble with one row per spectrum and one column per summary
+  quantity and attribute and a column with the names of the spectra.
 }
 \description{
 Compute irradiance or fluence by waveband and energy or photon ratios
 between wavebands of interest to plants' and human visual responses to light.
 }
 \details{
-This function packages different functions from pacakge 'photobiology'
-   and returns a typical set of summaries for different purposes.
+This function packages different functions from pacakge
+  'photobiology' and returns a typical set of summaries for different
+  purposes.
 }
 \examples{
 

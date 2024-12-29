@@ -24,6 +24,7 @@ acq_irrad_interactive(
   save.collections = !interface.mode \%in\% c("simple", "series", "series-attr"),
   async.saves = FALSE,
   show.figs = TRUE,
+  figs.theme = "built.in",
   interface.mode = ifelse(qty.out == "fluence", "manual", "auto"),
   num.exposures = ifelse(qty.out == "fluence", 1L, -1L),
   f.trigger.init = NA,
@@ -32,8 +33,8 @@ acq_irrad_interactive(
   triggers.enabled = c("light", "filter"),
   folder.name = paste("acq", qty.out, lubridate::today(tzone = "UTC"), sep = "-"),
   user.name = Sys.info()[["user"]],
-  session.name = paste(user.name, strftime(lubridate::now(tzone = "UTC"),
-    "\%Y.\%b.\%d_\%H.\%M.\%S"), sep = "_"),
+  session.name = paste(user.name, strftime(lubridate::now(tzone = ""),
+    "\%Y_\%m_\%d.\%H\%M"), sep = "_"),
   verbose = getOption("photobiology.verbose", default = FALSE),
   QC.enabled = TRUE
 )
@@ -89,6 +90,8 @@ enabling this feature.}
 
 \item{show.figs}{logical Default for flag enabling display plots of acquired
 spectra.}
+
+\item{figs.theme}{character One of "built.in", "ggplot2.current", or "current".}
 
 \item{interface.mode}{character One of "auto", "simple", "manual", "full",
 "series", "auto-attr", "simple-attr", "manual-attr", "full-atr", and
@@ -146,7 +149,8 @@ Function \code{acq_irrad_interactive()} supports measurement of
   spectra and time series of spectra are supported.
 
   A tutorial guiding on the use of this function, illustrated with diagrams,
-  is available at \url{https://www.r4photobiology.info/pages/acq-irrad-tutorial.html}.
+  is available at
+  \url{https://www.r4photobiology.info/pages/acq-irrad-tutorial.html}.
   A summary is provided below.
 
   Different arguments passed to \code{interface.mode} modify which aspects
@@ -211,12 +215,12 @@ Function \code{acq_irrad_interactive()} supports measurement of
   The \code{step.delay} is numeric and gives the length of time between
   successive "light" measurements. The value entered by the user is adjusted
   based on the estimated duration of individual spectrum acquisition. In most
-  cases a vector of length one is used as time step lengths in seconds. Any vector
-  shorter than the number of steps will be extended with \code{rep_len()},
-  and the values interpreted as the time increment in seconds between the
-  start of successive measurements. If the length is the same as "num.steps",
-  and the values are monotonically increasing, they are interpreted as time
-  offsets from the start of the sequence.
+  cases a vector of length one is used as time step lengths in seconds. Any
+  vector shorter than the number of steps will be extended with
+  \code{rep_len()}, and the values interpreted as the time increment in
+  seconds between the start of successive measurements. If the length is the
+  same as "num.steps", and the values are monotonically increasing, they are
+  interpreted as time offsets from the start of the sequence.
 
   The \code{start.boundary} must be set to a character string, with "none",
   or a number of seconds, minutes or hours indicated by a number followed by
@@ -284,7 +288,7 @@ The function is composed in a modular way from functions defined in
 
   All these modes with \strong{-attr} appended, enable a menu and dialogues
   that make it possible to set the values stored in attributes \code{comment}
-  and \code{what.measure} interactively.
+  and \code{what.measured} interactively.
 
   All modes support repeated measurements with unchanged acquisition settings
   reusing the reference spectra ('dark' and 'filter') from the most recent
