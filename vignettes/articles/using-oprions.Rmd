@@ -1,0 +1,61 @@
+---
+title: "Data acquisition defaults"
+subtitle: "Setting R options and passing arguments to modify them"
+---
+
+# Introduction
+
+The default behaviour of functions `acq_irrad_interactive()` and `acq_fraction_interactive()` can be modified overriding the default argument values when calling them and by setting R options. This vignette describes what is possible and how to achieve it.
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(ooacquire)
+```
+
+# Verbosity of messages and warnings
+
+R option `verbose`, used in R itself, is respected by `ooacquire` and other R packages in the R for Photobiology Suite. In contrast, R option `photobiology.verbose` affects only the packages in the R for Photobiology suite. The default value for `verbose` is `FALSE` and that for `photobiology.verbose` the value of R option `verbose` if set, and otherwise `FALSE`.
+
+A logical value passed as argument to parameter `verbose` in `acq_irrad_interactive()`, `acq_fraction_interactive()` and in other functions overrides the value of the corresponding R option for the messages and warnings issued by each function but not others. In most cases when `verbose` is `TRUE` messages and warning are more detailed, and additional ones may be issued to alert about _possible_ problems or actions taken automatically.
+
+# Sanity checks on spectra
+
+Functions from the R for Photobiology suite of packages, including `ooacquire`, check the validity of the spectral data when objects are created and manipulated. This adds overhead to computations but makes it easier to detect but data early on. The checks are implemented in package 'photobiology' and how stringent they are when checking for out-of-range values is controlled by R option `photobiology.strict.range`, set to `TRUE`, `FALSE`, or `NA`, with `NA` fully disabling the range checks, and `FALSE` for less strict cheks. The default value is `FALSE`.
+
+Which level to use depends on the properties of the data being acquired. Using `NA` to disable checks is not recommended as it may lead to dificult to diagnose errors in subsequent computations.
+
+# Units and basis of expression of radiation
+
+The default unit for irradiance is $W m^{-2}$, as for the rest of the R for Photobiology suite of packages. This default can be changed, using functions from package 'photobiology', into $\mathrm{mole}\,s^{-1}\,m^{-2}$ by calling function `photon_as_default()` and the change undone by calling `energy_as_default()` or `unset_radiation_unit_default()`. Concurrently these same calls, change the default basis of expression for fluence from $\mathrm{J\,m^{-2}}$ per exposure event to $\mathrm{mole}\,m^{-2}$ per event and back. The switch between energy and photon units is possible also through a menu in the user interface, while plots as displayed.
+
+In a call to `acq_irrad_interactive()` the argument passed to parameter `qty.out` selects between `"irradiance"`, `"fluence"`, `"cps"` (counts per second) or `"raw"` (raw detector counts) for the expression of the measured spectra, and also adjusts the user interface to match.
+
+# Quantities used for optical properties
+
+In this case the default is to use reflectance, absorptance and transmittance as fractions adding up to 1. Because they add up two 1, specifying two of them determines the value of the third one. When comparing objects with vastly different properties or in chemistry when estimate solute concentrations is is usual to use absorbance, which is based either on a $log_{10}$ or $log_e$ transformation, in R for Photobiology Suite $log_{10}$ is always used for absorbance. The default can be changed to absorbance by calling `A_as_default()` or `Afr_as_default()` and the change undone by calling `Tfr_as_default()` or `unset_filter_qty_default()`.
+
+In a call to `acq_fraction_interactive()` the argument passed to parameter `qty.out` selects between `"Tfr"` (transmittance), `"Rfr"` (reflectance) or `"raw"` (raw detector counts) for the expression of the measured spectra, and also adjusts the user interface to match.
+
+**Conversions are only possible when at least two of the quantities are known, so in some cases thry are not available.**
+
+# Time units used for fluxes
+
+For irradiance the default unit for time is seconds, and is computed based on the integration time used for the measurement. For fluence, transmittance and reflectance, which are not fluxes, but a flow or fractions, time units are not relevant.
+
+# Plotting defaults
+
+Plotting is done by calling `autoplot()` method specioalizations from package 'ggspectra'. Several default arguments for these methods can be modified by setting R options, in most cases both with R's function `option()` and with functions from package 'ggspectra'.
+
+Please see the documentation of functions `ggspectra::set_annotations_default()` (option `"photobiology.plot.bands"`), and `ggspectra::set_w.band_default()` (option `"photobiology.plot.annotations"`) and of `ggspectra::autoplot()` methods for details. It is also possible to interactively chose some common sets of wavebands through a menu.
+
+Options that can be set directly with `options()` are `"ggspectra.pc.out"` (fractions as percentages) and `"ggspectra.wlrange"` (range of wavelengths to plot). The default range is that for which an irradiance calibration is available in the case of irradiance and fluence, and otherwise the full wavelength range of the spectrometer. It is also possible to interactively zoom-in by entering numeric values for a narrower range than that of the data.
+
+Options `"photobiology.fancy.chars"` defines the mapping SI prefixes to characters (such as k for kilo), `"ggspectra.axis.symbols"` can be used to disable/enable the use of symbols for physical quantities in axis labels.
+
+ The default theme can be set with function `theme_set()` from package 'ggplot2', keeping in mind that the theme set as default can be modified with a call to `theme()`. One is not limited to the themes defined in package 'ggplot2', but can also use full themes from other packages. Themes from package 'ggdark' are specially useful when doing measurements in a dark room. A dark theme can be used on screen while the matching normal theme is used when saving the PDF files. The dark screen-only theme, can be enabled interactively through the menu.

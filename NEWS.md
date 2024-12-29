@@ -6,12 +6,13 @@ editor_options:
 
 # ooacquire 0.5.2 (2024-12-xx)
 
-_Two major bug fixed, although neither of them affected the quality of the
+_Two major bugs fixed, although neither of them affected the quality of the
 spectral data._ The bugs were likely introduced in version 0.5.1 or 0.5.0. I
 find surprising that the first one at least slipped through testing. However, I
 do the testing of the interactive data-acquisition functions manually and I need
 access to a spectrometer for this. The unit tests check the data conversion and
-file reading functions.
+file reading functions. In addition to bug fixes the interactive menus and 
+messages in function `acq_irrad_interactive()` are improved.
 
 - Bug fixed: Error triggered when acquiring spectra interactively. The problem
 was related to parameters in the interactive acquisition functions that expect
@@ -26,9 +27,15 @@ same menu, using the updated metadata.
 - Improved: The currently set metadata are displayed above the menu where they
 can be changed. As before, the values are reused for the next spectrum unless
 modified.
+- Improved: The wavelength range in plots obeys the value of R 
+option `ggspectra.wlrange` if set. Newly, the R option setting can be modified
+interactively in the menu visible when the plot is displayed. The plot is 
+subsequently refreshed as for other settings in the
+same menu.
+- Fixed: Confusing sequence of messages when acquiring repeats.
 - Changed: Time in plot subtitle now uses the local timezone. Fractions of 
 seconds are rounded according to R option `digits.secs` if set and to the
-millisecond otherwise.
+nearest millisecond otherwise.
 
 # ooacquire 0.5.1-1 (2024-09-02)
 

@@ -873,3 +873,61 @@ read_period <- function(prompt,
   }
   z
 }
+
+#' Interactively set plot wavelength range
+#'
+#' Allow the user to set the range interactively by setting R option
+#' \code{ggspectra.wlrange}.
+#'
+#' @param wl.range.boundaries numeric vector of length two. Maximum allowed
+#'   wavelength range in nanometres (nm).
+#'
+#' @family interactive acquisition utility functions
+#'
+#' @return a named list of character vectors.
+#'
+set_wlrange_interactive <- function(wl.range.boundaries) {
+  wl.range.in.use <- getOption("ggspectra.wlrange")
+  if (is.null(wl.range.in.use)) {
+    # if option not already set all wavelengths are plotted
+    wl.range.in.use <- wl.range.boundaries
+  }
+
+  repeat{
+    cat("Data wavelength range: ", paste(wl.range.boundaries, collapse = "-"), " nm.\n", sep = "")
+    cat("Plot wavelength range: ", paste(wl.range.in.use, collapse = "-"), " nm.\n", sep = "")
+    new.wl.range <-
+      read_numbers(prompt = "New wavelength range (nm)/full-range/go (<2 numbers>/f/g-): ",
+                   n.max = 2L,
+                   pattern = "[,;]",
+                   pass.through = c("", "g", "f"))
+    if (is.null(new.wl.range) || anyNA(new.wl.range)) {
+      new.wl.range <- "invalid input"
+    }
+    if (!is.numeric(new.wl.range)) {
+      if (new.wl.range %in% c("", "g")) {
+        break()
+      } else if (new.wl.range == "f") {
+        options(ggspectra.wlrange = wl.range.boundaries)
+        break()
+      } else {
+        cat("Invalid input. Please, try again...\n")
+        next()
+      }
+    } else {
+      new.wl.range <- range(new.wl.range)
+      if (new.wl.range[1] < wl.range.boundaries[1]) {
+        new.wl.range[1] <- wl.range.boundaries[1]
+      }
+      if (new.wl.range[2] > wl.range.boundaries[2]) {
+        new.wl.range[2] <- wl.range.boundaries[2]
+      }
+      if ((new.wl.range[2] - new.wl.range[1]) < 20) {
+        message("Effective wavelength range less than 20 nm. Please, try again...\n")
+        next()
+      }
+      options(ggspectra.wlrange = new.wl.range)
+      break()
+    }
+  }
+}

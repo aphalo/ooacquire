@@ -40,6 +40,7 @@
 #'   enabling this feature.
 #' @param show.figs logical Default for flag enabling display plots of acquired
 #'   spectra.
+#' @param figs.theme character One of "built.in", "ggplot2.current", or "current".
 #' @param interface.mode character One of "auto", "simple", "manual", "full",
 #'   "series", "auto-attr", "simple-attr", "manual-attr", "full-atr", and
 #'   "series-attr".
@@ -189,7 +190,7 @@
 #'
 #'   All these modes with \strong{-attr} appended, enable a menu and dialogues
 #'   that make it possible to set the values stored in attributes \code{comment}
-#'   and \code{what.measure} interactively.
+#'   and \code{what.measured} interactively.
 #'
 #'   All modes support repeated measurements with unchanged acquisition settings
 #'   reusing the reference spectra ('dark' and 'filter') from the most recent
@@ -290,6 +291,7 @@ acq_irrad_interactive <-
            save.collections = !interface.mode %in% c("simple", "series", "series-attr"),
            async.saves = FALSE,
            show.figs = TRUE,
+           figs.theme = "built.in",
            interface.mode = ifelse(qty.out == "fluence", "manual", "auto"),
            num.exposures = ifelse(qty.out == "fluence", 1L, -1L),
            f.trigger.init = NA,
@@ -307,7 +309,15 @@ acq_irrad_interactive <-
            verbose = getOption("photobiology.verbose", default = FALSE),
            QC.enabled = TRUE) {
 
-    ## Is the driver available?
+    ## ggplot default themes
+    if (figs.theme == "built.in") {
+      screen.theme <- pdf.theme <-
+        list(ggplot2::theme_bw(), ggplot2::theme(legend.position = "bottom"))
+    } else if (figs.theme %in% c("ggplot2.current", "current")) {
+      screen.theme <- pdf.theme <- list()
+    }
+
+    ## Is the driver for the spectrometer available?
     if (getOption("ooacquire.offline", FALSE)) {
       warning("ooacquire off-line: Aborting...")
       return()
@@ -599,6 +609,7 @@ acq_irrad_interactive <-
     reuse.seq.settings <- FALSE
     reset.count <- TRUE
     get.obj.name <- TRUE
+    get.attributes <- grepl("-attr$", interface.mode)
     get.seq.settings <- grepl("^series", interface.mode)
     sequential.naming <- FALSE
     sequential.naming.required <- FALSE
@@ -720,8 +731,13 @@ acq_irrad_interactive <-
 
       } # obtain a valid object name from user
 
+      if (total.repeats > 1) {
+        cat("\nRepeat ", total.repeats - pending.repeats + 1,
+            " of ", total.repeats, ".\n", sep = "")
+      }
+
       # user input of metadata for attributes "comment" and "what.measured"
-      if (grepl("-attr", interface.mode)) {
+      if (get.attributes && grepl("-attr", interface.mode)) {
         user.attrs <- set_attributes_interactive(user.attrs)
       }
 
@@ -736,7 +752,8 @@ acq_irrad_interactive <-
         # with new settings we start with one repeat
         pending.repeats <- 1
         total.repeats <- 1
-        get.seq.settings <- grepl("series", interface.mode)
+        get.seq.settings <- grepl("^series", interface.mode)
+        get.attributes <- grepl("-attr", interface.mode)
       }
 
       # time series settings
@@ -781,11 +798,6 @@ acq_irrad_interactive <-
 
       }
 
-      if (pending.repeats >= 1) {
-        cat("\nRepeat ", total.repeats - pending.repeats + 1,
-            " of ", total.repeats, ".\n", sep = "")
-      }
-
       # call trigger- or measurement initialization function
       if (is.function(f.trigger.init)) {
         f.trigger.init()
@@ -803,12 +815,6 @@ acq_irrad_interactive <-
                                      f.trigger.off = f.trigger.off,
                                      triggers.enabled = intersect(protocol, triggers.enabled),
                                      user.label = obj.name)
-          if (pending.repeats > 1) {
-            answer.abort <- readline(prompt = "Skip pending repeats? yes/NO (y/n-): ")
-            if (answer.abort %in% c("y", "z")) {
-              pending.repeats <- 1
-            }
-          }
         } else {
           if (pending.repeats == total.repeats) {
             readline(paste("Acquire LIGHT reading(s): g = GO (g-):"))[1]
@@ -847,11 +853,13 @@ acq_irrad_interactive <-
 
       # combine spectra if needed
       if (reuse.old.refs) {
-        cat("Retrieving ", paste(names(old.refs.mpsct), collapse = " and "),
-            " spectrum/a ... ", sep = "")
-        # we add old refs to new light data
-        raw.mspct <- c(old.refs.mpsct, raw.mspct)
+        if (length(old.refs.mpsct) >= 1) {
+          cat("Retrieving ", paste(names(old.refs.mpsct), collapse = " and "),
+              " spectrum/a ... ", sep = "")
+          # we add old refs to new light data
+          raw.mspct <- c(old.refs.mpsct, raw.mspct)
         cat("ready!\n")
+        }
       } else {
         # we save old references for possible reuse
         refs.selector <- grep("dark|filter", protocol, value = TRUE)
@@ -932,21 +940,19 @@ acq_irrad_interactive <-
             ggplot2::labs(title = title.text,
                           subtitle = format(when_measured(irrad.spct)[[1L]],
                                             tz = ""),
-                          caption = how_measured(irrad.spct)[[1L]]) +
-            ggplot2::theme(legend.position = "bottom") +
-            ggplot2::theme_bw()
+                          caption = how_measured(irrad.spct)[[1L]])
           if (length(raw.mspct) > 10L) {
             cat("ready.\n")
           }
 
           if (show.figs) {
-            print(fig)
+            print(fig + screen.theme)
           } else {
             if (clear.display) {
               # clear plot viewer panel of RStudio
               print(ggplot2::ggplot() +
                       ggplot2::ggtitle("Display of plots disabled") +
-                      ggplot2::theme_minimal())
+                      ggplot2::theme_void())
               clear.display <- FALSE
             }
           }
@@ -955,11 +961,11 @@ acq_irrad_interactive <-
           # to avoid delays
           if (!reuse.seq.settings || pending.repeats == 1) {
             if(qty.out == "cps") {
-              plot.prompt <- "fig/w.bands/discard+go/SAVE+GO (f/w/d/s-): "
-              valid.answers <-  c("f","w", "d", "s", "g")
+              plot.prompt <- "fig/w.bands/range/attr/discard+go/SAVE+GO (f/w/r/a/d/s-): "
+              valid.answers <-  c("f","w", "r", "a", "d", "s", "g")
             } else {
-              plot.prompt <- "fig/photons/energy/w.bands/attr/discard+go/SAVE+GO (f/p/e/w/a/d/s-): "
-              valid.answers <- c("f","p", "e", "w", "a", "d", "s", "g")
+              plot.prompt <- "fig/photons/energy/w.bands/range/attr/discard+go/SAVE+GO (f/p/e/w/r/a/d/s-): "
+              valid.answers <- c("f","p", "e", "w", "r", "a", "d", "s", "g")
             }
             repeat {
               answer <- readline(plot.prompt)[1]
@@ -1032,10 +1038,13 @@ acq_irrad_interactive <-
                                            sep = "")
                      }
                      next()},
+                   r = { # set R option "ggspectra.wlrange"
+                     set_wlrange_interactive(photobiology::wl_range(irrad.spct))
+                     next()},
                    d = { # clear plot of discarded spectrum
                      print(ggplot2::ggplot() +
                              ggplot2::ggtitle("Spectrum discarded") +
-                             ggplot2::theme_minimal())
+                             ggplot2::theme_void())
                      break()} # exit loop early, discarding acquired data
             )
           }
@@ -1080,18 +1089,19 @@ acq_irrad_interactive <-
             pdf.name <- paste(obj.name, "spct.pdf", sep = ".")
             if (async.saves && !mirai::unresolved(pdf.mirai)) {
               pdf.mirai <- mirai::mirai({
-                grDevices::pdf(file = pdf.name, width = 8, height = 6)
-                print(fig)
+                grDevices::pdf(file = pdf.name, width = 11, height = 7)
+                print(fig + pdf.theme)
                 grDevices::dev.off()
                 return(file.exists(pdf.name))
               },
               pdf.name = pdf.name,
               fig = fig,
+              pdf.theme = pdf.theme,
               .timeout = 60000 # 60 s
               )
             } else {
-              grDevices::pdf(file = pdf.name, width = 8, height = 6)
-              print(fig)
+              grDevices::pdf(file = pdf.name, width = 11, height = 7)
+              print(fig + pdf.theme)
               grDevices::dev.off()
             }
           }
@@ -1211,9 +1221,8 @@ acq_irrad_interactive <-
                                   c("-", "peaks", "colour.guide", "summaries")) +
               ggplot2::labs(title = collection.title,
                             subtitle = session.label,
-                            caption = how_measured(collection.mspct[[1L]])) +
-              ggplot2::theme(legend.position = "bottom")
-            print(collection.fig)
+                            caption = how_measured(collection.mspct[[1L]]))
+            print(collection.fig + screen.theme)
             rm(collection.title)
 
             # save plot to file on disk
@@ -1221,7 +1230,7 @@ acq_irrad_interactive <-
               collection.pdf.name <- paste(collection.name, "pdf", sep = ".")
               grDevices::pdf(file = collection.pdf.name, onefile = TRUE,
                              width = 11, height = 7, paper = "a4r")
-              print(collection.fig)
+              print(collection.fig + pdf.theme)
               grDevices::dev.off()
               rm(collection.pdf.name)
             }
@@ -1239,20 +1248,21 @@ acq_irrad_interactive <-
                 repeat{
                   valid.answers <- c("plant", "PAR", "VIS")
                   summary.type <- readline(paste("Change summary type from \"",
-                                                 last.summary.type, "\"? (", "): ",
+                                                 last.summary.type, "\"? (",
                                                  paste(valid.answers, collapse = "/", sep = ""),
-                                                 ": ", sep = ""))[1]
+                                                 ") : ", sep = ""))[1]
                   if (summary.type == "") {
                     summary.type <- last.summary.type
                   }
-                  if (summary.type %in% valid.answers) {
+                  if (summary.type %in% c("plant", "PAR", "VIS")) {
                     break()
                   } else {
                     print("Answer not recognized. Please try again...")
                   }
                 }
                 summary.tb <-
-                  irrad_summary_table(mspct = collection.mspct)
+                  irrad_summary_table(mspct = collection.mspct,
+                                      summary.type = summary.type)
 
                 # save summary table to file on disk
                 if (!is.null(summary.tb) && is.data.frame(summary.tb)) {
@@ -1282,6 +1292,13 @@ acq_irrad_interactive <-
 
               # save collections to files on disk
               retrying <- FALSE
+              if (file.exists(collection.file.name)) {
+                collection.file.name <-
+                  gsub("\\.rda$",
+                       paste(trunc(runif(n = 1) * 1000), ".rda", sep = ""),
+                       collection.file.name)
+                message("File exists! Name changed into ", basename(collection.file.name))
+              }
               repeat {
                 save(list = collection.objects, file = collection.file.name, precheck = TRUE)
                 if (file.exists(collection.file.name)) {
@@ -1312,13 +1329,22 @@ acq_irrad_interactive <-
       }
 
       # whole-measurement repeats remaining to be done
+      if (acq.pausing && pending.repeats > 1) {
+        answer.abort <- readline(prompt = "Skip pending repeats? yes/NO (y/n-): ")
+        if (answer.abort %in% c("y", "z")) {
+          pending.repeats <- 1
+        }
+      }
       pending.repeats <- pending.repeats - 1L
 
+      # set up for next measurement
       if (pending.repeats >= 1) {
         get.obj.name <- FALSE
+        get.attributes <- acq.pausing.always && grepl("-attr", interface.mode)
         acq.pausing <- acq.pausing.always
       } else {
         get.obj.name <- TRUE
+        get.attributes <- grepl("-attr", interface.mode)
         acq.pausing <- TRUE
 
         get.seq.settings <- grepl("^series", interface.mode)
@@ -1382,7 +1408,7 @@ acq_irrad_interactive <-
           reuse.old.refs <- FALSE
           reuse.seq.settings <- FALSE
           sequential.naming.required <- FALSE
-          pending.repeats <- 1
+          pending.repeats <- total.repeats <- 1
         }
 
         if (answer2 == "q") {

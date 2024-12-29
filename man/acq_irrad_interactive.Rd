@@ -24,6 +24,7 @@ acq_irrad_interactive(
   save.collections = !interface.mode \%in\% c("simple", "series", "series-attr"),
   async.saves = FALSE,
   show.figs = TRUE,
+  figs.theme = "built.in",
   interface.mode = ifelse(qty.out == "fluence", "manual", "auto"),
   num.exposures = ifelse(qty.out == "fluence", 1L, -1L),
   f.trigger.init = NA,
@@ -89,6 +90,8 @@ enabling this feature.}
 
 \item{show.figs}{logical Default for flag enabling display plots of acquired
 spectra.}
+
+\item{figs.theme}{character One of "built.in", "ggplot2.current", or "current".}
 
 \item{interface.mode}{character One of "auto", "simple", "manual", "full",
 "series", "auto-attr", "simple-attr", "manual-attr", "full-atr", and
@@ -284,7 +287,7 @@ The function is composed in a modular way from functions defined in
 
   All these modes with \strong{-attr} appended, enable a menu and dialogues
   that make it possible to set the values stored in attributes \code{comment}
-  and \code{what.measure} interactively.
+  and \code{what.measured} interactively.
 
   All modes support repeated measurements with unchanged acquisition settings
   reusing the reference spectra ('dark' and 'filter') from the most recent
