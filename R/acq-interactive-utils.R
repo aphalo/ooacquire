@@ -886,6 +886,8 @@ read_period <- function(prompt,
 #'
 #' @return a named list of character vectors.
 #'
+#' @keywords internal
+#'
 set_wlrange_interactive <- function(wl.range.boundaries) {
   wl.range.in.use <- getOption("ggspectra.wlrange")
   if (is.null(wl.range.in.use)) {

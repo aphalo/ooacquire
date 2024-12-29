@@ -24,6 +24,7 @@ acq_fraction_interactive(
   save.collections = !interface.mode \%in\% c("simple", "series", "series-attr"),
   async.saves = FALSE,
   show.figs = TRUE,
+  figs.theme = "built.in",
   interface.mode = ifelse(light.source == "pulsed", "manual", "auto"),
   num.exposures = ifelse(light.source == "pulsed", 1L, -1L),
   f.trigger.init = NA,
@@ -32,8 +33,8 @@ acq_fraction_interactive(
   triggers.enabled = c("sample", "reference"),
   folder.name = paste("acq", qty.out, lubridate::today(tzone = "UTC"), sep = "-"),
   user.name = Sys.info()[["user"]],
-  session.name = paste(user.name, strftime(lubridate::now(tzone = "UTC"),
-    "\%Y.\%b.\%d_\%H.\%M.\%S"), sep = "_"),
+  session.name = paste(user.name, strftime(lubridate::now(tzone = ""),
+    "\%Y_\%m_\%d.\%H\%M"), sep = "_"),
   verbose = getOption("photobiology.verbose", default = FALSE),
   QC.enabled = TRUE
 )
@@ -88,6 +89,8 @@ enabling this feature.}
 
 \item{show.figs}{logical Default for flag enabling display plots of acquired
 spectra.}
+
+\item{figs.theme}{character One of "built.in", "ggplot2.current", or "current".}
 
 \item{interface.mode}{character One of "auto", "simple", "manual", "full",
 "series", "auto-attr", "simple-attr", "manual-attr", "full-atr", and

@@ -33,8 +33,8 @@ acq_irrad_interactive(
   triggers.enabled = c("light", "filter"),
   folder.name = paste("acq", qty.out, lubridate::today(tzone = "UTC"), sep = "-"),
   user.name = Sys.info()[["user"]],
-  session.name = paste(user.name, strftime(lubridate::now(tzone = "UTC"),
-    "\%Y.\%b.\%d_\%H.\%M.\%S"), sep = "_"),
+  session.name = paste(user.name, strftime(lubridate::now(tzone = ""),
+    "\%Y_\%m_\%d.\%H\%M"), sep = "_"),
   verbose = getOption("photobiology.verbose", default = FALSE),
   QC.enabled = TRUE
 )
@@ -149,7 +149,8 @@ Function \code{acq_irrad_interactive()} supports measurement of
   spectra and time series of spectra are supported.
 
   A tutorial guiding on the use of this function, illustrated with diagrams,
-  is available at \url{https://www.r4photobiology.info/pages/acq-irrad-tutorial.html}.
+  is available at
+  \url{https://www.r4photobiology.info/pages/acq-irrad-tutorial.html}.
   A summary is provided below.
 
   Different arguments passed to \code{interface.mode} modify which aspects
@@ -214,12 +215,12 @@ Function \code{acq_irrad_interactive()} supports measurement of
   The \code{step.delay} is numeric and gives the length of time between
   successive "light" measurements. The value entered by the user is adjusted
   based on the estimated duration of individual spectrum acquisition. In most
-  cases a vector of length one is used as time step lengths in seconds. Any vector
-  shorter than the number of steps will be extended with \code{rep_len()},
-  and the values interpreted as the time increment in seconds between the
-  start of successive measurements. If the length is the same as "num.steps",
-  and the values are monotonically increasing, they are interpreted as time
-  offsets from the start of the sequence.
+  cases a vector of length one is used as time step lengths in seconds. Any
+  vector shorter than the number of steps will be extended with
+  \code{rep_len()}, and the values interpreted as the time increment in
+  seconds between the start of successive measurements. If the length is the
+  same as "num.steps", and the values are monotonically increasing, they are
+  interpreted as time offsets from the start of the sequence.
 
   The \code{start.boundary} must be set to a character string, with "none",
   or a number of seconds, minutes or hours indicated by a number followed by

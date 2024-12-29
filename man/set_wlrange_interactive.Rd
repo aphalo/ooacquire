@@ -32,3 +32,4 @@ Other interactive acquisition utility functions:
 \code{\link{tune_interactive}()}
 }
 \concept{interactive acquisition utility functions}
+\keyword{internal}

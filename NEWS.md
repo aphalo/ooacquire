@@ -4,38 +4,40 @@ editor_options:
     wrap: 72
 ---
 
-# ooacquire 0.5.2 (2024-12-xx)
+# ooacquire 0.5.2 (2024-12-30)
 
-_Two major bugs fixed, although neither of them affected the quality of the
-spectral data._ The bugs were likely introduced in version 0.5.1 or 0.5.0. I
-find surprising that the first one at least slipped through testing. However, I
-do the testing of the interactive data-acquisition functions manually and I need
-access to a spectrometer for this. The unit tests check the data conversion and
-file reading functions. In addition to bug fixes the interactive menus and 
-messages in function `acq_irrad_interactive()` are improved.
+_Two bugs, one of them major, are fixed._ Although neither of them affected the
+quality of the spectral data one of them prevented the acquisition of spectra.
+The bugs were most likely introduced in version 0.5.1. Automated unit tests
+check the data conversion and file reading functions and did not detect these
+bugs. I do the testing of the interactive data-acquisition functions manually
+and I need access to a spectrometer for this. In addition to the bug-fixes the
+interactive menus and messages in functions `acq_irrad_interactive()` and 
+`acq_fraction_interactive()` are updated as described below.
 
-- Bug fixed: Error triggered when acquiring spectra interactively. The problem
-was related to parameters in the interactive acquisition functions that expect
+- **Bug fixed:** Error triggered when acquiring spectra. The problem was
+related to parameters in the interactive acquisition functions that expect
 function definitions as arguments. Fixed by replacing `NULL` with `NA` as
-default values and changing internal tests. This change does not affect user
+default values and changing internal tests. This change should not affect user
 code or the user interface of the affected functions.
-- Bug fixed: menus for collections and summaries not displayed.
-- Improved: entry of metadata and comments. Added possibility of replacing or
-adding 'what.measured' and 'comment' metadata to the spectra when the plot is 
-displayed. The plot is subsequently refreshed as for other settings in the
-same menu, using the updated metadata.
-- Improved: The currently set metadata are displayed above the menu where they
-can be changed. As before, the values are reused for the next spectrum unless
-modified.
-- Improved: The wavelength range in plots obeys the value of R 
-option `ggspectra.wlrange` if set. Newly, the R option setting can be modified
-interactively in the menu visible when the plot is displayed. The plot is 
-subsequently refreshed as for other settings in the
-same menu.
+- **Bug fixed:** Menus for collections and summaries not displayed.
+- Added possibility of replacing or adding `what.measured`
+and `comment` metadata to the spectra when the plot is displayed. The plot is
+subsequently refreshed like after changes to other settings in the same menu.
+- Improved: The currently set metadata are displayed above the menu from where
+they can be changed. As before, the values are reused for the next spectrum
+unless modified.
+- Improved: The wavelength range in plots obeys the value of R option
+`ggspectra.wlrange` if set. Newly, this R option can be modified interactively
+in the menu visible when the plot is displayed. The plot is subsequently
+refreshed as for other settings in the same menu.
 - Fixed: Confusing sequence of messages when acquiring repeats.
-- Changed: Time in plot subtitle now uses the local timezone. Fractions of 
-seconds are rounded according to R option `digits.secs` if set and to the
-nearest millisecond otherwise.
+- Changed: The time displayed in the plot subtitle now uses the local timezone.
+Fractions of seconds are rounded according to R option `digits.secs` if set and
+to the nearest millisecond otherwise.
+- Enhanced: The `theme` used for plots can optionally be the current 'ggplot2'
+default theme, which can be set with function `ggplot2::theme_set()`, or as
+earlier, the one hard-coded into these functions, which remains the default.
 
 # ooacquire 0.5.1-1 (2024-09-02)
 

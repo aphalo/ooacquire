@@ -67,7 +67,8 @@
 #'   spectra and time series of spectra are supported.
 #'
 #'   A tutorial guiding on the use of this function, illustrated with diagrams,
-#'   is available at \url{https://www.r4photobiology.info/pages/acq-irrad-tutorial.html}.
+#'   is available at
+#'   \url{https://www.r4photobiology.info/pages/acq-irrad-tutorial.html}.
 #'   A summary is provided below.
 #'
 #'   Different arguments passed to \code{interface.mode} modify which aspects
@@ -132,12 +133,12 @@
 #'   The \code{step.delay} is numeric and gives the length of time between
 #'   successive "light" measurements. The value entered by the user is adjusted
 #'   based on the estimated duration of individual spectrum acquisition. In most
-#'   cases a vector of length one is used as time step lengths in seconds. Any vector
-#'   shorter than the number of steps will be extended with \code{rep_len()},
-#'   and the values interpreted as the time increment in seconds between the
-#'   start of successive measurements. If the length is the same as "num.steps",
-#'   and the values are monotonically increasing, they are interpreted as time
-#'   offsets from the start of the sequence.
+#'   cases a vector of length one is used as time step lengths in seconds. Any
+#'   vector shorter than the number of steps will be extended with
+#'   \code{rep_len()}, and the values interpreted as the time increment in
+#'   seconds between the start of successive measurements. If the length is the
+#'   same as "num.steps", and the values are monotonically increasing, they are
+#'   interpreted as time offsets from the start of the sequence.
 #'
 #'   The \code{start.boundary} must be set to a character string, with "none",
 #'   or a number of seconds, minutes or hours indicated by a number followed by
@@ -288,7 +289,8 @@ acq_irrad_interactive <-
            summary.type = "plant",
            save.pdfs = TRUE,
            save.summaries = !interface.mode %in% c("series", "series-attr"),
-           save.collections = !interface.mode %in% c("simple", "series", "series-attr"),
+           save.collections =
+             !interface.mode %in% c("simple", "series", "series-attr"),
            async.saves = FALSE,
            show.figs = TRUE,
            figs.theme = "built.in",
@@ -303,17 +305,20 @@ acq_irrad_interactive <-
                                sep = "-"),
            user.name = Sys.info()[["user"]],
            session.name = paste(user.name,
-                                strftime(lubridate::now(tzone = "UTC"),
-                                         "%Y.%b.%d_%H.%M.%S"),
+                                strftime(lubridate::now(tzone = ""),
+                                         "%Y_%m_%d.%H%M"),
                                 sep = "_"),
            verbose = getOption("photobiology.verbose", default = FALSE),
            QC.enabled = TRUE) {
 
     ## ggplot default themes
+    # A dark theme option used only for the screen would be useful
     if (figs.theme == "built.in") {
       screen.theme <- pdf.theme <-
         list(ggplot2::theme_bw(), ggplot2::theme(legend.position = "bottom"))
     } else if (figs.theme %in% c("ggplot2.current", "current")) {
+      # adding an empty list to a gg object is of no consequence, and without
+      # a explicit theme added, the theme set as current is used.
       screen.theme <- pdf.theme <- list()
     }
 
@@ -330,14 +335,16 @@ acq_irrad_interactive <-
     }
 
     if (async.saves && !requireNamespace("mirai", quietly = TRUE)) {
-      message("Ignoring 'async.saves = TRUE' as package 'mirai' is not installed")
+      message("Ignoring 'async.saves = TRUE' as ",
+              "package 'mirai' is not installed")
       async.saves <- FALSE
     }
 
     if (async.saves) {
       cat("Will save files asynchronously\n(not blocking data acquisitions)\n")
     } else {
-      cat("Will save files synchronously\n(blocking data acquisition until files are saved)\n")
+      cat("Will save files synchronously\n",
+          "(blocking data acquisition until files are saved)\n")
     }
 
     # initialize mirai
@@ -413,21 +420,24 @@ acq_irrad_interactive <-
     cat("Using channel ", ch.index,
         " from spectrometer with serial number: ", serial_no, "\n", sep = "")
 
-    # if multiple entrance optics are available, each has a different calibration
+    # with multiple entrance optics available, each has a different calibration
     # we validate the argument passed in the case of on spectrometer
     if (serial_no == "MAYP11278") {
       if (is.null(entrance.optics) || grepl("^cos", entrance.optics) ) {
         entrance.optics <- "cosine"
-      } else if (entrance.optics == "dome" || grepl("^hemis", entrance.optics)) {
+      } else if (entrance.optics == "dome" ||
+                 grepl("^hemis", entrance.optics)) {
         entrance.optics <- "hemispherical"
       } else {
-        warning("Aborting! 'entrance.optics' must be \"cosine\" or \"hemispherical\"", call. = FALSE)
+        warning("Aborting! 'entrance.optics' must be ",
+                "\"cosine\" or \"hemispherical\"", call. = FALSE)
         return(NULL)
       }
       cat("Entrance optics \"", entrance.optics, "\" selected\n", sep = "")
       answer.entrance <- readline("Is this correct? YES/no (y-/n)")
       if (!answer.entrance %in% c("", "y")) {
-        warning("Aborting! 'entrance.optics' selection not validated by user!", call. = FALSE)
+        warning("Aborting! 'entrance.optics' selection not validated by user!",
+                call. = FALSE)
         return(NULL)
       }
     }
@@ -436,20 +446,28 @@ acq_irrad_interactive <-
     if (anyNA(c(descriptors[[1]], correction.method[[1]]))) {
       descriptor <-
         switch(serial_no,
-               MAYP11278 = which_descriptor(descriptors = ooacquire::MAYP11278_descriptors,
-                                            entrance.optics = entrance.optics),
-               MAYP112785 = which_descriptor(descriptors = ooacquire::MAYP112785_descriptors),
-               MAYP114590 = which_descriptor(descriptors = ooacquire::MAYP114590_descriptors),
-               FLMS04133 = which_descriptor(descriptors = ooacquire::FLMS04133_descriptors),
-               FLMS00673 = which_descriptor(descriptors = ooacquire::FLMS00673_descriptors),
-               FLMS00440 = which_descriptor(descriptors = ooacquire::FLMS00440_descriptors),
-               FLMS00416 = which_descriptor(descriptors = ooacquire::FLMS00416_descriptors),
-               {
-                 warning("No instrument descriptor found, retrieving from the spectrometer",
-                         call. = FALSE)
-                 get_oo_descriptor(w, sr.index = sr.index, ch.index = ch.index)
-                 # this can introduce NA irrad.mult, which are checked further below
-               }
+          MAYP11278 =
+            which_descriptor(descriptors = ooacquire::MAYP11278_descriptors,
+                             entrance.optics = entrance.optics),
+          MAYP112785 =
+            which_descriptor(descriptors = ooacquire::MAYP112785_descriptors),
+          MAYP114590 =
+            which_descriptor(descriptors = ooacquire::MAYP114590_descriptors),
+          FLMS04133 =
+            which_descriptor(descriptors = ooacquire::FLMS04133_descriptors),
+          FLMS00673 =
+            which_descriptor(descriptors = ooacquire::FLMS00673_descriptors),
+          FLMS00440 =
+            which_descriptor(descriptors = ooacquire::FLMS00440_descriptors),
+          FLMS00416 =
+            which_descriptor(descriptors = ooacquire::FLMS00416_descriptors),
+          {
+            warning("No instrument descriptor found in software, ",
+                    "retrieving from the spectrometer",
+                    call. = FALSE)
+            get_oo_descriptor(w, sr.index = sr.index, ch.index = ch.index)
+            # this can introduce NA irrad.mult, which are checked further below
+          }
         )
 
       correction.method <-
@@ -462,8 +480,9 @@ acq_irrad_interactive <-
                FLMS00440 = ooacquire::FLMS00440_none.mthd,
                FLMS00416 = ooacquire::FLMS00416_none.mthd,
                {
-                 warning("No spectrometer-specific method found, using a generic one",
-                         call. = FALSE)
+                 warning(
+                   "No spectrometer-specific method found, using a generic one",
+                   call. = FALSE)
                  new_correction_method(descriptor,
                                        stray.light.method = "none")
                }
@@ -473,20 +492,29 @@ acq_irrad_interactive <-
       available.protocols <- names(protocols)
       default.protocol <-
         switch(serial_no,
-               MAYP11278 = ifelse("lfd" %in% available.protocols, "lfd", available.protocols[1]),
-               MAYP112785 = ifelse("lfd" %in% available.protocols, "lfd", available.protocols[1]),
-               MAYP114590 = ifelse("lfd" %in% available.protocols, "lfd", available.protocols[1]),
-               FLMS04133 = ifelse("ld" %in% available.protocols, "ld", available.protocols[1]),
-               FLMS00673 = ifelse("ld" %in% available.protocols, "ld", available.protocols[1]),
-               FLMS00440 = ifelse("ld" %in% available.protocols, "ld", available.protocols[1]),
-               FLMS00416 = ifelse("ld" %in% available.protocols, "ld", available.protocols[1]),
-               ifelse("ld" %in% available.protocols, "ld", available.protocols[1])
+          MAYP11278 = ifelse("lfd" %in% available.protocols,
+                             "lfd", available.protocols[1]),
+          MAYP112785 = ifelse("lfd" %in% available.protocols,
+                              "lfd", available.protocols[1]),
+          MAYP114590 = ifelse("lfd" %in% available.protocols,
+                              "lfd", available.protocols[1]),
+          FLMS04133 = ifelse("ld" %in% available.protocols,
+                             "ld", available.protocols[1]),
+          FLMS00673 = ifelse("ld" %in% available.protocols,
+                             "ld", available.protocols[1]),
+          FLMS00440 = ifelse("ld" %in% available.protocols,
+                             "ld", available.protocols[1]),
+          FLMS00416 = ifelse("ld" %in% available.protocols,
+                             "ld", available.protocols[1]),
+          ifelse("ld" %in% available.protocols,
+                 "ld", available.protocols[1])
         )
 
     } else {
       descriptor <- which_descriptor(descriptors = descriptors)
       stopifnot(exists("spectrometer.name", descriptor))
-      default.protocol <- ifelse("ld" %in% available.protocols, "ld", available.protocols[1])
+      default.protocol <- ifelse("ld" %in% available.protocols,
+                                 "ld", available.protocols[1])
     }
 
     # jwrapper and spectrometer indexes have to be set to current ones if
@@ -513,13 +541,16 @@ acq_irrad_interactive <-
 
     # check serial numbers, really needed only for user supplied descriptors
     descriptor.inst <- get_oo_descriptor(w)
-    stopifnot(descriptor[["spectrometer.sn"]] == descriptor.inst[["spectrometer.sn"]])
+    stopifnot(descriptor[["spectrometer.sn"]] ==
+                descriptor.inst[["spectrometer.sn"]])
 
     # check that wavelength calibration is available
-    stopifnot(length(descriptor[["wavelengths"]]) == descriptor[["num.pixs"]])
+    stopifnot(length(descriptor[["wavelengths"]]) ==
+                descriptor[["num.pixs"]])
 
     # check for valid calibration multipliers
-    if (length(descriptor[["inst.calib"]][["irrad.mult"]]) != descriptor[["num.pixs"]] ||
+    if (length(descriptor[["inst.calib"]][["irrad.mult"]]) !=
+           descriptor[["num.pixs"]] ||
         anyNA(descriptor[["inst.calib"]][["irrad.mult"]])) {
       if (qty.out %in% c("irrad", "fluence")) {
         warning("Bad calibration data, returning counts-per-second.",
@@ -532,10 +563,11 @@ acq_irrad_interactive <-
     # session and user IDs
     session.name <- set_session_name_interactive(session.name)
     user.name <- set_user_name_interactive(user.name)
-    session.label <- paste("Operator: ", user.name,
-                           "\nSession: ", session.name,
-                           ", instrument s.n.: ", descriptor[["spectrometer.sn"]],
-                           sep = "")
+    session.label <-
+      paste("Operator: ", user.name,
+            "\nSession: ", session.name,
+            ", instrument s.n.: ", descriptor[["spectrometer.sn"]],
+            sep = "")
 
     # set working directory for current session
     folder.name <- set_folder_interactive(folder.name)
@@ -547,15 +579,18 @@ acq_irrad_interactive <-
     user.attrs <-
       list(what.measured = "",
            comment.text = "",
-           how.measured = paste("Acquired with ", descriptor[["spectrometer.name"]],
-                                " (", descriptor[["spectrometer.sn"]],
-                                "), with a ", descriptor[["entrance.optics"]][["geometry"]], " diffuser",
-                                "\nR (", paste(R.version[["major"]], R.version[["minor"]], sep = "."),
-                                "), 'ooacquire' (", utils::packageVersion("ooacquire"),
-                                ") in mode \"", interface.mode,
-                                "\", 'rOmniDriver' (", utils::packageVersion("rOmniDriver"),
-                                ") and OmniDriver (", rOmniDriver::get_api_version(w), ").",
-                                sep = ""))
+           how.measured =
+             paste("Acquired with ", descriptor[["spectrometer.name"]],
+                   " (", descriptor[["spectrometer.sn"]],
+                   "), with a ", descriptor[["entrance.optics"]][["geometry"]],
+                   " diffuser",
+                   "\nR (", paste(R.version[["major"]], R.version[["minor"]],
+                                  sep = "."),
+                   "), 'ooacquire' (", utils::packageVersion("ooacquire"),
+                   ") in mode \"", interface.mode,
+                   "\", 'rOmniDriver' (", utils::packageVersion("rOmniDriver"),
+                   ") and OmniDriver (", rOmniDriver::get_api_version(w), ").",
+                   sep = ""))
 
     # ask user to choose protocol only if needed
     if (length(protocols) > 1) {
@@ -583,7 +618,8 @@ acq_irrad_interactive <-
                            step.delay = 0,
                            num.steps = 1L)
     } else if (!setequal(names(seq.settings),
-                         c("start.boundary", "initial.delay", "step.delay", "num.steps"))) {
+                         c("start.boundary", "initial.delay",
+                           "step.delay", "num.steps"))) {
       warning("Missing or wrong member names in 'seq.settings': ignoring!")
       seq.settings <- list(start.boundary = "second",
                            initial.delay = 0.1,
@@ -669,7 +705,8 @@ acq_irrad_interactive <-
 
             base.obj.name <- make.names(user.obj.name)
             if (base.obj.name != user.obj.name) {
-              answ <- readline(paste("Use sanitised (base) name '", base.obj.name, "'? (y-/n): "))
+              answ <- readline(paste("Use sanitised (base) name '",
+                                     base.obj.name, "'? (y-/n): "))
               if (answ == "n") {
                 base.obj.name <- current.base.obj.name
                 next()
@@ -694,10 +731,12 @@ acq_irrad_interactive <-
 
         if (sequential.naming) {
           # increase width of seq numbers if needed
-          seq.name.digits <- max(seq.name.digits, ceiling(log10(file.counter + 1)))
-          obj.name <- paste(base.obj.name,
-                            formatC(file.counter, width = seq.name.digits, flag = "0"),
-                            sep = "")
+          seq.name.digits <-
+            max(seq.name.digits, ceiling(log10(file.counter + 1)))
+          obj.name <-
+            paste(base.obj.name,
+                  formatC(file.counter, width = seq.name.digits, flag = "0"),
+                  sep = "")
         } else {
           obj.name <- base.obj.name
         }
@@ -718,7 +757,8 @@ acq_irrad_interactive <-
             break()
           } else {
             # operator likely present
-            if (readline(paste("Overwrite existing '", irrad.name, "? (y/n-): "))[1] == "y") {
+            if (readline(paste("Overwrite existing '", irrad.name,
+                               "? (y/n-): "))[1] == "y") {
               irrad.names <- setdiff(irrad.names, irrad.name)
               raw.names <- setdiff(raw.names, raw.name)
               break()
@@ -734,6 +774,8 @@ acq_irrad_interactive <-
       if (total.repeats > 1) {
         cat("\nRepeat ", total.repeats - pending.repeats + 1,
             " of ", total.repeats, ".\n", sep = "")
+      } else {
+        cat("\nNew acquisition.\n")
       }
 
       # user input of metadata for attributes "comment" and "what.measured"
@@ -760,16 +802,16 @@ acq_irrad_interactive <-
       if (get.seq.settings) {
 
         # Estimate time needed for measuring one spectrum
-        if (length(settings$HDR.mult) > 1) { # acq settings once per integ time value
+        if (length(settings$HDR.mult) > 1) { # settings per integ time value
           estimated.measurement.duration <-
             sum(settings$integ.time * settings$num.scans * 1e-6) +
-            acq.overhead * length(settings$HDR.mult) + # number of HDR acquisitions
-            sum(2 * settings$integ.time * 1e-6) # worse case overhead due to restart
-        } else if (length(settings$HDR.mult) == 1) { # no need to change acq settings
+            acq.overhead * length(settings$HDR.mult) + # number of HDR acq.
+            sum(2 * settings$integ.time * 1e-6) # worse case overhead on restart
+        } else if (length(settings$HDR.mult) == 1) { # no change in settings
           if (settings$num.scans > 1) {
             estimated.measurement.duration <-
               settings$integ.time * settings$num.scans * 1e-6 + acq.overhead
-          } else if (settings$num.scans == 1) { # buffered high speed acquisition
+          } else if (settings$num.scans == 1) { # buffered high speed acq.
             estimated.measurement.duration <-
               settings$integ.time * 1e-6 # no overhead
           } else {
@@ -786,14 +828,15 @@ acq_irrad_interactive <-
             signif(estimated.measurement.duration, 3), " s.\n", sep = "")
 
         seq.settings <-
-          set_seq_interactive(seq.settings = seq.settings,
-                              measurement.duration = estimated.measurement.duration,
-                              minimum.step.delay = ifelse(length(settings$HDR.mult) == 1L,
-                                                          0,
-                                                          estimated.measurement.duration),
-                              time.division = ifelse(length(settings$HDR.mult) == 1L,
-                                                     settings$integ.time * 1e-6, # -> seconds
-                                                     0))
+          set_seq_interactive(
+            seq.settings = seq.settings,
+            measurement.duration = estimated.measurement.duration,
+            minimum.step.delay = ifelse(length(settings$HDR.mult) == 1L,
+                                        0,
+                                        estimated.measurement.duration),
+            time.division = ifelse(length(settings$HDR.mult) == 1L,
+                                   settings$integ.time * 1e-6, # -> seconds
+                                   0))
         get.seq.settings <- FALSE
 
       }
@@ -813,7 +856,8 @@ acq_irrad_interactive <-
                                      pause.fun = NULL,
                                      f.trigger.on = f.trigger.on,
                                      f.trigger.off = f.trigger.off,
-                                     triggers.enabled = intersect(protocol, triggers.enabled),
+                                     triggers.enabled =
+                                       intersect(protocol, triggers.enabled),
                                      user.label = obj.name)
         } else {
           if (pending.repeats == total.repeats) {
@@ -826,7 +870,8 @@ acq_irrad_interactive <-
                                      pause.fun = function(...) {TRUE},
                                      f.trigger.on = f.trigger.on,
                                      f.trigger.off = f.trigger.off,
-                                     triggers.enabled = intersect(protocol, triggers.enabled),
+                                     triggers.enabled =
+                                       intersect(protocol, triggers.enabled),
                                      user.label = obj.name)
         }
       } else { # acquire all spectra needed for protocol
@@ -837,7 +882,8 @@ acq_irrad_interactive <-
                                    pause.fun = NULL, # default
                                    f.trigger.on = f.trigger.on,
                                    f.trigger.off = f.trigger.off,
-                                   triggers.enabled = intersect(protocol, triggers.enabled),
+                                   triggers.enabled =
+                                     intersect(protocol, triggers.enabled),
                                    user.label = obj.name)
       }
 
@@ -887,12 +933,13 @@ acq_irrad_interactive <-
         }
 
         irrad.spct <-
-          s_irrad_corrected(x = raw.mspct,
-                            spct.names = spct.names,
-                            correction.method = correction.method,
-                            hdr.tolerance = getOption("ooacquire.hdr.tolerance",
-                                                      default = 0.05),
-                            return.cps = qty.out == "cps")
+          s_irrad_corrected(
+            x = raw.mspct,
+            spct.names = spct.names,
+            correction.method = correction.method,
+            hdr.tolerance = getOption("ooacquire.hdr.tolerance",
+                                      default = 0.05),
+            return.cps = qty.out == "cps")
 
         cat('Adding metadata ... ')
         photobiology::setHowMeasured(irrad.spct, user.attrs$how.measured)
@@ -914,7 +961,7 @@ acq_irrad_interactive <-
         }
 
         # prepare plot invariants
-        if (plot.lines.max < getMultipleWl(irrad.spct)) {
+        if (getMultipleWl(irrad.spct) > plot.lines.max) {
           title.text <- paste(what_measured(irrad.spct)[[1L]],
                               " (n = ", plot.lines.max,
                               "/", getMultipleWl(irrad.spct),
@@ -933,10 +980,11 @@ acq_irrad_interactive <-
           if (length(raw.mspct) > 10L) {
             cat("Building plot ... ")
           }
-          fig <- ggplot2::autoplot(plot.spct,
-                                   annotations = c("-", "colour.guide"),
-                                   geom = ifelse(getMultipleWl(irrad.spct) == 1,
-                                                 "spct", "line")) +
+          fig <-
+            ggplot2::autoplot(plot.spct,
+                              annotations = c("-", "colour.guide"),
+                              geom = ifelse(getMultipleWl(irrad.spct) == 1,
+                                            "spct", "line")) +
             ggplot2::labs(title = title.text,
                           subtitle = format(when_measured(irrad.spct)[[1L]],
                                             tz = ""),
@@ -961,10 +1009,13 @@ acq_irrad_interactive <-
           # to avoid delays
           if (!reuse.seq.settings || pending.repeats == 1) {
             if(qty.out == "cps") {
-              plot.prompt <- "fig/w.bands/range/attr/discard+go/SAVE+GO (f/w/r/a/d/s-): "
+              plot.prompt <-
+                "fig/w.bands/range/attr/discard+go/SAVE+GO (f/w/r/a/d/s-): "
               valid.answers <-  c("f","w", "r", "a", "d", "s", "g")
             } else {
-              plot.prompt <- "fig/photons/energy/w.bands/range/attr/discard+go/SAVE+GO (f/p/e/w/r/a/d/s-): "
+              plot.prompt <-
+                paste0("fig/photons/energy/w.bands/range/attr/",
+                       "discard+go/SAVE+GO(f/p/e/w/r/a/d/s-): ")
               valid.answers <- c("f","p", "e", "w", "r", "a", "d", "s", "g")
             }
             repeat {
@@ -977,16 +1028,23 @@ acq_irrad_interactive <-
               }
             }
             switch(answer,
-                   f = {clear.display <- show.figs; show.figs <- !show.figs; next()},
-                   p = {options(photobiology.radiation.unit = "photon"); next()},
-                   e = {options(photobiology.radiation.unit = "energy"); next()},
+                   f = {
+                     clear.display <- show.figs; show.figs <- !show.figs;
+                     next()},
+                   p = {
+                     options(photobiology.radiation.unit = "photon");
+                     next()},
+                   e = {
+                     options(photobiology.radiation.unit = "energy");
+                     next()},
                    w = {
                      repeat {
                        utils::flush.console()
                        answer1 <-
                          tolower(
-                           readline("Bands: UV+PhR/UV+PAR/plants/VIS/TOT/DEFAULT (u/a/p/v/t/d-): ")
-                         )[1]
+                           readline(
+                             paste0("Bands: UV+PhR/UV+PAR/plants/VIS/TOT/",
+                                    "DEFAULT (u/a/p/v/t/d-): ")))[1]
                        answer1 <- ifelse(answer1 == "", "d", answer1)
                        if (answer1 %in% c("u", "a", "p", "v", "t", "d")) {
                          break()
@@ -994,23 +1052,24 @@ acq_irrad_interactive <-
                          print("Answer not recognized. Please try again...")
                        }
                      }
-                     switch(answer1,
-                            u = options(photobiology.plot.bands =
-                                          c(photobiologyWavebands::UV_bands(),
-                                            list(photobiologyWavebands::PhR()))),
-                            a = options(photobiology.plot.bands =
-                                          c(photobiologyWavebands::UV_bands(),
-                                            list(photobiologyWavebands::PAR()))),
-                            p = options(photobiology.plot.bands =
-                                          photobiologyWavebands::Plant_bands()),
-                            v = options(photobiology.plot.bands =
-                                          photobiologyWavebands::VIS_bands()),
-                            t = options(photobiology.plot.bands =
-                                          list(photobiology::new_waveband(
-                                            photobiology::wl_min(irrad.spct),
-                                            photobiology::wl_max(irrad.spct),
-                                            wb.name = "Total"))),
-                            options(photobiology.plot.bands = NULL))
+                     switch(
+                       answer1,
+                       u = options(photobiology.plot.bands =
+                                     c(photobiologyWavebands::UV_bands(),
+                                       list(photobiologyWavebands::PhR()))),
+                       a = options(photobiology.plot.bands =
+                                     c(photobiologyWavebands::UV_bands(),
+                                       list(photobiologyWavebands::PAR()))),
+                       p = options(photobiology.plot.bands =
+                                     photobiologyWavebands::Plant_bands()),
+                       v = options(photobiology.plot.bands =
+                                     photobiologyWavebands::VIS_bands()),
+                       t = options(photobiology.plot.bands =
+                                     list(photobiology::new_waveband(
+                                       photobiology::wl_min(irrad.spct),
+                                       photobiology::wl_max(irrad.spct),
+                                       wb.name = "Total"))),
+                       options(photobiology.plot.bands = NULL))
                      next()},
                    a = { # allow metadata attributes to be replaced
                      user.attrs <- set_attributes_interactive(user.attrs)
@@ -1018,24 +1077,28 @@ acq_irrad_interactive <-
                      photobiology::what_measured(irrad.spct) <-
                        user.attrs$what.measured
                      comment(irrad.spct) <-
-                       paste(comment.text.root, user.attrs$comment.text, sep = "\n")
-                     # object to be displayed, possibly containing a subset of spectra
-                     # metadata update needed if annotations are not the default
+                       paste(comment.text.root, user.attrs$comment.text,
+                             sep = "\n")
+                     # plot data, possibly a subset of measured spectra
+                     # metadata update needed if annotations not default
                      photobiology::what_measured(plot.spct) <-
                        user.attrs$what.measured
                      comment(plot.spct) <-
-                       paste(comment.text.root, user.attrs$comment.text, sep = "\n")
+                       paste(comment.text.root, user.attrs$comment.text,
+                             sep = "\n")
                      # Update plot title text
                      if (plot.lines.max < getMultipleWl(irrad.spct)) {
-                       title.text <- paste(what_measured(irrad.spct)[[1L]],
-                                           " (n = ", plot.lines.max,
-                                           "/", getMultipleWl(irrad.spct),
-                                           ")",
-                                           sep = "")
+                       title.text <-
+                         paste(what_measured(irrad.spct)[[1L]],
+                               " (n = ", plot.lines.max,
+                               "/", getMultipleWl(irrad.spct),
+                               ")",
+                               sep = "")
                      } else {
-                       title.text <- paste(what_measured(irrad.spct)[[1L]],
-                                           " (n = ", getMultipleWl(irrad.spct), ")",
-                                           sep = "")
+                       title.text <-
+                         paste(what_measured(irrad.spct)[[1L]],
+                               " (n = ", getMultipleWl(irrad.spct), ")",
+                               sep = "")
                      }
                      next()},
                    r = { # set R option "ggspectra.wlrange"
@@ -1172,25 +1235,40 @@ acq_irrad_interactive <-
                   paste(irrad.names, collapse = ", "))
           message("Raw objects to collect: ",
                   paste(raw.names, collapse = ", "), sep = " ")
-          user.collection.name <- readline("Name of the collection?: ")
-          collection.name <- make.names(paste("collection ",
-                                              user.collection.name, sep = ""))
-          if (user.collection.name == "") {
-            collection.name <- make.names(paste("collection ",
-                                                lubridate::now(tzone = "UTC"), sep = ""))
-          }
-          if (collection.name != user.collection.name) {
-            message("Using sanitised/generated name: '",
-                    collection.name, "'.", sep = "")
+          repeat {
+            user.collection.name <- readline("Name of the collection?: ")
+            # name of the R object holding the collection
+            if (user.collection.name == "") {
+              cat("No name supplied, creating one...\n")
+              collection.name <-
+                paste("collection",
+                      format(lubridate::now(tzone = ""),
+                             format = "%Y_%m_%d.%H%M",
+                             tz = "UTC"), sep = ".")
+            } else {
+              collection.name <-
+                make.names(paste("collection ",
+                                 user.collection.name, sep = ""))
+            }
+            # name of the Rda file used to save the collection
+            collection.file.name <- paste(collection.name, "Rda", sep = ".")
+            if (file.exists(collection.file.name)) {
+              cat("A file with name '", collection.file.name,
+                  "' already exists. Please, try again...\n")
+              next()
+            }
+            if (collection.name != user.collection.name) {
+              message("Using sanitised/generated name: '",
+                      collection.name, "'.", sep = "")
+            }
+            break()
           }
           collection.title <- readline("Title for plot?: ")
           if (collection.title == "") {
             collection.title <- collection.name
           }
 
-          # name of the Rda file used to save the collection
-          collection.file.name <- paste(collection.name, "Rda", sep = ".")
-          # collection.objects used to collect all R objects to be saved to the Rda file
+          # names of collection.objects used to collect R objects to be saved
           collection.objects <- character()
 
           if (qty.out != "raw") {
@@ -1203,31 +1281,38 @@ acq_irrad_interactive <-
                      cps =   photobiology::cps_mspct(mget(irrad.names)))
 
             # plot collection and summaries
-            if (plot.lines.max < getMultipleWl(irrad.spct)) {
-              collection.title <- paste(collection.title,
-                                        " (sample of ", plot.lines.max, ")",
-                                        sep = "")
+            if (length(collection.mspct) > plot.lines.max) {
+              collection.title <-
+                paste(collection.title,
+                      " (", plot.lines.max, " out of n = ",
+                      length(collection.mspct), ")",
+                      sep = "")
             } else {
-              collection.title <- paste(collection.title,
-                                        " (n = ", getMultipleWl(irrad.spct), ")",
-                                        sep = "")
+              collection.title <-
+                paste(collection.title,
+                      " (n = ", length(collection.mspct), ")",
+                      sep = "")
             }
 
             # create plot
-            # if too many spectra to plot, draw a random sample of the maximum size
+            # if too many spectra, draw a random sample of the maximum size
             collection.fig <-
-              ggplot2::autoplot(pull_sample(collection.mspct, plot.lines.max),
-                                annotations =
-                                  c("-", "peaks", "colour.guide", "summaries")) +
-              ggplot2::labs(title = collection.title,
-                            subtitle = session.label,
-                            caption = how_measured(collection.mspct[[1L]]))
+              ggplot2::autoplot(
+                pull_sample(collection.mspct, plot.lines.max),
+                annotations =
+                  c("-", "peaks", "colour.guide", "summaries")) +
+              ggplot2::labs(
+                title = collection.title,
+                subtitle = session.label,
+                caption = how_measured(collection.mspct[[1L]]))
+
             print(collection.fig + screen.theme)
             rm(collection.title)
 
             # save plot to file on disk
             if (save.pdfs) {
-              collection.pdf.name <- paste(collection.name, "pdf", sep = ".")
+              collection.pdf.name <-
+                paste(collection.name, "pdf", sep = ".")
               grDevices::pdf(file = collection.pdf.name, onefile = TRUE,
                              width = 11, height = 7, paper = "a4r")
               print(collection.fig + pdf.theme)
@@ -1241,16 +1326,19 @@ acq_irrad_interactive <-
               contents.collection.name <-
                 paste(collection.name, "contents.tb", sep = ".")
               assign(contents.collection.name, summary(collection.mspct))
-              collection.objects <- c(collection.objects, contents.collection.name)
+              collection.objects <-
+                c(collection.objects, contents.collection.name)
 
               if (qty.out %in% c("irrad", "fluence")) {
                 last.summary.type <- summary.type
                 repeat{
                   valid.answers <- c("plant", "PAR", "VIS")
-                  summary.type <- readline(paste("Change summary type from \"",
-                                                 last.summary.type, "\"? (",
-                                                 paste(valid.answers, collapse = "/", sep = ""),
-                                                 ") : ", sep = ""))[1]
+                  summary.type <-
+                    readline(paste("Change summary type from \"",
+                                   last.summary.type, "\"? (",
+                                   paste(valid.answers, collapse = "/",
+                                         sep = ""),
+                                   ") : ", sep = ""))[1]
                   if (summary.type == "") {
                     summary.type <- last.summary.type
                   }
@@ -1266,13 +1354,16 @@ acq_irrad_interactive <-
 
                 # save summary table to file on disk
                 if (!is.null(summary.tb) && is.data.frame(summary.tb)) {
-                  readr::write_delim(summary.tb,
-                                     file =  paste(collection.name, "csv", sep = "."),
-                                     delim = readr::locale()$grouping_mark)
-                  summary.collection.name <- paste(collection.name, "summary.tb", sep = ".")
+                  readr::write_delim(
+                    summary.tb,
+                    file =  paste(collection.name, "csv", sep = "."),
+                    delim = readr::locale()$grouping_mark)
+                  summary.collection.name <-
+                    paste(collection.name, "summary.tb", sep = ".")
                   # "rename" data frame with summaries
                   assign(summary.collection.name, summary.tb)
-                  collection.objects <- c(collection.objects, summary.collection.name)
+                  collection.objects <-
+                    c(collection.objects, summary.collection.name)
                 } else {
                   message("Computation of summaries failed!")
                 }
@@ -1282,25 +1373,22 @@ acq_irrad_interactive <-
             # create collection of raw-counts spectra and save all collections
             if (save.collections) {
               # "rename" temporary objects
-              irrad.collection.name <- paste(collection.name, qty.out, "mspct", sep = ".")
+              irrad.collection.name <-
+                paste(collection.name, qty.out, "mspct", sep = ".")
               assign(irrad.collection.name, collection.mspct)
-              collection.objects <- c(collection.objects, irrad.collection.name)
+              collection.objects <-
+                c(collection.objects, irrad.collection.name)
 
-              raw.collection.name <- paste(collection.name, "raw", "lst", sep = ".")
+              raw.collection.name <-
+                paste(collection.name, "raw", "lst", sep = ".")
               assign(raw.collection.name, mget(raw.names))
-              collection.objects <- c(collection.objects, raw.collection.name)
+              collection.objects <-
+                c(collection.objects, raw.collection.name)
 
               # save collections to files on disk
-              retrying <- FALSE
-              if (file.exists(collection.file.name)) {
-                collection.file.name <-
-                  gsub("\\.rda$",
-                       paste(trunc(runif(n = 1) * 1000), ".rda", sep = ""),
-                       collection.file.name)
-                message("File exists! Name changed into ", basename(collection.file.name))
-              }
               repeat {
-                save(list = collection.objects, file = collection.file.name, precheck = TRUE)
+                save(list = collection.objects,
+                     file = collection.file.name, precheck = TRUE)
                 if (file.exists(collection.file.name)) {
                   message("Collection objects saved to file '",
                           collection.file.name, "'.", sep = "")
@@ -1316,10 +1404,12 @@ acq_irrad_interactive <-
                   break()
                 } else {
                   if (retrying) {
-                    message("Saving of the collection to file failed again! (Aborting)")
+                    message("Saving of the collection to file failed again! ",
+                            "(Aborting)")
                     break()
                   }
-                  message("Saving of the collection to file failed! (Trying again)")
+                  message("Saving of the collection to file failed! ",
+                          "(Trying again)")
                   retrying <- TRUE
                 }
               }
@@ -1330,7 +1420,8 @@ acq_irrad_interactive <-
 
       # whole-measurement repeats remaining to be done
       if (acq.pausing && pending.repeats > 1) {
-        answer.abort <- readline(prompt = "Skip pending repeats? yes/NO (y/n-): ")
+        answer.abort <-
+          readline(prompt = "Skip pending repeats? yes/NO (y/n-): ")
         if (answer.abort %in% c("y", "z")) {
           pending.repeats <- 1
         }
@@ -1380,7 +1471,8 @@ acq_irrad_interactive <-
             }
           }
           repeat {
-            answer3 <- readline("Repeats: no figs./WITH FIGS./pausing (n/f-/p): ")
+            answer3 <-
+              readline("Repeats: no figs./WITH FIGS./pausing (n/f-/p): ")
             if (answer3 == "") {
               answer3 <- "f"
             }
@@ -1433,7 +1525,8 @@ acq_irrad_interactive <-
     } # end of main UI loop
 
     # Wait for all files to be saved (needed? but anyway reassuring)
-    if (async.saves && (mirai::unresolved(rda.mirai) || mirai::unresolved(pdf.mirai))) {
+    if (async.saves &&
+        (mirai::unresolved(rda.mirai) || mirai::unresolved(pdf.mirai))) {
       cat("Saving files ")
       while (mirai::unresolved(rda.mirai) || mirai::unresolved(pdf.mirai)) {
         cat(".")
@@ -1479,11 +1572,12 @@ acq_irrad_interactive <-
 #' @param summary.type character One of "plant", "PAR" or "VIS".
 #' @param digits integer The number of significant digits in the output.
 #'
-#' @details This function packages different functions from pacakge 'photobiology'
-#'    and returns a typical set of summaries for different purposes.
+#' @details This function packages different functions from pacakge
+#'   'photobiology' and returns a typical set of summaries for different
+#'   purposes.
 #'
-#' @return A tibble with one row per spectrum and one column per
-#'    summary quantity and attribute and a column with the names of the spectra.
+#' @return A tibble with one row per spectrum and one column per summary
+#'   quantity and attribute and a column with the names of the spectra.
 #'
 #' @export
 #'
@@ -1545,13 +1639,17 @@ irrad_summary_table <-
             w.band.denom = photobiologyWavebands::PAR())
     vis_ratios.tb <-
       ratio(mspct,
-            w.band.num = list(blue = photobiologyWavebands::Blue("Sellaro"),
-                              red = photobiologyWavebands::Red("Smith20")),
-            w.band.denom = list(green = photobiologyWavebands::Green("Sellaro"),
-                                "far-red" = photobiologyWavebands::Far_red("Smith20")),
+            w.band.num =
+              list(blue = photobiologyWavebands::Blue("Sellaro"),
+                   red = photobiologyWavebands::Red("Smith20")),
+            w.band.denom =
+              list(green = photobiologyWavebands::Green("Sellaro"),
+                   "far-red" = photobiologyWavebands::Far_red("Smith20")),
             attr2tb = attr2tb)
-    summary.tb <- dplyr::full_join(irrad.tb, uv_ratios.tb, by = "spct.idx")
-    summary.tb <- dplyr::full_join(summary.tb, vis_ratios.tb, by = "spct.idx")
+    summary.tb <-
+      dplyr::full_join(irrad.tb, uv_ratios.tb, by = "spct.idx")
+    summary.tb <-
+      dplyr::full_join(summary.tb, vis_ratios.tb, by = "spct.idx")
   } else if (summary.type == "VIS") {
     summary.tb <-
       photobiology::irrad(mspct,
