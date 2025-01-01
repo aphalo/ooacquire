@@ -393,7 +393,7 @@ citation("ooacquire")
 
 ## License
 
-© 2016-2024 Pedro J. Aphalo
+© 2016-2025 Pedro J. Aphalo
 ([pedro.aphalo\@helsinki.fi](mailto:pedro.aphalo@helsinki.fi)) for the
 code. Lasse Ylianttila developed the majority of the algorithms used.
 Released under the GPL, version 2 or greater. This software carries no
