@@ -976,7 +976,7 @@ acq_fraction_interactive <-
           # save objects to files on disk
           if (async.saves && !mirai::unresolved(rda.mirai)) {
             # non-blocking
-            cat("Saving files asynchronously ...\n")
+            cat("Saving '", obj.name, "' to file asynchronously.\n", sep = "")
             rda.mirai <-
               mirai::mirai({
                 assign(obj.names[1], raw.mspct)
@@ -992,7 +992,7 @@ acq_fraction_interactive <-
               )
           } else {
             # fall back to main process
-            cat("Saving files ... ")
+            cat("Saving '", obj.name, "' to file ... ", sep = "")
             save(list = obj.names, file = file.name)
             cat("ready\n")
           }
@@ -1045,7 +1045,7 @@ acq_fraction_interactive <-
             assign(raw.name, raw.mspct)
 
             if (async.saves && !mirai::unresolved(rda.mirai)) {
-              cat("Saving files asynchronously\n")
+              cat("Saving '", obj.name, "' to file asynchronously.\n", sep = "")
               rda.mirai <- mirai::mirai({
                 assign(raw.name, raw.mspct)
                 save(list = raw.name, file = file.name)
@@ -1054,7 +1054,7 @@ acq_fraction_interactive <-
               .args = list(raw.name, file.name, raw.mspct),
               .timeout = 60000) # 1 min
             } else {
-              cat("Saving files ... ")
+              cat("Saving '", obj.name, "' to file ... ", sep = "")
               save(list = raw.name, file = file.name)
               cat("ready\n")
             }
@@ -1236,11 +1236,11 @@ acq_fraction_interactive <-
               # save collections to files on disk
               retrying <- FALSE
               repeat {
+                cat("Saving '", collection.name, "' to file ... ", sep = "")
                 save(list = collection.objects,
                      file = collection.file.name, precheck = TRUE)
                 if (file.exists(collection.file.name)) {
-                  message("Collection objects saved to file '",
-                          collection.file.name, "'.", sep = "")
+                  cat("ready.\n")
                   # save file name to report at end of session
                   file.names <- c(file.names, collection.file.name)
                   # remove saved objects and the list with their names
@@ -1249,16 +1249,17 @@ acq_fraction_interactive <-
                   # reset the lists of names for next collection
                   filter.names <- character()
                   raw.names <- character()
-                  message("Object lists reset")
+                  cat("Lists of collected objects' reset.\n")
                   break()
                 } else {
                   if (retrying) {
-                    message("Saving of the collection to file failed again! ",
-                            "(Aborting)")
+                    cat("Saving of the collection to file failed again! ",
+                        "(Save aborted)\n",
+                        "Lists of collected objects' preserved.\n")
                     break()
                   }
-                  message("Saving of the collection to file failed! ",
-                          "(Trying again)")
+                  cat("Saving of the collection to file failed! ",
+                      "(Trying again...)\n")
                   retrying <- TRUE
                 }
               }
