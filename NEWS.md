@@ -4,6 +4,12 @@ editor_options:
     wrap: 72
 ---
 
+# ooacquire 0.5.2.9000 (2025-04-10)
+
+- Extended validity of the calibrations of the two Mayas belonging to UH. This
+is a workaround to avoid a bug in the handling of dated calibrations when two
+diffusers are in use.
+
 # ooacquire 0.5.2 (2024-12-30)
 
 _Two bugs, one of them major, are fixed._ Although neither of them affected the
