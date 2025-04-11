@@ -56,6 +56,7 @@ reference:
     - QC_dark
     - rm_jwrapper
     - update_bad_pixs
+    - update_instr_desc
 
   - title: Data import from text files
   - subtitle: Read data

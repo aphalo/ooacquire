@@ -131,6 +131,7 @@ for (f in files) {
   diffuser.filename <- paste("data-raw/calibrations-MAYP11278/",
                              MAYP11278_calib_dates.df[["diffuser.file"]][date.row],
                              sep = "")
+
   descriptor.tmp$entrance.optics <- readRDS(diffuser.filename)
 
   descriptors[[name.f]] <- descriptor.tmp

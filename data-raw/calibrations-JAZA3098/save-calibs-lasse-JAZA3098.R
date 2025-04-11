@@ -95,7 +95,16 @@ for (d in names(descriptors)) {
                               irrad.mult = rep(1, length(descriptor.tmp[["wavelengths"]])),
                               wl.range = c(250, 890), # 190..250 used as reference
                               start.date = lubridate::ymd("2014-01-01"),
-                              end.date = lubridate::ymd("2024-01-01"))
+                              end.date = lubridate::ymd("2026-01-01"))
+
+  descriptor.tmp$entrance.optics <-
+    list(make = "Ocean Optics",
+         model = NA_character_,
+         geometry = "integ.sphere",
+         serial.number = NA_character_,
+         area = NA_real_,
+         fibre = NA_character_)
+
   descriptors[[d]] <- descriptor.tmp
 }
 

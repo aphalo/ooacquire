@@ -53,3 +53,24 @@ Calibrations for instruments stored in a list and passed as argument
 The default argument for \code{verbose} is for this function
   \code{TRUE} as conversion of other objects to a date may fail.
 }
+\examples{
+d1 <- which_descriptor()
+d1$spectrometer.sn
+d1$entrance.optics$geometry
+
+d2 <- which_descriptor(entrance.optics = "hemispherical")
+d2$spectrometer.sn
+d2$entrance.optics$geometry
+
+d3 <- which_descriptor(descriptors = ooacquire::MAYP112785_descriptors)
+d3$spectrometer.sn
+d3$entrance.optics$geometry
+
+# gives error, as expected
+# which_descriptor(descriptors = ooacquire::MAYP112785_descriptors,
+#                  entrance.optics = "hemispherical")
+
+# gives error
+# which_descriptor(date = lubridate::now() + lubridate::years(1))
+
+}

@@ -4,11 +4,13 @@ editor_options:
     wrap: 72
 ---
 
-# ooacquire 0.5.2.9000 (2025-04-10)
+# ooacquire 0.5.3 (2025-04-11)
 
-- Extended validity of the calibrations of the two Mayas belonging to UH. This
-is a workaround to avoid a bug in the handling of dated calibrations when two
-diffusers are in use.
+- Fix a bug triggered when the most recent calibration is out-dated and two 
+or more different entrance optics are available for the spectrometer in use.
+- Add entrance optics field to instrument descriptors that still had it missing.
+- Add function `update_instr_desc()` allowing refresh or replacement of the
+metadata attribute `instr.desc` in existing `raw_spct` and `raw_mspct` objects.
 
 # ooacquire 0.5.2 (2024-12-30)
 

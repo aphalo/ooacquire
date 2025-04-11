@@ -76,9 +76,18 @@ for (f in files) {
                               wl.range = cal.wl.range,
                               start.date = FLMS00416_calib_dates.df[["start.date"]][date.row],
                               end.date = FLMS00416_calib_dates.df[["end.date"]][date.row],
-                              cal.source = MAYP11278_calib_dates.df[["name"]][date.row])
+                              cal.source = FLMS00416_calib_dates.df[["name"]][date.row])
 
-  descriptor.tmp <- descriptors[[name.f]] <- descriptor.tmp
+  descriptor.tmp$entrance.optics <-
+    list(make = "Ocean Optics",
+         model = NA_character_,
+         geometry = "cosine",
+         serial.number = NA_character_,
+         area = NA_real_,
+         fibre = NA_character_)
+
+    descriptor.tmp <- descriptors[[name.f]] <- descriptor.tmp
+
 }
 
 print(names(descriptors))

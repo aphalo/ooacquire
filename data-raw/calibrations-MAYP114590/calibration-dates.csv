@@ -1,3 +1,3 @@
 ## Calibration dates
-inst.sn, name, calib.date, start.date, end.date, coeffs.file
-MAYP114590, cal_201908, 2019-08-06, 2019-08-06, 2023-08-06, MAYP114590_2019-08-06_cal.rda
+inst.sn, name, calib.date, start.date, end.date, coeffs.file, diffuser.file
+MAYP114590, cal_201908, 2019-08-06, 2019-08-06, 2023-08-06, MAYP114590_2019-08-06_cal.rda,  d7-h-2019.rds

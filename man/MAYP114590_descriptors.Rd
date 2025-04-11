@@ -15,7 +15,7 @@ Lists and data frames.
 
 An object of class \code{calibration_spct} (inherits from \code{generic_spct}, \code{spec_tbl_df}, \code{tbl_df}, \code{tbl}, \code{data.frame}) with 2068 rows and 2 columns.
 
-An object of class \code{spec_tbl_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 1 rows and 6 columns.
+An object of class \code{spec_tbl_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 1 rows and 7 columns.
 
 An object of class \code{list} of length 0.
 

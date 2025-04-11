@@ -85,7 +85,12 @@ for (f in files) {
                               wl.range = cal.wl.range,
                               start.date = MAYP114590_calib_dates.df[["start.date"]][date.row],
                               end.date = MAYP114590_calib_dates.df[["end.date"]][date.row],
-                              cal.source = MAYP11278_calib_dates.df[["name"]][date.row])
+                              cal.source = MAYP114590_calib_dates.df[["name"]][date.row])
+
+  diffuser.filename <- paste("data-raw/calibrations-MAYP114590/",
+                             MAYP114590_calib_dates.df[["diffuser.file"]][date.row],
+                             sep = "")
+  descriptor.tmp$entrance.optics <- readRDS(diffuser.filename)
 
   descriptors[[name.f]] <- descriptor.tmp
 }
