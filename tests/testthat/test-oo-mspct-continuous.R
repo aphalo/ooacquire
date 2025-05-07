@@ -2,7 +2,7 @@ context("convert raw continuous source")
 
 # set to TRUE to reset snapshots
 updating <- FALSE
-debugging <- TRUE
+debugging <- FALSE
 
 # library(ggspectra)
 test_that("ooacquire irrad continuous MAYA", {

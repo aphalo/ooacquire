@@ -8,7 +8,7 @@ library(tibble)
 test_that("SpectraSuite", {
 
   ss.spct <- read_oo_ssdata(file = "data-test/pheno1normal.txt",
-                             tz = "EET")
+                            tz = "EET")
 
   expect_equal(nrow(ss.spct), 2068)
   expect_equal(ncol(ss.spct), 2)
