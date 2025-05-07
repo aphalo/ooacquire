@@ -53,24 +53,33 @@ possible.
 
 ## Discontinuation of OmniDriver by Ocean Optics
 
-**Ocean Insight has discontinued support for _OmniDriver_ in mid 2024!**
-This means that the runtime can no longer be downloaded from Ocean Optics
-support site. If you already have an installer file for OmniDriver, package
-'rOmniDriver' can be still used. Package 'ooacquire' can be installed without
-installing OmniDriver, but only off-line processing of spectra and import of
-spectral data from files obtained with other software from OceanOptics remains
-enabled. All functions that connect to spectrometer hardware are disabled in the
-absence of an installed OmniDriver driver.
+**Ocean Optics has discontinued support for _OmniDriver_ in mid 2024!**
+This means that the runtime has to be downloaded from a "hidden" page in the
+Ocean Optics web site at
+[https://www.oceanoptics.com/software/resources/discontinued-software/](https://www.oceanoptics.com/software/resources/discontinued-software/).
+Discontinuation seems to mean that support for newer models will not be added.
+Two versions of OmniDriver are available 2.75 and 2.56. Version 2.75 is the last
+released on and does not support very old spectrometers such as the USB2000. Version 2.56 was the last one to support them.
+Package 'ooacquire' supports both of these versions of OmniDriver (and
+several other versions), which are needed for controlling spectrometers and acquiring data from within R, including when running in RStudio. However, package 'ooacquire' can be also used without
+installing OmniDriver, but in this case only off-line processing of spectra and
+import of spectral data from files obtained with other software from OceanOptics
+is possible. All functions that connect to spectrometer hardware are
+disabled in the absence of an installed OmniDriver driver.
 
-Not only the last release but also previous releases of OmniDriver are supported
-by 'rOmniDriver'. I will investigate if SeaBreeze can be used as a replacement
-for OmniDriver through a new package replacing 'rOmniDriver'. Basic
-functionality seems to be well supported, but fast buffered acquisition of
-spectra does not seem to be supported. On the other hand, SeaBreeze is open
-source and written in C++. The Python version should be the easiest to use but
-can be expected to be slower. I will most likely try to support the Python
-library at least, as it is compatible with more spectrometers, including the
-only one I have unrestricted access to: an old USB2000.
+Package 'ooacquire' accesses spectrometers through functions in package
+'rOmniDriver', which exposes many functions from the OmniDriver API as R
+functions.  At some point, I will investigate if SeaBreeze can be used as a
+replacement for OmniDriver through a future R package replacing 'rOmniDriver'.
+Basic functionality seems to be well supported by SeaBreeze, but fast buffered
+acquisition of spectra does not seem to be supported. On the other hand,
+SeaBreeze is open source and written in C++. A translation of the code in Python
+is also available. The Python version should be the easiest to use as Python
+functions could be accessed from R code using package 'reticulate'. However,
+this approach can be expected to be slower than calling C++ code through package
+'Rcpp'. I will most likely try to support the Python library at some point in
+the future, as it is compatible with more spectrometers, including the only one
+I have unrestricted access to: an old USB2000.
 
 ## Warning!
 

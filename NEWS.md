@@ -4,6 +4,12 @@ editor_options:
     wrap: 72
 ---
 
+# ooacquire 0.5.3-1 (2025-05-07)
+
+- Edit README with updated download link for the discontinued OmniDriver. 
+Although discontinued and removed from the main web site, versions 2.75 and
+2.56 remain available for download.
+
 # ooacquire 0.5.3 (2025-04-11)
 
 - Fix a bug triggered when the most recent calibration is out-dated and two 
