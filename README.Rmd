@@ -41,7 +41,7 @@ including UV-B, UV-A, VIS and NIR regions.
 The User Guide menu of the [on-line documentation](https://docs.r4photobiology.info/ooacquire/) includes in addition to the
 vignettes included in the package, two on-line only chapters: [a tutorial
 on how to measure spectral irradiance](https://www.r4photobiology.info/pages/acq-irrad-tutorial.html) 
-with 'oocquire' and a [description of the algorithms used](https://www.r4photobiology.info/pages/ooacquire-algorithms.html).
+with 'ooacquire' and a [description of the algorithms used](https://www.r4photobiology.info/pages/ooacquire-algorithms.html).
 
 Package **'ooacquire'** supports most types of *Ocean Optics*
 spectrometers from former *Ocean Optics*, now *Ocean Insight*

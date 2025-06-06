@@ -64,7 +64,7 @@ In this vignette we provide a brief tutorial on how to carry out measurements.
 The User Guide menu of the [on-line documentation](https://docs.r4photobiology.info/ooacquire/) includes in addition to the
 vignettes included in the package, two on-line only chapters: [a tutorial
 on how to measure spectral irradiance](https://www.r4photobiology.info/pages/acq-irrad-tutorial.html) 
-with 'oocquire' and a [description of the algorithms used](https://www.r4photobiology.info/pages/ooacquire-algorithms.html).
+with 'ooacquire' and a [description of the algorithms used](https://www.r4photobiology.info/pages/ooacquire-algorithms.html).
 
 The package exports both high level user-friendly functions and the
 lower level functions used to build them. What we describe here is the
