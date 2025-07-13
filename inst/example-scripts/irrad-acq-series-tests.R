@@ -7,7 +7,7 @@ library(ooacquire)
 
 photon_as_default()
 
-# half minute of measurements every 2 seconds
+# half minute of measurements at 2 seconds interval
 acq_irrad_interactive(interface.mode = "series",
                       folder.name = "./inst-not/series",
                       tot.time.range = 1,
