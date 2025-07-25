@@ -4,6 +4,11 @@ editor_options:
     wrap: 72
 ---
 
+# ooacquire 0.5.4
+
+- Revise function `read_oo_caldata()` to variations on the Date format in
+the header of calibration files from Ocean Optics.
+
 # ooacquire 0.5.3-1 (2025-05-07)
 
 - Edit README with updated download link for the discontinued OmniDriver. 

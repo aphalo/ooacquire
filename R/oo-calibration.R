@@ -11,9 +11,39 @@
 #'   documents, case insensitive. Ignored unless \code{area = NULL}.
 #' @param verbose Logical indicating the level of warnings wanted.
 #'
-#' @return a \code{calibration_spct} object of the same number of rows as
-#'   \code{x} containing wavelengths in varable \code{w.length} and the
-#'   re-scaled calibration factors in variable \code{irrad.mult}.
+#' @details Ocean Optics expresses spectroradiometer calibrations in a format
+#'   that is independent of the diffuser user. Such a calibration cannot be
+#'   used as is, it needs to be scaled based on the \emph{effective} light
+#'   collecting surface area of the diffuser used. It is crucial that the
+#'   correct \code{area} or \code{diff.type} is entered when calling this
+#'   function. (This is an unusual approach as there is variation among
+#'   individual diffusers of a given type. Calibrations are also affected
+#'   by the optical fibre and even the alignment of the fibre at the
+#'   spectrometer attachment bulkhead.)
+#'
+#' @section Cosine diffusers:
+#'   Ocean Optics spectrometers can be used with cosine diffusers supplied
+#'   by Ocean Optics or by third parties. Some diffusers are recognised by
+#'   name (argument passed to \code{diff.type}) while others can be described by
+#'   their light collecting area expressed in \eqn{mm^2} (argument passed to
+#'   \code{area}). The known cosine diffuser names are tabulated below.
+#'
+#'   \tabular{ll}{
+#'   \strong{Name}  \tab \strong{Supplier} \cr
+#'   "CC-3-DA"      \tab Ocean Optics\cr
+#'   "CC-3"         \tab Ocean Optics\cr
+#'   "CC-3-UV-S"    \tab Ocean Optics\cr
+#'   "CC-3-UV-T"    \tab Ocean Optics\cr
+#'   "UV-J1002-SMA" \tab CMS Schreder\cr
+#'   "D7-SMA"       \tab Bentham Instruments\cr
+#'   "D7-H-SMA"     \tab Bentham Instruments\cr
+#'   }
+#'
+#' @return A \code{calibration_spct} object of the same number of rows as
+#'   \code{x} containing wavelengths in variable \code{w.length} and the
+#'   re-scaled calibration factors in variable \code{irrad.mult}. In practice
+#'   the \code{calibration_spct} object contains one row for each pixel in
+#'   the detector array of the spectrometer.
 #'
 #' @export
 #'
@@ -79,6 +109,21 @@ oo_calib2irrad_mult <-
 #'   like the default time zone, encoding, decimal mark, big mark, and day/month
 #'   names.
 #' @param verbose Logical indicating the level of warnings wanted.
+#'
+#' @details The format of the data used by Ocean Optics seems to have remained
+#'   consistent in time and with spectrometer model, but not the header. In
+#'   particular, the format of the date and whether time is included or not
+#'   varies. The function is able to decode three different date formats that I
+#'   have come across. If decoding fails with a message indicating that parsing
+#'   has failed, the problem can be overcome by passing the date as an argument
+#'   to parameter \code{time} when calling the function, as in this case no
+#'   decoding of the date is attempted. The easiest approach is to use function
+#'   \code{\link[lubridate]{dmy}} or similar from package 'lubridate'.
+#'   \emph{When no time zone information is included in the file header, the
+#'   local time zone is used, which in many cases will shift the date by one
+#'   day. If you know where the calibration was done, the correct TZ can be
+#'   passed as an argument. Anyway as calibrations are usually considered valid
+#'   for one or two years, this shift is only rarely important,}
 #'
 #' @return A generic_spct object, with columns \code{w.length} and
 #'   \code{oo.cal}.
@@ -147,14 +192,24 @@ read_oo_caldata <-
     }
 
     if (is.null(time)) {
-      line01 <- sub("Date: [[:alpha:]]{3} ", "", file_header[1])
-      if (is.null(tz)) {
-        tz <- sub("^(.{16})([[:upper:]]{3,4})(.{5})$", "\\2", line01)
-        if (nchar(tz) == 4) {
-          tz <- sub("S", "", tz)
+      # get time from file header if no argument was passed in call
+      # I have come across three different date formats in calibration files
+      # requiring two different approaches to parsing
+      if (grepl("[0,1][0-9][-/][0-3][0-9][-/][0-2][0-9]$", line01[2])) {
+        # dates like 07-05-25 or 07/05/25 for day/month/year
+        date.string <- line01[2]
+        time <- lubridate::dmy(date.string, tz = tz)
+      } else {
+        # dates like "Fri Jun 03 13:17:08 EDT 2016"
+        line01 <- sub("Date: [[:alpha:]]{3} ", "", file_header[1])
+        if (is.null(tz)) {
+          tz <- sub("^(.{16})([[:upper:]]{3,4})(.{5})$", "\\2", line01)
+          if (nchar(tz) == 4) {
+            tz <- sub("S", "", tz)
+          }
         }
+        time <- lubridate::parse_date_time(line01, "mdHMSy", tz = tz, locale = "C")
       }
-      time <- lubridate::parse_date_time(line01, "mdHMSy", tz = tz, locale = "C")
       if (verbose) {
         message("File '", basename(file), "' with header time: ", time)
       }
@@ -181,7 +236,8 @@ read_oo_caldata <-
     comment(z) <-
       paste(paste(file_header[1:(data.rows[["skip"]] - 1)], collapse = "\n"),
             "^^^^ end of file header ^^^^",
-            paste("Ocean Optics irradiance calibration file '", file, "' imported on ",
+            paste("Ocean Optics irradiance calibration file '", file,
+                  "' imported on ",
                   lubridate::now(tzone = "UTC"), " UTC", sep = ""),
             sep = "\n")
 
@@ -190,5 +246,6 @@ read_oo_caldata <-
     photobiology::setWhatMeasured(z, what.measured)
     set_oo_ssdata_descriptor(z,
                              descriptor = descriptor,
-                             action = ifelse(is.null(descriptor), "overwrite", "merge"))
+                             action = ifelse(is.null(descriptor),
+                                             "overwrite", "merge"))
   }

@@ -117,5 +117,3 @@ compute_irrad_calibration <-
 
     return(updated_descriptor)
 }
-
-

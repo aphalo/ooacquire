@@ -23,15 +23,48 @@ documents, case insensitive. Ignored unless \code{area = NULL}.}
 \item{verbose}{Logical indicating the level of warnings wanted.}
 }
 \value{
-a \code{calibration_spct} object of the same number of rows as
-  \code{x} containing wavelengths in varable \code{w.length} and the
-  re-scaled calibration factors in variable \code{irrad.mult}.
+A \code{calibration_spct} object of the same number of rows as
+  \code{x} containing wavelengths in variable \code{w.length} and the
+  re-scaled calibration factors in variable \code{irrad.mult}. In practice
+  the \code{calibration_spct} object contains one row for each pixel in
+  the detector array of the spectrometer.
 }
 \description{
 Convert irradiance calibration values as supplied by Ocean Optics into
 multipliers expressed in the units and format expected by the functions in
 this package.
 }
+\details{
+Ocean Optics expresses spectroradiometer calibrations in a format
+  that is independent of the diffuser user. Such a calibration cannot be
+  used as is, it needs to be scaled based on the \emph{effective} light
+  collecting surface area of the diffuser used. It is crucial that the
+  correct \code{area} or \code{diff.type} is entered when calling this
+  function. (This is an unusual approach as there is variation among
+  individual diffusers of a given type. Calibrations are also affected
+  by the optical fibre and even the alignment of the fibre at the
+  spectrometer attachment bulkhead.)
+}
+\section{Cosine diffusers}{
+
+  Ocean Optics spectrometers can be used with cosine diffusers supplied
+  by Ocean Optics or by third parties. Some diffusers are recognised by
+  name (argument passed to \code{diff.type}) while others can be described by
+  their light collecting area expressed in \eqn{mm^2} (argument passed to
+  \code{area}). The known cosine diffuser names are tabulated below.
+
+  \tabular{ll}{
+  \strong{Name}  \tab \strong{Supplier} \cr
+  "CC-3-DA"      \tab Ocean Optics\cr
+  "CC-3"         \tab Ocean Optics\cr
+  "CC-3-UV-S"    \tab Ocean Optics\cr
+  "CC-3-UV-T"    \tab Ocean Optics\cr
+  "UV-J1002-SMA" \tab CMS Schreder\cr
+  "D7-SMA"       \tab Bentham Instruments\cr
+  "D7-H-SMA"     \tab Bentham Instruments\cr
+  }
+}
+
 \seealso{
 \code{\link{read_oo_caldata}}
 }

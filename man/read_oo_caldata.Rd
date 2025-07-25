@@ -52,6 +52,22 @@ or supplied as arguments as attributes of the same object, including the time
 and date of the calibration. The whole file header is in addition stored as a
 comment.
 }
+\details{
+The format of the data used by Ocean Optics seems to have remained
+  consistent in time and with spectrometer model, but not the header. In
+  particular, the format of the date and whether time is included or not
+  varies. The function is able to decode three different date formats that I
+  have come across. If decoding fails with a message indicating that parsing
+  has failed, the problem can be overcome by passing the date as an argument
+  to parameter \code{time} when calling the function, as in this case no
+  decoding of the date is attempted. The easiest approach is to use function
+  \code{\link[lubridate]{dmy}} or similar from package 'lubridate'.
+  \emph{When no time zone information is included in the file header, the
+  local time zone is used, which in many cases will shift the date by one
+  day. If you know where the calibration was done, the correct TZ can be
+  passed as an argument. Anyway as calibrations are usually considered valid
+  for one or two years, this shift is only rarely important,}
+}
 \seealso{
 \code{\link{oo_calib2irrad_mult}}
 }
