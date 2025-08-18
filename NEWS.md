@@ -8,6 +8,8 @@ editor_options:
 
 - Revise function `read_oo_caldata()` to variations on the Date format in
 the header of calibration files from Ocean Optics.
+- Revise function `update_instr_desc()` to issue a message when the new
+descriptor differs in input optics from the old one.
 
 # ooacquire 0.5.3-1 (2025-05-07)
 
