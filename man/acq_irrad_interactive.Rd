@@ -17,7 +17,7 @@ acq_irrad_interactive(
   area = NULL,
   diff.type = NULL,
   qty.out = "irrad",
-  plot.lines.max = 11,
+  plot.lines.max = ifelse(interface.mode \%in\% c("series", "series-attr"), 11, 50),
   summary.type = "plant",
   save.pdfs = TRUE,
   save.summaries = !interface.mode \%in\% c("series", "series-attr"),

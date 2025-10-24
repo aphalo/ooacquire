@@ -6,10 +6,13 @@ editor_options:
 
 # ooacquire 0.5.4
 
-- Revise function `read_oo_caldata()` to variations on the Date format in
-the header of calibration files from Ocean Optics.
+- Revise function `read_oo_caldata()` to support additional variations on the 
+Date format in the header of calibration files from Ocean Optics.
 - Revise function `update_instr_desc()` to issue a message when the new
 descriptor differs in input optics from the old one.
+- Change the default for `plot.lines.max` in `acq_irrad_interactive()` making it
+dependent on the interface.mode, with a value of 11 when _series_ modes are
+active, and increasing it to 50 otherwise.
 
 # ooacquire 0.5.3-1 (2025-05-07)
 
