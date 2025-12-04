@@ -29,7 +29,7 @@ documentation](https://docs.r4photobiology.info/ooacquire/) includes in
 addition to the vignettes included in the package, two on-line only
 chapters: [a tutorial on how to measure spectral
 irradiance](https://www.r4photobiology.info/pages/acq-irrad-tutorial.html)
-with ‘oocquire’ and a [description of the algorithms
+with ‘ooacquire’ and a [description of the algorithms
 used](https://www.r4photobiology.info/pages/ooacquire-algorithms.html).
 
 Package **‘ooacquire’** supports most types of *Ocean Optics*
@@ -428,7 +428,7 @@ citation("ooacquire")
 #> To cite package 'ooacquire' in publications use:
 #> 
 #>   Aphalo P, Ylianttila L (2025). _ooacquire: Acquire Data from OO
-#>   Spectrometers_. R package version 0.5.3,
+#>   Spectrometers_. R package version 0.5.3-1.9002,
 #>   <https://docs.r4photobiology.info/ooacquire/>.
 #> 
 #> A BibTeX entry for LaTeX users is
@@ -437,7 +437,7 @@ citation("ooacquire")
 #>     title = {ooacquire: Acquire Data from OO Spectrometers},
 #>     author = {Pedro J. Aphalo and Lasse Ylianttila},
 #>     year = {2025},
-#>     note = {R package version 0.5.3},
+#>     note = {R package version 0.5.3-1.9002},
 #>     url = {https://docs.r4photobiology.info/ooacquire/},
 #>   }
 ```

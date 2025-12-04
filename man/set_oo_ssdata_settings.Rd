@@ -20,8 +20,8 @@ A copy of \code{x} with updated attributes.
 }
 \description{
 Parse the header of the file returned by SpectraSuite for corrections,
-smotthing and acquisition parameters used. These values are used to set
-the "inst.settings" atrribute of \code{x}.
+smoothing and acquisition parameters used. These values are used to set
+the "inst.settings" attribute of \code{x}.
 }
 \seealso{
 Other functions for importing spectral data from files: 

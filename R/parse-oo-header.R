@@ -1,8 +1,8 @@
 #' Set the values of instrument settings from file header
 #'
 #' Parse the header of the file returned by SpectraSuite for corrections,
-#' smotthing and acquisition parameters used. These values are used to set
-#' the "inst.settings" atrribute of \code{x}.
+#' smoothing and acquisition parameters used. These values are used to set
+#' the "inst.settings" attribute of \code{x}.
 #'
 #' @param x generic_spct, although with defaults only raw_spct.
 #' @param file.header character string The header of the file output by
@@ -41,8 +41,13 @@ set_oo_ssdata_settings <- function(x,
 
   if (grepl("SpectraSuite", lines[1])) {
     my.gr <- data.frame(
-      feature = c("dark.corr", "lin.corr", "stray.corr", "boxcar",
-                  "integ.time", "scans", "sn"),
+      feature = c("dark.corr",
+                  "lin.corr",
+                  "stray.corr",
+                  "boxcar",
+                  "integ.time",
+                  "scans",
+                  "sn"),
       pattern = c("Correct for Electrical Dark",
                   "Correct for Detector Non-linearity:",
                   "Correct for Stray Light:",
@@ -55,11 +60,16 @@ set_oo_ssdata_settings <- function(x,
     names(position) <- my.gr[["feature"]]
   } else { # we assume OceanView file
     my.gr <- data.frame(
-      feature = c("dark.corr", "lin.corr", "stray.corr", "boxcar",
-                   "integ.time", "scans", "sn"),
+      feature = c("dark.corr",
+                  "lin.corr",
+                  "stray.corr",
+                  "boxcar",
+                   "integ.time",
+                  "scans",
+                  "sn"),
       pattern = c("Electric dark correction enabled:",
                    "Nonlinearity correction enabled:",
-                   NA_character_,
+                   "NOTHING-TO-MATCH",
                    "Boxcar width:",
                    "Integration Time",
                    "Scans to average:",
@@ -217,6 +227,7 @@ map_oofile_header_rows <- function(lines,
     header.end <- which(stringr::str_detect(lines,
                                             "^>>>>>Begin |end of file header")) - 1L
   }
+  header.end <- min(header.end, length(lines)) # do not error on short headers
   line.idxs <- numeric(nrow(grammar))
   for (i in seq_along(grammar$feature)) {
     idx <- which(stringr::str_detect(lines[1:header.end], grammar$pattern[i]))

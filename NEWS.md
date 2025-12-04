@@ -4,8 +4,10 @@ editor_options:
     wrap: 72
 ---
 
-# ooacquire 0.5.4
+# ooacquire 0.5.4 (2025-12-04)
 
+- Work around change introduced to pattern matching in 'stringr' (>= 1.6.0), 
+which broke decoding of OceanView file headers.
 - Revise function `read_oo_caldata()` to support additional variations on the 
 Date format in the header of calibration files from Ocean Optics.
 - Revise function `update_instr_desc()` to issue a message when the new
