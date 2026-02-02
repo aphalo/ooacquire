@@ -46,8 +46,9 @@ Suggests:
     rmarkdown (>= 2.28),
     testthat (>= 3.2.2),
     spacesXYZ (>= 1.6-0)
-LazyData: yes
+Additional_repositories: https://aphalo.r-universe.dev/
 LazyLoad: yes
+LazyData: yes
 ByteCompile: true
 LinkingTo: Rcpp
 URL: https://docs.r4photobiology.info/ooacquire/, https://github.com/aphalo/ooacquire
