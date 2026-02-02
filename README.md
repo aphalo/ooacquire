@@ -3,18 +3,23 @@
 
 # ooacquire <img src="man/figures/logo.png" align="right" width="120"/>
 
+<!-- badges: start -->
+
 [![R Universe
 vwersion](https://aphalo.r-universe.dev/badges/ooacquire)](https://aphalo.r-universe.dev/ooacquire)
+[![R-CMD-check](https://github.com/aphalo/ooacquire/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/aphalo/ooacquire/actions/workflows/R-CMD-check.yaml)
+[![Documentation](https://img.shields.io/badge/documentation-ooacquire-informational.svg)](https://docs.r4photobiology.info/ooacquire/)
+<!-- badges: end -->
 
 ## Purpose
 
 Package **‘ooacquire’** makes it possible to control, modify settings
 and acquire spectral data directly from within R. It can be also used
 off-line to read raw-counts data from files saved by Ocean Insight’s
-software and hardware. In both cases it implements the conversion of
-raw-counts data into physical quantities, with different protocols to
-improve the dynamic range and corrections to reduce stray-light and
-other sources of noise.
+software and hardware, or previously acquired with ‘ooacquire’. In both
+cases it implements the conversion of raw-counts data into physical
+quantities, with different protocols to improve the dynamic range and
+corrections to reduce stray-light and other sources of noise.
 
 In sunlight, array spectrometers due to their single monochromator have
 a noise floor of three orders of magnitude, which makes it impossible to
@@ -33,11 +38,11 @@ with ‘ooacquire’ and a [description of the algorithms
 used](https://www.r4photobiology.info/pages/ooacquire-algorithms.html).
 
 Package **‘ooacquire’** supports most types of *Ocean Optics*
-spectrometers from former *Ocean Optics*, now *Ocean Insight*
+spectrometers from former *Ocean Optics*
 (<https://www.oceanoptics.com/>). The free runtime of the *OmniDriver
-SDP* is no longer supported by Ocean Optics and, thus, no longer
-available. The free runtime of the *OmniDriver SDP* and *Java* need both
-to be installed before data acquisition is possible.
+SDP* is no longer supported by Ocean Optics and, but still available.
+The free runtime of the *OmniDriver SDP* and *Java* need both to be
+installed before data acquisition is possible.
 
 ## Discontinuation of OmniDriver by Ocean Optics
 
@@ -47,21 +52,24 @@ the Ocean Optics web site at
 <https://www.oceanoptics.com/software/resources/discontinued-software/>.
 Discontinuation seems to mean that support for newer models will not be
 added. Two versions of OmniDriver are available 2.75 and 2.56. Version
-2.75 is the last released on and does not support very old spectrometers
+2.75 is the last released and does not support very old spectrometers
 such as the USB2000. Version 2.56 was the last one to support them.
 Package ‘ooacquire’ supports both of these versions of OmniDriver (and
 several other versions), which are needed for controlling spectrometers
 and acquiring data from within R, including when running in RStudio.
-However, package ‘ooacquire’ can be also used without installing
-OmniDriver, but in this case only off-line processing of spectra and
-import of spectral data from files obtained with other software from
-OceanOptics is possible. All functions that connect to spectrometer
-hardware are disabled in the absence of an installed OmniDriver driver.
+
+Package ‘ooacquire’ can be also used without installing OmniDriver, but
+in this case only off-line processing of spectra and import of spectral
+data from files obtained with other software from OceanOptics is
+possible. All functions that connect to spectrometer hardware are
+disabled in the absence of an installed OmniDriver driver, while all
+functions that do not communicate with the spectrometer remain fully
+sfunctional.
 
 Package ‘ooacquire’ accesses spectrometers through functions in package
 ‘rOmniDriver’, which exposes many functions from the OmniDriver API as R
-functions. At some point, I will investigate if SeaBreeze can be used as
-a replacement for OmniDriver through a future R package replacing
+functions. *At some point, I will investigate if SeaBreeze can be used
+as a replacement for OmniDriver through a future R package replacing
 ‘rOmniDriver’. Basic functionality seems to be well supported by
 SeaBreeze, but fast buffered acquisition of spectra does not seem to be
 supported. On the other hand, SeaBreeze is open source and written in
@@ -71,7 +79,7 @@ accessed from R code using package ‘reticulate’. However, this approach
 can be expected to be slower than calling C++ code through package
 ‘Rcpp’. I will most likely try to support the Python library at some
 point in the future, as it is compatible with more spectrometers,
-including the only one I have unrestricted access to: an old USB2000.
+including the only one I have unrestricted access to: an old USB2000.*
 
 ## Warning!
 
@@ -161,14 +169,14 @@ discontinued in recent versions of OmniDriver*, to use, for example, the
 formerly very popular USB2000 spectrometer, it is necessary to install
 an old version of *OmniDriver* instead of the current one.
 
-## Installation of the released version
+## Installation for data acquisition and conversion
 
 *The ‘ooacquire’ package should be preferably installed after the system
 requirements are met by installing drivers and software required at the
 operating system level. Please, read carefully the whole installation
 instructions before attempting to install this package.*
 
-*Some of the systems requirements need to be installed only for direct
+*Some of the system requirements need to be installed only for direct
 connection of spectrometers. If spectral data will be input from files
 on disk to do computations rather than acquired from a connected
 spectrometer, installation of the OmniDriver runtime, package
@@ -182,10 +190,10 @@ Installation of Java/Temurin and OmniDriver should be done first.
     Temurin OpenJDK and Corretto OpenJDK are free distributions, in
     contrast Oracle’s Java 8 JDK, has some restrictions and is less
     frequently updated.
-2.  **rOmniDriver run-time** from Ocean Optics which was until recently
-    a free download but has been discontinued. It is the same installer
-    as for the non-free SDP, but if run-time is selected during
-    installation no key/password are asked for.
+2.  **rOmniDriver run-time** from Ocean Optics which is a free download,
+    but support has been discontinued. It is the same installer as for
+    the non-free SDP, but if run-time is selected during installation no
+    key/password are required.
 3.  Install ‘rOmniDriver’ and ‘ooacquire’ after setting the `repos`
     option, which ensures dependencies will be installed automatically.
     Once the option is set, installation is as for packages hosted at
@@ -200,12 +208,47 @@ visible to R before installing this package and ‘rOmniDriver’ as usual.
 
 ``` r
 repos <- getOption("repos", default = list())
-repos[["r4photobiology"]] <- "https://aphalo.r-universe.dev'"
+repos[["r4photobiology"]] <- "https://aphalo.r-universe.dev"
 options(repos = repos)
 ```
 
 ``` r
-install.packages("ooacquire")
+install.packages(c('rOmniDriver', 'ooacquire'))
+```
+
+Without setting the option, it is also possible to pass the URL in the
+call, together with the CRAN URL to ensure that dependencies are
+installed.
+
+``` r
+install.packages(c('rOmniDriver', 'ooacquire'), 
+                 repos = c('https://aphalo.r-universe.dev', 
+                           'https://cloud.r-project.org'))
+```
+
+**Steps 1 and 2 are described in the README file of ‘rOmniDriver’, which
+can be found in its [on-line
+documentation](https://docs.r4photobiology.info/rOmniDriver/) site. Make
+sure to read it, follow step by step the installation, testing success
+after each step making sure all the required software is properly
+installed before attempting to install ‘ooacquire’.**
+
+## Installation for data import and conversion
+
+If ‘ooacquire’ will not be used to connect to a spectrometer, there is
+no need to install Ocean Optics’ Omnidiver or package ‘rOmniDriver’.
+
+In recent versions of R an option can be set to make this repository
+visible to R before installing this package and ‘rOmniDriver’ as usual.
+
+``` r
+repos <- getOption("repos", default = list())
+repos[["r4photobiology"]] <- "https://aphalo.r-universe.dev"
+options(repos = repos)
+```
+
+``` r
+install.packages('ooacquire')
 ```
 
 Without setting the option, it is also possible to pass the URL in the
@@ -218,22 +261,15 @@ install.packages('ooacquire',
                            'https://cloud.r-project.org'))
 ```
 
-**Steps 1 and 2 are described in the README file of ‘rOmniDriver’, which
-can be found in its [on-line
-documentation](https://docs.r4photobiology.info/rOmniDriver/) site. Make
-sure to read it, follow step by step the installation, testing success
-after each step making sure all the required software is properly
-installed before attempting to install ‘ooacquire’.**
-
-## Installation of the under development version
+## Installation from GitHub
 
 Installation from sources is also possible directly from the Git
-repository at GitHub. For this we can use package ‘remotes’ (or package
-‘pak’). **This rarely needed, except to install a non default branch or
-from a specific commit.** The repository [![:name status
+repository at GitHub. **This rarely needed, except to install a non
+default branch or from a specific old commit.** The repository [![:name
+status
 badge](https://aphalo.r-universe.dev/badges/:name)](https://aphalo.r-universe.dev/)
-is updated with no more than 1 h of lag to match default branch of each
-of the packages in GitHub that are registered.
+is updated with no more than 1 h of lag to match default branch of
+‘ooacquire’ and ‘rOmniDriver’.
 
 Package ‘ooacquire’ although coded mainly in R, includes one function in
 C++. Thus, build chain for R packages needs to be installed when
@@ -269,27 +305,40 @@ Installation of the current version from GitHub:
 
 ``` r
 # install.packages("remotes")
+remotes::install_github("aphalo/rOmniDriver")
 remotes::install_github("aphalo/ooacquire")
 ```
 
+## Setting-up for your own spectrometer
+
 The package includes calibration data for the spectrometers used in
-testing the package and that are used by myself and collaborators. The
-last step before being able to use the package is to obtain calibration
-data for the spectrometers to be used and their descriptor and saving
-them in a suitable format. At least one correction method needs also to
-be defined for each spectrometer. Depending on how detailed has been the
-characterization of the spectrometer different corrections are possible.
-The source package includes a folder ‘data-raw’ with examples of how
-this can be done. The process cannot be easily automated as bad pixels
-and suitable reference wavelengths need to be chosen based both on the
-instrument used and light source to be measured.
+testing the package and that are used by myself and collaborators.
+Before ‘ooacquire’ can be used with other spectrometers for measuring
+irradaince calibration data and their descriptor has to be available.
+The functions fall-back into retrieving calibration data from the
+spectrometer when no other calibration or correction methods are
+available. This restricts corrections to simpler ones.
+
+When measuring optical properties, transmittance or reflectance,
+measurements are relative, and only a wavelength calibration is needed,
+and one is almost always retrievable from the spectrometer. The case is
+the same for linearization as the polynomial coefficients are also
+retrievable from the spectrometer. At least one correction method needs
+also to be defined for each spectrometer.
+
+Depending on how detailed has been the characterization of the
+spectrometer different corrections are possible. The source package
+includes a folder ‘data-raw’ with examples of how this can be done. The
+process cannot be easily automated as bad pixels and suitable reference
+wavelengths need to be chosen based both on the instrument used and
+light source to be measured.
 
 ## Documentation and examples
 
 Documentation includes five vignettes in addition to help pages. The
 examples in the vignettes and help pages use spectral data from
 measurements done with this package as well as output files created by
-Ocean Optics’s software. These data files are in folder `exdata`.
+Ocean Optics’s software. These data files are in folder `extdata`.
 Scripts containing examples that can be in most cases used with only
 small edits are in folder `example-scripts` of this package.
 
@@ -428,7 +477,7 @@ citation("ooacquire")
 #> To cite package 'ooacquire' in publications use:
 #> 
 #>   Aphalo P, Ylianttila L (2025). _ooacquire: Acquire Data from OO
-#>   Spectrometers_. R package version 0.5.3-1.9002,
+#>   Spectrometers_. R package version 0.5.4,
 #>   <https://docs.r4photobiology.info/ooacquire/>.
 #> 
 #> A BibTeX entry for LaTeX users is
@@ -437,14 +486,14 @@ citation("ooacquire")
 #>     title = {ooacquire: Acquire Data from OO Spectrometers},
 #>     author = {Pedro J. Aphalo and Lasse Ylianttila},
 #>     year = {2025},
-#>     note = {R package version 0.5.3-1.9002},
+#>     note = {R package version 0.5.4},
 #>     url = {https://docs.r4photobiology.info/ooacquire/},
 #>   }
 ```
 
 ## License
 
-© 2016-2025 Pedro J. Aphalo (<pedro.aphalo@helsinki.fi>) for the code.
+© 2016-2026 Pedro J. Aphalo (<pedro.aphalo@helsinki.fi>) for the code.
 Lasse Ylianttila developed the majority of the algorithms used. Released
 under the GPL, version 2 or greater. This software carries no warranty
 of any kind.
