@@ -476,8 +476,8 @@ acknowledge this by citing the package according to:
 citation("ooacquire")
 #> To cite package 'ooacquire' in publications use:
 #> 
-#>   Aphalo P, Ylianttila L (2025). _ooacquire: Acquire Data from OO
-#>   Spectrometers_. R package version 0.5.4,
+#>   Aphalo P, Ylianttila L (2026). _ooacquire: Acquire Data from OO
+#>   Spectrometers_. R package version 0.5.4.9000,
 #>   <https://docs.r4photobiology.info/ooacquire/>.
 #> 
 #> A BibTeX entry for LaTeX users is
@@ -485,8 +485,8 @@ citation("ooacquire")
 #>   @Manual{,
 #>     title = {ooacquire: Acquire Data from OO Spectrometers},
 #>     author = {Pedro J. Aphalo and Lasse Ylianttila},
-#>     year = {2025},
-#>     note = {R package version 0.5.4},
+#>     year = {2026},
+#>     note = {R package version 0.5.4.9000},
 #>     url = {https://docs.r4photobiology.info/ooacquire/},
 #>   }
 ```
