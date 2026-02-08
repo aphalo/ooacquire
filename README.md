@@ -6,7 +6,7 @@
 <!-- badges: start -->
 
 [![R Universe
-vwersion](https://aphalo.r-universe.dev/badges/ooacquire)](https://aphalo.r-universe.dev/ooacquire)
+version](https://aphalo.r-universe.dev/badges/ooacquire)](https://aphalo.r-universe.dev/ooacquire)
 [![R-CMD-check](https://github.com/aphalo/ooacquire/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/aphalo/ooacquire/actions/workflows/R-CMD-check.yaml)
 [![Documentation](https://img.shields.io/badge/documentation-ooacquire-informational.svg)](https://docs.r4photobiology.info/ooacquire/)
 <!-- badges: end -->
