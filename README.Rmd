@@ -50,13 +50,11 @@ irradiance](https://www.r4photobiology.info/pages/acq-irrad-tutorial.html) with
 'ooacquire' and a [description of the algorithms
 used](https://www.r4photobiology.info/pages/ooacquire-algorithms.html).
 
-Package **'ooacquire'** supports most types of *Ocean Optics*
-spectrometers from former *Ocean Optics*
-(<https://www.oceanoptics.com/>). The free runtime of the *OmniDriver
-SDP* is no longer supported by Ocean Optics and, but still available.
-The free runtime of the *OmniDriver
-SDP* and *Java* need both to be installed before data acquisition is
-possible.
+Package **'ooacquire'** supports most types of *Ocean Optics* spectrometers
+(<https://www.oceanoptics.com/>). The 64 bit versions of the free runtime of the
+*OmniDriver SDP* and *Java* need both to be installed before data acquisition is
+possible. The driver is only needed for live communication, control and data
+acquisition from within R.
 
 ## Discontinuation of OmniDriver by Ocean Optics
 
@@ -64,20 +62,22 @@ possible.
 This means that the runtime has to be downloaded from a "hidden" page in the
 Ocean Optics web site at
 [https://www.oceanoptics.com/software/resources/discontinued-software/](https://www.oceanoptics.com/software/resources/discontinued-software/).
-Discontinuation seems to mean that support for newer models will not be added.
-Two versions of OmniDriver are available 2.75 and 2.56. Version 2.75 is the last
-released and does not support very old spectrometers such as the USB2000. Version 2.56 was the last one to support them.
-Package 'ooacquire' supports both of these versions of OmniDriver (and
-several other versions), which are needed for controlling spectrometers and acquiring data from within R, including when running in RStudio. 
+Discontinuation seems to mean that support for newer models will not be added,
+while maintenance updates are still regularly released. Multiple versions of
+OmniDriver are currently available: 2.80, 2.79, 2.75 and 2.56. Recently released
+versions do not support very old spectrometer models such as the USB2000 and
+HR2000. Version 2.56 is the most recent one that supports them. Package
+'ooacquire' works with all versions that I have tested (2.56, 2.75 and several
+other).
 
 Package 'ooacquire' can be also used without
 installing OmniDriver, but in this case only off-line processing of spectra and
 import of spectral data from files obtained with other software from OceanOptics
-is possible. All functions that connect to spectrometer hardware are
+are possible. All functions that connect to spectrometer hardware are
 disabled in the absence of an installed OmniDriver driver, while all functions
-that do not communicate with the spectrometer remain fully sfunctional.
+that do not communicate with the spectrometer remain fully functional.
 
-Package 'ooacquire' accesses spectrometers through functions in package
+Package 'ooacquire' accesses spectrometers through functions in R package
 'rOmniDriver', which exposes many functions from the OmniDriver API as R
 functions. *At some point, I will investigate if SeaBreeze can be used as a
 replacement for OmniDriver through a future R package replacing 'rOmniDriver'.
