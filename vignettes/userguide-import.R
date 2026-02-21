@@ -37,9 +37,9 @@ cps.spct <-
 autoplot(cps.spct)
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  cal.spct <- read_oo_caldata("oo-calibration/xxxx")
+# cal.spct <- read_oo_caldata("oo-calibration/xxxx")
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  cal.multipliers <- oo_calib2irrad_mult(cal.spct,
-#                                         diff.type = "CC-3")
+# cal.multipliers <- oo_calib2irrad_mult(cal.spct,
+#                                        diff.type = "CC-3")
 

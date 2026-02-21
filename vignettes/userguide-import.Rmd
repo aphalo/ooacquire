@@ -22,7 +22,7 @@ on the Raspberry Pi single-board microcomputers from attached spectrometers,
 and those acquired autonomously with the Jaz spectrometer.
 * Irradiance, reflectance, transmittance, absorptance and absorbance can be
 derived from row spectra.
-* Measurments of both continuous and pulsed light sources is possible.
+* Measurements of both continuous and pulsed light sources is possible.
 * Different measurement protocols, data averaging, integration time
 bracketing, automatic adjustment of integration time can be used and corrections 
 for stray light and slit function can be applied.
@@ -122,7 +122,7 @@ autoplot(cps.spct)
 
 ## Reading calibration data from files
 
-Package 'oacquire' uses its own format for storage of calibration data. This format supports storage of data for various corrections in addition to calibration multipliers. A full calibration and instrument characterization as needed to use all the capabilities implemented in 'ooacuire' needs to be custom made. However, some of the methods and protocols implemented can be also applied when only _regular_ calibration data are available. Ocean Optics provides calibration data expressed differently than they are stored and used in 'ooacquire'. Function `read_oo_caldata()` imports calibration data from text files as supplied by Ocean Optics. A problem is that the format used by Ocean Optics seems not to be fully consistent over time resulting occasionally in the import with `read_oo_caldata()` failing.
+Package 'oacquire' uses its own format for storage of calibration data. This format supports storage of data for various corrections in addition to calibration multipliers. A full calibration and instrument characterization as needed to use all the capabilities implemented in 'ooacquire' needs to be custom made. However, some of the methods and protocols implemented can be also applied when only _regular_ calibration data are available. Ocean Optics provides calibration data expressed differently than they are stored and used in 'ooacquire'. Function `read_oo_caldata()` imports calibration data from text files as supplied by Ocean Optics. A problem is that the format used by Ocean Optics seems not to be fully consistent over time resulting occasionally in the import with `read_oo_caldata()` failing.
 
 ```{r, eval=FALSE}
 cal.spct <- read_oo_caldata("oo-calibration/xxxx")

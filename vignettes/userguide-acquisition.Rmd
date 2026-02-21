@@ -318,7 +318,7 @@ rejected in cases of mismatch.
 
 If no calibration information is available based on the serial number or the
 user has not supplied valid calibration information as arguments to the call, an
-attempt is made to retrieve an iradiance calibration from the spectrometer
+attempt is made to retrieve an irradiance calibration from the spectrometer
 EEPROM. Because of the way in which irradiance calibrations are stored in Ocean
 Optics spectrometers. Calibration data retrieved from the EEPROM can only be
 used if the user provides information about the diffuser used as entrance optics
@@ -376,7 +376,7 @@ possible.
 4.  Follow the prompts to acquire spectra.
 
 Many settings can be adjusted during a data acquisition session. Here, using
-`interface.mode = "simple"` fewer of these settings can be modofied
+`interface.mode = "simple"` fewer of these settings can be modified
 interactively than when using, for example, `interface.mode = "full"`, which has
 additional menu options in the user interface. If one knows in advance what
 settings will need, these can be passed as arguments when starting the session
@@ -540,7 +540,7 @@ When the integration time for individual scans is adjusted automatically the
 target value of maximum instrument counts is computed proportionally to the
 maximum counts specification of the spectrometer. The head-room as a fraction of
 one can be set by the user as depending on the stability or not of the
-irradiance we need more or less head-room to accomodate increases in irradiance.
+irradiance we need more or less head-room to accommodate increases in irradiance.
 Parameter `target.margin` allows the user to set a *safety margin* different
 from the default of 0.1 (or 10%). The example below could help prevent clipping
 in cases when irradiance changes so fast that it could be up to 25% higher
@@ -826,7 +826,7 @@ This information will also be used when plotting the data.
 acq_fraction_interactive(qty.out = "Rfr", type = "specular")
 ```
 
-Wen using *light sources with pulsed emission* we start a session by
+When using *light sources with pulsed emission* we start a session by
 calling function `acq_fraction_pulsed_interactive()` instead of
 `acq_fraction_interactive` and we set manually the integration time as
 when measuring spectral fluence. In other respects the procedure is
@@ -844,7 +844,7 @@ spectral data acquisitions. This should be fairly simple, not requiring
 advanced knowledge of the R language as we export lower level
 functions that can be used as building blocks for new variations. It
 should be even possible to use these functions to develop a user
-interface based of package 'shinny'.
+interface based of package 'shiny'.
 
 ## Using scripts
 

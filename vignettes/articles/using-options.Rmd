@@ -26,9 +26,9 @@ A logical value passed as argument to parameter `verbose` in `acq_irrad_interact
 
 # Sanity checks on spectra
 
-Functions from the R for Photobiology suite of packages, including `ooacquire`, check the validity of the spectral data when objects are created and manipulated. This adds overhead to computations but makes it easier to detect but data early on. The checks are implemented in package 'photobiology' and how stringent they are when checking for out-of-range values is controlled by R option `photobiology.strict.range`, set to `TRUE`, `FALSE`, or `NA`, with `NA` fully disabling the range checks, and `FALSE` for less strict cheks. The default value is `FALSE`.
+Functions from the R for Photobiology suite of packages, including `ooacquire`, check the validity of the spectral data when objects are created and manipulated. This adds overhead to computations but makes it easier to detect but data early on. The checks are implemented in package 'photobiology' and how stringent they are when checking for out-of-range values is controlled by R option `photobiology.strict.range`, set to `TRUE`, `FALSE`, or `NA`, with `NA` fully disabling the range checks, and `FALSE` for less strict checks. The default value is `FALSE`.
 
-Which level to use depends on the properties of the data being acquired. Using `NA` to disable checks is not recommended as it may lead to dificult to diagnose errors in subsequent computations.
+Which level to use depends on the properties of the data being acquired. Using `NA` to disable checks is not recommended as it may lead to difficult to diagnose errors in subsequent computations.
 
 # Units and basis of expression of radiation
 
@@ -42,7 +42,7 @@ In this case the default is to use reflectance, absorptance and transmittance as
 
 In a call to `acq_fraction_interactive()` the argument passed to parameter `qty.out` selects between `"Tfr"` (transmittance), `"Rfr"` (reflectance) or `"raw"` (raw detector counts) for the expression of the measured spectra, and also adjusts the user interface to match.
 
-**Conversions are only possible when at least two of the quantities are known, so in some cases thry are not available.**
+**Conversions are only possible when at least two of the quantities are known, so in some cases they are not available.**
 
 # Time units used for fluxes
 
@@ -50,7 +50,7 @@ For irradiance the default unit for time is seconds, and is computed based on th
 
 # Plotting defaults
 
-Plotting is done by calling `autoplot()` method specioalizations from package 'ggspectra'. Several default arguments for these methods can be modified by setting R options, in most cases both with R's function `option()` and with functions from package 'ggspectra'.
+Plotting is done by calling `autoplot()` method specializations from package 'ggspectra'. Several default arguments for these methods can be modified by setting R options, in most cases both with R's function `option()` and with functions from package 'ggspectra'.
 
 Please see the documentation of functions `ggspectra::set_annotations_default()` (option `"photobiology.plot.bands"`), and `ggspectra::set_w.band_default()` (option `"photobiology.plot.annotations"`) and of `ggspectra::autoplot()` methods for details. It is also possible to interactively chose some common sets of wavebands through a menu.
 

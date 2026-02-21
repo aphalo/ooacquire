@@ -220,7 +220,7 @@ read_oo_caldata <-
     }
 
     old.opts <- options(readr.num_columns = ifelse(verbose, 6, 0))
-    z <- readr::read_table2(
+    z <- readr::read_table(
       file = file,
       col_names = c("w.length", "oo.cal"),
       skip =  data.rows[["skip"]],

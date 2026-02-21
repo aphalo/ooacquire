@@ -4,6 +4,12 @@ editor_options:
     wrap: 72
 ---
 
+# ooacquire 0.5.5 (2026-02-21)
+
+- Track rename of `read_table2()` into `read_table()` in package 'readr' 
+(>= 2.2.0).
+- Test under upcoming 'photobiology' (== 0.14.2).
+
 # ooacquire 0.5.4 (2025-12-04)
 
 - Work around change introduced to pattern matching in 'stringr' (>= 1.6.0), 

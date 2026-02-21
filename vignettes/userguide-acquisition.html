@@ -12,7 +12,7 @@
 
 <meta name="author" content="Pedro J. Aphalo" />
 
-<meta name="date" content="2025-07-25" />
+<meta name="date" content="2026-02-21" />
 
 <title>Acquisition of Spectra</title>
 
@@ -50,8 +50,9 @@ overflow: visible;
 }
 </style>
 <style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -62,7 +63,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
 { counter-reset: source-line 0; }
@@ -339,9 +340,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 <h1 class="title toc-ignore">Acquisition of Spectra</h1>
-<h3 class="subtitle"><code>ooacquire</code> 0.5.3.1.9000</h3>
+<h3 class="subtitle"><code>ooacquire</code> 0.5.5</h3>
 <h4 class="author">Pedro J. Aphalo</h4>
-<h4 class="date">2025-07-25</h4>
+<h4 class="date">2026-02-21</h4>
 
 
 <div id="TOC">
@@ -871,7 +872,7 @@ arguments are checked to match the serial number of the attached
 spectrometer, and rejected in cases of mismatch.</p>
 <p>If no calibration information is available based on the serial number
 or the user has not supplied valid calibration information as arguments
-to the call, an attempt is made to retrieve an iradiance calibration
+to the call, an attempt is made to retrieve an irradiance calibration
 from the spectrometer EEPROM. Because of the way in which irradiance
 calibrations are stored in Ocean Optics spectrometers. Calibration data
 retrieved from the EEPROM can only be used if the user provides
@@ -927,7 +928,7 @@ is possible.</p>
 </ol>
 <p>Many settings can be adjusted during a data acquisition session.
 Here, using <code>interface.mode = &quot;simple&quot;</code> fewer of these
-settings can be modofied interactively than when using, for example,
+settings can be modified interactively than when using, for example,
 <code>interface.mode = &quot;full&quot;</code>, which has additional menu options
 in the user interface. If one knows in advance what settings will need,
 these can be passed as arguments when starting the session by calling
@@ -1070,7 +1071,7 @@ automatically the target value of maximum instrument counts is computed
 proportionally to the maximum counts specification of the spectrometer.
 The head-room as a fraction of one can be set by the user as depending
 on the stability or not of the irradiance we need more or less head-room
-to accomodate increases in irradiance. Parameter
+to accommodate increases in irradiance. Parameter
 <code>target.margin</code> allows the user to set a <em>safety
 margin</em> different from the default of 0.1 (or 10%). The example
 below could help prevent clipping in cases when irradiance changes so
@@ -1334,7 +1335,7 @@ optical set-up used is for measuring specular spectral reflectance, we
 use the following code. This information will also be used when plotting
 the data.</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">acq_fraction_interactive</span>(<span class="at">qty.out =</span> <span class="st">&quot;Rfr&quot;</span>, <span class="at">type =</span> <span class="st">&quot;specular&quot;</span>)</span></code></pre></div>
-<p>Wen using <em>light sources with pulsed emission</em> we start a
+<p>When using <em>light sources with pulsed emission</em> we start a
 session by calling function
 <code>acq_fraction_pulsed_interactive()</code> instead of
 <code>acq_fraction_interactive</code> and we set manually the
@@ -1355,7 +1356,7 @@ of spectral data acquisitions. This should be fairly simple, not
 requiring advanced knowledge of the R language as we export lower level
 functions that can be used as building blocks for new variations. It
 should be even possible to use these functions to develop a user
-interface based of package ‘shinny’.</p>
+interface based of package ‘shiny’.</p>
 </div>
 <div id="using-scripts" class="section level2">
 <h2>Using scripts</h2>

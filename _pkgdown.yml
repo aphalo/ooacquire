@@ -178,9 +178,20 @@ navbar:
     tutorials:
       text: Resources
       menu:
-      - text: R for Photobiology packages
+      - text: R for Photobiology Suite at R-Universe
+        href: https://aphalo.r-universe.dev/
+      - text: R for Photobiology documentation
+        href: https://docs.r4photobiology.info/
+      - text: R for Photobiology web site
         href: https://www.r4photobiology.info/
+      - text: Ocean Optics
+        href: https://www.oceanoptics.com/
+      - text: ------
+      - text: Book 'Learn R - As a Language'
+        href: https://www.learnr-book.info/
       - text: A handbook of methods
         href: https://doi.org/10.31885/9789521083631
-      - text: Ocean Insight (ex. Ocean Optics)
-        href: https://www.oceaninsight.com/
+      - text: Photobiological Sciences Online
+        href: http://photobiology.info/
+      - text: FOSS for Spectroscopy
+        href: https://bryanhanson.github.io/FOSS4Spectroscopy/

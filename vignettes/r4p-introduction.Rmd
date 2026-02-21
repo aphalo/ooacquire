@@ -27,7 +27,7 @@ Package ['photobiology'](https://docs.r4photobiology.info/photobiology/)
 is at the core of a suite of packages for analysis and
 plotting of data relevant to photobiology. The accompanying packages provide data and
 definitions that are to a large extent application-area specific while the
-functions in the package 'photobioloy' are widely useful in photobiology and in
+functions in the package 'photobiology' are widely useful in photobiology and in
 radiation quantification in geophysics and meteorology. Package 'photobiology'
 has its main focus in the characterization of the light environment in a
 biologically relevant manner and in the manipulation of spectral data to
@@ -38,9 +38,9 @@ derived quantities like day- and night length that are important for most
 organisms.
 
 Data exchange with packages 'pavo', 'colorSpec' and 'hyperSpec' is supported.
-The focus of package 'pavo' (Maia et al. 2003) is on color perception by animals
-and assessment of animal coloration. The focus of package 'colorSpec' (Davis
-2019) is on color-related computations: "Calculate with spectral properties of
+The focus of package 'pavo' (Maia et al. 2003) is on colour perception by animals
+and assessment of animal colouration. The focus of package 'colorSpec' (Davis
+2019) is on colour-related computations: "Calculate with spectral properties of
 light sources, materials, cameras, eyes, and scanners." The focus of package
 'hyperSpec' (Beleites and Sergo) is the handling of hyperspectral data sets,
 such as spectral images and time series of spectra. Because of their different
