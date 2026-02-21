@@ -182,7 +182,10 @@ spectrometer, installation of the OmniDriver runtime, package
 ‘rOmniDriver’ and their respective dependencies can be skipped.
 ‘ooacquire’ detects their absence and switches to an “off-line” mode.*
 
-Installation of Java/Temurin and OmniDriver should be done first.
+Installation of Java/Temurin and OmniDriver should be done first. Recent
+versions of R are only available as **64 bit** binaries. **The versions
+of the Java OpenJDK and of OmniDriver to be installed are the 64 bit
+ones.**
 
 1.  **Temurin 8 OpenJDK**, **Corretto 8 OpenJDK**, or **Java 8 JDK**
     (Java Open development kit). *The Java run-time is not enough!*
