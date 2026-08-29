@@ -108,9 +108,9 @@ The returned value can be used as argument to \code{acq.settings} in
   \code{\link{acq_raw_mspct}}
 }
 \seealso{
-Other acquisition-settings related functions: 
-\code{\link{set_integ_time}()},
-\code{\link{set_linearized}()},
-\code{\link{set_num_exposures}()}
+Other acquisition-settings related functions:
+\code{\link[=set_integ_time]{set_integ_time()}},
+\code{\link[=set_linearized]{set_linearized()}},
+\code{\link[=set_num_exposures]{set_num_exposures()}}
 }
 \concept{acquisition-settings related functions}

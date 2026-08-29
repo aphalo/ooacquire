@@ -38,7 +38,7 @@ algorithms for stray light and slit function by Lasse Ylianttila, and
 variations by Pedro J. Aphalo..
 }
 \seealso{
-Other objects containing instrument-specific data: 
+Other objects containing instrument-specific data:
 \code{\link{FLMS00416_descriptors}},
 \code{\link{FLMS00440_descriptors}},
 \code{\link{FLMS00673_descriptors}},

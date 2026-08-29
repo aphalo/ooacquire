@@ -14,5 +14,12 @@ a list
 }
 \description{
 Query the spectrometer for the settings currently in use for corrections,
-smotthing and acquisition parameters integration time and number of scans.
+smoothing and acquisition parameters integration time and number of scans.
 }
+\details{
+Instrument settings, are settings whose values can vary between data
+  acquisition events. They are stored as a list. The descriptor object is used
+  to access the spectrometer and the currently in use settings are retrieved,
+  formated and returned.
+}
+\concept{Functions and methods for instrument settings}

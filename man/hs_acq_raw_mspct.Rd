@@ -61,8 +61,8 @@ For normal speed acquisition of a single spectrum and multiple
   spectra according to a user defined protocol see \code{\link{acq_raw_spct}}
   and \code{\link{acq_raw_mspct}}.
 
-Other raw-counts-spectra acquisition functions: 
-\code{\link{acq_raw_mspct}()},
-\code{\link{acq_raw_spct}()}
+Other raw-counts-spectra acquisition functions:
+\code{\link[=acq_raw_mspct]{acq_raw_mspct()}},
+\code{\link[=acq_raw_spct]{acq_raw_spct()}}
 }
 \concept{raw-counts-spectra acquisition functions}

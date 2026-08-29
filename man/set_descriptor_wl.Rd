@@ -18,6 +18,16 @@ wavelengths field of the calibration data replaced by the new values.
 }
 \description{
 Replace wavelength values in an instrument descriptor for an Ocean Optics
-spectrometer with new values. (e.g. when wavelngth calibration is not stored
+spectrometer with new values. (e.g. when wavelength calibration is not stored
 in firmware).
 }
+\seealso{
+Other Functions and methods for instrument descriptors:
+\code{\link[=get_oo_descriptor]{get_oo_descriptor()}},
+\code{\link[=set_descriptor_bad_pixs]{set_descriptor_bad_pixs()}},
+\code{\link[=set_descriptor_entrance_optics]{set_descriptor_entrance_optics()}},
+\code{\link[=set_descriptor_integ_time]{set_descriptor_integ_time()}},
+\code{\link[=set_descriptor_irrad_mult]{set_descriptor_irrad_mult()}},
+\code{\link[=set_descriptor_nl]{set_descriptor_nl()}}
+}
+\concept{Functions and methods for instrument descriptors}

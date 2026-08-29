@@ -23,14 +23,14 @@ Trim out-of-range counts values in data stored in a "raw_spct" object. The
 values are replaced with the supplied \code{fill} value.
 }
 \seealso{
-Other spectral data-processing functions: 
-\code{\link{MAYP112785_tail_correction}()},
-\code{\link{MAYP11278_tail_correction}()},
-\code{\link{check_sn_match}()},
-\code{\link{linearize_counts}()},
-\code{\link{merge_raw_mspct}()},
-\code{\link{new_correction_method}()},
-\code{\link{ref_correction}()},
-\code{\link{uvb_corrections}()}
+Other spectral data-processing functions:
+\code{\link[=MAYP112785_tail_correction]{MAYP112785_tail_correction()}},
+\code{\link[=MAYP11278_tail_correction]{MAYP11278_tail_correction()}},
+\code{\link[=check_sn_match]{check_sn_match()}},
+\code{\link[=linearize_counts]{linearize_counts()}},
+\code{\link[=merge_raw_mspct]{merge_raw_mspct()}},
+\code{\link[=new_correction_method]{new_correction_method()}},
+\code{\link[=ref_correction]{ref_correction()}},
+\code{\link[=uvb_corrections]{uvb_corrections()}}
 }
 \concept{spectral data-processing functions}

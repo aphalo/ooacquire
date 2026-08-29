@@ -45,6 +45,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Pedro J. Aphalo \email{pedro.aphalo@helsinki.fi} [translator]
   \item Lasse Ylianttila
 }
 

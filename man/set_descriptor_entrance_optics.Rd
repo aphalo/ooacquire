@@ -29,3 +29,13 @@ by the new list.
 Replace or add a description of the fibre and diffuser or other entrance
 optics to the instrument descriptor.
 }
+\seealso{
+Other Functions and methods for instrument descriptors:
+\code{\link[=get_oo_descriptor]{get_oo_descriptor()}},
+\code{\link[=set_descriptor_bad_pixs]{set_descriptor_bad_pixs()}},
+\code{\link[=set_descriptor_integ_time]{set_descriptor_integ_time()}},
+\code{\link[=set_descriptor_irrad_mult]{set_descriptor_irrad_mult()}},
+\code{\link[=set_descriptor_nl]{set_descriptor_nl()}},
+\code{\link[=set_descriptor_wl]{set_descriptor_wl()}}
+}
+\concept{Functions and methods for instrument descriptors}

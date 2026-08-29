@@ -33,9 +33,25 @@ Model, configuration, serial number, and calibration data stored in the
 EEPROM of an Ocean Optics spectrometer are retrieved and returned in a
 list.
 }
-\note{
-One and only one of \code{area} or \code{diff.type} is needed if an
+\details{
+Instrument descriptors are \code{"list"} objects with fields
+  describing features of a spectrometer that remain consistent across
+  data acquisition events, including calibration data, entrance optics,
+  serial number, optical configuration, etc. Some of these field can be
+  obtained from the EEPROM inside Ocean Optics spectrometers.
+
+  One and only one of \code{area} or \code{diff.type} is needed if an
   irradiance calibration stored in the EEPROM is to be retrieved. If both
   are null, as by default, the irradiance calibration factors will not be
-  retireved even if present in the EEPROM.
+  retrieved even if present in the EEPROM.
 }
+\seealso{
+Other Functions and methods for instrument descriptors:
+\code{\link[=set_descriptor_bad_pixs]{set_descriptor_bad_pixs()}},
+\code{\link[=set_descriptor_entrance_optics]{set_descriptor_entrance_optics()}},
+\code{\link[=set_descriptor_integ_time]{set_descriptor_integ_time()}},
+\code{\link[=set_descriptor_irrad_mult]{set_descriptor_irrad_mult()}},
+\code{\link[=set_descriptor_nl]{set_descriptor_nl()}},
+\code{\link[=set_descriptor_wl]{set_descriptor_wl()}}
+}
+\concept{Functions and methods for instrument descriptors}

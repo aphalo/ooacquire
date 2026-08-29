@@ -15,7 +15,7 @@ Solar radiation at ground level measured in Helsinki Finland. The
 spectrometer used was an Ocean Optics Maya2000 Pro.
 }
 \seealso{
-Other objects containing example raw-counts data: 
+Other objects containing example raw-counts data:
 \code{\link{blue_filter.raw_mspct}},
 \code{\link{halogen.raw_mspct}},
 \code{\link{red_filter.raw_mspct}},

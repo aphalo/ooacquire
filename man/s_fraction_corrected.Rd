@@ -98,9 +98,9 @@ Currently \code{s_fraction_corrected.list} allows processing of files
   accuracy.
 }
 \seealso{
-Other functions for conversion of raw-counts data: 
-\code{\link{raw2corr_cps}()},
-\code{\link{raw2cps}()},
-\code{\link{s_irrad_corrected}()}
+Other functions for conversion of raw-counts data:
+\code{\link[=raw2corr_cps]{raw2corr_cps()}},
+\code{\link[=raw2cps]{raw2cps()}},
+\code{\link[=s_irrad_corrected]{s_irrad_corrected()}}
 }
 \concept{functions for conversion of raw-counts data}

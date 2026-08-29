@@ -345,7 +345,7 @@ This function calls functions \code{\link{tune_interactive}},
   retrieved from the instrument, functions \code{\link{get_oo_descriptor}}
   and \code{\link{oo_calib2irrad_mult}} are also called.
 
-Other interactive acquisition functions: 
-\code{\link{acq_fraction_interactive}()}
+Other interactive acquisition functions:
+\code{\link[=acq_fraction_interactive]{acq_fraction_interactive()}}
 }
 \concept{interactive acquisition functions}

@@ -71,7 +71,7 @@ In this case no calibration for spectral irradiance or characterizations of
 the slit function are available.
 }
 \seealso{
-Other objects containing instrument-specific data: 
+Other objects containing instrument-specific data:
 \code{\link{FLMS00416_descriptors}},
 \code{\link{FLMS00440_descriptors}},
 \code{\link{FLMS00673_descriptors}},

@@ -45,17 +45,17 @@ value for integration time for tuning when the user chooses not to use the
 value stored in \code{acq.settings}.
 }
 \seealso{
-Other interactive acquisition utility functions: 
-\code{\link{choose_ch_interactive}()},
-\code{\link{choose_sr_interactive}()},
-\code{\link{f.trigger.message}()},
-\code{\link{list_srs_interactive}()},
-\code{\link{protocol_interactive}()},
-\code{\link{set_attributes_interactive}()},
-\code{\link{set_folder_interactive}()},
-\code{\link{set_seq_interactive}()},
-\code{\link{set_session_name_interactive}()},
-\code{\link{set_user_name_interactive}()},
-\code{\link{set_wlrange_interactive}()}
+Other interactive acquisition utility functions:
+\code{\link[=choose_ch_interactive]{choose_ch_interactive()}},
+\code{\link[=choose_sr_interactive]{choose_sr_interactive()}},
+\code{\link[=f.trigger.message]{f.trigger.message()}},
+\code{\link[=list_srs_interactive]{list_srs_interactive()}},
+\code{\link[=protocol_interactive]{protocol_interactive()}},
+\code{\link[=set_attributes_interactive]{set_attributes_interactive()}},
+\code{\link[=set_folder_interactive]{set_folder_interactive()}},
+\code{\link[=set_seq_interactive]{set_seq_interactive()}},
+\code{\link[=set_session_name_interactive]{set_session_name_interactive()}},
+\code{\link[=set_user_name_interactive]{set_user_name_interactive()}},
+\code{\link[=set_wlrange_interactive]{set_wlrange_interactive()}}
 }
 \concept{interactive acquisition utility functions}

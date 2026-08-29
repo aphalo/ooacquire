@@ -52,7 +52,7 @@ Some of the method definitions are fill-ins for methods not implemented.
 In this case no characterization of the slit function is available.
 }
 \seealso{
-Other objects containing instrument-specific data: 
+Other objects containing instrument-specific data:
 \code{\link{FLMS00416_descriptors}},
 \code{\link{FLMS00440_descriptors}},
 \code{\link{FLMS00673_descriptors}},

@@ -15,10 +15,18 @@
 #' @export
 #' @return a list
 #'
-#' @note One and only one of \code{area} or \code{diff.type} is needed if an
+#' @details Instrument descriptors are \code{"list"} objects with fields
+#'   describing features of a spectrometer that remain consistent across
+#'   data acquisition events, including calibration data, entrance optics,
+#'   serial number, optical configuration, etc. Some of these field can be
+#'   obtained from the EEPROM inside Ocean Optics spectrometers.
+#'
+#'   One and only one of \code{area} or \code{diff.type} is needed if an
 #'   irradiance calibration stored in the EEPROM is to be retrieved. If both
 #'   are null, as by default, the irradiance calibration factors will not be
-#'   retireved even if present in the EEPROM.
+#'   retrieved even if present in the EEPROM.
+#'
+#' @family Functions and methods for instrument descriptors
 #'
 get_oo_descriptor <- function(w,
                               sr.index = 0L,
@@ -130,8 +138,16 @@ get_oo_descriptor <- function(w,
 
 #' Add bad pixel information to an instrument description
 #'
-#' A integer vector of indexes to bad pixels in the instrument array. Data from
-#' these array pixels will be discarded.
+#' A integer vector of indexes to bad pixels in the instrument array is stored
+#' in the instrument descriptor.
+#'
+#' @details When a descriptor contains indexes to bad pixels, data from these
+#'   array pixels will is replaced by interpolation when a acquired data is
+#'   converted into physical units. Although the indexes to bad pixels are
+#'   normally set when a new calibration is stored in a descriptor, new bad
+#'   pixels can develop later or some bad pixels can be identified at a later
+#'   time even if present. The current method is used when creating a descriptor
+#'   but it is also useful when a descriptor needs to be updated.
 #'
 #' @param descriptor list as returned by function \code{get_oo_descriptor}
 #' @param spct an object of class \code{generic_spct} or derived.
@@ -148,6 +164,8 @@ get_oo_descriptor <- function(w,
 #'   new values.
 #'
 #' @export
+#'
+#' @family Functions and methods for instrument descriptors
 #'
 set_descriptor_bad_pixs <- function(descriptor,
                                     bad.pixs) {
@@ -195,7 +213,7 @@ update_mspct_bad_pixs <- function(mspct,
 #' Replace integration time limits in instrument descriptor
 #'
 #' This function can be needed in exceptional cases such as when the limits
-#' stored in the intrument's persistent memory are wrong. In other cases in can
+#' stored in the intrument's persistent memory are wrong. In other cases it can
 #' be used to restrict the range of values allowed to be set to a smaller range
 #' than natively supported by the spectrometer.
 #'
@@ -213,6 +231,8 @@ update_mspct_bad_pixs <- function(mspct,
 #' invalid data without an error being triggered.
 #'
 #' @export
+#'
+#' @family Functions and methods for instrument descriptors
 #'
 set_descriptor_integ_time <- function(descriptor,
                                       min.integ.time = NA_integer_,
@@ -248,7 +268,7 @@ set_descriptor_integ_time <- function(descriptor,
 #' Replace wavelength values in an instrument description
 #'
 #' Replace wavelength values in an instrument descriptor for an Ocean Optics
-#' spectrometer with new values. (e.g. when wavelngth calibration is not stored
+#' spectrometer with new values. (e.g. when wavelength calibration is not stored
 #' in firmware).
 #'
 #' @param descriptor list as returned by function \code{get_oo_descriptor}
@@ -259,6 +279,8 @@ set_descriptor_integ_time <- function(descriptor,
 #' wavelengths field of the calibration data replaced by the new values.
 #'
 #' @export
+#'
+#' @family Functions and methods for instrument descriptors
 #'
 set_descriptor_wl <- function(descriptor,
                               wl) {
@@ -287,6 +309,8 @@ set_descriptor_wl <- function(descriptor,
 #'
 #' @export
 #'
+#' @family Functions and methods for instrument descriptors
+#'
 set_descriptor_nl <- function(descriptor,
                               nl.coeff = NA_real_,
                               nl.fun = NULL)
@@ -311,7 +335,7 @@ set_descriptor_nl <- function(descriptor,
 
 #' Add spectral irradiance calibration
 #'
-#' Adds calibration data expressed as multipliers for each pixel stores in a
+#' Adds calibration data expressed as multipliers for each pixel stored in a
 #' numeric vector.
 #'
 #' @param descriptor list as returned by function \code{get_oo_descriptor}
@@ -327,6 +351,8 @@ set_descriptor_nl <- function(descriptor,
 #'   irrad.mult field of the calibration data replaced by the new values.
 #'
 #' @export
+#'
+#' @family Functions and methods for instrument descriptors
 #'
 set_descriptor_irrad_mult <- function(descriptor,
                                       irrad.mult,
@@ -353,12 +379,19 @@ set_descriptor_irrad_mult <- function(descriptor,
 #' Get the current values of instrument settings
 #'
 #' Query the spectrometer for the settings currently in use for corrections,
-#' smotthing and acquisition parameters integration time and number of scans.
+#' smoothing and acquisition parameters integration time and number of scans.
+#'
+#' @details Instrument settings, are settings whose values can vary between data
+#'   acquisition events. They are stored as a list. The descriptor object is used
+#'   to access the spectrometer and the currently in use settings are retrieved,
+#'   formated and returned.
 #'
 #' @param descriptor list as returned by function \code{get_oo_descriptor}
 #'
 #' @export
 #' @return a list
+#'
+#' @family Functions and methods for instrument settings
 #'
 get_oo_settings <- function(descriptor) {
   if (getOption("ooacquire.offline", TRUE)) {
@@ -398,6 +431,8 @@ get_oo_settings <- function(descriptor) {
 #' by the new list.
 #'
 #' @export
+#'
+#' @family Functions and methods for instrument descriptors
 #'
 set_descriptor_entrance_optics <- function(descriptor,
                                            make = NA_character_,

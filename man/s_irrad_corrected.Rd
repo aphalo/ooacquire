@@ -114,9 +114,9 @@ Currently \code{s_irrad_corrected.list} allows processing of files
   portability of the spectral data.
 }
 \seealso{
-Other functions for conversion of raw-counts data: 
-\code{\link{raw2corr_cps}()},
-\code{\link{raw2cps}()},
-\code{\link{s_fraction_corrected}()}
+Other functions for conversion of raw-counts data:
+\code{\link[=raw2corr_cps]{raw2corr_cps()}},
+\code{\link[=raw2cps]{raw2cps()}},
+\code{\link[=s_fraction_corrected]{s_fraction_corrected()}}
 }
 \concept{functions for conversion of raw-counts data}

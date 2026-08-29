@@ -111,8 +111,8 @@ Obviously the duration of the time steps must be longer than the time
 spectrum. Computations on date times are done with
 \code{\link[lubridate]{lubridate}}.
 
-Other raw-counts-spectra acquisition functions: 
-\code{\link{acq_raw_spct}()},
-\code{\link{hs_acq_raw_mspct}()}
+Other raw-counts-spectra acquisition functions:
+\code{\link[=acq_raw_spct]{acq_raw_spct()}},
+\code{\link[=hs_acq_raw_mspct]{hs_acq_raw_mspct()}}
 }
 \concept{raw-counts-spectra acquisition functions}

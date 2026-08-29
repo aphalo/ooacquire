@@ -7,11 +7,12 @@
 rm_jwrapper(x)
 }
 \arguments{
-\item{x}{raw_spct or raw_mspct object with attribute \code{instr.desc} set.}
+\item{x}{generic_spct or generic_mspct object with attribute
+\code{instr.desc} set.}
 }
 \value{
-a copy of \code{x} possibly with an updated
-  \code{instr.desc} attribute embedded.
+a copy of \code{x} possibly with field \code{"w"} removed, if present,
+  from the embedded \code{instr.desc} attribute of spectral objects.
 }
 \description{
 Clean up left-behind wrappers used to communicate with Java code using
@@ -24,8 +25,8 @@ between R and a spectrometer ends, these wrappers are invalidated, becoming
 useless. However, if present they create a dependency on 'rJava', possibly
 triggering errors. In recent versions of 'ooacquire' this wrapper is removed
 immediately after acquisition. However, the instrument descriptor of spectral
-objects created with versions of 'ooacquire' for some years ago can contain a
-member storing a useless Java wrapper. This function removes this field if
+objects created with versions of 'ooacquire' from some years ago can contain a
+member storing the useless Java wrapper. This function removes this field if
 present.
 }
 \note{

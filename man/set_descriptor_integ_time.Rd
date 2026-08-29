@@ -25,7 +25,7 @@ integration time fields of the descriptor modified.
 }
 \description{
 This function can be needed in exceptional cases such as when the limits
-stored in the intrument's persistent memory are wrong. In other cases in can
+stored in the intrument's persistent memory are wrong. In other cases it can
 be used to restrict the range of values allowed to be set to a smaller range
 than natively supported by the spectrometer.
 }
@@ -35,3 +35,13 @@ may fail or return the wrong value. Values should be within the range
 in the instrument's specifications. Setting wrong values can result in
 invalid data without an error being triggered.
 }
+\seealso{
+Other Functions and methods for instrument descriptors:
+\code{\link[=get_oo_descriptor]{get_oo_descriptor()}},
+\code{\link[=set_descriptor_bad_pixs]{set_descriptor_bad_pixs()}},
+\code{\link[=set_descriptor_entrance_optics]{set_descriptor_entrance_optics()}},
+\code{\link[=set_descriptor_irrad_mult]{set_descriptor_irrad_mult()}},
+\code{\link[=set_descriptor_nl]{set_descriptor_nl()}},
+\code{\link[=set_descriptor_wl]{set_descriptor_wl()}}
+}
+\concept{Functions and methods for instrument descriptors}

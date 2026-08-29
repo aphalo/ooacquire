@@ -82,8 +82,8 @@ the flash a number of times that depends on the settings in
 \code{\link{acq_raw_mspct}} which can be used to acquire multiple
 spectra according to a user defined protocol.
 
-Other raw-counts-spectra acquisition functions: 
-\code{\link{acq_raw_mspct}()},
-\code{\link{hs_acq_raw_mspct}()}
+Other raw-counts-spectra acquisition functions:
+\code{\link[=acq_raw_mspct]{acq_raw_mspct()}},
+\code{\link[=hs_acq_raw_mspct]{hs_acq_raw_mspct()}}
 }
 \concept{raw-counts-spectra acquisition functions}

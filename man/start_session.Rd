@@ -20,8 +20,8 @@ and initialize an object with a reference to the
 Java object returned by Omni Driver.
 }
 \seealso{
-Other spectrometer-connection functions: 
-\code{\link{end_session}()},
-\code{\link{list_instruments}()}
+Other spectrometer-connection functions:
+\code{\link[=end_session]{end_session()}},
+\code{\link[=list_instruments]{list_instruments()}}
 }
 \concept{spectrometer-connection functions}

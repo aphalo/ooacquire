@@ -39,14 +39,14 @@ In contrast to other classes defined in package 'photobiology', class
   function applied.
 }
 \seealso{
-Other spectral data-processing functions: 
-\code{\link{MAYP112785_tail_correction}()},
-\code{\link{MAYP11278_tail_correction}()},
-\code{\link{check_sn_match}()},
-\code{\link{merge_raw_mspct}()},
-\code{\link{new_correction_method}()},
-\code{\link{ref_correction}()},
-\code{\link{trim_counts}()},
-\code{\link{uvb_corrections}()}
+Other spectral data-processing functions:
+\code{\link[=MAYP112785_tail_correction]{MAYP112785_tail_correction()}},
+\code{\link[=MAYP11278_tail_correction]{MAYP11278_tail_correction()}},
+\code{\link[=check_sn_match]{check_sn_match()}},
+\code{\link[=merge_raw_mspct]{merge_raw_mspct()}},
+\code{\link[=new_correction_method]{new_correction_method()}},
+\code{\link[=ref_correction]{ref_correction()}},
+\code{\link[=trim_counts]{trim_counts()}},
+\code{\link[=uvb_corrections]{uvb_corrections()}}
 }
 \concept{spectral data-processing functions}

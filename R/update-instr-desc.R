@@ -92,32 +92,33 @@ update_bad_pixs <- function(x,
 #' useless. However, if present they create a dependency on 'rJava', possibly
 #' triggering errors. In recent versions of 'ooacquire' this wrapper is removed
 #' immediately after acquisition. However, the instrument descriptor of spectral
-#' objects created with versions of 'ooacquire' for some years ago can contain a
-#' member storing a useless Java wrapper. This function removes this field if
+#' objects created with versions of 'ooacquire' from some years ago can contain a
+#' member storing the useless Java wrapper. This function removes this field if
 #' present.
 #'
 #' @note
 #' Method \code{getInstrDesc()} removes member field \code{w} from the returned
 #' value but does not modify its argument.
 #'
-#' @param x raw_spct or raw_mspct object with attribute \code{instr.desc} set.
+#' @param x generic_spct or generic_mspct object with attribute
+#'   \code{instr.desc} set.
 #'
-#' @return a copy of \code{x} possibly with an updated
-#'   \code{instr.desc} attribute embedded.
+#' @return a copy of \code{x} possibly with field \code{"w"} removed, if present,
+#'   from the embedded \code{instr.desc} attribute of spectral objects.
 #'
 #' @export
 #'
 rm_jwrapper <- function(x) {
-  if (is.raw_mspct(x)) {
+  if (is.generic_mspct(x)) {
     msmsply(x, .fun = rm_jwrapper)
   } else {
-    if (!is.raw_spct(x)) {
-      warning("'x' must be a 'raw_spct' object")
+    if (!is.generic_spct(x)) {
+      warning("'x' must be a 'generic_spct' or derived object")
       return(x)
     }
     descriptor <- getInstrDesc(x)
     if (length(descriptor) == 0) {
-      warning("Attribute 'inst.desc' is not set in 'x'")
+      message("Attribute 'inst.desc' is not set in 'x'")
       return(x)
     }
     if (exists("w", descriptor, inherits = FALSE)) {

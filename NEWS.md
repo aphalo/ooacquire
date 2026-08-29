@@ -4,6 +4,10 @@ editor_options:
     wrap: 72
 ---
 
+# ooacquire 0.5.6 (2026-09-xx)
+
+- Add functions `s_irrad_refresh()` and `spectrometer_defaults()`.
+
 # ooacquire 0.5.5 (2026-02-21)
 
 - Track rename of `read_table2()` into `read_table()` in package 'readr' 

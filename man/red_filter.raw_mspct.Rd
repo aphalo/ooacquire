@@ -16,7 +16,7 @@ incandescent lamp as light source. The spectrometer used was an Ocean Optics
 Maya2000 Pro.
 }
 \seealso{
-Other objects containing example raw-counts data: 
+Other objects containing example raw-counts data:
 \code{\link{blue_filter.raw_mspct}},
 \code{\link{halogen.raw_mspct}},
 \code{\link{sun001.raw_mspct}},

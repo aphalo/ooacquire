@@ -15,7 +15,7 @@ A blue interference filter from UQG measured using a household incandescent
 lamp as light source. The spectrometer used was an Ocean Optics Maya2000 Pro.
 }
 \seealso{
-Other objects containing example raw-counts data: 
+Other objects containing example raw-counts data:
 \code{\link{halogen.raw_mspct}},
 \code{\link{red_filter.raw_mspct}},
 \code{\link{sun001.raw_mspct}},

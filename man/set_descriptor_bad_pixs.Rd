@@ -29,10 +29,29 @@ A copy of the argument passed to \code{descriptor}, \code{spct} or
   new values.
 }
 \description{
-A integer vector of indexes to bad pixels in the instrument array. Data from
-these array pixels will be discarded.
+A integer vector of indexes to bad pixels in the instrument array is stored
+in the instrument descriptor.
+}
+\details{
+When a descriptor contains indexes to bad pixels, data from these
+  array pixels will is replaced by interpolation when a acquired data is
+  converted into physical units. Although the indexes to bad pixels are
+  normally set when a new calibration is stored in a descriptor, new bad
+  pixels can develop later or some bad pixels can be identified at a later
+  time even if present. The current method is used when creating a descriptor
+  but it is also useful when a descriptor needs to be updated.
 }
 \note{
 Following R's syntax the first pixel in the detector array has index
  1.
 }
+\seealso{
+Other Functions and methods for instrument descriptors:
+\code{\link[=get_oo_descriptor]{get_oo_descriptor()}},
+\code{\link[=set_descriptor_entrance_optics]{set_descriptor_entrance_optics()}},
+\code{\link[=set_descriptor_integ_time]{set_descriptor_integ_time()}},
+\code{\link[=set_descriptor_irrad_mult]{set_descriptor_irrad_mult()}},
+\code{\link[=set_descriptor_nl]{set_descriptor_nl()}},
+\code{\link[=set_descriptor_wl]{set_descriptor_wl()}}
+}
+\concept{Functions and methods for instrument descriptors}
