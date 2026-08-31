@@ -82,9 +82,6 @@ for.
   characterization of the shape of the slit function by measuring one or more
   laser beams at suitable wavelengths.
 }
-\references{
-\url{http://www.r4photobiology.info}
-}
 \seealso{
 Other spectral data-processing functions:
 \code{\link[=MAYP112785_tail_correction]{MAYP112785_tail_correction()}},

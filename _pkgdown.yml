@@ -88,6 +88,7 @@ reference:
     - raw2corr_cps
     - raw2cps
     - s_irrad_corrected
+    - s_irrad_refresh
     - s_fraction_corrected
     - which_descriptor
 
@@ -107,6 +108,7 @@ reference:
     - merge_cps
     - new_correction_method
     - skip_bad_pixs
+    - spectrometer_defaults
 
   - subtitle: Computation of calibration coefficients
     desc: Compute a calibration coefficients.

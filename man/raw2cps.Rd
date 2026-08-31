@@ -47,6 +47,7 @@ starting with "cps". All other columns are left unchanded.
 Other functions for conversion of raw-counts data:
 \code{\link[=raw2corr_cps]{raw2corr_cps()}},
 \code{\link[=s_fraction_corrected]{s_fraction_corrected()}},
-\code{\link[=s_irrad_corrected]{s_irrad_corrected()}}
+\code{\link[=s_irrad_corrected]{s_irrad_corrected()}},
+\code{\link[=s_irrad_corrected_updt]{s_irrad_corrected_updt()}}
 }
 \concept{functions for conversion of raw-counts data}

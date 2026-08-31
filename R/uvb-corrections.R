@@ -37,8 +37,6 @@
 #'
 #' @export
 #'
-#' @references \url{http://www.r4photobiology.info}
-#'
 #' @note \code{stray.light.method = "none"} is a valid argument only for
 #'   function \code{uvb_corrections()}. The default \code{worker.fun} is just an
 #'   example. Corrections are specific to each individual spectrometer unit (not

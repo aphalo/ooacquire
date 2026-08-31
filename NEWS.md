@@ -6,7 +6,7 @@ editor_options:
 
 # ooacquire 0.5.6 (2026-09-xx)
 
-- Add functions `s_irrad_refresh()` and `spectrometer_defaults()`.
+- Add functions `s_irrad_corrected_updt()` and `instr_defaults()`.
 
 # ooacquire 0.5.5 (2026-02-21)
 

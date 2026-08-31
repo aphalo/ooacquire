@@ -28,7 +28,7 @@ knitr::opts_chunk$set(
 
 Package **'ooacquire'** makes it possible to control, modify settings and
 acquire spectral data directly from within R. It can be also used off-line to
-read raw-counts data from files saved by Ocean Insight's software and hardware,
+read raw-counts data from files saved by Ocean Optics's software and hardware,
 or previously acquired with 'ooacquire'. In both cases it implements the
 conversion of raw-counts data into physical quantities, with different protocols
 to improve the dynamic range and corrections to reduce stray-light and other
@@ -72,7 +72,7 @@ other).
 
 Package 'ooacquire' can be also used without
 installing OmniDriver, but in this case only off-line processing of spectra and
-import of spectral data from files obtained with other software from OceanOptics
+import of spectral data from files obtained with other software from Ocean Optics
 are possible. All functions that connect to spectrometer hardware are
 disabled in the absence of an installed OmniDriver driver, while all functions
 that do not communicate with the spectrometer remain fully functional.
@@ -108,9 +108,9 @@ available, **'ooacquire'** will enter its **off-line** mode in which all
 functions that communicate with the spectrometer are disabled or trigger
 an error, while other functions will be usable. Thanks to the
 **off-line** mode, raw data previously acquired with this package or
-with software from Ocean Insight can be processed without the need to
+with software from Ocean Optics can be processed without the need to
 install packages **'rOmniDriver'** and **'rJava'** or the **OmniDriver**
-drivers from Ocean Insight. Ocean Insight's **SPAM** library is not used
+drivers from Ocean Optics. Ocean Optics's **SPAM** library is not used
 as all computations are done in function defined in this package using
 **R** and **C++**.
 
@@ -163,7 +163,7 @@ provided. Settings used for acquisition of spectra and a descriptor of
 the instrument are stored at the time of acquisition as attributes of
 the object where the raw counts are stored. These metadata are preserved
 through all processing steps. Most of these metadata are also available
-in the header of data files created with software from Ocean Insight.
+in the header of data files created with software from Ocean Optics.
 When raw-counts data are read from files, these metadata are read and
 saved to the objects together with the data. The aim is to make
 traceability of the origin of the data automatic.
@@ -248,7 +248,7 @@ installed before attempting to install 'ooacquire'.**
 ## Installation for data import and conversion
 
 If 'ooacquire' will not be used to connect to a spectrometer, there is no need
-to install Ocean Optics' Omnidiver or package 'rOmniDriver'.
+to install Ocean Optics' OmniDriver or package 'rOmniDriver'.
 
 In recent versions of R an option can be set to make this
 repository visible to R before installing this package and
@@ -319,35 +319,45 @@ remotes::install_github("aphalo/ooacquire")
 
 ## Setting-up for your own spectrometer
 
+Calibrations are linked to individual spectrometers through the instrument serial number, and as they need to be updated periodically, multiple calibrations are usually in use for a given instrument and selected depending on the data acquisition date. 
+
 The package includes calibration data for the spectrometers used in
-testing the package and that are used by myself and collaborators. Before 
-'ooacquire' can be used with other spectrometers for measuring irradaince
-calibration data and their descriptor has to be available. The functions
-fall-back into retrieving calibration data from the spectrometer when
-no other calibration or correction methods are available. This restricts
-corrections to simpler ones.
+testing the package or used by myself and collaborators. Before 
+'ooacquire' can be used with other spectrometers for measuring irradiance,
+calibration data and their "instrument descriptor" has to be available.
+
+Data acquisition functions from 'ooacquire' fall-back onto retrieving irradiance
+calibration data from the spectrometer EEPROM when no other calibration or
+correction methods are available. In such case, only a simple correction
+algorithm is available, not different from that used by OceanOptics own
+spectrometer support software.
 
 When measuring optical properties, transmittance or reflectance, measurements
 are relative, and only a wavelength calibration is needed, and one is almost
-always retrievable from the spectrometer. The case is the same for 
-linearization as the polynomial coefficients are also retrievable from the
-spectrometer. At least one correction method needs also to
-be defined for each spectrometer. 
+always retrievable from the spectrometer. The case is the same for linearisation
+as the polynomial coefficients are also retrievable from the spectrometer.
 
-Depending on how detailed has been the characterization of the spectrometer
-different corrections are possible. The source package includes a folder
-'data-raw' with examples of how this can be done. The process cannot be easily
-automated as bad pixels and suitable reference wavelengths need to be chosen
-based both on the instrument used and light source to be measured.
+_Depending on how detailed has been the characterization of the spectrometer
+different corrections are available. The source package includes a folder
+'data-raw' with examples of how correction methods' parameters and functions can
+be made availble. The process cannot be easily automated as bad pixels and
+suitable reference wavelengths need to be chosen based both on the instrument
+used and light source to be measured. Ylianttila et al. (2005) describe 
+correction methods on which those in 'ooacuire' are based, as well as their
+performance._
 
-## Documentation and examples
+## Documentation
 
-Documentation includes five vignettes in addition to help pages. The
-examples in the vignettes and help pages use spectral data from
-measurements done with this package as well as output files created by
-Ocean Optics's software. These data files are in folder `extdata`.
-Scripts containing examples that can be in most cases used with only
-small edits are in folder `example-scripts` of this package.
+HTML documentation for this package is available at
+(<https://docs.r4photobiology.info/ooacquire/>). Documentation includes `r length(list.files(path = "./vignettes", pattern = "*.Rmd"))` package vignettes and `r length(list.files(path = "./vignettes/articles", pattern = "*.Rmd"))` on-line-only articles, in addition to help pages. 
+
+The examples in the vignettes and help pages use spectral data from measurements
+done with this package as well as output files created by Ocean Optics's
+software. These data files are in folder `extdata`. Scripts containing examples
+that can be in most cases used with only small edits are in folder
+`example-scripts` of this package.
+
+The API documentation for the *OmniDriver SDP* is no longer available from Ocean Optics.
 
 ## Examples
 
@@ -383,36 +393,9 @@ scripts.filepaths <- list.files(scripts.path, full.names = TRUE)
 file.copy(from = scripts.filepaths, to = ".")
 ```
 
-## Non-commercial status
-
-Packages **'rOmniDriver'** and **'ooacquire'** are both open source and
-released under a GPL license. Neither **'rOmniDriver'** nor
-**'ooacquire'** require the commercial software *OceanView* or
-*SpectraSuite* to be installed, but should be able to coexist with
-either of them. They do not require the purchase of any software from
-Ocean Optics, but the use of these packages or the free *OmniDriver*
-runtime is not supported in any way by Ocean Optics, unless you acquire
-a license to the *OmniDriver SDP*. The *OmniDriver SDP* is not open
-source and is proprietary software copyrighted by Ocean Optics and
-supporting only the use of hardware sold by this company
-(<https://oceanoptics.com/>).
-
-## Documentation
-
-HTML documentation for this package is available at
-(<https://docs.r4photobiology.info/ooacquire/>), including a *User
-Guide* and a description of the algorithms.
-
-The API documentation for the *OmniDriver SDP* is available from Ocean
-Insight
-[on-line](https://www.oceaninsight.com/globalassets/catalog-blocks-and-images/software-downloads-installers/javadocs-api/omnidriver/index.html "API").
-
-News about updates are regularly posted at
-(<https://www.r4photobiology.info/>).
-
 ## Folder Structure
 
-The folder structure of the Git repository is shown below. Folders `pkgdown`, `inst-not`, `data-raw` and `tests-scripts-interactive` are not included in the built package. Folder `data-raw` also contains raw calibration data and R scripts used to convert them into the objects included in folder `data`. Folder `tests-scripts-interactive` contains R scripts used to test data acquisition with specific spectrometers used during development. Other folders are the usual ones for R packages: `src` contains C++ code sources based on R package 'Rcpp', folder `packadown` contains bitmaps and other files used in the HTML version of the documentation, and folder `test` files implementing unit tests for functions and objects that do not require special hardware, i.e., spectrometers, for execution.
+The folder structure of the Git repository is shown below. Folders `pkgdown`, `inst-not`, `data-raw` and `tests-scripts-interactive` are not included in the built package. Folder `data-raw` also contains raw calibration data and R scripts used to convert them into the objects included in folder `data`. Folder `tests-scripts-interactive` contains R scripts used to test data acquisition with specific spectrometers used during development. Other folders are the usual ones for R packages: `src` contains C++ code sources based on R package 'Rcpp', folder `pckgdown` contains bitmaps and other files used in the HTML version of the documentation, and folder `test` files implementing unit tests for functions and objects that do not require special hardware, i.e., spectrometers, for execution.
 
 ```
 oacquire
@@ -441,6 +424,11 @@ Please report bugs and request new features at
 (<https://github.com/aphalo/ooacquire/issues>). Pull requests are
 welcome at (<https://github.com/aphalo/ooacquire>).
 
+## References
+
+Ylianttila, Lasse, Visuri, Reijo, Huurto, Laura, Jokela, Kari (2005) Evaluation of a single-monochromator diode array spectroradiometer for sunbed UV-radiation measurements. 
+_Photochemistry and Photobiology_ , 81(2), 333-341.
+
 ## Citation
 
 If you use 'ooacquire' to produce scientific or commercial publications,
@@ -451,6 +439,19 @@ citation("ooacquire")
 ```
 
 ## License
+
+Packages **'rOmniDriver'** and **'ooacquire'** are both open source and
+released under a GPL license. Neither **'rOmniDriver'** nor
+**'ooacquire'** require the commercial software *OceanView* or
+*SpectraSuite* to be installed, but should be able to coexist with
+either of them. They do not require the purchase of any software from
+Ocean Optics, but the use of these packages or the free *OmniDriver*
+runtime is not supported in any way by Ocean Optics, unless you acquire
+a license to the *OmniDriver SDP*. The *OmniDriver SDP* is not open
+source and is proprietary software copyrighted by Ocean Optics and
+supporting only the use of hardware sold by this company
+(<https://oceanoptics.com/>). Although still to some extent maintained,
+*OmniDriver* development has been discontinued by OceanOptics.
 
 © 2016-2026 Pedro J. Aphalo
 ([pedro.aphalo\@helsinki.fi](mailto:pedro.aphalo@helsinki.fi)) for the
