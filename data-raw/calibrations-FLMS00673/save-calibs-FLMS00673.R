@@ -41,6 +41,7 @@ FLMS00673_simple.mthd <- list()
 # create an object with the parameters for simple method for Jaz
 # suitable for any light source, but not as good for irradiance.
 FLMS00673_none.mthd <- list(
+  name = "FLMS00673_none.mthd",
   spectrometer.sn = descriptor$spectrometer.sn,
   stray.light.method = "none",
   stray.light.wl = c(203.34, 222.85),

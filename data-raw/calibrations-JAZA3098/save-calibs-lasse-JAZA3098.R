@@ -13,6 +13,7 @@ JAZA3098_ch1_sun.mthd <- list()
 # create an object with the parameters for simple method for Jaz
 # suitable for any light source, but not as good for irradiance.
 JAZA3098_ch1_simple.mthd <- list(
+  name = "JAZA3098_ch1_simple.mthd",
   stray.light.method = "simple",
   stray.light.wl = c(218.5, 228.5),
   flt.dark.wl = c(199.3, 215.1),
@@ -27,6 +28,7 @@ JAZA3098_ch1_simple.mthd <- list(
 # create an object with the parameters for simple method for Jaz
 # suitable for any light source, but not as good for irradiance.
 JAZA3098_ch1_none.mthd <- list(
+  name = "JAZA3098_ch1_none.mthd",
   stray.light.method = "none",
   stray.light.wl = c(218.5, 228.5),
   flt.dark.wl = c(NA_real_, NA_real_),
@@ -49,6 +51,7 @@ JAZA3098_ch2_sun.mthd <- list()
 # create an object with the parameters for simple method for Jaz
 # suitable for any light source, but not as good for irradiance.
 JAZA3098_ch2_simple.mthd <- list(
+  name = "JAZA3098_ch2_simple.mthd",
   stray.light.method = "simple",
   stray.light.wl = c(218.5, 228.5),
   flt.dark.wl = c(199.3, 215.1),
@@ -63,6 +66,7 @@ JAZA3098_ch2_simple.mthd <- list(
 # create an object with the parameters for simple method for Jaz
 # suitable for any light source, but not as good for irradiance.
 JAZA3098_ch2_none.mthd <- list(
+  name = "JAZA3098_ch2_none.mthd",
   stray.light.method = "none",
   stray.light.wl = c(218.5, 228.5),
   flt.dark.wl = c(NA_real_, NA_real_),

@@ -13,11 +13,11 @@ Lists and data frames.
 
 An object of class \code{spec_tbl_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 4 rows and 8 columns.
 
-An object of class \code{list} of length 10.
+An object of class \code{list} of length 11.
 
-An object of class \code{list} of length 10.
+An object of class \code{list} of length 11.
 
-An object of class \code{list} of length 10.
+An object of class \code{list} of length 11.
 }
 \usage{
 MAYP112785_descriptors

@@ -194,5 +194,7 @@ s_fraction_corrected.raw_mspct <- function(x,
                                dyn.range = dyn.range) / reference.value
     z <- setRfrType(z, type)
   }
+  attr(z, "correction.method") <- correction.method
+
   check_spct(z)
 }

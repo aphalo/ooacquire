@@ -15,7 +15,7 @@ s_irrad_corrected(x, ...)
 \method{s_irrad_corrected}{list}(
   x,
   time = NULL,
-  correction.method,
+  correction.method = NULL,
   hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
   return.cps = FALSE,
   trim.descriptor = !return.cps,
@@ -28,7 +28,7 @@ s_irrad_corrected(x, ...)
 \method{s_irrad_corrected}{raw_mspct}(
   x,
   spct.names = c(light = "light", filter = "filter", dark = "dark"),
-  correction.method,
+  correction.method = NULL,
   hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
   return.cps = FALSE,
   trim.descriptor = !return.cps,

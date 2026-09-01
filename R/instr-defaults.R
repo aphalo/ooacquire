@@ -8,16 +8,29 @@
 #'   arguments passed to \code{serial_no}, \code{entrance.optics}, and
 #'   \code{protocols}.
 #'
+#' @inheritParams acq_irrad_interactive
+#'
 #' @param serial_no character The serial number of an Ocean Optics spectrometer
 #'   for which data is available in 'ooacquire'.
 #' @param date Any object that \code{anytime::anydate()} will decode as a date
 #'   or convert to a date. Used to select a descriptor containing calibration
 #'   data valid for the date when \emph{data was acquired}.
-#' @inheritParams acq_irrad_interactive
+#' @param descriptor instr_desc A list-derived object describing a specific
+#'   spectrometer.
 #'
 #' @examples
 #'
-#' str(instr_defaults(serial_no = "MAYP114590"))
+#' str(
+#'   default_descriptor(serial_no = "MAYP114590",
+#'                      date = lubridate::ymd("2020-01-01"))
+#'    )
+#' str(
+#'   default_method(serial_no = "MAYP114590")
+#'    )
+#' str(
+#'   instr_defaults(serial_no = "MAYP114590",
+#'                      date = lubridate::ymd("2020-01-01"))
+#'    )
 #'
 #' @export
 #'
@@ -25,11 +38,35 @@ instr_defaults <-
   function(serial_no,
            entrance.optics = "cosine",
            date = lubridate::now(tzone = "UTC"),
-           descriptors = NA,
+           descriptor = NA,
            correction.method = NA) {
 
+    descriptor <-
+      default_descriptor(serial_no = serial_no,
+                         entrance.optics = entrance.optics,
+                         date = date,
+                         descriptor = descriptor)
+    correction.method <-
+      default_method(serial_no = serial_no,
+                     correction.method = correction.method,
+                     descriptor = descriptor)
+
+    list(descriptor = descriptor,
+         correction.method = correction.method)
+  }
+
+#' @rdname instr_defaults
+#'
+#' @export
+#'
+default_descriptor <-
+  function(serial_no,
+           entrance.optics = "cosine",
+           date = lubridate::now(tzone = "UTC"),
+           descriptor = NA) {
+
     # spectrometer-specific correction method parameters
-    if (anyNA(c(descriptors[[1]]))) {
+    if (is.null(descriptor) || anyNA(descriptor)) {
       descriptor <-
         switch(serial_no,
                MAYP11278 =
@@ -58,8 +95,19 @@ instr_defaults <-
                        "spectrometer with s/n ='", serial_no, "'!")
         )
     }
+    descriptor = descriptor
+  }
 
-    if (anyNA(correction.method[[1]])) {
+#' @rdname instr_defaults
+#'
+#' @export
+#'
+default_method <-
+  function(serial_no,
+           correction.method = NA,
+           descriptor = NA) {
+
+    if (is.null(correction.method) || anyNA(correction.method)) {
       correction.method <-
         switch(serial_no,
                MAYP11278 = ooacquire::MAYP11278_ylianttila.mthd,
@@ -70,15 +118,17 @@ instr_defaults <-
                FLMS00440 = ooacquire::FLMS00440_none.mthd,
                FLMS00416 = ooacquire::FLMS00416_none.mthd,
                {
-                 warning(
+                 if (is.null(descriptor) || anyNA(descriptor)) {
+                   stop("No correction method found! Please pass an argument to 'descriptor' to create one.")
+                 } else {
+                   warning(
                    "No spectrometer-specific method found, using a generic one",
                    call. = FALSE)
-                 new_correction_method(descriptor,
-                                       stray.light.method = "none")
+                   new_correction_method(descriptor,
+                                         stray.light.method = "none")
+                 }
                }
         )
     }
-    list(descriptor = descriptor,
-         correction.method = correction.method)
+    correction.method
   }
-

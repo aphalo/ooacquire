@@ -9,6 +9,8 @@ editor_options:
 - Add functions `s_irrad_corrected_updt()` and `instr_defaults()`.
 - Rename `white_LED.raw_mspct` into `white_grow_LED.raw_mspct` to better
 distinguish these example data from `white_led.raw_spct` from 'photobiology'.
+- Update `s_irrad_corrected()` and `s_fraction_corrected()` to save the 
+correction method used in attribute `correction.method`.
 
 # ooacquire 0.5.5 (2026-02-21)
 
@@ -32,7 +34,8 @@ active, and increasing it to 50 otherwise.
 
 - Edit README with updated download link for the discontinued OmniDriver. 
 Although discontinued and removed from the main web site, versions 2.75 and
-2.56 remain available for download.
+2.56 remain available for download. [correction: they are still available at a
+different URL.]
 
 # ooacquire 0.5.3 (2025-04-11)
 

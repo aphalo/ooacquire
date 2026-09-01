@@ -2,15 +2,26 @@
 % Please edit documentation in R/instr-defaults.R
 \name{instr_defaults}
 \alias{instr_defaults}
+\alias{default_descriptor}
+\alias{default_method}
 \title{Fetch spectrometer defaults}
 \usage{
 instr_defaults(
   serial_no,
   entrance.optics = "cosine",
   date = lubridate::now(tzone = "UTC"),
-  descriptors = NA,
+  descriptor = NA,
   correction.method = NA
 )
+
+default_descriptor(
+  serial_no,
+  entrance.optics = "cosine",
+  date = lubridate::now(tzone = "UTC"),
+  descriptor = NA
+)
+
+default_method(serial_no, correction.method = NA, descriptor = NA)
 }
 \arguments{
 \item{serial_no}{character The serial number of an Ocean Optics spectrometer
@@ -23,8 +34,8 @@ if there is more than one for the same instrument.}
 or convert to a date. Used to select a descriptor containing calibration
 data valid for the date when \emph{data was acquired}.}
 
-\item{descriptors}{list A list of instrument descriptors containing
-calibration data.}
+\item{descriptor}{instr_desc A list-derived object describing a specific
+spectrometer.}
 
 \item{correction.method}{list The method to use when applying the calibration}
 }
@@ -40,6 +51,16 @@ When \code{protocols} or \code{descriptor} is not available
 }
 \examples{
 
-str(instr_defaults(serial_no = "MAYP114590"))
+str(
+  default_descriptor(serial_no = "MAYP114590",
+                     date = lubridate::ymd("2020-01-01"))
+   )
+str(
+  default_method(serial_no = "MAYP114590")
+   )
+str(
+  instr_defaults(serial_no = "MAYP114590",
+                     date = lubridate::ymd("2020-01-01"))
+   )
 
 }

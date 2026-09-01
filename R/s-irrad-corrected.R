@@ -89,7 +89,7 @@ s_irrad_corrected.default <- function(x, ...) {
 s_irrad_corrected.list <-
   function(x,
            time = NULL,
-           correction.method,
+           correction.method = NULL,
            hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
            return.cps = FALSE,
            trim.descriptor = !return.cps,
@@ -137,12 +137,32 @@ s_irrad_corrected.raw_mspct <-
            spct.names = c(light = "light",
                           filter = "filter",
                           dark = "dark"),
-           correction.method,
+           correction.method = NULL,
            hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
            return.cps = FALSE,
            trim.descriptor = !return.cps,
            verbose = getOption("photobiology.verbose", default = FALSE),
            ...) {
+
+    if (is.null(correction.method)) {
+      if (verbose) {
+        message("Using")
+      }
+      x.descriptor <- photobiology::instr_descriptor(x[[1]])
+      if (!"entrance.optics" %in% names(x.descriptor)) {
+        entrance.optics <- "cosine"
+      } else {
+        entrance.optics <- x.descriptor[["entrance.optics"]]["geometry"]
+      }
+      # fetch the default correction method used in current 'ooacquire'
+      correction.method <-
+        instr_defaults(serial_no = x.descriptor[["spectrometer.sn"]],
+                       entrance.optics = entrance.optics,
+                       date = photobiology::when_measured(x[[1]]))[["correction.method"]]
+      if (verbose) {
+        message("Using default 'correction.method'!")
+      }
+    }
 
     # remove unused name mappings (dependent on protocol)
     if ("dark" %in% names(spct.names) && !spct.names[["dark"]] %in% names(x)) {
@@ -289,7 +309,8 @@ s_irrad_corrected.raw_mspct <-
     }
 
     attributes(corrected.spct) <- c(attributes(corrected.spct),
-                                    list(QC_dark_pass = QC_spct))
+                                    list(QC_dark_pass = QC_spct,
+                                         correction.method = correction.method))
     corrected.spct
   }
 

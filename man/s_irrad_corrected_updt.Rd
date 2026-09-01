@@ -7,6 +7,11 @@
 s_irrad_corrected_updt(
   x,
   y = NULL,
+  spct.names = c(light = "light", filter = "filter", dark = "dark"),
+  correction.method = NULL,
+  hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
+  return.cps = NULL,
+  trim.descriptor = NULL,
   which = NULL,
   which.not = NULL,
   verbose = getOption("photobiology.verbose", default = FALSE)
@@ -19,6 +24,23 @@ s_irrad_corrected_updt(
 \item{y}{source_spct Object containing spectral irradiance earlier
 computed from the same \code{raw_mspct} object as passed to \code{x}.}
 
+\item{spct.names}{named character vector of length three, to map names in
+\code{x} to those expected.}
+
+\item{correction.method}{A named list of constants and functions defining the
+method to be used for stray light and dark signal corrections.}
+
+\item{hdr.tolerance}{numeric Tolerance for mean deviation among cps columns as
+a fraction of one. Used in check of HDR consistency. A negative value
+disables merging using only the data for the shortest integration time.}
+
+\item{return.cps}{logical Useful when there is no need to apply a calibration,
+such as when computing new calibration multipliers.}
+
+\item{trim.descriptor}{logical If \code{TRUE} the spectrometer calibration
+constants, pixel wavelengths, slit-function "tail-correction"
+function code and other calibration-related information is deleted.}
+
 \item{which, which.not}{character Names of attributes to copy or
 not to copy.}
 
@@ -28,10 +50,9 @@ not to copy.}
 A \code{source_spct} or a \code{cps_spct} object.
 }
 \description{
-Compute spectral irradiance using the instrument descriptor
-for the same spectrometer and date of measurement using the
-calibration data in the current version of 'ooacquire' rather
-than that available at the time when raw data were acquired.
+Compute spectral irradiance using the instrument descriptor for the same
+spectrometer and date of measurement from the current version of 'ooacquire'
+rather than that available at the time when raw data were acquired.
 }
 \details{
 When raw counts data are acquired with
@@ -47,21 +68,26 @@ When raw counts data are acquired with
   necessary or preferable to use the updated calibrations when computing
   spectral irradiance.
 
-  In \code{s_irrad_corrected_updt()} the \code{instr.desc} attribute in \code{x} is matched
-  based on spectrometer serial number, date and entrance optics
-  to the current, and possibly updated, version of the same calibration
-  data in the current version of 'ooacquire'. The instrument descriptor
-  is replaced in a local copy of \code{x} and this local copy used to
-  computed spectral irradiance with \code{s_irrad_corrected()}, without
-  altering \code{x}.
+  In \code{s_irrad_corrected_updt()} the \code{instr.desc} attribute in
+  \code{x} is matched based on spectrometer serial number, date and entrance
+  optics to the possibly updated version of the same calibration data in the
+  current version of 'ooacquire'. The instrument descriptor is replaced in a
+  local copy of \code{x} and this local copy used to compute spectral
+  irradiance with \code{s_irrad_corrected()}, without altering \code{x}.
+  Explicit arguments passed to parameters in the call to
+  \code{s_irrad_corrected_updt()} are used in the call to
+  \code{s_irrad_corrected()}, however, defaults are in some cases different.
 
   If an argument is passed to parameter \code{y} and the value of the
   \code{when.measured} attribute and spectrometer serial number match between
-  \code{x} and \code{y}, attributes, possibky added or modified after
-  \code{y} was computed, are copied to the returned \code{source_spct} object
-  using method \code{\link[photobiology]{copy_attributes}()} passing
-  \code{which} and \code{which.not} in the call. This creates, as close as
-  possible an updated version of \code{y}. Attributes \code{"instr.desc"},
+  \code{x} and \code{y}, default arguments for \code{return.cps} and
+  \code{correction.method} are based on metadata from  \code{y}. In this case
+  attributes unrelated to to those in the raw data or their conversion,
+  possibly added or modified after \code{y} was computed, are copied to the
+  returned \code{source_spct} object using method
+  \code{\link[photobiology]{copy_attributes}()} passing \code{which} and
+  \code{which.not} in the call. This creates, as close as possible an updated
+  version of \code{y}. Attributes \code{"instr.desc"},
   \code{"instr.settings"}, \code{"when.measured"} and several others set by
   \code{s_irrad_corrected()} are never updates in the returned value to
   ensure they remain valid. Other attributes including
@@ -71,6 +97,11 @@ When raw counts data are acquired with
   allowed. However, exclusion of attributes named in the union of the
   argument passed to \code{which.not} and those not excluded by default takes
   precedence.
+}
+\note{
+Entrance optics metadata have been saved in the instrument descriptor
+  only since 'ooacquire' (>= 0.5.3) and correction method only from 'ooacquire'
+  (>= 0.5.6).
 }
 \examples{
 

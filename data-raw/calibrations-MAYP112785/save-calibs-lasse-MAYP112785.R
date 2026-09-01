@@ -14,6 +14,7 @@ descriptor$bad.pixs <- numeric()
 
 # create an object with the parameters for Lasse Ylianttila's method for Maya
 MAYP112785_ylianttila.mthd <- list(
+  name = "MAYP112785_ylianttila.mthd",
   spectrometer.sn = descriptor$spectrometer.sn,
   stray.light.method = "original",
   stray.light.wl = c(218.5, 228.5),
@@ -29,6 +30,7 @@ MAYP112785_ylianttila.mthd <- list(
 # create an object with the parameters for a method good only for sunlight,
 # based on Lasse Ylianttila's original method suitable ONLY for sunlight.
 MAYP112785_sun.mthd <- list(
+  name = "MAYP112785_sun.mthd",
   spectrometer.sn = descriptor$spectrometer.sn,
   stray.light.method = "sun",
   stray.light.wl = c(218.5, 228.5),
@@ -44,6 +46,7 @@ MAYP112785_sun.mthd <- list(
 # create an object with the parameters for simple method for Maya
 # suitable for any light source, but not as good for sunlight
 MAYP112785_simple.mthd <- list(
+  name = "MAYP112785_simple.mthd",
   spectrometer.sn = descriptor$spectrometer.sn,
   stray.light.method = "simple",
   stray.light.wl = c(218.5, 228.5),
@@ -59,6 +62,7 @@ MAYP112785_simple.mthd <- list(
 # create an object with the parameters for simple method for Maya
 # suitable for any light source, but not as good for sunlight
 MAYP112785_simple.mthd <- list(
+  name = "MAYP112785_simple.mthd",
   spectrometer.sn = descriptor$spectrometer.sn,
   stray.light.method = "none",
   stray.light.wl = c(218.5, 228.5),
@@ -129,5 +133,4 @@ save(MAYP112785_ylianttila.mthd,
      MAYP112785_descriptors,
      MAYP112785_calib_dates.df,
      file = "data/calibs-MAYP112785.rda")
-
 

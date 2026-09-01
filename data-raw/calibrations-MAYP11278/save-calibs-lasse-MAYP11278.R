@@ -20,6 +20,7 @@ black.pixels <- c(1, 2, 3, 4, 2065, 2066, 2067, 2068) # all covered?
 # create an object with the parameters for Lasse Ylianttila's original method
 # for Maya suitable for sunlight
 MAYP11278_ylianttila.mthd <- list(
+  name = "MAYP11278_ylianttila.mthd",
   spectrometer.sn = descriptor$spectrometer.sn,
   stray.light.method = "original",
   stray.light.wl = c(218.5, 228.5),
@@ -35,6 +36,7 @@ MAYP11278_ylianttila.mthd <- list(
 # create an object with the parameters for Lasse Ylianttila's original method
 # for Maya suitable for sunlight modified by shifting the flt reference -10nm
 MAYP11278_short_flt_ref.mthd <- list(
+  name = "MAYP11278_short_flt_ref.mthd",
   spectrometer.sn = descriptor$spectrometer.sn,
   stray.light.method = "original",
   stray.light.wl = c(218.5, 228.5),
@@ -50,6 +52,7 @@ MAYP11278_short_flt_ref.mthd <- list(
 # create an object with the parameters for a method good only for sunlight,
 # based on Lasse Ylianttila's original method suitable ONLY for sunlight.
 MAYP11278_sun.mthd <- list(
+  name = "MAYP11278_sun.mthd",
   spectrometer.sn = descriptor$spectrometer.sn,
   stray.light.method = "sun",
   stray.light.wl = c(218.5, 228.5),
@@ -65,6 +68,7 @@ MAYP11278_sun.mthd <- list(
 # create an object with the parameters for simple method for Maya
 # suitable for any light source, but not as good for sunlight
 MAYP11278_simple.mthd <- list(
+  name = "MAYP11278_simple.mthd",
   spectrometer.sn = descriptor$spectrometer.sn,
   stray.light.method = "simple",
   stray.light.wl = c(218.5, 228.5),
@@ -80,6 +84,7 @@ MAYP11278_simple.mthd <- list(
 # create an object with the parameters for skipping correction method for Maya
 # suitable for any light source, but not as good for sunlight
 MAYP11278_none.mthd <- list(
+  name = "MAYP11278_none.mthd",
   spectrometer.sn = descriptor$spectrometer.sn,
   stray.light.method = "none",
   stray.light.wl = c(218.5, 228.5),

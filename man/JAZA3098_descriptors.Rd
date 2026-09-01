@@ -24,9 +24,9 @@ An object of class \code{list} of length 0.
 
 An object of class \code{list} of length 0.
 
-An object of class \code{list} of length 9.
+An object of class \code{list} of length 10.
 
-An object of class \code{list} of length 9.
+An object of class \code{list} of length 10.
 
 An object of class \code{list} of length 1.
 
@@ -34,9 +34,9 @@ An object of class \code{list} of length 0.
 
 An object of class \code{list} of length 0.
 
-An object of class \code{list} of length 9.
+An object of class \code{list} of length 10.
 
-An object of class \code{list} of length 9.
+An object of class \code{list} of length 10.
 }
 \usage{
 JAZA3098_calib_dates.df

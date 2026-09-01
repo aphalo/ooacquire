@@ -21,9 +21,9 @@ An object of class \code{list} of length 0.
 
 An object of class \code{list} of length 0.
 
-An object of class \code{list} of length 10.
+An object of class \code{list} of length 11.
 
-An object of class \code{list} of length 10.
+An object of class \code{list} of length 11.
 }
 \usage{
 FLMS04133_descriptors

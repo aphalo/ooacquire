@@ -23,6 +23,8 @@ MAYP114590_sun.mthd <- list()
 # create an object with the parameters for simple method for Jaz
 # suitable for any light source, but not as good for irradiance.
 MAYP114590_simple.mthd <- list(
+  name = "MAYP114590_simple.mthd",
+  correction = "simple",
   spectrometer.sn = descriptor$spectrometer.sn,
   stray.light.method = "simple",
   stray.light.wl = c(218.5, 228.5),
@@ -38,6 +40,8 @@ MAYP114590_simple.mthd <- list(
 # create an object with the parameters for simple method for Jaz
 # suitable for any light source, but not as good for irradiance.
 MAYP114590_none.mthd <- list(
+  name = "MAYP114590_none.mthd",
+  correction = "none",
   spectrometer.sn = descriptor$spectrometer.sn,
   stray.light.method = "none",
   stray.light.wl = c(NA_real_, NA_real_),
