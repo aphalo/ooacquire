@@ -7,6 +7,8 @@ editor_options:
 # ooacquire 0.5.6 (2026-09-xx)
 
 - Add functions `s_irrad_corrected_updt()` and `instr_defaults()`.
+- Rename `white_LED.raw_mspct` into `white_grow_LED.raw_mspct` to better
+distinguish these example data from `white_led.raw_spct` from 'photobiology'.
 
 # ooacquire 0.5.5 (2026-02-21)
 

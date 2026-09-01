@@ -36,7 +36,7 @@
 #'
 #' @family objects containing example raw-counts data
 #'
-"white_LED.raw_mspct"
+"white_grow_LED.raw_mspct"
 
 #' Raw counts data for a lamp measurement.
 #'

@@ -85,8 +85,53 @@ names.}
 \item{spct.names}{named character vector of length three, to map names in
 \code{x} to those expected.}
 }
+\value{
+A \code{source_spct} or a \code{cps_spct} object.
+}
 \description{
 Convert raw counts data into spectral irradiance or fluence
+}
+\details{
+Method \code{s_irrad_corrected()} computes spectral irradiance from
+  raw detector counts from an Ocean Optics spectrometer. Depending on both
+  the calibration data and the raw-counts data available different
+  corrections can be applied. Raw counts data can be acquired using different
+  protocols, and which one was used limits what corrections are applicable.
+  If \code{return.cps = TRUE} is passed, then counts-per-second are computed
+  instead of irradiances, applying only the wavelength calibration.
+
+  When raw data are acquired with function \code{acq_irrad_interactive()} the
+  raw-counts are returned in an object of class \code{raw_mspct}. The
+  embedded metadata include the wavelength calibration, irradiance
+  calibration, and spectrometer settings used to acquire the data. The
+  specialization \code{s_irrad_corrected.raw_mspct()} uses these metadata to
+  compute spectral irradiance.
+
+  The specialization \code{s_irrad_corrected.list} allows processing of files
+  written by OceanOptics' SpectraSuite software. Some of the metadata can be
+  extracted from file headers, but other, such as the calibration data
+  cannot. Based on the date of data acquisition and instrument serial number
+  a matching calibration is searched for and must be available.
+
+  The supported protocols include single-integration time and
+  integration-time bracketing, a dark reference measurement or use of dark
+  sensor pixels, and a filter measurement to correct for stray light in the
+  UV region or not. A correction for the slit function is applied
+  non-recursively if included in the calibration.
+
+  Three measurement are recognized: a "light" measurement, a "filter"
+  measurement using a polycarbonate filter and a dark measurement. Only the
+  "light" measurement is mandatory. All three measurements should have been
+  acquired with exactly the same settings in the spectrometer, with the same
+  instrument, and close enough in time to avoid background signal drift due
+  to temperature changes.
+
+  Passing \code{trim.descriptor = TRUE} ensures that the data objects
+  returned are significantly smaller in size as calibration data are removed
+  and free of references to code in 'ooacquire', which is crucial for the
+  portability of the spectral data. By default, the descriptor is trimmed
+  when the returned object is a `source_spct` object and not trimmed when the
+  returned object is a `cps_spct`.
 }
 \section{Methods (by class)}{
 \itemize{
@@ -99,20 +144,6 @@ Convert raw counts data into spectral irradiance or fluence
 \item \code{s_irrad_corrected(raw_spct)}: Default for generic function.
 
 }}
-\note{
-Currently \code{s_irrad_corrected.list} allows processing of files
-  written by OceanOptics' SpectraSuite software, from protocols with
-  integration-time bracketing or not, with a dark reference measurement or
-  not. Three measurements components are recognized: a "light" measurement, a
-  "filter" measurement using a polycarbonate filter and a dark measurement.
-  Only "light" is mandatory. Data should be raw counts, either corrected for
-  detector non-linearity or not. All three spectra should be acquired using
-  the same instrument settings to achieve good accuracy.
-
-  Enabling \code{trim.descriptor} ensures that the data objects are
-  free of references to code in 'ooacquire', which is crucial for the
-  portability of the spectral data.
-}
 \seealso{
 Other functions for conversion of raw-counts data:
 \code{\link[=raw2corr_cps]{raw2corr_cps()}},

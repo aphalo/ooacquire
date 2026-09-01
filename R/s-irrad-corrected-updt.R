@@ -17,18 +17,20 @@
 #' @family functions for conversion of raw-counts data
 #' @seealso copy_attributes
 #'
-#' @details When raw counts data are acquired the calibration information is
-#'   stored together with the data. When computing spectral irradiance with
-#'   function \code{s_irrad_corrected()} at any later time, this stored
-#'   calibration is the one used. This approach ensures reproducibility as
-#'   calibrations can be, and have been, retrospectively modified when
-#'   'ooacquire' is updated. In most cases the updates have only added
-#'   information about "hot" and "dead" pixels. However, in one case the range
-#'   of the calibration data included was incomplete, and later expanded. These
-#'   changes can be important in some cases, making it necessary or preferable
-#'   to use the updated calibrations when computing spectral irradiance.
+#' @details When raw counts data are acquired with
+#'   \code{acq_irrad_interactive()} or imported from text files from other
+#'   software the calibration information is stored together with the data. When
+#'   computing spectral irradiance with function \code{s_irrad_corrected()} at
+#'   any later time, this stored calibration data are the ones used. This
+#'   approach ensures reproducibility as calibrations can be, and have been,
+#'   retrospectively modified when 'ooacquire' is updated. In most cases the
+#'   updates have only added information about "hot" and "dead" pixels. However,
+#'   in one case the range of the calibration data included was incomplete, and
+#'   later expanded. These changes can be important in some cases, making it
+#'   necessary or preferable to use the updated calibrations when computing
+#'   spectral irradiance.
 #'
-#'   In \code{s_irrad_refresh()} the \code{instr.desc} attribute in \code{x} is matched
+#'   In \code{s_irrad_corrected_updt()} the \code{instr.desc} attribute in \code{x} is matched
 #'   based on spectrometer serial number, date and entrance optics
 #'   to the current, and possibly updated, version of the same calibration
 #'   data in the current version of 'ooacquire'. The instrument descriptor
@@ -53,15 +55,14 @@
 #'   argument passed to \code{which.not} and those not excluded by default takes
 #'   precedence.
 #'
+#' @return A \code{source_spct} or a \code{cps_spct} object.
+#'
 #' @export
 #'
 #' @examples
 #'
 #' # only metadata from x and the new descriptor
-#' s_irrad_corrected_updt(x = white_LED.raw_mspct)
-#'
-#' # metadata from x and the new descriptor updated to some metadata from y
-#' s_irrad_corrected_updt(x = white_LED.raw_mspct, y = white_led.source_spct)
+#' s_irrad_corrected_updt(x = white_grow_LED.raw_mspct)
 #'
 s_irrad_corrected_updt <- function(x,
                                    y = NULL,

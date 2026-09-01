@@ -12,7 +12,7 @@
 
 <meta name="author" content="Pedro J. Aphalo" />
 
-<meta name="date" content="2026-02-21" />
+<meta name="date" content="2026-08-31" />
 
 <title>User Guide</title>
 
@@ -340,9 +340,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 <h1 class="title toc-ignore">User Guide</h1>
-<h3 class="subtitle"><code>ooacquire</code> 0.5.5</h3>
+<h3 class="subtitle"><code>ooacquire</code> 0.5.5.9000</h3>
 <h4 class="author">Pedro J. Aphalo</h4>
-<h4 class="date">2026-02-21</h4>
+<h4 class="date">2026-08-31</h4>
 
 
 <div id="TOC">
@@ -1035,7 +1035,7 @@ irradiance values form wavelengths shorter than 290 nm.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>one_file.spct</span></code></pre></div>
 <pre><code>## Object: source_spct [1,423 x 2]
 ## Wavelength range 250.21-898.81 nm, step 0.43-0.48 nm 
-## Label: light: C:/Users/aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/light-short.txt 
+## Label: light: C:/Users/Aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/light-short.txt 
 ## Measured on 2016-10-11 11:23:05 UTC 
 ## Variables:
 ##  w.length: Wavelength [nm]
@@ -1061,18 +1061,18 @@ irradiance values form wavelengths shorter than 290 nm.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">getWhenMeasured</span>(one_file.spct)</span></code></pre></div>
 <pre><code>## [1] &quot;2016-10-11 11:23:05 UTC&quot;</code></pre>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">getWhatMeasured</span>(one_file.spct))</span></code></pre></div>
-<pre><code>## light: C:/Users/aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/light-short.txt</code></pre>
+<pre><code>## light: C:/Users/Aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/light-short.txt</code></pre>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">getWhereMeasured</span>(one_file.spct)</span></code></pre></div>
 <pre><code>## # A tibble: 1 × 3
 ##     lon   lat address
 ##   &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;  
 ## 1    NA    NA &lt;NA&gt;</code></pre>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">comment</span>(one_file.spct))</span></code></pre></div>
-<pre><code>## Processed on 2026-02-21
-## with &#39;s_irrad_corrected()&#39; from &#39;ooacquire&#39; ver. 0.5.5
+<pre><code>## Processed on 2026-08-31
+## with &#39;s_irrad_corrected()&#39; from &#39;ooacquire&#39; ver. 0.5.5.9000
 ## 
 ## from files:
-## light: C:/Users/aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/light-short.txt</code></pre>
+## light: C:/Users/Aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/light-short.txt</code></pre>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="fu">getInstrDesc</span>(one_file.spct)</span></code></pre></div>
 <pre><code>## Data acquired with &#39;MayaPro2000&#39; s.n. MAYP11278
 ## grating &#39;HC1&#39;, slit &#39;010s&#39;
@@ -1110,9 +1110,9 @@ noise from regions known to be zero as we did above.</p>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a>five_files.spct</span></code></pre></div>
 <pre><code>## Object: source_spct [1,423 x 2]
 ## Wavelength range 250.21-898.81 nm, step 0.43-0.48 nm 
-## Label: light: C:/Users/aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/light-short.txt, C:/Users/aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/light-long.txt
-## filter: C:/Users/aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/flt-long.txt
-## dark: C:/Users/aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/dark-short.txt, C:/Users/aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/dark-long.txt 
+## Label: light: C:/Users/Aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/light-short.txt, C:/Users/Aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/light-long.txt
+## filter: C:/Users/Aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/flt-long.txt
+## dark: C:/Users/Aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/dark-short.txt, C:/Users/Aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/dark-long.txt 
 ## Measured on 2016-10-11 11:23:05 UTC 
 ## Variables:
 ##  w.length: Wavelength [nm]
@@ -1138,20 +1138,20 @@ noise from regions known to be zero as we did above.</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a><span class="fu">getWhenMeasured</span>(five_files.spct)</span></code></pre></div>
 <pre><code>## [1] &quot;2016-10-11 11:23:05 UTC&quot;</code></pre>
 <div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" tabindex="-1"></a><span class="fu">getWhatMeasured</span>(five_files.spct)</span></code></pre></div>
-<pre><code>## [1] &quot;light: C:/Users/aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/light-short.txt, C:/Users/aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/light-long.txt\nfilter: C:/Users/aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/flt-long.txt\ndark: C:/Users/aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/dark-short.txt, C:/Users/aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/dark-long.txt&quot;</code></pre>
+<pre><code>## [1] &quot;light: C:/Users/Aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/light-short.txt, C:/Users/Aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/light-long.txt\nfilter: C:/Users/Aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/flt-long.txt\ndark: C:/Users/Aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/dark-short.txt, C:/Users/Aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/dark-long.txt&quot;</code></pre>
 <div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a><span class="fu">getWhereMeasured</span>(five_files.spct)</span></code></pre></div>
 <pre><code>## # A tibble: 1 × 3
 ##     lon   lat address
 ##   &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;  
 ## 1    NA    NA &lt;NA&gt;</code></pre>
 <div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">comment</span>(five_files.spct))</span></code></pre></div>
-<pre><code>## Processed on 2026-02-21
-## with &#39;s_irrad_corrected()&#39; from &#39;ooacquire&#39; ver. 0.5.5
+<pre><code>## Processed on 2026-08-31
+## with &#39;s_irrad_corrected()&#39; from &#39;ooacquire&#39; ver. 0.5.5.9000
 ## 
 ## from files:
-## light: C:/Users/aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/light-short.txt, C:/Users/aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/light-long.txt
-## filter: C:/Users/aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/flt-long.txt
-## dark: C:/Users/aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/dark-short.txt, C:/Users/aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/dark-long.txt</code></pre>
+## light: C:/Users/Aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/light-short.txt, C:/Users/Aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/light-long.txt
+## filter: C:/Users/Aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/flt-long.txt
+## dark: C:/Users/Aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/dark-short.txt, C:/Users/Aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/dark-long.txt</code></pre>
 <div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" tabindex="-1"></a><span class="fu">getInstrDesc</span>(five_files.spct)</span></code></pre></div>
 <pre><code>## Data acquired with &#39;MayaPro2000&#39; s.n. MAYP11278
 ## grating &#39;HC1&#39;, slit &#39;010s&#39;
@@ -1304,8 +1304,8 @@ OceanView originated from different instruments.</p>
 <div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" tabindex="-1"></a>ov_files.spct</span></code></pre></div>
 <pre><code>## Object: source_spct [1,439 x 2]
 ## Wavelength range 251.116-899.874 nm, step 0.428-0.47 nm 
-## Label: light: C:/Users/aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/light_MAYP112785.txt
-## dark: C:/Users/aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/dark_MAYP112785.txt 
+## Label: light: C:/Users/Aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/light_MAYP112785.txt
+## dark: C:/Users/Aphalo/Documents/R-pkgs-owned/ooacquire/inst/extdata/irrad-files/dark_MAYP112785.txt 
 ## Measured on 2017-01-05 14:22:55 UTC 
 ## Variables:
 ##  w.length: Wavelength [nm]
@@ -1338,9 +1338,9 @@ without affecting the regions with higher signal.</p>
 <div id="from-raw_mspct-objects" class="section level4">
 <h4>From <code>&quot;raw_mspct&quot;</code> objects</h4>
 <div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" tabindex="-1"></a>descriptor <span class="ot">&lt;-</span> </span>
-<span id="cb58-2"><a href="#cb58-2" tabindex="-1"></a>  <span class="fu">which_descriptor</span>(<span class="fu">getWhenMeasured</span>(white_LED.raw_mspct<span class="sc">$</span>light))</span>
+<span id="cb58-2"><a href="#cb58-2" tabindex="-1"></a>  <span class="fu">which_descriptor</span>(<span class="fu">getWhenMeasured</span>(white_grow_LED.raw_mspct<span class="sc">$</span>light))</span>
 <span id="cb58-3"><a href="#cb58-3" tabindex="-1"></a>irrad01.spct <span class="ot">&lt;-</span> </span>
-<span id="cb58-4"><a href="#cb58-4" tabindex="-1"></a>  <span class="fu">s_irrad_corrected</span>(<span class="at">x =</span> white_LED.raw_mspct,</span>
+<span id="cb58-4"><a href="#cb58-4" tabindex="-1"></a>  <span class="fu">s_irrad_corrected</span>(<span class="at">x =</span> white_grow_LED.raw_mspct,</span>
 <span id="cb58-5"><a href="#cb58-5" tabindex="-1"></a>                    <span class="at">descriptor =</span> descriptor,</span>
 <span id="cb58-6"><a href="#cb58-6" tabindex="-1"></a>                    <span class="at">correction.method =</span> MAYP11278_ylianttila.mthd)</span></code></pre></div>
 <div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" tabindex="-1"></a>irrad01.spct</span></code></pre></div>
