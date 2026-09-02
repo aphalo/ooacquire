@@ -80,7 +80,6 @@ test_that("raw from pulsed to Tfr works", {
     expect_known_value(transmittance(new.spct), file = paste("current-refs/ref-tfr", f, sep = "-"), update = updating)
 #    expect_known_value(summary(new.spct), file = paste("current-refs/ref-summary", f, sep = "-"), update = updating)
     expect_known_value(new.spct, file = paste("current-refs/ref", f, sep = "-"), update = updating)
-
     if (debugging) cat(" <- ", serial.no, " file: ", f, "\n")
 
   }

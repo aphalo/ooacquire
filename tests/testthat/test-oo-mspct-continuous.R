@@ -131,11 +131,21 @@ test_that("ooacquire filter continuous", {
                         range = c(450:800))
     new.spct <- trimInstrDesc(new.spct)
     enable_check_spct()
-    expect_known_value(transmittance(new.spct), file = paste("current-refs/ref-tfr", f, sep = "-"), update = updating)
-    expect_known_value(summary(new.spct), file = paste("current-refs/ref-summary", f, sep = "-"), update = updating)
-    expect_known_value(wl_range(new.spct), file = paste("current-refs/ref-wl", f, sep = "-"), update = updating)
-    expect_known_value(wls_at_target(new.spct), file = paste("current-refs/ref-wls", f, sep = "-"), update = updating)
-    expect_known_value(new.spct, file = paste("current-refs/ref", f, sep = "-"), update = updating)
+    expect_known_value(transmittance(new.spct),
+                       file = paste("current-refs/ref-tfr", f, sep = "-"),
+                       update = updating)
+    expect_known_value(summary(new.spct),
+                       file = paste("current-refs/ref-summary", f, sep = "-"),
+                       update = updating)
+    expect_known_value(wl_range(new.spct),
+                       file = paste("current-refs/ref-wl", f, sep = "-"),
+                       update = updating)
+    expect_known_value(wls_at_target(new.spct),
+                       file = paste("current-refs/ref-wls", f, sep = "-"),
+                       update = updating)
+    expect_known_value(new.spct,
+                       file = paste("current-refs/ref", f, sep = "-"),
+                       update = updating)
 
     if (debugging) cat(" <- ", serial.no, " file: ", f, "\n")
 

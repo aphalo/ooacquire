@@ -45,7 +45,7 @@ original name and location, after renaming the original files to serve as
 backups.
 }
 \details{
-Data spectral data objects acquired directly from a connected spectrometer
+Spectral data objects acquired directly from a connected spectrometer
 with 'ooacquire' (<= ) contain a leftover Java wrapper used to connect to
 the spectrometer. This is of no use after disconnection, but if it remains
 in the objects saved to an \code{.rda} file loading these files requires

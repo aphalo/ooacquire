@@ -21,7 +21,7 @@
 #'   objects already free of the problematic Java wrapper are encountered.
 #'
 #' @details
-#' Data spectral data objects acquired directly from a connected spectrometer
+#' Spectral data objects acquired directly from a connected spectrometer
 #' with 'ooacquire' (<= ) contain a leftover Java wrapper used to connect to
 #' the spectrometer. This is of no use after disconnection, but if it remains
 #' in the objects saved to an \code{.rda} file loading these files requires
@@ -56,65 +56,67 @@
 #'
 #' @export
 #'
-files_rm_jwrapper <- function(path = ".",
-                           pattern = "\\.spct\\.[Rr]da",
-                           recursive = TRUE,
-                           date.limit = NULL,
-                           save.files = FALSE,
-                           verbose = getOption("photobiology.verbose",
-                                               default = FALSE)) {
-  if (!save.files) {
-    message("TEST RUN: No files will be saved or modified!")
-  }
-  # find files
-  all.files <- list.files(path = path,
-                          pattern = pattern,
-                          full.names = TRUE,
-                          recursive = recursive)
-  # subset based on creation time
-  if (!is.null(date.limit)) {
-    selector <- file.mtime(all.files) < as.POSIXct(date.limit)
-    files <- all.files[selector]
-    message("Found ", length(files),
-            " files. Skipped ", length(all.files) - length(files), " files")
-  } else {
-    files <- all.files
-    message("Found ", length(files), " files")
-  }
-  # make sure we do not mess other files
-  existing.objects <- ls(pattern = "\\.raw_mspct$|\\.spct")
-  updated.files <- character()
-  for (f in files) {
-    message("---\n", basename(f))
-    load(f)
-    loaded.objects <- setdiff(ls(pattern = "\\.raw_mspct$|\\.spct"),
-                       existing.objects)
-    updated.objs <- 0L
-    for (obj in loaded.objects) {
-      temp <- get(obj, inherits = FALSE)
-      if (!is.generic_spct(temp) && !is.generic_mspct(temp)) {
-        warning("Skipping unsupported object '", obj,
-                " of class \"", class(temp)[1], "\"")
-        next()
-      }
-      z <- rm_jwrapper(temp, verbose = verbose)
-      if (!identical(temp, z)) {
-        assign(obj, z)
-        updated.objs <- updated.objs + 1L
-      }
+files_rm_jwrapper <-
+  function(path = ".",
+           pattern = "\\.spct\\.[Rr]da",
+           recursive = TRUE,
+           date.limit = NULL,
+           save.files = FALSE,
+           verbose = getOption("photobiology.verbose",
+                               default = FALSE)) {
+    if (!save.files) {
+      message("TEST RUN: No files will be saved or modified!")
     }
-    # files containing only objects with no Java wrappers are skipped
-    if (save.files && updated.objs) {
-      backup.file <- gsub("\\.spct.[Rr]da$", ".spct.rjava.rda", f)
-      file.rename(from = f, to = backup.file)
-      stopifnot(file.exists(backup.file))
-      save(list = loaded.objects, file = f)
-      updated.files <- c(updated.files, f)
-      message("Updated ", updated.objs, " objects. Saved!")
+    # find files
+    all.files <- list.files(path = path,
+                            pattern = pattern,
+                            full.names = TRUE,
+                            recursive = recursive)
+    # subset based on creation time
+    if (!is.null(date.limit)) {
+      selector <- file.mtime(all.files) < as.POSIXct(date.limit)
+      files <- all.files[selector]
+      message("Found ", length(files),
+              " files. Skipped ", length(all.files) - length(files), " files")
     } else {
-      message("Updated ", updated.objs, " objects. Not saved!")
+      files <- all.files
+      message("Found ", length(files), " files")
     }
-    rm(list = loaded.objects)
+    # make sure we do not mess other files
+    existing.objects <- ls(pattern = "\\.raw_mspct$|\\.spct")
+    updated.files <- character()
+    for (f in files) {
+      message("---\n", basename(f))
+      load(f)
+      loaded.objects <- setdiff(ls(pattern = "\\.raw_mspct$|\\.spct"),
+                                existing.objects)
+      updated.objs <- 0L
+      for (obj in loaded.objects) {
+        temp <- get(obj, inherits = FALSE)
+        if (!(photobiology::is.generic_spct(temp) ||
+              photobiology::is.generic_mspct(temp))) {
+          warning("Skipping unsupported object '", obj,
+                  " of class \"", class(temp)[1], "\"")
+          next()
+        }
+        z <- rm_jwrapper(temp, verbose = verbose)
+        if (!identical(temp, z)) {
+          assign(obj, z)
+          updated.objs <- updated.objs + 1L
+        }
+      }
+      # files containing only objects with no Java wrappers are skipped
+      if (save.files && updated.objs) {
+        backup.file <- gsub("\\.spct.[Rr]da$", ".spct.rjava.rda", f)
+        file.rename(from = f, to = backup.file)
+        stopifnot(file.exists(backup.file))
+        save(list = loaded.objects, file = f)
+        updated.files <- c(updated.files, f)
+        message("Updated ", updated.objs, " objects. Saved!")
+      } else {
+        message("Updated ", updated.objs, " objects. Not saved!")
+      }
+      rm(list = loaded.objects)
+    }
+    invisible(updated.files)
   }
-  invisible(updated.files)
-}
