@@ -37,6 +37,8 @@
 #' @return a copy of \code{x} with an updated \code{instr.desc} attribute
 #'   embedded.
 #'
+#' @family Functions and methods related to instrument descriptors.
+#'
 #' @export
 #'
 update_bad_pixs <- function(x,
@@ -96,21 +98,29 @@ update_bad_pixs <- function(x,
 #' member storing the useless Java wrapper. This function removes this field if
 #' present.
 #'
-#' @note
+#' @details
 #' Method \code{getInstrDesc()} removes member field \code{w} from the returned
-#' value but does not modify its argument.
+#' value but does not modify its argument, it returns the modified object.
 #'
 #' @param x generic_spct or generic_mspct object with attribute
 #'   \code{instr.desc} set.
+#' @param verbose logical If \code{TRUE}, issue message when no action is
+#'   needed, i.e., the spectral object does not contain a Java wrapper.
 #'
 #' @return a copy of \code{x} possibly with field \code{"w"} removed, if present,
 #'   from the embedded \code{instr.desc} attribute of spectral objects.
 #'
 #' @export
 #'
-rm_jwrapper <- function(x) {
+#' @family Functions and methods related to instrument descriptors.
+#' @seealso Use function \code{\link{files_rm_jwrapper}()} to apply function
+#'   \code{rm_jwrapper()} to objects stored in .rda files,
+#'
+rm_jwrapper <- function(x,
+                        verbose = getOption("photobiology.verbose",
+                                            default = FALSE)) {
   if (is.generic_mspct(x)) {
-    msmsply(x, .fun = rm_jwrapper)
+    msmsply(x, .fun = rm_jwrapper, verbose = verbose)
   } else {
     if (!is.generic_spct(x)) {
       warning("'x' must be a 'generic_spct' or derived object")
@@ -119,11 +129,11 @@ rm_jwrapper <- function(x) {
     descriptor <- getInstrDesc(x)
     if (length(descriptor) == 0) {
       message("Attribute 'inst.desc' is not set in 'x'")
-      return(x)
-    }
-    if (exists("w", descriptor, inherits = FALSE)) {
+    } else if (exists("w", descriptor, inherits = FALSE)) {
       descriptor[["w"]] <- NULL
       x <- setInstrDesc(x, descriptor)
+    } else if (verbose) {
+      message("No Java wrapper found")
     }
     x
   }

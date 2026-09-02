@@ -24,7 +24,7 @@ Uses a user supplied function, possibly that supplied by a manufacturer
 like Ocean Optics stored in firmware or in any other form.
 }
 \seealso{
-Other Functions and methods for instrument descriptors:
+Other Functions and methods related to instrument descriptors:
 \code{\link[=get_oo_descriptor]{get_oo_descriptor()}},
 \code{\link[=set_descriptor_bad_pixs]{set_descriptor_bad_pixs()}},
 \code{\link[=set_descriptor_entrance_optics]{set_descriptor_entrance_optics()}},
@@ -32,4 +32,4 @@ Other Functions and methods for instrument descriptors:
 \code{\link[=set_descriptor_irrad_mult]{set_descriptor_irrad_mult()}},
 \code{\link[=set_descriptor_wl]{set_descriptor_wl()}}
 }
-\concept{Functions and methods for instrument descriptors}
+\concept{Functions and methods related to instrument descriptors}

@@ -46,7 +46,7 @@ Following R's syntax the first pixel in the detector array has index
  1.
 }
 \seealso{
-Other Functions and methods for instrument descriptors:
+Other Functions and methods related to instrument descriptors:
 \code{\link[=get_oo_descriptor]{get_oo_descriptor()}},
 \code{\link[=set_descriptor_entrance_optics]{set_descriptor_entrance_optics()}},
 \code{\link[=set_descriptor_integ_time]{set_descriptor_integ_time()}},
@@ -54,4 +54,4 @@ Other Functions and methods for instrument descriptors:
 \code{\link[=set_descriptor_nl]{set_descriptor_nl()}},
 \code{\link[=set_descriptor_wl]{set_descriptor_wl()}}
 }
-\concept{Functions and methods for instrument descriptors}
+\concept{Functions and methods related to instrument descriptors}

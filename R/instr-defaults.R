@@ -18,6 +18,8 @@
 #' @param descriptor instr_desc A list-derived object describing a specific
 #'   spectrometer.
 #'
+#' @family Functions and methods related to instrument descriptors.
+#'
 #' @examples
 #'
 #' str(

@@ -46,7 +46,7 @@ Instrument descriptors are \code{"list"} objects with fields
   retrieved even if present in the EEPROM.
 }
 \seealso{
-Other Functions and methods for instrument descriptors:
+Other Functions and methods related to instrument descriptors:
 \code{\link[=set_descriptor_bad_pixs]{set_descriptor_bad_pixs()}},
 \code{\link[=set_descriptor_entrance_optics]{set_descriptor_entrance_optics()}},
 \code{\link[=set_descriptor_integ_time]{set_descriptor_integ_time()}},
@@ -54,4 +54,4 @@ Other Functions and methods for instrument descriptors:
 \code{\link[=set_descriptor_nl]{set_descriptor_nl()}},
 \code{\link[=set_descriptor_wl]{set_descriptor_wl()}}
 }
-\concept{Functions and methods for instrument descriptors}
+\concept{Functions and methods related to instrument descriptors}

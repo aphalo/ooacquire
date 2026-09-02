@@ -26,7 +26,7 @@
 #'   are null, as by default, the irradiance calibration factors will not be
 #'   retrieved even if present in the EEPROM.
 #'
-#' @family Functions and methods for instrument descriptors
+#' @family Functions and methods related to instrument descriptors
 #'
 get_oo_descriptor <- function(w,
                               sr.index = 0L,
@@ -165,7 +165,7 @@ get_oo_descriptor <- function(w,
 #'
 #' @export
 #'
-#' @family Functions and methods for instrument descriptors
+#' @family Functions and methods related to instrument descriptors
 #'
 set_descriptor_bad_pixs <- function(descriptor,
                                     bad.pixs) {
@@ -232,7 +232,7 @@ update_mspct_bad_pixs <- function(mspct,
 #'
 #' @export
 #'
-#' @family Functions and methods for instrument descriptors
+#' @family Functions and methods related to instrument descriptors
 #'
 set_descriptor_integ_time <- function(descriptor,
                                       min.integ.time = NA_integer_,
@@ -280,7 +280,7 @@ set_descriptor_integ_time <- function(descriptor,
 #'
 #' @export
 #'
-#' @family Functions and methods for instrument descriptors
+#' @family Functions and methods related to instrument descriptors
 #'
 set_descriptor_wl <- function(descriptor,
                               wl) {
@@ -309,7 +309,7 @@ set_descriptor_wl <- function(descriptor,
 #'
 #' @export
 #'
-#' @family Functions and methods for instrument descriptors
+#' @family Functions and methods related to instrument descriptors
 #'
 set_descriptor_nl <- function(descriptor,
                               nl.coeff = NA_real_,
@@ -352,7 +352,7 @@ set_descriptor_nl <- function(descriptor,
 #'
 #' @export
 #'
-#' @family Functions and methods for instrument descriptors
+#' @family Functions and methods related to instrument descriptors
 #'
 set_descriptor_irrad_mult <- function(descriptor,
                                       irrad.mult,
@@ -432,7 +432,7 @@ get_oo_settings <- function(descriptor) {
 #'
 #' @export
 #'
-#' @family Functions and methods for instrument descriptors
+#' @family Functions and methods related to instrument descriptors
 #'
 set_descriptor_entrance_optics <- function(descriptor,
                                            make = NA_character_,

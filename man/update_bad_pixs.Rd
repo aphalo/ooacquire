@@ -48,3 +48,10 @@ Only objects of class \code{raw_spct}, individually or as members of a
 conversion into physical units, and will propagate to returned values when
 computations are applied to the updated \code{raw_spct} objects.
 }
+\seealso{
+Other Functions and methods related to instrument descriptors.:
+\code{\link[=files_rm_jwrapper]{files_rm_jwrapper()}},
+\code{\link[=instr_defaults]{instr_defaults()}},
+\code{\link[=rm_jwrapper]{rm_jwrapper()}}
+}
+\concept{Functions and methods related to instrument descriptors.}

@@ -4,11 +4,14 @@
 \alias{rm_jwrapper}
 \title{Remove java wrapper from descriptor}
 \usage{
-rm_jwrapper(x)
+rm_jwrapper(x, verbose = getOption("photobiology.verbose", default = FALSE))
 }
 \arguments{
 \item{x}{generic_spct or generic_mspct object with attribute
 \code{instr.desc} set.}
+
+\item{verbose}{logical If \code{TRUE}, issue message when no action is
+needed, i.e., the spectral object does not contain a Java wrapper.}
 }
 \value{
 a copy of \code{x} possibly with field \code{"w"} removed, if present,
@@ -28,8 +31,17 @@ immediately after acquisition. However, the instrument descriptor of spectral
 objects created with versions of 'ooacquire' from some years ago can contain a
 member storing the useless Java wrapper. This function removes this field if
 present.
-}
-\note{
+
 Method \code{getInstrDesc()} removes member field \code{w} from the returned
-value but does not modify its argument.
+value but does not modify its argument, it returns the modified object.
 }
+\seealso{
+Use function \code{\link{files_rm_jwrapper}()} to apply function
+  \code{rm_jwrapper()} to objects stored in .rda files,
+
+Other Functions and methods related to instrument descriptors.:
+\code{\link[=files_rm_jwrapper]{files_rm_jwrapper()}},
+\code{\link[=instr_defaults]{instr_defaults()}},
+\code{\link[=update_bad_pixs]{update_bad_pixs()}}
+}
+\concept{Functions and methods related to instrument descriptors.}
