@@ -9,6 +9,7 @@ files_rm_jwrapper(
   pattern = "\\\\.spct\\\\.[Rr]da",
   recursive = TRUE,
   date.limit = NULL,
+  trim.descriptor = TRUE,
   save.files = FALSE,
   verbose = getOption("photobiology.verbose", default = FALSE)
 )
@@ -26,6 +27,11 @@ which match the regular expression will be returned. See
 
 \item{date.limit}{POSIXct Files with more recent creation dates are skipped
 assuming they have been created with 'ooacquire' (>= 0.2.5 2022-09-30).}
+
+\item{trim.descriptor}{logical If \code{TRUE} apply
+\code{trimInstrDesc()} instead of \code{rm_jwrapper()} to spectral objects
+containing data in physical units. \code{rm_jwrapper()} is always used for
+objects containing sensor counts, either raw of cps.}
 
 \item{save.files}{logical If \code{FALSE} skip saving of files. Useful to
 test what files would be modified.}
@@ -46,15 +52,27 @@ backups.
 }
 \details{
 Spectral data objects acquired directly from a connected spectrometer
-with 'ooacquire' (<= ) contain a leftover Java wrapper used to connect to
+with 'ooacquire' (< 0.2.5) contain a leftover Java wrapper used to connect to
 the spectrometer. This is of no use after disconnection, but if it remains
 in the objects saved to an \code{.rda} file loading these files requires
-'rJava' and the Java JDK to be available.
+'rJava' and the Java JDK to be available. Some old \code{source_spct} and
+\code{filter_spct} objects can also contain the full instrument descriptor
+including calibration data, which makes the objects unnecessarily large.
 
 This function, searches folders for files with names matching \code{pattern},
- loads them one by one if created before the \code{date.limit}, removes the
+loads them one by one if modified before the \code{date.limit}, removes the
 spurious Java wrapper and saves the updated objects into a file with the
 original name after renaming the original file.
+
+The defaults match the defaults of \code{s_irrad_corected()} and
+\code{acq_irrad_interactive()} in the current version of 'ooacquire'.
+Field \code{w} containing the \code{jwrapper} is deleted from all
+spectral objects, and for objects containing spectral data expressed
+in physical units, also fields related to instrument calibration are
+deleted. If \code{trim.descriptor = FALSE} is passed in the call,
+deleting the \code{w} is the action applied to all objects.
+Any objects in the loaded files that are not spectral objects or
+collections of spectral objects are kept unchanged.
 
 **The date-based file selection uses file modification time as Windows has
 an unusual logic for file creation time, resulting in creation times being

@@ -98,6 +98,8 @@ test_that("ooacquire irrad continuous MAYA update bad pixs", {
 # })
 
 test_that("ooacquire filter continuous", {
+  # could be replaced by use of ref file versions but I will soon add requirement
+  testthat::skip_if_not_installed("photobiology", minimum_version = "0.14.2.9000")
 
   rm(list = ls(pattern = "*"))
 
