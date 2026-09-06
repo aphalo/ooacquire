@@ -9,6 +9,8 @@ files_s_irrad_updt(
   pattern = "\\\\.spct\\\\.[Rr]da",
   recursive = TRUE,
   date.limit = NULL,
+  spct.names = c(light = "light", filter = "filter", dark = "dark"),
+  correction.method = NULL,
   hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
   return.cps = NULL,
   trim.descriptor = TRUE,
@@ -31,6 +33,12 @@ which match the regular expression will be returned. See
 
 \item{date.limit}{POSIXct Files with more recent creation dates are skipped
 assuming they have been created with 'ooacquire' (>= 0.2.5 2022-09-30).}
+
+\item{spct.names}{named character vector of length three, to map names in
+\code{x} to those expected.}
+
+\item{correction.method}{A named list of constants and functions defining the
+method to be used for stray light and dark signal corrections.}
 
 \item{hdr.tolerance}{numeric Tolerance for mean deviation among cps columns as
 a fraction of one. Used in check of HDR consistency. A negative value
@@ -76,7 +84,9 @@ This function, searches folders for files with names matching \code{pattern},
 loads them one by one if modified before the \code{date.limit}, removes the
 Java wrapper if present and recomputes spectral irradiance with
 \code{\link{s_irrad_corrected_updt}()} and saves the updated objects into a
-file with the original name after renaming the original file.
+file with the original name after renaming the original file. If the
+\code{"raw_mspct"} object is not accompanied by a \code{"source_spct"}
+object with a matching name, the file is skipped.
 
 The defaults match the defaults of \code{s_irrad_corrected()} and
 \code{acq_irrad_interactive()} in the current version of 'ooacquire'.

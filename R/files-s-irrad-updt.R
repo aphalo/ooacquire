@@ -23,7 +23,9 @@
 #' loads them one by one if modified before the \code{date.limit}, removes the
 #' Java wrapper if present and recomputes spectral irradiance with
 #' \code{\link{s_irrad_corrected_updt}()} and saves the updated objects into a
-#' file with the original name after renaming the original file.
+#' file with the original name after renaming the original file. If the
+#' \code{"raw_mspct"} object is not accompanied by a \code{"source_spct"}
+#' object with a matching name, the file is skipped.
 #'
 #' The defaults match the defaults of \code{s_irrad_corrected()} and
 #' \code{acq_irrad_interactive()} in the current version of 'ooacquire'.
@@ -56,6 +58,8 @@ files_s_irrad_updt <-
            pattern = "\\.spct\\.[Rr]da",
            recursive = TRUE,
            date.limit = NULL,
+           spct.names = c(light = "light", filter = "filter", dark = "dark"),
+           correction.method = NULL,
            hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
            return.cps = NULL,
            trim.descriptor = TRUE,
@@ -88,8 +92,10 @@ files_s_irrad_updt <-
     for (f in files) {
       message("---\n", basename(f))
       load(f)
-      loaded.raw.objects <- setdiff(ls(pattern = "\\.raw_mspct$"),
+      loaded.objects <- setdiff(ls(pattern = "\\.raw_mspct|\\.spct$"),
                                 existing.objects)
+      loaded.raw.objects <- setdiff(ls(pattern = "\\.raw_mspct$"),
+                                    existing.objects)
       updated.objs <- 0L
       for (obj in loaded.raw.objects) {
         temp <- get(obj, inherits = FALSE)
@@ -111,8 +117,8 @@ files_s_irrad_updt <-
                                     spct.names = spct.names,
                                     correction.method = correction.method,
                                     hdr.tolerance = hdr.tolerance,
-                                    which = NULL,
-                                    which.not = NULL,
+                                    which = which,
+                                    which.not = which.not,
                                     verbose = verbose)
 
         assign(obj, temp)

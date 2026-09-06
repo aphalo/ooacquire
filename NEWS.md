@@ -6,7 +6,8 @@ editor_options:
 
 # ooacquire 0.5.6 (2026-09-xx)
 
-- Add functions `s_irrad_corrected_updt()` and `instr_defaults()`.
+- Add functions `s_irrad_corrected_updt()` and `instr_defaults()`, factoring out
+code shared with `acq_irrad_interactive()`.
 - Add function `files_rm_jwrapper()` for removing the Java wrapper from
 objects stored in .rda files (saved by `acq_irrad_interactive()` from
 'ooacquire' < 0.2.5). This is a wrapper on `rm_jwrapper()` that walks
@@ -19,6 +20,9 @@ files.
 distinguish these example data from `white_led.raw_spct` from 'photobiology'.
 - Update `s_irrad_corrected()` and `s_fraction_corrected()` to save the 
 correction method used in attribute `correction.method`.
+- Update `acq_irrad_interactive()` to more consistently use times and dates in
+defaults for folder name and session. Change default collection file name to
+use the starting time instead of time when the file is saved.
 
 # ooacquire 0.5.5 (2026-02-21)
 
