@@ -31,10 +31,9 @@ acq_irrad_interactive(
   f.trigger.on = ifelse(qty.out == "fluence", f.trigger.message, NA),
   f.trigger.off = NA,
   triggers.enabled = c("light", "filter"),
-  folder.name = paste("acq", qty.out, lubridate::today(tzone = "UTC"), sep = "-"),
+  folder.name = NULL,
   user.name = Sys.info()[["user"]],
-  session.name = paste(user.name, strftime(lubridate::now(tzone = ""),
-    "\%Y_\%m_\%d.\%H\%M"), sep = "_"),
+  session.name = NULL,
   verbose = getOption("photobiology.verbose", default = FALSE),
   QC.enabled = TRUE
 )

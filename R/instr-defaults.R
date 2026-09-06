@@ -93,8 +93,12 @@ default_descriptor <-
                FLMS00416 =
                  which_descriptor(date = date,
                                   descriptors = ooacquire::FLMS00416_descriptors),
-               warning("No instrument descriptor found in 'ooacquire' for ",
-                       "spectrometer with s/n ='", serial_no, "'!")
+               {
+                 list()
+                 warning("No instrument descriptor found in 'ooacquire' for ",
+                         "spectrometer with s/n ='", serial_no, "'!")
+               }
+
         )
     }
     descriptor = descriptor

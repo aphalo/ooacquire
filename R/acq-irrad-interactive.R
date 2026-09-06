@@ -301,16 +301,25 @@ acq_irrad_interactive <-
            f.trigger.on = ifelse(qty.out == "fluence", f.trigger.message, NA),
            f.trigger.off = NA,
            triggers.enabled = c("light", "filter"),
-           folder.name = paste("acq", qty.out,
-                               lubridate::today(tzone = "UTC"),
-                               sep = "-"),
+           folder.name = NULL,
            user.name = Sys.info()[["user"]],
-           session.name = paste(user.name,
-                                strftime(lubridate::now(tzone = ""),
-                                         "%Y_%m_%d.%H%M"),
-                                sep = "_"),
+           session.name = NULL,
            verbose = getOption("photobiology.verbose", default = FALSE),
            QC.enabled = TRUE) {
+
+    session.start.time <- lubridate::now(tzone = "UTC")
+    collection.start.time <- session.start.time
+    if (is.null(folder.name)) {
+      folder.name <- paste("acq",
+                           qty.out,
+                           strftime(session.start.time, "%Y_%m_%d"),
+                           sep = "-")
+    }
+    if (is.null(session.name)) {
+      session.name = paste(user.name,
+                           strftime(session.start.time, "%Y_%m_%d.%H%M"),
+                           sep = "_")
+    }
 
     ## ggplot default themes
     # A dark theme option used only for the screen would be useful
@@ -441,93 +450,101 @@ acq_irrad_interactive <-
                 call. = FALSE)
         return(NULL)
       }
+    } else {
+      entrance.optics <- "cosine"
     }
 
-    # spectrometer-specific correction method parameters
-    if (anyNA(c(descriptors[[1]], correction.method[[1]]))) {
+    ## Instrument descriptor
+    # spectrometer-specific calibration and correction method parameters
+    if (anyNA(descriptors[[1]])) {
+      # search for 'known' spectrum
       descriptor <-
-        switch(serial_no,
-          MAYP11278 =
-            which_descriptor(descriptors = ooacquire::MAYP11278_descriptors,
-                             entrance.optics = entrance.optics),
-          MAYP112785 =
-            which_descriptor(descriptors = ooacquire::MAYP112785_descriptors),
-          MAYP114590 =
-            which_descriptor(descriptors = ooacquire::MAYP114590_descriptors),
-          FLMS04133 =
-            which_descriptor(descriptors = ooacquire::FLMS04133_descriptors),
-          FLMS00673 =
-            which_descriptor(descriptors = ooacquire::FLMS00673_descriptors),
-          FLMS00440 =
-            which_descriptor(descriptors = ooacquire::FLMS00440_descriptors),
-          FLMS00416 =
-            which_descriptor(descriptors = ooacquire::FLMS00416_descriptors),
-          {
-            warning("No instrument descriptor found in software, ",
-                    "retrieving from the spectrometer",
-                    call. = FALSE)
-            get_oo_descriptor(w, sr.index = sr.index, ch.index = ch.index)
-            # this can introduce NA irrad.mult, which are checked further below
-          }
-        )
+        default_descriptor(serial_no = serial_no,
+                           entrance.optics = entrance.optics,
+                           date = session.start.time,
+                           descriptor = NA)
+    } else {
+      # search in user supplied list of descriptors
+      descriptor <- which_descriptor(date = session.start.time,
+                                     descriptors = descriptors,
+                                     entrance.optics = entrance.optics)
+      stopifnot(exists("spectrometer.name", descriptor))
+    }
 
-      correction.method <-
-        switch(serial_no,
-               MAYP11278 = ooacquire::MAYP11278_ylianttila.mthd,
-               MAYP112785 = ooacquire::MAYP112785_ylianttila.mthd,
-               MAYP114590 = ooacquire::MAYP114590_simple.mthd,
-               FLMS04133 = ooacquire::FLMS04133_none.mthd,
-               FLMS00673 = ooacquire::FLMS00673_none.mthd,
-               FLMS00440 = ooacquire::FLMS00440_none.mthd,
-               FLMS00416 = ooacquire::FLMS00416_none.mthd,
-               {
-                 warning(
-                   "No spectrometer-specific method found, using a generic one",
-                   call. = FALSE)
-                 new_correction_method(descriptor,
-                                       stray.light.method = "none")
-               }
-        )
+    if (!length(descriptor)) {
+      # no descriptor found as R object, fetch it from spectrometer
+      # possibly with NA for fields including calibration multipliers
+      descriptor <-
+        get_oo_descriptor(w = w,
+                          sr.index = sr.index,
+                          ch.index = ch.index,
+                          area = area,
+                          diff.type = diff.type)
+    } else {
+      # check serial numbers, really needed only for user supplied descriptors
+      descriptor.inst <- get_oo_descriptor(w = w,
+                                           sr.index = sr.index,
+                                           ch.index = ch.index)
+      stopifnot(descriptor[["spectrometer.sn"]] ==
+                  descriptor.inst[["spectrometer.sn"]])
 
-      # default protocols depend of implemented correction methods
-      available.protocols <- names(protocols)
+      # jwrapper and spectrometer indexes have to be set to current ones if
+      # descriptor was not acquired from the spectrometer in the current session
+      descriptor[["w"]] <- w
+      descriptor[["sr.index"]] <- sr.index
+      descriptor[["ch.index"]] <- ch.index
+    }
+
+    if (length(descriptor) < 10) {
+      stop("No matching instrument descriptor found")
+    }
+
+    ## Correction method
+    if (anyNA(correction.method)) {
+      correction.method <- default_method(serial_no = serial_no,
+                                          correction.method = NA,
+                                          descriptor = descriptor)
+    } else {
+      # NA could be used for generic methods
+      stopifnot("Spectrometer serial number mismatch in 'correction.method'" =
+                  is.na(correction.method[["spectrometer.sn"]]) ||
+                  correction.method[["spectrometer.sn"]] == serial_no)
+    }
+
+    if (length(correction.method) < 5) {
+      stop("No matching correction method found")
+    }
+
+    # Default protocol used in UI
+    # based on call arguments, length known >= 1
+    available.protocols <- names(protocols)
+    if (length(available.protocols) == 1L) {
+      default.protocol <- available.protocols
+    } else {
+      # default protocol in UI depends on spectrometer
       default.protocol <-
         switch(serial_no,
-          MAYP11278 = ifelse("lfd" %in% available.protocols,
-                             "lfd", available.protocols[1]),
-          MAYP112785 = ifelse("lfd" %in% available.protocols,
-                              "lfd", available.protocols[1]),
-          MAYP114590 = ifelse("lfd" %in% available.protocols,
-                              "lfd", available.protocols[1]),
-          FLMS04133 = ifelse("ld" %in% available.protocols,
-                             "ld", available.protocols[1]),
-          FLMS00673 = ifelse("ld" %in% available.protocols,
-                             "ld", available.protocols[1]),
-          FLMS00440 = ifelse("ld" %in% available.protocols,
-                             "ld", available.protocols[1]),
-          FLMS00416 = ifelse("ld" %in% available.protocols,
-                             "ld", available.protocols[1]),
-          ifelse("ld" %in% available.protocols,
-                 "ld", available.protocols[1])
+               MAYP11278 = ifelse("lfd" %in% available.protocols,
+                                  "lfd", available.protocols[1]),
+               MAYP112785 = ifelse("lfd" %in% available.protocols,
+                                   "lfd", available.protocols[1]),
+               MAYP114590 = ifelse("lfd" %in% available.protocols,
+                                   "lfd", available.protocols[1]),
+               FLMS04133 = ifelse("ld" %in% available.protocols,
+                                  "ld", available.protocols[1]),
+               FLMS00673 = ifelse("ld" %in% available.protocols,
+                                  "ld", available.protocols[1]),
+               FLMS00440 = ifelse("ld" %in% available.protocols,
+                                  "ld", available.protocols[1]),
+               FLMS00416 = ifelse("ld" %in% available.protocols,
+                                  "ld", available.protocols[1]),
+               ifelse("ld" %in% available.protocols,
+                      "ld", available.protocols[1])
         )
-
-    } else {
-      descriptor <- which_descriptor(descriptors = descriptors)
-      stopifnot(exists("spectrometer.name", descriptor))
-      default.protocol <- ifelse("ld" %in% available.protocols,
-                                 "ld", available.protocols[1])
     }
 
-    # jwrapper and spectrometer indexes have to be set to current ones if
-    # descriptor was not acquired from the spectrometer in the current session
-    descriptor[["w"]] <- w
-    descriptor[["sr.index"]] <- sr.index
-    descriptor[["ch.index"]] <- ch.index
-
-    if (length(descriptor) < 10 || length(correction.method) < 5) {
-      stop("No spectrometer data found")
-    }
-
+    # some spectrometers are capable of acquisition of data in parallel with
+    # communication with < 1 ms dead time between acquired spectra in fast mode
     if (!grepl("^series", interface.mode)) {
       acq.overhead <- NA_real_ # safeguard as it should not be used
     } else if (grepl("^MAY", serial_no)) {
@@ -539,11 +556,6 @@ acq_irrad_interactive <-
     } else {
       acq.overhead <- 50e-3 # 50 ms, just in case
     }
-
-    # check serial numbers, really needed only for user supplied descriptors
-    descriptor.inst <- get_oo_descriptor(w)
-    stopifnot(descriptor[["spectrometer.sn"]] ==
-                descriptor.inst[["spectrometer.sn"]])
 
     # check that wavelength calibration is available
     stopifnot(length(descriptor[["wavelengths"]]) ==
@@ -1243,7 +1255,7 @@ acq_irrad_interactive <-
               cat("No name supplied, creating one...\n")
               collection.name <-
                 paste("collection",
-                      format(lubridate::now(tzone = ""),
+                      format(collection.start.time,
                              format = "%Y_%m_%d.%H%M",
                              tz = "UTC"), sep = ".")
             } else {
@@ -1402,6 +1414,7 @@ acq_irrad_interactive <-
                   # reset the lists of names for next collection
                   irrad.names <- character()
                   raw.names <- character()
+                  collection.start.time <- lubridate::now(tzone = "UTC")
                   cat("Lists of collected objects' reset.\n")
                   break()
                 } else {
@@ -1508,7 +1521,7 @@ acq_irrad_interactive <-
 
         if (answer2 == "q") {
           break() # out of UI main loop
-        } else if (!reuse.old.refs) {
+        } else if (!reuse.old.refs && length(protocols) > 1L) {
           repeat {
             answer5 <- readline("Change protocol? yes/NO (y/n-): ")[1]
             answer5 <- ifelse(answer5 == "", "n", answer5)
