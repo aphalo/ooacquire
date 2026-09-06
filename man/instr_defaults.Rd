@@ -67,6 +67,7 @@ str(
 \seealso{
 Other Functions and methods related to instrument descriptors.:
 \code{\link[=files_rm_jwrapper]{files_rm_jwrapper()}},
+\code{\link[=files_s_irrad_updt]{files_s_irrad_updt()}},
 \code{\link[=rm_jwrapper]{rm_jwrapper()}},
 \code{\link[=update_bad_pixs]{update_bad_pixs()}}
 }

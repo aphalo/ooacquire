@@ -10,7 +10,11 @@ editor_options:
 - Add function `files_rm_jwrapper()` for removing the Java wrapper from
 objects stored in .rda files (saved by `acq_irrad_interactive()` from
 'ooacquire' < 0.2.5). This is a wrapper on `rm_jwrapper()` that walks
-through a tree of file folders updating the objects stored in files.
+through a tree of file folders updating the objects stored in `.rda` files.
+- Add function `files_s_irrad_updt()` for updating spectral irradiance
+stored in `source_spct` objects. This is a wrapper on `s_irrad_corrected_updt()`
+that walks through a tree of file folders updating the objects stored in `.rda` 
+files.
 - Rename `white_LED.raw_mspct` into `white_grow_LED.raw_mspct` to better
 distinguish these example data from `white_led.raw_spct` from 'photobiology'.
 - Update `s_irrad_corrected()` and `s_fraction_corrected()` to save the 

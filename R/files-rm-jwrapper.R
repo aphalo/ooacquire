@@ -48,26 +48,30 @@
 #' Any objects in the loaded files that are not spectral objects or
 #' collections of spectral objects are kept unchanged.
 #'
-#' **The date-based file selection uses file modification time as Windows has
+#' @section Date related uncertainties:
+#' The date-based file selection uses file modification time as Windows has
 #' an unusual logic for file creation time, resulting in creation times being
 #' later than modification time when a file is copied. When attached files are
 #' downloaded or when files are downloaded they may get the creation and
 #' modification times set to the time of downloading. This is only a speed
 #' up for avoiding loading of files. Files containing objects that do not need
-#' updating will not be modified even if they are loaded.**
+#' updating will not be modified even if they are loaded.
 #'
 #' @section Warning!: It is strongly recommended that before committing
 #' changes a test is first done to check which files will be updated.
 #'
 #' @return A \code{character} vector with the paths to the updated files,
-#' returned silently.
+#' returned silently. As a side effect files can be saved containing updated
+#' objects while keeping original files renamed as backups. By default no
+#' files are saved.
 #'
-#' @seealso \code{\link{ls}()}, \code{\link{list.files}()},
-#' \code{\link[ooacquire]{rm_jwrapper}()} which are used to list objects
-#' and files, and to update remove the Java wrapper from 'rjava', respectively.
+#' @seealso \code{\link{ls}()}, and \code{\link{list.files}()}, which are used
+#'   to list objects and files, and \code{\link{rm_jwrapper}()} used to remove
+#'   the Java wrapper from the instrument descriptor embedded in objects of
+#'   class \code{generic_spct} and derived classes, respectively.
 #'
 #' @family Functions and methods related to instrument descriptors.
-#' @seealso Use function \code{\link{rm_jwrapper}()} from individual
+#' @seealso Use function \code{\link{rm_jwrapper}()} for individual
 #'   objects in the R workspace.
 #'
 #' @export

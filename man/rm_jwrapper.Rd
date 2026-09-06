@@ -41,6 +41,7 @@ Use function \code{\link{files_rm_jwrapper}()} to apply function
 
 Other Functions and methods related to instrument descriptors.:
 \code{\link[=files_rm_jwrapper]{files_rm_jwrapper()}},
+\code{\link[=files_s_irrad_updt]{files_s_irrad_updt()}},
 \code{\link[=instr_defaults]{instr_defaults()}},
 \code{\link[=update_bad_pixs]{update_bad_pixs()}}
 }
