@@ -98,7 +98,7 @@ uvb_corrections <-
       y <- ref_correction(y, ref_name = "dark")
     } else if (length(setdiff(c("light", "dark"), spct.names)) == 0) {
       if (verbose && !stray.light.method %in% c("none")) {
-        warning("No 'filter' measurement available: ",
+        message("No 'filter' measurement available: ",
                 "continuing without filter correction")
       }
       flt.flag <- FALSE   # overrides flt.flag <- TRUE set above based on method
@@ -106,11 +106,11 @@ uvb_corrections <-
     } else if (length(setdiff(c("light", "filter"), spct.names)) == 0) {
       # added 2019-01-09
       if (verbose) {
-        warning("No 'dark' measurement available: using internal reference")
+        message("No 'dark' measurement available: using internal reference")
       }
     } else if (length(setdiff("light", spct.names)) == 0) {
       if (verbose) {
-        warning("No 'dark' or 'filter' measurements available: ",
+        message("No 'dark' or 'filter' measurements available: ",
                 "using internal reference")
       }
       flt.flag <- FALSE  # overrides flt.flag  <- TRUE set above based on method

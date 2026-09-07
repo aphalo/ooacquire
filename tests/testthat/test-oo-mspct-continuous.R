@@ -2,12 +2,11 @@ context("convert raw continuous source")
 
 # set to TRUE to reset snapshots
 updating <- FALSE
-debugging <- FALSE
+debugging <- TRUE
 
-# library(ggspectra)
 test_that("ooacquire irrad continuous MAYA", {
 
-  rm(list = ls(pattern = "*"))
+  rm(list = setdiff(ls(pattern = "*"), c("updating", "debugging")))
 
   files <- list.files("test-irrad-mspct-maya-data", pattern = "*.[Rr]da")
 #  print(files)
@@ -36,10 +35,9 @@ test_that("ooacquire irrad continuous MAYA", {
 
 })
 
-# library(ggspectra)
 test_that("ooacquire irrad continuous MAYA update bad pixs", {
 
-  rm(list = ls(pattern = "*"))
+  rm(list = setdiff(ls(pattern = "*"), c("updating", "debugging")))
 
   files <- list.files("test-irrad-mspct-maya-data", pattern = "*.[Rr]da")
 #  print(files)
@@ -69,6 +67,58 @@ test_that("ooacquire irrad continuous MAYA update bad pixs", {
   }
 
 })
+
+test_that("ooacquire irrad continuous MAYA update rm jwrapper", {
+
+  rm(list = setdiff(ls(pattern = "*"), c("updating", "debugging")))
+  debugging <- getOption("verbose", FALSE)
+
+  files <- list.files("test-irrad-mspct-maya-data", pattern = "*.[Rr]da")
+  #  print(files)
+  for (f in files) {
+    #    print(f)
+    load(paste("test-irrad-mspct-maya-data", f, sep = "/"))
+    old.raw.mspct <- get(sub("spct.[Rr]da", "raw_mspct", f))
+    updated.raw.mspct <- rm_jwrapper(old.raw.mspct)
+    old.descriptor <- instr_descriptor(old.raw.mspct[[1]])
+    updated.descriptor <- instr_descriptor(updated.raw.mspct[[1]])
+    expect_false(exists("w", updated.descriptor))
+    serial.no <- getInstrDesc(updated.raw.mspct[[1]])$spectrometer.sn
+
+    if (debugging) cat(" <- ", serial.no, " file: ", f, "\n")
+
+  }
+
+})
+
+test_that("ooacquire irrad continuous MAYA files rm jwrapper", {
+
+  rm(list = setdiff(ls(pattern = "*"), c("updating", "debugging")))
+
+  expect_no_error(
+    targetted.files <-
+      files_rm_jwrapper(path = "test-irrad-mspct-maya-data",
+                        save.files = FALSE,
+                        verbose = TRUE)
+  )
+  expect_equal(targetted.files, character(0))
+
+})
+
+test_that("ooacquire irrad continuous MAYA files irrad update", {
+
+  rm(list = setdiff(ls(pattern = "*"), c("updating", "debugging")))
+
+  expect_no_error(
+    targetted.files <-
+      files_s_irrad_updt(path = "test-irrad-mspct-maya-data",
+                         save.files = FALSE,
+                         verbose = FALSE)
+  )
+  expect_equal(targetted.files, character(0))
+
+})
+
 
 # Should be enabled after a few suitable files are added for the tests.
 # test_that("ooacquire irrad continuous FLAME-S", {
@@ -101,7 +151,7 @@ test_that("ooacquire filter continuous", {
   # could be replaced by use of ref file versions but I will soon add requirement
   testthat::skip_if_not_installed("photobiology", minimum_version = "0.14.2.9000")
 
-  rm(list = ls(pattern = "*"))
+  rm(list = setdiff(ls(pattern = "*"), c("updating", "debugging")))
 
   files <- list.files("test-filter-mspct-data", pattern = "*.Rda")
 

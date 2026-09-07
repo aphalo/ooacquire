@@ -15,9 +15,10 @@
 #' @details
 #' Spectral data objects acquired directly from a connected spectrometer
 #' with 'ooacquire' contain embedded calibration data and correction algorithms
-#' that by default are used when spectral irradiance is computed. Function
+#' that by default are used when spectral irradiance is computed. In addition,
+#' quality control of raw counts data has been enhanced. Function
 #' \code{\link{s_irrad_corrected_updt}()} uses the current matching
-#' descriptor.
+#' descriptor, quality control and conversion default settings.
 #'
 #' This function, searches folders for files with names matching \code{pattern},
 #' loads them one by one if modified before the \code{date.limit}, removes the
@@ -100,23 +101,32 @@ files_s_irrad_updt <-
       for (obj in loaded.raw.objects) {
         temp <- get(obj, inherits = FALSE)
         if (!(photobiology::is.raw_mspct(temp))) {
-          warning("Skipping unsupported raw-counts object '", obj,
+          warning("Skipping file '", basename(f),
+                  "'! Found unsupported raw-counts object '", obj,
                   " of class \"", class(temp)[1], "\"")
           next()
         }
-        source.obj <- gsub("\\.raw_mspct$", ".spct")
-        if (!exists(source.obj) ||
-            !photobiology::is.source_spct(get(source.obj))) {
-          warning("Skipping unsupported irradiance object '", obj,
-                  " of class \"", class(temp)[1], "\"")
+        source.obj <- gsub("\\.raw_mspct$", ".spct", obj)
+        if (!exists(source.obj)) {
+          message("Skipping file '", basename(f),
+                  "'! Missing irradiance object '", source.obj, "'")
+          next()
+        }
+        y <- get(source.obj)
+        if (!photobiology::is.source_spct(y)) {
+          message("Skipping file '", basename(f),
+                  "! Object '", source.obj,
+                  " is a \"", class(y), "\" instead of \"source_spct\"")
           next()
         }
         temp <- rm_jwrapper(temp, verbose = verbose)
         z <- s_irrad_corrected_updt(x = temp,
-                                    y = get(source.obj),
+                                    y = y,
                                     spct.names = spct.names,
                                     correction.method = correction.method,
                                     hdr.tolerance = hdr.tolerance,
+                                    return.cps = NULL,
+                                    trim.descriptor = NULL,
                                     which = which,
                                     which.not = which.not,
                                     verbose = verbose)

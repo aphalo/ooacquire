@@ -72,118 +72,119 @@
 #' # only metadata from x and the new descriptor
 #' s_irrad_corrected_updt(x = white_grow_LED.raw_mspct)
 #'
-s_irrad_corrected_updt <- function(x,
-                                   y = NULL,
-                                   spct.names = c(light = "light",
-                                                  filter = "filter",
-                                                  dark = "dark"),
-                                   correction.method = NULL,
-                                   hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
-                                   return.cps = NULL,
-                                   trim.descriptor = NULL,
-                                   which = NULL,
-                                   which.not = NULL,
-                                   verbose = getOption("photobiology.verbose",
-                                                       default = FALSE)) {
-  if (!photobiology::is.raw_mspct(x)) {
-    stop("Argument passed to 'x' should be a 'raw_mspct' ",
-         "but its class is: ", class(x)[1])
-  }
-  if (length(y) && !photobiology::is.source_spct(y)) {
-    stop("Argument passed to 'y' should be a 'source_spct' ",
-         "but its class is: ", class(x)[1])
-  }
-
-  # new descriptor is selected based on the existing one
-  x.descriptor <- photobiology::instr_descriptor(x[[1]])
-
-  # entrance optics field is part of the fetched descriptor
-  # the geometry is used, possibly unwisely, to select the correct
-  # descriptor out of multiple ones available for a given spectrometer
-  if (!"entrance.optics" %in% names(x.descriptor)) {
-    entrance.optics <- "cosine"
-  } else {
-    entrance.optics <- x.descriptor[["entrance.optics"]]["geometry"]
-  }
-
-  # fetch the descriptor used in current 'ooacquire'
-  date <- photobiology::when_measured(x[[1]])
-  current.descriptor <-
-    default_descriptor(serial_no = x.descriptor[["spectrometer.sn"]],
-                       entrance.optics = entrance.optics,
-                       date = date)
-
-  # assign the descriptor to the raw_spct objects
-  x <- photobiology::msmsply(x,
-                             photobiology::setInstrDesc,
-                             instr.desc = current.descriptor)
-
-  # fetch correction method
-  if (is.null(correction.method)) {
-    if (!is.null(y) &&
-        !is.null(attr(y, "correction.method", exact = TRUE))) {
-      correction.method <- attr(y, "correction.method", exact = TRUE)
-      if (verbose) {
-        message("Using 'correction.method' from 'y'")
-      }
-    } else {
-      correction.method <- default_method(serial_no = x.descriptor[["spectrometer.sn"]],
-                                          descriptor = current.descriptor)
-      if (verbose) {
-        message("Using default 'correction.method'")
-      }
+s_irrad_corrected_updt <-
+  function(x,
+           y = NULL,
+           spct.names = c(light = "light",
+                          filter = "filter",
+                          dark = "dark")[names(x)],
+           correction.method = NULL,
+           hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
+           return.cps = NULL,
+           trim.descriptor = NULL,
+           which = NULL,
+           which.not = NULL,
+           verbose = getOption("photobiology.verbose",
+                               default = FALSE)) {
+    if (!photobiology::is.raw_mspct(x)) {
+      stop("Argument passed to 'x' should be a 'raw_mspct' ",
+           "but its class is: ", class(x)[1])
     }
-  } else if (verbose) {
-    message("Using 'correction.method' from call argument")
-  }
-
-  # compute spectral irradiance
-  return.cps <- ifelse(is.null(return.cps),
-                       !is.null(y) && photobiology::is.cps_spct(y),
-                       return.cps)
-  trim.descriptor <- ifelse(is.null(trim.descriptor),
-                            !return.cps,
-                            trim.descriptor)
-  z <-
-    s_irrad_corrected(x = x,
-                      spct.names = spct.names,
-                      correction.method = correction.method,
-                      hdr.tolerance = hdr.tolerance,
-                      return.cps = return.cps,
-                      trim.descriptor = trim.descriptor,
-                      verbose = verbose)
-
-  # add/replace metadata present in y to the freshly computed one
-  # attributes such as what.measured, where.measured and when.measured
-  if (!is.null(y)) {
-    y.descriptor <- photobiology::instr_descriptor(y)
-    matched <-
-      y.descriptor[["spectrometer.sn"]] == x.descriptor[["spectrometer.sn"]] &&
-      photobiology::when_measured(y) == photobiology::when_measured(z)
-
-    which.not <- union(which.not,
-                       c("instr.desc",
-                         "instr.settings",
-                         "spct.version",
-                         "when.measured",
-                         "multiple.wl",
-                         "time.unit",
-                         "straylight.corrected",
-                         "slit.corrected",
-                         "bswf.used",
-                         "QC_dark_pass",
-                         "normalized",
-                         "normalization",
-                         "scaled"))
-    if (matched) {
-      z <- photobiology::copy_attributes(x = y, y = z,
-                                         which.not = which.not,
-                                         which = which)
-    } else {
-      warning("Spectra in 'x' and 'y' are mismatched! Metadata not updated!")
+    if (length(y) && !photobiology::is.source_spct(y)) {
+      stop("Argument passed to 'y' should be a 'source_spct' ",
+           "but its class is: ", class(x)[1])
     }
-  } else if (verbose) {
-    message("No metadata copied as no argument was passed to 'y'")
+
+    # new descriptor is selected based on the existing one
+    x.descriptor <- photobiology::instr_descriptor(x[[1]])
+
+    # entrance optics field is part of the fetched descriptor
+    # the geometry is used, possibly unwisely, to select the correct
+    # descriptor out of multiple ones available for a given spectrometer
+    if (!"entrance.optics" %in% names(x.descriptor)) {
+      entrance.optics <- "cosine"
+    } else {
+      entrance.optics <- x.descriptor[["entrance.optics"]]["geometry"]
+    }
+
+    # fetch the descriptor used in current 'ooacquire'
+    date <- photobiology::when_measured(x[[1]])
+    current.descriptor <-
+      default_descriptor(serial_no = x.descriptor[["spectrometer.sn"]],
+                         entrance.optics = entrance.optics,
+                         date = date)
+
+    # assign the descriptor to the raw_spct objects
+    x <- photobiology::msmsply(x,
+                               photobiology::setInstrDesc,
+                               instr.desc = current.descriptor)
+
+    # fetch correction method
+    if (is.null(correction.method)) {
+      if (!is.null(y) &&
+          !is.null(attr(y, "correction.method", exact = TRUE))) {
+        correction.method <- attr(y, "correction.method", exact = TRUE)
+        if (verbose) {
+          message("Using 'correction.method' from 'y'")
+        }
+      } else {
+        correction.method <- default_method(serial_no = x.descriptor[["spectrometer.sn"]],
+                                            descriptor = current.descriptor)
+        if (verbose) {
+          message("Using default 'correction.method'")
+        }
+      }
+    } else if (verbose) {
+      message("Using 'correction.method' from call argument")
+    }
+
+    # compute spectral irradiance
+    return.cps <- ifelse(is.null(return.cps),
+                         !is.null(y) && photobiology::is.cps_spct(y),
+                         return.cps)
+    trim.descriptor <- ifelse(is.null(trim.descriptor),
+                              !return.cps,
+                              trim.descriptor)
+    z <-
+      s_irrad_corrected(x = x,
+                        spct.names = spct.names,
+                        correction.method = correction.method,
+                        hdr.tolerance = hdr.tolerance,
+                        return.cps = return.cps,
+                        trim.descriptor = trim.descriptor,
+                        verbose = verbose)
+
+    # add/replace metadata present in y to the freshly computed one
+    # attributes such as what.measured, where.measured and when.measured
+    if (!is.null(y)) {
+      y.descriptor <- photobiology::instr_descriptor(y)
+      matched <-
+        y.descriptor[["spectrometer.sn"]] == x.descriptor[["spectrometer.sn"]] &&
+        photobiology::when_measured(y) == photobiology::when_measured(z)
+
+      which.not <- union(which.not,
+                         c("instr.desc",
+                           "instr.settings",
+                           "spct.version",
+                           "when.measured",
+                           "multiple.wl",
+                           "time.unit",
+                           "straylight.corrected",
+                           "slit.corrected",
+                           "bswf.used",
+                           "QC_dark_pass",
+                           "normalized",
+                           "normalization",
+                           "scaled"))
+      if (matched) {
+        z <- photobiology::copy_attributes(x = y, y = z,
+                                           which.not = which.not,
+                                           which = which)
+      } else {
+        warning("Spectra in 'x' and 'y' are mismatched! Metadata not updated!")
+      }
+    } else if (verbose) {
+      message("No metadata copied as no argument was passed to 'y'")
+    }
+    z
   }
-  z
-}

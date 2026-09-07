@@ -7,7 +7,7 @@
 s_irrad_corrected_updt(
   x,
   y = NULL,
-  spct.names = c(light = "light", filter = "filter", dark = "dark"),
+  spct.names = c(light = "light", filter = "filter", dark = "dark")[names(x)],
   correction.method = NULL,
   hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
   return.cps = NULL,
