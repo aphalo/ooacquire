@@ -76,9 +76,10 @@ current version of 'ooacquire'.
 \details{
 Spectral data objects acquired directly from a connected spectrometer
 with 'ooacquire' contain embedded calibration data and correction algorithms
-that by default are used when spectral irradiance is computed. Function
+that by default are used when spectral irradiance is computed. In addition,
+quality control of raw counts data has been enhanced. Function
 \code{\link{s_irrad_corrected_updt}()} uses the current matching
-descriptor.
+descriptor, quality control and conversion default settings.
 
 This function, searches folders for files with names matching \code{pattern},
 loads them one by one if modified before the \code{date.limit}, removes the

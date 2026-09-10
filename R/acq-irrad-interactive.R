@@ -980,7 +980,14 @@ acq_irrad_interactive <-
                               "/", getMultipleWl(irrad.spct),
                               ")",
                               sep = "")
-          plot.spct <- pull_sample(irrad.spct, size = plot.lines.max)
+          if (packageVersion("photobiology") < "0.14.2.9001") {
+            plot.spct <- pull_sample(irrad.spct,
+                                     size = plot.lines.max)
+          } else {
+            plot.spct <- pull_sample(irrad.spct,
+                                     size = plot.lines.max,
+                                     method = "equal.steps")
+          }
         } else {
           title.text <- paste(what_measured(irrad.spct)[[1L]],
                               " (n = ", getMultipleWl(irrad.spct), ")",

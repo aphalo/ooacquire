@@ -825,8 +825,15 @@ acq_fraction_interactive <-
                               "/", getMultipleWl(filter.spct),
                               ")",
                               sep = "")
-          plot.spct <- pull_sample(filter.spct, size = plot.lines.max)
-        } else {
+          if (packageVersion("photobiology") <= "0.14.2.9001") {
+            plot.spct <- pull_sample(filter.spct,
+                                     size = plot.lines.max)
+          } else {
+            plot.spct <- pull_sample(filter.spct,
+                                     size = plot.lines.max,
+                                     method = "equal.steps")
+          }
+         } else {
           title.text <- paste(what_measured(filter.spct)[[1L]],
                               " (n = ", getMultipleWl(filter.spct), ")",
                               sep = "")
