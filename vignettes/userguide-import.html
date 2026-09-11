@@ -12,7 +12,7 @@
 
 <meta name="author" content="Pedro J. Aphalo" />
 
-<meta name="date" content="2026-02-21" />
+<meta name="date" content="2026-09-11" />
 
 <title>Import and conversion</title>
 
@@ -340,9 +340,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 <h1 class="title toc-ignore">Import and conversion</h1>
-<h3 class="subtitle"><code>ooacquire</code> 0.5.5</h3>
+<h3 class="subtitle"><code>ooacquire</code> 0.5.5.9001</h3>
 <h4 class="author">Pedro J. Aphalo</h4>
-<h4 class="date">2026-02-21</h4>
+<h4 class="date">2026-09-11</h4>
 
 
 <div id="TOC">
@@ -432,11 +432,11 @@ correspond to the role of each spectrum or each group of spectra in a
 given protocol. As long as the input files with the necessary data are
 available, the results are exactly the same as if the spectra had been
 acquired in R.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>file_names <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">light =</span> <span class="fu">c</span>(<span class="st">&quot;irrad-files/light-short.txt&quot;</span>,</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>                             <span class="st">&quot;irrad-files/light-long.txt&quot;</span>),</span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>                   <span class="at">filter =</span> <span class="st">&quot;irrad-files/flt-long.txt&quot;</span>,</span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>                   <span class="at">dark =</span> <span class="fu">c</span>(<span class="st">&quot;irrad-files/dark-short.txt&quot;</span>,</span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>                            <span class="st">&quot;irrad-files/dark-long.txt&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>file_names <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">light =</span> <span class="fu">c</span>(<span class="st">&quot;foreign-files/light-short.txt&quot;</span>,</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>                             <span class="st">&quot;foreign-files/light-long.txt&quot;</span>),</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>                   <span class="at">filter =</span> <span class="st">&quot;foreign-files/flt-long.txt&quot;</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>                   <span class="at">dark =</span> <span class="fu">c</span>(<span class="st">&quot;foreign-files/dark-short.txt&quot;</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>                            <span class="st">&quot;foreign-files/dark-long.txt&quot;</span>))</span></code></pre></div>
 <p>In this case, a call to a high level function both reads five files
 with raw data, and converts these to a single spectral irradiance
 spectrum. For this to work, a valid calibration specific to the

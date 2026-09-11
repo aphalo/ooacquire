@@ -12,7 +12,7 @@
 
 <meta name="author" content="Pedro J. Aphalo" />
 
-<meta name="date" content="2026-02-21" />
+<meta name="date" content="2026-09-11" />
 
 <title>Acquisition of Spectra</title>
 
@@ -340,9 +340,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 <h1 class="title toc-ignore">Acquisition of Spectra</h1>
-<h3 class="subtitle"><code>ooacquire</code> 0.5.5</h3>
+<h3 class="subtitle"><code>ooacquire</code> 0.5.5.9001</h3>
 <h4 class="author">Pedro J. Aphalo</h4>
-<h4 class="date">2026-02-21</h4>
+<h4 class="date">2026-09-11</h4>
 
 
 <div id="TOC">
@@ -1372,10 +1372,10 @@ your own working directory before sourcing them or editing them.</p>
 the ‘ooacquire’ package is installed, and where the file you are
 interested in is, and to copy it to your own workspace. Here we copy the
 script called <code>&quot;irrad-acq-interac.R&quot;</code>.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>filepath <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;example-scripts&quot;</span>, <span class="st">&quot;irrad-acq-interac.R&quot;</span>, <span class="at">package=</span><span class="st">&quot;ooacquire&quot;</span>)</span>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>filepath <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata/example-scripts&quot;</span>, <span class="st">&quot;irrad-acq-interac.R&quot;</span>, <span class="at">package=</span><span class="st">&quot;ooacquire&quot;</span>)</span>
 <span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a><span class="fu">file.copy</span>(<span class="at">from =</span> filepath, <span class="at">to =</span> <span class="st">&quot;.&quot;</span>)</span></code></pre></div>
 <p>Here we copy all the example scripts.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>folderpath <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;example-scripts&quot;</span>, <span class="at">package=</span><span class="st">&quot;ooacquire&quot;</span>)</span>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>folderpath <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata/example-scripts&quot;</span>, <span class="at">package=</span><span class="st">&quot;ooacquire&quot;</span>)</span>
 <span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a><span class="fu">list.files</span>(<span class="at">path =</span> folderpath, <span class="at">pattern =</span> <span class="st">&quot;.*[.]R&quot;</span>)</span>
 <span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a><span class="fu">file.copy</span>(<span class="at">from =</span> <span class="fu">list.files</span>(<span class="at">path =</span> folderpath, <span class="at">pattern =</span> <span class="st">&quot;.*[.]R&quot;</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>), <span class="at">to =</span> <span class="st">&quot;.&quot;</span>)</span></code></pre></div>
 </div>

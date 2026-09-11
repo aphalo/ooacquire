@@ -367,7 +367,7 @@ A simple example using no dark reference scans.
 library(ooacquire)
 folderpath <- system.file("extdata", package = "ooacquire")
 file_names <- list(light = paste(folderpath, 
-                                 "irrad-files/light-short.txt", sep = "/"))
+                                 "foreign-files/light-short.txt", sep = "/"))
 one_file.spct <- 
   s_irrad_corrected(x = file_names,
                     descriptor = which_descriptor("2016-10-11" , 
@@ -381,7 +381,7 @@ autoplot(one_file.spct, unit.out = "photon", range = c(300, 850))
 The package includes several example scripts, with some of then containing multiple examples of how functions can be used to acquire data from spectrometers. users will most likely edit local copies of these files as the need arises. The list of files can be obtained as shown below. 
 
 ```{r scripts-1, message = FALSE}
-scripts.path <- system.file("example-scripts", package = "ooacquire")
+scripts.path <- system.file("extdata", "example-scripts", package = "ooacquire")
 scripts.files <- list.files(scripts.path, full.names = FALSE)
 cat(paste(scripts.files, collapse = "\n"))
 ```

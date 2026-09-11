@@ -70,9 +70,9 @@
 #' @examples
 #'
 #' # only metadata from x and the new descriptor
-#' s_irrad_corrected_updt(x = white_grow_LED.raw_mspct)
+#' s_irrad_update(x = white_grow_LED.raw_mspct)
 #'
-s_irrad_corrected_updt <-
+s_irrad_update <-
   function(x,
            y = NULL,
            spct.names = c(light = "light",

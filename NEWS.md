@@ -6,13 +6,13 @@ editor_options:
 
 # ooacquire 0.5.6 (2026-09-xx)
 
-- Add functions `s_irrad_corrected_updt()` and `instr_defaults()`, factoring out
+- Add functions `s_irrad_update()` and `instr_defaults()`, factoring out
 code shared with `acq_irrad_interactive()`.
 - Add function `files_rm_jwrapper()` for removing the Java wrapper from
 objects stored in .rda files (saved by `acq_irrad_interactive()` from
 'ooacquire' < 0.2.5). This is a wrapper on `rm_jwrapper()` that walks
 through a tree of file folders updating the objects stored in `.rda` files.
-- Add function `files_s_irrad_updt()` for updating spectral irradiance
+- Add function `files_s_irrad_update()` for updating spectral irradiance
 stored in `source_spct` objects. This is a wrapper on `s_irrad_corrected_updt()`
 that walks through a tree of file folders updating the objects stored in `.rda` 
 files.

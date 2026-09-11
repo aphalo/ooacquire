@@ -863,14 +863,14 @@ in is, and to copy it to your own workspace. Here we copy the script
 called `"irrad-acq-interac.R"`.
 
 ```{r, eval=FALSE}
-filepath <- system.file("example-scripts", "irrad-acq-interac.R", package="ooacquire")
+filepath <- system.file("extdata/example-scripts", "irrad-acq-interac.R", package="ooacquire")
 file.copy(from = filepath, to = ".")
 ```
 
 Here we copy all the example scripts.
 
 ```{r, eval=FALSE}
-folderpath <- system.file("example-scripts", package="ooacquire")
+folderpath <- system.file("extdata/example-scripts", package="ooacquire")
 list.files(path = folderpath, pattern = ".*[.]R")
 file.copy(from = list.files(path = folderpath, pattern = ".*[.]R", full.names = TRUE), to = ".")
 ```

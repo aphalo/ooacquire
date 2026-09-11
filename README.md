@@ -369,7 +369,7 @@ A simple example using no dark reference scans.
 library(ooacquire)
 folderpath <- system.file("extdata", package = "ooacquire")
 file_names <- list(light = paste(folderpath, 
-                                 "irrad-files/light-short.txt", sep = "/"))
+                                 "foreign-files/light-short.txt", sep = "/"))
 one_file.spct <- 
   s_irrad_corrected(x = file_names,
                     descriptor = which_descriptor("2016-10-11" , 
@@ -389,24 +389,9 @@ these files as the need arises. The list of files can be obtained as
 shown below.
 
 ``` r
-scripts.path <- system.file("example-scripts", package = "ooacquire")
+scripts.path <- system.file("ext-data", "example-scripts", package = "ooacquire")
 scripts.files <- list.files(scripts.path, full.names = FALSE)
 cat(paste(scripts.files, collapse = "\n"))
-#> acq-interac-using-triggers.R
-#> fluence-acq-interac-acq-options.R
-#> irrad-acq-interac-acq-options.R
-#> irrad-acq-interac-ui-options.R
-#> irrad-acq-script-FLMS.R
-#> irrad-acq-script-Luke.R
-#> irrad-acq-script.R
-#> irrad-acq-series-tests.R
-#> irrad-acq-timeseries.R
-#> irrad-files.R
-#> linearization_test_script.R
-#> measure-detector-non-linearity.R
-#> transmittance-acq-interac-flash.R
-#> transmittance-acq-interac.R
-#> transmittance_acq_script.R
 ```
 
 All files (as shown), or the files of interest, can be copied to the
@@ -476,7 +461,7 @@ citation("ooacquire")
 #> To cite package 'ooacquire' in publications use:
 #> 
 #>   Aphalo P, Ylianttila L (2026). _ooacquire: Acquire Data from OO
-#>   Spectrometers_. R package version 0.5.5.9000,
+#>   Spectrometers_. R package version 0.5.5.9001,
 #>   <https://docs.r4photobiology.info/ooacquire/>.
 #> 
 #> A BibTeX entry for LaTeX users is
@@ -485,7 +470,7 @@ citation("ooacquire")
 #>     title = {ooacquire: Acquire Data from OO Spectrometers},
 #>     author = {Pedro J. Aphalo and Lasse Ylianttila},
 #>     year = {2026},
-#>     note = {R package version 0.5.5.9000},
+#>     note = {R package version 0.5.5.9001},
 #>     url = {https://docs.r4photobiology.info/ooacquire/},
 #>   }
 ```

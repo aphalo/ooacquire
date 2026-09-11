@@ -102,7 +102,7 @@ Use function \code{\link{rm_jwrapper}()} for individual
   objects in the R workspace.
 
 Other Functions and methods related to instrument descriptors.:
-\code{\link[=files_s_irrad_updt]{files_s_irrad_updt()}},
+\code{\link[=files_s_irrad_update]{files_s_irrad_update()}},
 \code{\link[=instr_defaults]{instr_defaults()}},
 \code{\link[=rm_jwrapper]{rm_jwrapper()}},
 \code{\link[=update_bad_pixs]{update_bad_pixs()}}

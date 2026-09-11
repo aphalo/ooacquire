@@ -69,11 +69,11 @@ library(ooacquire)
 # acq_fraction_interactive(qty.out = "Rfr", type = "specular")
 
 ## ----eval=FALSE---------------------------------------------------------------
-# filepath <- system.file("example-scripts", "irrad-acq-interac.R", package="ooacquire")
+# filepath <- system.file("extdata/example-scripts", "irrad-acq-interac.R", package="ooacquire")
 # file.copy(from = filepath, to = ".")
 
 ## ----eval=FALSE---------------------------------------------------------------
-# folderpath <- system.file("example-scripts", package="ooacquire")
+# folderpath <- system.file("extdata/example-scripts", package="ooacquire")
 # list.files(path = folderpath, pattern = ".*[.]R")
 # file.copy(from = list.files(path = folderpath, pattern = ".*[.]R", full.names = TRUE), to = ".")
 

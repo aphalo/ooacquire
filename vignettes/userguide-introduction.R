@@ -13,7 +13,7 @@ library(ggspectra)
 library(ooacquire)
 
 ## -----------------------------------------------------------------------------
-file_names <- list(light = paste(folderpath, "irrad-files/light-short.txt", sep = "/"))
+file_names <- list(light = paste(folderpath, "foreign-files/light-short.txt", sep = "/"))
 
 ## -----------------------------------------------------------------------------
 one_file.spct <- 
@@ -47,11 +47,11 @@ getInstrDesc(one_file.spct)
 getInstrSettings(one_file.spct)
 
 ## -----------------------------------------------------------------------------
-file_names <- list(light = paste(folderpath, c("irrad-files/light-short.txt",
-                             "irrad-files/light-long.txt"), sep = "/"),
-                   filter = paste(folderpath, "irrad-files/flt-long.txt", sep = "/"),
-                   dark = paste(folderpath, c("irrad-files/dark-short.txt",
-                            "irrad-files/dark-long.txt"), sep = "/"))
+file_names <- list(light = paste(folderpath, c("foreign-files/light-short.txt",
+                             "foreign-files/light-long.txt"), sep = "/"),
+                   filter = paste(folderpath, "foreign-files/flt-long.txt", sep = "/"),
+                   dark = paste(folderpath, c("foreign-files/dark-short.txt",
+                            "foreign-files/dark-long.txt"), sep = "/"))
 
 ## -----------------------------------------------------------------------------
 five_files.spct <- 
@@ -96,9 +96,9 @@ knitr::kable(
 )
 
 ## -----------------------------------------------------------------------------
-file_names <- list(light = paste(folderpath, "irrad-files/light_MAYP112785.txt", sep = "/"),
-#                    filter = paste(folderpath, "irrad-files/filter_MAYP112785.txt", sep = "/"),
-                    dark = paste(folderpath, "irrad-files/dark_MAYP112785.txt", sep = "/"))
+file_names <- list(light = paste(folderpath, "foreign-files/light_MAYP112785.txt", sep = "/"),
+#                    filter = paste(folderpath, "foreign-files/filter_MAYP112785.txt", sep = "/"),
+                    dark = paste(folderpath, "foreign-files/dark_MAYP112785.txt", sep = "/"))
 
 ## -----------------------------------------------------------------------------
 ov_files.raw_mspct <- 

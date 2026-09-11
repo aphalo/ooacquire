@@ -980,7 +980,7 @@ acq_irrad_interactive <-
                               "/", getMultipleWl(irrad.spct),
                               ")",
                               sep = "")
-          if (packageVersion("photobiology") < "0.14.2.9001") {
+          if (utils::packageVersion("photobiology") < "0.14.2.9001") {
             plot.spct <- pull_sample(irrad.spct,
                                      size = plot.lines.max)
           } else {

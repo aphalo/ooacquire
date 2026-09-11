@@ -58,6 +58,6 @@ Other functions for conversion of raw-counts data:
 \code{\link[=raw2cps]{raw2cps()}},
 \code{\link[=s_fraction_corrected]{s_fraction_corrected()}},
 \code{\link[=s_irrad_corrected]{s_irrad_corrected()}},
-\code{\link[=s_irrad_corrected_updt]{s_irrad_corrected_updt()}}
+\code{\link[=s_irrad_update]{s_irrad_update()}}
 }
 \concept{functions for conversion of raw-counts data}

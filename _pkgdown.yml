@@ -56,6 +56,7 @@ reference:
     - check_sn_match
     - QC_dark
     - rm_jwrapper
+    - files_rm_jwrapper
     - update_bad_pixs
     - update_instr_desc
 
@@ -88,7 +89,8 @@ reference:
     - raw2corr_cps
     - raw2cps
     - s_irrad_corrected
-    - s_irrad_corrected_updt
+    - s_irrad_update
+    - files_s_irrad_update
     - s_fraction_corrected
     - which_descriptor
 
@@ -140,6 +142,18 @@ reference:
     - FLMS00440_descriptors
     - FLMS00673_descriptors
     - FLMS04133_descriptors
+
+  - subtitle: Example R scripts
+    desc: Scripts that illustrate the use of 'ooacquire' to acquire spectral data in different situations.
+    contents:
+    - example-scripts
+
+  - subtitle: Example R and foreign data files
+    desc: These files are used in the documentatikon for testing the package.
+    contents:
+    - foreign-files
+    - photobiology-files
+
 
 navbar:
   structure:

@@ -9,11 +9,11 @@ library(ggspectra)
 library(ooacquire)
 
 ## -----------------------------------------------------------------------------
-file_names <- list(light = c("irrad-files/light-short.txt",
-                             "irrad-files/light-long.txt"),
-                   filter = "irrad-files/flt-long.txt",
-                   dark = c("irrad-files/dark-short.txt",
-                            "irrad-files/dark-long.txt"))
+file_names <- list(light = c("foreign-files/light-short.txt",
+                             "foreign-files/light-long.txt"),
+                   filter = "foreign-files/flt-long.txt",
+                   dark = c("foreign-files/dark-short.txt",
+                            "foreign-files/dark-long.txt"))
 
 ## -----------------------------------------------------------------------------
 irrad.spct <- 

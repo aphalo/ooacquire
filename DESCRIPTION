@@ -1,8 +1,8 @@
 Package: ooacquire
 Type: Package
 Title: Acquire Data from OO Spectrometers
-Version: 0.5.5.9001
-Date: 2026-09-07
+Version: 0.5.5.9002
+Date: 2026-09-11
 Authors@R:
    c(
     person("Pedro J.", "Aphalo", email = "pedro.aphalo@helsinki.fi", role = c("aut", "trl", "cre")),
@@ -18,8 +18,8 @@ Description: Functions to acquire data directly from Ocean Optics spectrometers,
 License: GPL (>= 2)
 Depends:
     R (>= 4.2.0),
-    photobiology (>= 0.14.0),
-    ggspectra (>= 0.3.17),
+    photobiology (>= 0.14.2),
+    ggspectra (>= 0.4.0),
     lubridate (>= 1.9.4)
 Imports:
     grDevices,
@@ -27,7 +27,7 @@ Imports:
     stats,
     methods,
     tibble (>= 3.2.0),
-    ggplot2 (>= 3.4.0),
+    ggplot2 (>= 4.0.0),
     caTools (>= 1.18.2),
     Rcpp (>= 1.1.0),
     photobiologyWavebands (>= 0.5.4),

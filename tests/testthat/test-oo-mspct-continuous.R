@@ -111,9 +111,9 @@ test_that("ooacquire irrad continuous MAYA files irrad update", {
 
   expect_no_error(
     targetted.files <-
-      files_s_irrad_updt(path = "test-irrad-mspct-maya-data",
-                         save.files = FALSE,
-                         verbose = FALSE)
+      files_s_irrad_update(path = "test-irrad-mspct-maya-data",
+                           save.files = FALSE,
+                           verbose = FALSE)
   )
   expect_equal(targetted.files, character(0))
 

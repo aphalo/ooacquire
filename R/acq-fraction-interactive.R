@@ -825,7 +825,7 @@ acq_fraction_interactive <-
                               "/", getMultipleWl(filter.spct),
                               ")",
                               sep = "")
-          if (packageVersion("photobiology") <= "0.14.2.9001") {
+          if (utils::packageVersion("photobiology") <= "0.14.2.9001") {
             plot.spct <- pull_sample(filter.spct,
                                      size = plot.lines.max)
           } else {

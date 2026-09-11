@@ -6,9 +6,9 @@
 #' current version of 'ooacquire'.
 #'
 #' @inheritParams files_rm_jwrapper
-#' @inheritParams s_irrad_corrected_updt
+#' @inheritParams s_irrad_update
 #' @param trim.descriptor logical Passed to
-#'   \code{\link{s_irrad_corrected_updt}()}.  If TRUE the spectrometer
+#'   \code{\link{s_irrad_update}()}.  If TRUE the spectrometer
 #'   calibration constants, pixel wavelengths, slit-function "tail-correction"
 #'   function code and other calibration-related information is deleted.
 #'
@@ -17,13 +17,13 @@
 #' with 'ooacquire' contain embedded calibration data and correction algorithms
 #' that by default are used when spectral irradiance is computed. In addition,
 #' quality control of raw counts data has been enhanced. Function
-#' \code{\link{s_irrad_corrected_updt}()} uses the current matching
+#' \code{\link{s_irrad_update}()} uses the current matching
 #' descriptor, quality control and conversion default settings.
 #'
 #' This function, searches folders for files with names matching \code{pattern},
 #' loads them one by one if modified before the \code{date.limit}, removes the
 #' Java wrapper if present and recomputes spectral irradiance with
-#' \code{\link{s_irrad_corrected_updt}()} and saves the updated objects into a
+#' \code{\link{s_irrad_update}()} and saves the updated objects into a
 #' file with the original name after renaming the original file. If the
 #' \code{"raw_mspct"} object is not accompanied by a \code{"source_spct"}
 #' object with a matching name, the file is skipped.
@@ -45,16 +45,16 @@
 #' files are saved.
 #'
 #' @seealso \code{\link{ls}()}, \code{\link{list.files}()},
-#'   \code{\link{s_irrad_corrected_updt}()} which are used to list
+#'   \code{\link{s_irrad_update}()} which are used to list
 #'   objects and files, and to update spectral irradiance, respectively.
 #'
 #' @family Functions and methods related to instrument descriptors.
-#' @seealso Use function \code{\link{s_irrad_corrected_updt}()} for individual
+#' @seealso Use function \code{\link{s_irrad_update}()} for individual
 #'   objects in the R workspace.
 #'
 #' @export
 #'
-files_s_irrad_updt <-
+files_s_irrad_update <-
   function(path = ".",
            pattern = "\\.spct\\.[Rr]da",
            recursive = TRUE,
@@ -120,16 +120,16 @@ files_s_irrad_updt <-
           next()
         }
         temp <- rm_jwrapper(temp, verbose = verbose)
-        z <- s_irrad_corrected_updt(x = temp,
-                                    y = y,
-                                    spct.names = spct.names,
-                                    correction.method = correction.method,
-                                    hdr.tolerance = hdr.tolerance,
-                                    return.cps = NULL,
-                                    trim.descriptor = NULL,
-                                    which = which,
-                                    which.not = which.not,
-                                    verbose = verbose)
+        z <- s_irrad_update(x = temp,
+                            y = y,
+                            spct.names = spct.names,
+                            correction.method = correction.method,
+                            hdr.tolerance = hdr.tolerance,
+                            return.cps = NULL,
+                            trim.descriptor = NULL,
+                            which = which,
+                            which.not = which.not,
+                            verbose = verbose)
 
         assign(obj, temp)
         assign(source.obj, z)
