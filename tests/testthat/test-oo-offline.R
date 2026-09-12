@@ -26,8 +26,8 @@ test_that("SpectraSuite", {
   expect_equal(getWhatMeasured(ss.spct), "File: pheno1normal.txt")
   expect_equal(getTimeUnit(ss.spct), "unknown")
   expect_gt(length(comment(ss.spct)), 0)
-  expect_equal(as.numeric(getWhenMeasured(ss.spct), tz = "EET"),
-               as.numeric(ymd_hms("2016-10-11 11:23:05", tz = "UTC"), tz = "EET"))
+  expect_equal(as.numeric(getWhenMeasured(ss.spct) -
+                    ymd_hms("2016-10-11 11:23:05", tz = "UTC")), 0)
 })
 
 
@@ -54,8 +54,8 @@ test_that("SpectraSuite comma", {
   expect_equal(getWhatMeasured(ss.spct), "File: pheno1normal.txt")
   expect_equal(getTimeUnit(ss.spct), "unknown")
   expect_gt(length(comment(ss.spct)), 0)
-  expect_equivalent(getWhenMeasured(ss.spct),
-                    ymd_hms("2016-10-11 11:23:05", tz = "UTC"))
+  expect_equal(as.numeric(getWhenMeasured(ss.spct) -
+                    ymd_hms("2016-10-11 11:23:05", tz = "UTC")), 0)
 })
 
 test_that("SpectraSuite comma multiple", {
@@ -84,10 +84,10 @@ test_that("SpectraSuite comma multiple", {
   expect_is(ss.mspct[["light"]], "raw_spct")
   expect_is(ss.mspct[["dark"]], "raw_spct")
   expect_named(ss.mspct[["light"]], c("w.length", "counts"))
-  expect_equivalent(getWhenMeasured(ss.mspct[["light"]]),
-                    ymd_hms("2016-10-11 11:23:05", tz = "UTC"))
-  expect_equivalent(getWhenMeasured(ss.mspct[["dark"]]),
-                    ymd_hms("2016-10-11 11:23:53", tz = "UTC"))
+  expect_equal(as.numeric(getWhenMeasured(ss.mspct[["light"]]) -
+                    ymd_hms("2016-10-11 11:23:05", tz = "UTC")), 0)
+  expect_equal(as.numeric(getWhenMeasured(ss.mspct[["dark"]]) -
+                    ymd_hms("2016-10-11 11:23:53", tz = "UTC")), 0)
   expect_equal(getWhereMeasured(ss.mspct[["light"]]),
                tibble(lon = NA_real_, lat = NA_real_, address = NA_character_))
   expect_equal(getWhatMeasured(ss.mspct[["light"]]), "File: pheno1normal.txt")
