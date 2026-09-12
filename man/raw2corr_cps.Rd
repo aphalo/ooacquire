@@ -38,10 +38,10 @@ a cps_spct object with one spectrum preserving the metadata present in
 }
 \description{
 Replace data from bad pixels with interpolated values, replace data from
-saturated and nearby pixels withs NAs, apply linearization function if data
+saturated and nearby pixels with NAs, apply linearization function if data
 is not already linearized, optionally use a range of pixels as dark
 reference, convert the raw counts for each integration time used into
-counts-per-second, if data from bracketed intergartion times is available,
+counts-per-second, if data from bracketed integration times is available,
 splice the different spectra.
 }
 \section{Methods (by class)}{
@@ -54,6 +54,8 @@ splice the different spectra.
 
 }}
 \seealso{
+\code{\link[photobiology]{despike}()}
+
 Other functions for conversion of raw-counts data:
 \code{\link[=raw2cps]{raw2cps()}},
 \code{\link[=s_fraction_corrected]{s_fraction_corrected()}},

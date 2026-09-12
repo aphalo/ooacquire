@@ -1,10 +1,10 @@
 #' Convert raw detector counts into counts-per-second
 #'
 #' Replace data from bad pixels with interpolated values, replace data from
-#' saturated and nearby pixels withs NAs, apply linearization function if data
+#' saturated and nearby pixels with NAs, apply linearization function if data
 #' is not already linearized, optionally use a range of pixels as dark
 #' reference, convert the raw counts for each integration time used into
-#' counts-per-second, if data from bracketed intergartion times is available,
+#' counts-per-second, if data from bracketed integration times is available,
 #' splice the different spectra.
 #'
 #' @param x raw_spct object.
@@ -15,6 +15,8 @@
 #'
 #' @return a cps_spct object with one spectrum preserving the metadata present in
 #'   \code{x}.
+#'
+#' @seealso \code{\link[photobiology]{despike}()}
 #'
 #' @family functions for conversion of raw-counts data
 #'
@@ -65,9 +67,10 @@ raw2corr_cps.raw_spct <-
     if (despike) {
       spike.wls <- photobiology::spikes(x, ...)[["w.length"]]
       if (length(spike.wls) > 0) {
-        warning("Despiking as spikes were detected at: ",
-                paste(round(spike.wls, digits = 0), collapse = ", "), " nm.")
-        x <- photobiology::despike(x, ...) # may need to adjust arguments
+        warning("Found ", length(spike.wls), " at: ",
+                paste(round(spike.wls, digits = 0), collapse = ", "),
+                " nm. Despiking.")
+        x <- photobiology::despike(x, na.rm = FALSE, ...) # may need to adjust arguments
       }
     }
     x
