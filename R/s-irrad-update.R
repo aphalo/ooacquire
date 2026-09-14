@@ -14,7 +14,7 @@
 #' @inherit s_irrad_corrected return
 #'
 #' @family functions for conversion of raw-counts data
-#' @seealso copy_attributes
+#' @seealso \code{\link[photobiology]{copy_attributes}()}
 #'
 #' @details When raw counts data are acquired with
 #'   \code{acq_irrad_interactive()} or imported from text files from other
@@ -29,18 +29,19 @@
 #'   necessary or preferable to use the updated calibrations when computing
 #'   spectral irradiance.
 #'
-#'   In \code{s_irrad_corrected_updt()} the \code{instr.desc} attribute in
+#'   In \code{s_irrad_update()} the \code{instr.desc} attribute in
 #'   \code{x} is matched based on spectrometer serial number, date and entrance
 #'   optics to the possibly updated version of the same calibration data in the
 #'   current version of 'ooacquire'. The instrument descriptor is replaced in a
 #'   local copy of \code{x} and this local copy used to compute spectral
 #'   irradiance with \code{s_irrad_corrected()}, without altering \code{x}.
 #'   Explicit arguments passed to parameters in the call to
-#'   \code{s_irrad_corrected_updt()} are used in the call to
-#'   \code{s_irrad_corrected()}, however, defaults are in some cases different.
+#'   \code{s_irrad_update()} are used in the call to
+#'   \code{\link{s_irrad_corrected}()}, however, defaults are in some cases
+#'   different.
 #'
 #'   If an argument is passed to parameter \code{y} and the value of the
-#'   \code{when.measured} attribute and spectrometer serial number match between
+#'   spectrometer serial number attributes match between
 #'   \code{x} and \code{y}, default arguments for \code{return.cps} and
 #'   \code{correction.method} are based on metadata from  \code{y}. In this case
 #'   attributes unrelated to to those in the raw data or their conversion,
@@ -50,7 +51,7 @@
 #'   \code{which.not} in the call. This creates, as close as possible an updated
 #'   version of \code{y}. Attributes \code{"instr.desc"},
 #'   \code{"instr.settings"}, \code{"when.measured"} and several others set by
-#'   \code{s_irrad_corrected()} are never updates in the returned value to
+#'   \code{s_irrad_corrected()} are never updated in the returned value to
 #'   ensure they remain valid. Other attributes including
 #'   \code{"what.measured"}, \code{"where.measured"}, \code{"how.measured"},
 #'   \code{"comment"}, are copied by default. If names are passed in an argument
@@ -58,6 +59,8 @@
 #'   allowed. However, exclusion of attributes named in the union of the
 #'   argument passed to \code{which.not} and those not excluded by default takes
 #'   precedence.
+#'
+#' @inheritSection s_irrad_corrected  Computation of spectral irradiance
 #'
 #' @note Entrance optics metadata have been saved in the instrument descriptor
 #'   only since 'ooacquire' (>= 0.5.3) and correction method only from 'ooacquire'
@@ -75,9 +78,7 @@
 s_irrad_update <-
   function(x,
            y = NULL,
-           spct.names = list(light = "light",
-                             filter = "filter",
-                             dark = "dark"),
+           spct.names = find_spct_names(x),
            correction.method = NULL,
            hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
            return.cps = NULL,

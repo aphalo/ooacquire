@@ -38,18 +38,17 @@ assuming they have been created with 'ooacquire' (>= 0.2.5 2022-09-30).}
 members, named \code{"light"}, \code{"dark"} and \code{"filter"}, used to
 map names in \code{x} to the measuring protocol; for time series,
 \code{"light"} is a vector of length > 1, while \code{"dark"} and
-\code{"filter"} have always length = 1. The default is suitable for single
-spectra and must be overridden for time series.}
+\code{"filter"} have always length = 1 if present.}
 
 \item{correction.method}{A named list of constants and functions defining the
 method to be used for stray light and dark signal corrections.}
 
-\item{hdr.tolerance}{numeric Tolerance for mean deviation among cps columns as
-a fraction of one. Used in check of HDR consistency. A negative value
+\item{hdr.tolerance}{numeric Tolerance for mean deviation among cps columns
+as a fraction of one. Used in check of HDR consistency. A negative value
 disables merging using only the data for the shortest integration time.}
 
-\item{return.cps}{logical Useful when there is no need to apply a calibration,
-such as when computing new calibration multipliers.}
+\item{return.cps}{logical Useful when there is no need to apply a
+calibration, such as when computing new calibration multipliers.}
 
 \item{trim.descriptor}{logical Passed to
 \code{\link{s_irrad_update}()}.  If TRUE the spectrometer

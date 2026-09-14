@@ -1,13 +1,14 @@
 #' Convert raw counts data into spectral irradiance or fluence
 #'
 #' @param x A named list of one to three vectors of file names, with names
-#'   "light", "filter", and "dark". Or a raw_mspt object, or a raw_spct object.
+#'   containing "light", "filter", and "dark". Or a \code{raw_mspt} or a
+#'   \code{raw_spct} object with similarly named members, or with any name
+#'   if a suitable mapping is passed through parameter \code{spct.names}.
 #' @param spct.names named list of character vectors, with one, two or three
 #'   members, named \code{"light"}, \code{"dark"} and \code{"filter"}, used to
 #'   map names in \code{x} to the measuring protocol; for time series,
 #'   \code{"light"} is a vector of length > 1, while \code{"dark"} and
-#'   \code{"filter"} have always length = 1. The default is suitable for single
-#'   spectra and must be overridden for time series.
+#'   \code{"filter"} have always length = 1 if present.
 #' @param correction.method A named list of constants and functions defining the
 #'   method to be used for stray light and dark signal corrections.
 #' @param hdr.tolerance numeric Tolerance for mean deviation among cps columns
@@ -29,14 +30,7 @@
 #' @param ... Named arguments passed to \code{photobiology::cps2irrad} which is
 #'   the final calculation step.
 #'
-#' @details Method \code{s_irrad_corrected()} computes spectral irradiance from
-#'   raw detector counts from an Ocean Optics spectrometer. Depending on both
-#'   the calibration data and the raw-counts data available different
-#'   corrections can be applied. Raw counts data can be acquired using different
-#'   protocols, and which one was used limits what corrections are applicable.
-#'   If \code{return.cps = TRUE} is passed, then counts-per-second are computed
-#'   instead of irradiances, applying only the wavelength calibration.
-#'
+#' @details
 #'   When raw data are acquired with function \code{acq_irrad_interactive()} the
 #'   raw-counts are returned in an object of class \code{raw_mspct}. The
 #'   embedded metadata include the wavelength calibration, irradiance
@@ -45,10 +39,23 @@
 #'   compute spectral irradiance.
 #'
 #'   The specialization \code{s_irrad_corrected.list} allows processing of files
-#'   written by OceanOptics' SpectraSuite software. Some of the metadata can be
+#'   written by Ocean Optics' SpectraSuite software. Some of the metadata can be
 #'   extracted from file headers, but other, such as the calibration data
 #'   cannot. Based on the date of data acquisition and instrument serial number
 #'   a matching calibration is searched for and must be available.
+#'
+#' @section Computation of spectral irradiance:
+#'   Method \code{s_irrad_corrected()} computes spectral irradiance from
+#'   raw detector counts from an Ocean Optics spectrometer. Function
+#'   \code{s_irrad_update()} calls \code{s_irrad_corrected()} on a copy of
+#'   \code{x} with its calibration data updated.
+#'
+#'   Depending on both
+#'   the calibration data and the raw-counts data available different
+#'   corrections can be applied. Raw counts data can be acquired using different
+#'   protocols, and which one was used limits what corrections are applicable.
+#'   If \code{return.cps = TRUE} is passed, then counts-per-second are computed
+#'   instead of irradiances, applying only the wavelength calibration.
 #'
 #'   The supported protocols include single-integration time and
 #'   integration-time bracketing, a dark reference measurement or use of dark
@@ -56,25 +63,31 @@
 #'   UV region or not. A correction for the slit function is applied
 #'   non-recursively if included in the calibration.
 #'
-#'   Three measurement are recognized: a "light" measurement, a "filter"
+#'   Three measurement events are recognized: a "light" measurement, a "filter"
 #'   measurement using a polycarbonate filter and a dark measurement. Only the
 #'   "light" measurement is mandatory. All three measurements should have been
 #'   acquired with exactly the same settings in the spectrometer, with the same
 #'   instrument, and close enough in time to avoid background signal drift due
 #'   to temperature changes.
 #'
+#'   The returned object is by default a \code{source_spct} object as long as
+#'   spectrometer calibration data are available, and a \code{cps_spct} object
+#'   otherwise. It is possible to force the return of a \code{cps_spct} object.
+#'
 #'   Passing \code{trim.descriptor = TRUE} ensures that the data objects
-#'   returned are significantly smaller in size as calibration data are removed
-#'   and free of references to code in 'ooacquire', which is crucial for the
-#'   portability of the spectral data. By default, the descriptor is trimmed
-#'   when the returned object is a `source_spct` object and not trimmed when the
-#'   returned object is a `cps_spct`.
+#'   returned are significantly smaller in size as calibration data are removed.
+#'   By default, the descriptor is trimmed when the returned object is a
+#'   `source_spct` object and not trimmed when the returned object is a
+#'   `cps_spct`.
 #'
 #' @return A \code{source_spct} or a \code{cps_spct} object.
 #'
 #' @family functions for conversion of raw-counts data
 #'
 #' @export
+#'
+#' @examples
+#' s_irrad_corrected(x = white_grow_LED.raw_mspct)
 #'
 s_irrad_corrected <- function(x, ...) UseMethod("s_irrad_corrected")
 
@@ -114,9 +127,7 @@ s_irrad_corrected.list <-
 
     corrected.spct <-
       s_irrad_corrected(x = raw.mspct,
-                        spct.names = c(light = "light",
-                                       filter = "filter",
-                                       dark = "dark"),
+                        spct.names = find_spct_names(x),
                         correction.method = correction.method,
                         hdr.tolerance = hdr.tolerance,
                         return.cps = return.cps,
@@ -138,9 +149,7 @@ s_irrad_corrected.list <-
 #' @export
 s_irrad_corrected.raw_mspct <-
   function(x,
-           spct.names = list(light = "light",
-                             filter = "filter",
-                             dark = "dark"),
+           spct.names = find_spct_names(x),
            correction.method = NULL,
            hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
            return.cps = FALSE,
@@ -526,3 +535,98 @@ which_descriptor <-
 
     descriptor
   }
+
+#' Find names of raw-counts members
+#'
+#' Find member names matching the different stages of a measurement protocol.
+#'
+#' @param x raw_spct or list object with named members.
+#' @param qty character The physical quantity whose calculation the spectra in
+#'   \code{x} are intended for. Currently only \code{"s.irrad"} is supported.
+#' @param verbose logical If \code{TRUE} issue informative messages.
+#'
+#' @return A named list of character vectors containing member names for each
+#'   stage of a measurement protocol.
+#'
+#' @details When \code{qty = "irrad"} is passed in the call, search for members
+#'   of \code{x} with names containing each of the character strings
+#'   \code{"dark"}, \code{"filter"}, and \code{"light"}, returning them in a
+#'   list of character vectors with members named \code{"dark"},
+#'   \code{"filter"}, and \code{"light"}. In case of no matching names in
+#'   \code{x} the corresponding member of the returned list is missing. Thus,
+#'   when no matches are found for any of the three strings, the object returned
+#'   is \code{list()}, the empty list.
+#'
+#'   When data have been acquired with `acq_irrad_interactive()` both single
+#'   and time series measurements and all default protocols are supported when
+#'   using default measurement protocols or if user created protocols use names
+#'   that contain suitable matched strings embedded.
+#'
+#'   When data are imported with `read_files2mspct()` the names are always set
+#'   by the user, and for this function to work correctly, the names used must
+#'   contain suitable matched strings embedded.
+#'
+#'   When \code{x} contains members named not following the convention expected
+#'   by \code{find_spct_names()}, a mapping of member names to protocol steps
+#'   can be created using a different approach, either manually or in user
+#'   written code.
+#'
+#' @export
+#'
+#' @seealso Function \code{find_spct_names()} is used to set the default
+#'   argument for formal parameter \code{spct.names} in
+#'   \code{\link{s_irrad_corrected}()} and \code{\link{s_irrad_update}()}.
+#'
+#' @examples
+#' find_spct_names(x = white_grow_LED.raw_mspct)
+#' find_spct_names(x = white_grow_LED.raw_mspct, verbose = TRUE)
+#' find_spct_names(x = sun001.raw_mspct, verbose = TRUE)
+#'
+find_spct_names <- function(x,
+                            qty = "s.irrad",
+                            verbose = getOption("photobiology.verbose",
+                                                default = FALSE)) {
+  stopifnot(is.raw_mspct(x) || is.list(x))
+  # relative fraction measurements not yet implemented
+  stopifnot(qty %in% c("irrad", "s.irrad", "s.q.irrad", "s.e.irrad"))
+
+  spct.names <- list()
+
+  names <- names(x)
+  if (is.null(names)) {
+    if (verbose) {
+      message("'x' lacks names! No names returned")
+    }
+    return(spct.names)
+  }
+
+  if (any(grepl("sample", names)) || !any(grepl("light", names))) {
+    warning("'x' does not contain raw-counts data for irradiance")
+  }
+
+  spct.names[["dark"]] <- names[grepl("dark", names)]
+  if (length(spct.names[["dark"]]) > 1L) {
+    list[["dark"]] <- spct.names[["dark"]][1]
+    warning("'x' contains more than one \"dark\" spectrum. ",
+            "Using: ", spct.names[["dark"]])
+  }
+
+  spct.names[["filter"]] <- names[grepl("filter", names)]
+  if (length(spct.names[["filter"]]) > 1L) {
+    spct.names[["filter"]] <-  spct.names[["filter"]][1]
+    warning("'x' contains more than one \"filter\" spectrum. ",
+            "Using: ",  spct.names[["filter"]])
+  }
+
+  spct.names[["light"]] <- names[grepl("light", names)]
+
+  spct.names <- spct.names[sapply(spct.names, length) > 0L]
+  if (verbose || length(spct.names[["light"]]) < 1L) {
+    message("Found data for protocol: \"",
+            paste(names(spct.names), collapse = ", "),
+            "\" with ", length(spct.names[["light"]]), " \"light\" ",
+            ifelse(length(spct.names[["light"]]) == 1L,
+                   "spectrum.", "spectra."))
+  }
+  spct.names
+}

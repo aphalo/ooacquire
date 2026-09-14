@@ -7,7 +7,7 @@
 s_irrad_update(
   x,
   y = NULL,
-  spct.names = list(light = "light", filter = "filter", dark = "dark"),
+  spct.names = find_spct_names(x),
   correction.method = NULL,
   hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
   return.cps = NULL,
@@ -19,7 +19,9 @@ s_irrad_update(
 }
 \arguments{
 \item{x}{A named list of one to three vectors of file names, with names
-"light", "filter", and "dark". Or a raw_mspt object, or a raw_spct object.}
+containing "light", "filter", and "dark". Or a \code{raw_mspt} or a
+\code{raw_spct} object with similarly named members, or with any name
+if a suitable mapping is passed through parameter \code{spct.names}.}
 
 \item{y}{source_spct Object containing spectral irradiance earlier
 computed from the same \code{raw_mspct} object as passed to \code{x}.}
@@ -28,22 +30,21 @@ computed from the same \code{raw_mspct} object as passed to \code{x}.}
 members, named \code{"light"}, \code{"dark"} and \code{"filter"}, used to
 map names in \code{x} to the measuring protocol; for time series,
 \code{"light"} is a vector of length > 1, while \code{"dark"} and
-\code{"filter"} have always length = 1. The default is suitable for single
-spectra and must be overridden for time series.}
+\code{"filter"} have always length = 1 if present.}
 
 \item{correction.method}{A named list of constants and functions defining the
 method to be used for stray light and dark signal corrections.}
 
-\item{hdr.tolerance}{numeric Tolerance for mean deviation among cps columns as
-a fraction of one. Used in check of HDR consistency. A negative value
+\item{hdr.tolerance}{numeric Tolerance for mean deviation among cps columns
+as a fraction of one. Used in check of HDR consistency. A negative value
 disables merging using only the data for the shortest integration time.}
 
-\item{return.cps}{logical Useful when there is no need to apply a calibration,
-such as when computing new calibration multipliers.}
+\item{return.cps}{logical Useful when there is no need to apply a
+calibration, such as when computing new calibration multipliers.}
 
 \item{trim.descriptor}{logical If \code{TRUE} the spectrometer calibration
-constants, pixel wavelengths, slit-function "tail-correction"
-function code and other calibration-related information is deleted.}
+constants, pixel wavelengths, slit-function "tail-correction" function code
+and other calibration-related information is deleted.}
 
 \item{which, which.not}{character Names of attributes to copy or
 not to copy.}
@@ -72,18 +73,19 @@ When raw counts data are acquired with
   necessary or preferable to use the updated calibrations when computing
   spectral irradiance.
 
-  In \code{s_irrad_corrected_updt()} the \code{instr.desc} attribute in
+  In \code{s_irrad_update()} the \code{instr.desc} attribute in
   \code{x} is matched based on spectrometer serial number, date and entrance
   optics to the possibly updated version of the same calibration data in the
   current version of 'ooacquire'. The instrument descriptor is replaced in a
   local copy of \code{x} and this local copy used to compute spectral
   irradiance with \code{s_irrad_corrected()}, without altering \code{x}.
   Explicit arguments passed to parameters in the call to
-  \code{s_irrad_corrected_updt()} are used in the call to
-  \code{s_irrad_corrected()}, however, defaults are in some cases different.
+  \code{s_irrad_update()} are used in the call to
+  \code{\link{s_irrad_corrected}()}, however, defaults are in some cases
+  different.
 
   If an argument is passed to parameter \code{y} and the value of the
-  \code{when.measured} attribute and spectrometer serial number match between
+  spectrometer serial number attributes match between
   \code{x} and \code{y}, default arguments for \code{return.cps} and
   \code{correction.method} are based on metadata from  \code{y}. In this case
   attributes unrelated to to those in the raw data or their conversion,
@@ -93,7 +95,7 @@ When raw counts data are acquired with
   \code{which.not} in the call. This creates, as close as possible an updated
   version of \code{y}. Attributes \code{"instr.desc"},
   \code{"instr.settings"}, \code{"when.measured"} and several others set by
-  \code{s_irrad_corrected()} are never updates in the returned value to
+  \code{s_irrad_corrected()} are never updated in the returned value to
   ensure they remain valid. Other attributes including
   \code{"what.measured"}, \code{"where.measured"}, \code{"how.measured"},
   \code{"comment"}, are copied by default. If names are passed in an argument
@@ -107,6 +109,44 @@ Entrance optics metadata have been saved in the instrument descriptor
   only since 'ooacquire' (>= 0.5.3) and correction method only from 'ooacquire'
   (>= 0.5.6).
 }
+\section{Computation of spectral irradiance}{
+
+  Method \code{s_irrad_corrected()} computes spectral irradiance from
+  raw detector counts from an Ocean Optics spectrometer. Function
+  \code{s_irrad_update()} calls \code{s_irrad_corrected()} on a copy of
+  \code{x} with its calibration data updated.
+
+  Depending on both
+  the calibration data and the raw-counts data available different
+  corrections can be applied. Raw counts data can be acquired using different
+  protocols, and which one was used limits what corrections are applicable.
+  If \code{return.cps = TRUE} is passed, then counts-per-second are computed
+  instead of irradiances, applying only the wavelength calibration.
+
+  The supported protocols include single-integration time and
+  integration-time bracketing, a dark reference measurement or use of dark
+  sensor pixels, and a filter measurement to correct for stray light in the
+  UV region or not. A correction for the slit function is applied
+  non-recursively if included in the calibration.
+
+  Three measurement events are recognized: a "light" measurement, a "filter"
+  measurement using a polycarbonate filter and a dark measurement. Only the
+  "light" measurement is mandatory. All three measurements should have been
+  acquired with exactly the same settings in the spectrometer, with the same
+  instrument, and close enough in time to avoid background signal drift due
+  to temperature changes.
+
+  The returned object is by default a \code{source_spct} object as long as
+  spectrometer calibration data are available, and a \code{cps_spct} object
+  otherwise. It is possible to force the return of a \code{cps_spct} object.
+
+  Passing \code{trim.descriptor = TRUE} ensures that the data objects
+  returned are significantly smaller in size as calibration data are removed.
+  By default, the descriptor is trimmed when the returned object is a
+  `source_spct` object and not trimmed when the returned object is a
+  `cps_spct`.
+}
+
 \examples{
 
 # only metadata from x and the new descriptor
@@ -114,7 +154,7 @@ s_irrad_update(x = white_grow_LED.raw_mspct)
 
 }
 \seealso{
-copy_attributes
+\code{\link[photobiology]{copy_attributes}()}
 
 Other functions for conversion of raw-counts data:
 \code{\link[=raw2corr_cps]{raw2corr_cps()}},

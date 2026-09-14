@@ -142,7 +142,7 @@ uvb_corrections <-
                              verbose = verbose)
     } else if (stray.light.method != "none") {
       if (verbose) {
-        warning("Assuming pure stray light in ",
+        message("Assuming pure stray light in ",
                 stray.light.wl[1], " to ", stray.light.wl[2], " nm")
       }
       z <- no_filter_correction(x = y[["light"]],
@@ -158,7 +158,7 @@ uvb_corrections <-
 
     if (is.null(worker.fun) && stray.light.method != "none") {
       if (verbose) {
-        warning("Skipping slit function tail correction: no function available.")
+        message("Skipping slit function tail correction: no function available.")
       }
     } else {
       z <- slit_function_correction(z,
@@ -260,7 +260,7 @@ filter_correction <-
         !is.na(straylight.corrected) &&
         straylight.corrected) {
       if (verbose) {
-        warning("Skipping straylight correction: already corrected.")
+        message("Skipping straylight correction: already corrected.")
       }
       return(x)
     }
@@ -313,13 +313,13 @@ filter_correction <-
 
     # We try to avoid spureous warnings by using the mean
     if (verbose && mean_flt_cps_short < -1e4 * max_x_cps) {
-      warning("Negative mean cps in \"filter\" spectrum's ",
+      message("Negative mean cps in \"filter\" spectrum's ",
               "internal dark reference: ",
               mean_flt_cps_short)
     }
 
     if (verbose && mean_x_cps_short < -1e4 * max_x_cps) {
-      warning("Negative mean cps in \"measured\" spectrum's ",
+      message("Negative mean cps in \"measured\" spectrum's ",
               "internal dark reference: ",
               mean_x_cps_short)
     }
@@ -327,7 +327,7 @@ filter_correction <-
     # Lasse's first correction
     if (stray.light.method == "original") {
       if (verbose && anyNA(flt_clip_dark[["filter_ratio"]])) {
-        warning(paste(sum(is.na(flt_clip_dark[["filter_ratio"]])),
+        message(paste(sum(is.na(flt_clip_dark[["filter_ratio"]])),
                       " NAs in filter_ratio"))
       }
       flt_clip_dark[["filter_ratio"]] <-
@@ -443,7 +443,7 @@ no_filter_correction <-
     counts.cols <- length(grep("^cps", names(x), value = TRUE))
     if (counts.cols > 1) {
       if (verbose) {
-        warning("Multiple 'cps' variables found in 'x': ",
+        message("Multiple 'cps' variables found in 'x': ",
                 "merging them before continuing!")
       }
       x <- merge_cps(x, tolerance = hdr.tolerance)
@@ -465,7 +465,7 @@ no_filter_correction <-
     if ((mean_x_cps_medium - mean_x_cps_short) < 0.0 &&
         mean_x_cps_short < (1e-3 * max(x[["cps"]], na.rm = TRUE))) {
       if (verbose) {
-        warning("No stray light detected, skipping correction.")
+        message("No stray light detected, skipping correction.")
       }
     } else {
       x <- x - mean_x_cps_medium

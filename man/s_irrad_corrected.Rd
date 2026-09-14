@@ -27,7 +27,7 @@ s_irrad_corrected(x, ...)
 
 \method{s_irrad_corrected}{raw_mspct}(
   x,
-  spct.names = list(light = "light", filter = "filter", dark = "dark"),
+  spct.names = find_spct_names(x),
   correction.method = NULL,
   hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
   return.cps = FALSE,
@@ -49,7 +49,9 @@ s_irrad_corrected(x, ...)
 }
 \arguments{
 \item{x}{A named list of one to three vectors of file names, with names
-"light", "filter", and "dark". Or a raw_mspt object, or a raw_spct object.}
+containing "light", "filter", and "dark". Or a \code{raw_mspt} or a
+\code{raw_spct} object with similarly named members, or with any name
+if a suitable mapping is passed through parameter \code{spct.names}.}
 
 \item{...}{Named arguments passed to \code{photobiology::cps2irrad} which is
 the final calculation step.}
@@ -60,16 +62,16 @@ file is used, and if \code{NA}, date is set to NA.}
 \item{correction.method}{A named list of constants and functions defining the
 method to be used for stray light and dark signal corrections.}
 
-\item{hdr.tolerance}{numeric Tolerance for mean deviation among cps columns as
-a fraction of one. Used in check of HDR consistency. A negative value
+\item{hdr.tolerance}{numeric Tolerance for mean deviation among cps columns
+as a fraction of one. Used in check of HDR consistency. A negative value
 disables merging using only the data for the shortest integration time.}
 
-\item{return.cps}{logical Useful when there is no need to apply a calibration,
-such as when computing new calibration multipliers.}
+\item{return.cps}{logical Useful when there is no need to apply a
+calibration, such as when computing new calibration multipliers.}
 
 \item{trim.descriptor}{logical If \code{TRUE} the spectrometer calibration
-constants, pixel wavelengths, slit-function "tail-correction"
-function code and other calibration-related information is deleted.}
+constants, pixel wavelengths, slit-function "tail-correction" function code
+and other calibration-related information is deleted.}
 
 \item{descriptor}{A named list with a descriptor of the characteristics of
 the spectrometer (if serial number does not agree an error is triggered).}
@@ -86,8 +88,7 @@ names.}
 members, named \code{"light"}, \code{"dark"} and \code{"filter"}, used to
 map names in \code{x} to the measuring protocol; for time series,
 \code{"light"} is a vector of length > 1, while \code{"dark"} and
-\code{"filter"} have always length = 1. The default is suitable for single
-spectra and must be overridden for time series.}
+\code{"filter"} have always length = 1 if present.}
 }
 \value{
 A \code{source_spct} or a \code{cps_spct} object.
@@ -96,15 +97,7 @@ A \code{source_spct} or a \code{cps_spct} object.
 Convert raw counts data into spectral irradiance or fluence
 }
 \details{
-Method \code{s_irrad_corrected()} computes spectral irradiance from
-  raw detector counts from an Ocean Optics spectrometer. Depending on both
-  the calibration data and the raw-counts data available different
-  corrections can be applied. Raw counts data can be acquired using different
-  protocols, and which one was used limits what corrections are applicable.
-  If \code{return.cps = TRUE} is passed, then counts-per-second are computed
-  instead of irradiances, applying only the wavelength calibration.
-
-  When raw data are acquired with function \code{acq_irrad_interactive()} the
+When raw data are acquired with function \code{acq_irrad_interactive()} the
   raw-counts are returned in an object of class \code{raw_mspct}. The
   embedded metadata include the wavelength calibration, irradiance
   calibration, and spectrometer settings used to acquire the data. The
@@ -112,30 +105,10 @@ Method \code{s_irrad_corrected()} computes spectral irradiance from
   compute spectral irradiance.
 
   The specialization \code{s_irrad_corrected.list} allows processing of files
-  written by OceanOptics' SpectraSuite software. Some of the metadata can be
+  written by Ocean Optics' SpectraSuite software. Some of the metadata can be
   extracted from file headers, but other, such as the calibration data
   cannot. Based on the date of data acquisition and instrument serial number
   a matching calibration is searched for and must be available.
-
-  The supported protocols include single-integration time and
-  integration-time bracketing, a dark reference measurement or use of dark
-  sensor pixels, and a filter measurement to correct for stray light in the
-  UV region or not. A correction for the slit function is applied
-  non-recursively if included in the calibration.
-
-  Three measurement are recognized: a "light" measurement, a "filter"
-  measurement using a polycarbonate filter and a dark measurement. Only the
-  "light" measurement is mandatory. All three measurements should have been
-  acquired with exactly the same settings in the spectrometer, with the same
-  instrument, and close enough in time to avoid background signal drift due
-  to temperature changes.
-
-  Passing \code{trim.descriptor = TRUE} ensures that the data objects
-  returned are significantly smaller in size as calibration data are removed
-  and free of references to code in 'ooacquire', which is crucial for the
-  portability of the spectral data. By default, the descriptor is trimmed
-  when the returned object is a `source_spct` object and not trimmed when the
-  returned object is a `cps_spct`.
 }
 \section{Methods (by class)}{
 \itemize{
@@ -148,6 +121,48 @@ Method \code{s_irrad_corrected()} computes spectral irradiance from
 \item \code{s_irrad_corrected(raw_spct)}: Default for generic function.
 
 }}
+\section{Computation of spectral irradiance}{
+
+  Method \code{s_irrad_corrected()} computes spectral irradiance from
+  raw detector counts from an Ocean Optics spectrometer. Function
+  \code{s_irrad_update()} calls \code{s_irrad_corrected()} on a copy of
+  \code{x} with its calibration data updated.
+
+  Depending on both
+  the calibration data and the raw-counts data available different
+  corrections can be applied. Raw counts data can be acquired using different
+  protocols, and which one was used limits what corrections are applicable.
+  If \code{return.cps = TRUE} is passed, then counts-per-second are computed
+  instead of irradiances, applying only the wavelength calibration.
+
+  The supported protocols include single-integration time and
+  integration-time bracketing, a dark reference measurement or use of dark
+  sensor pixels, and a filter measurement to correct for stray light in the
+  UV region or not. A correction for the slit function is applied
+  non-recursively if included in the calibration.
+
+  Three measurement events are recognized: a "light" measurement, a "filter"
+  measurement using a polycarbonate filter and a dark measurement. Only the
+  "light" measurement is mandatory. All three measurements should have been
+  acquired with exactly the same settings in the spectrometer, with the same
+  instrument, and close enough in time to avoid background signal drift due
+  to temperature changes.
+
+  The returned object is by default a \code{source_spct} object as long as
+  spectrometer calibration data are available, and a \code{cps_spct} object
+  otherwise. It is possible to force the return of a \code{cps_spct} object.
+
+  Passing \code{trim.descriptor = TRUE} ensures that the data objects
+  returned are significantly smaller in size as calibration data are removed.
+  By default, the descriptor is trimmed when the returned object is a
+  `source_spct` object and not trimmed when the returned object is a
+  `cps_spct`.
+}
+
+\examples{
+s_irrad_corrected(x = white_grow_LED.raw_mspct)
+
+}
 \seealso{
 Other functions for conversion of raw-counts data:
 \code{\link[=raw2corr_cps]{raw2corr_cps()}},
