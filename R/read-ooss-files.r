@@ -81,7 +81,10 @@ read_oo_ssdata <- function(file,
         tz <- sub("S", "", tz)
       }
     }
-    time <- lubridate::parse_date_time(line03, "mdHMSy", tz = tz, locale = "C")
+    time <- lubridate::parse_date_time(x = line03,
+                                       orders = "mdHMSy",
+                                       locale = "C",
+                                       tz = tz)
     if (verbose) {
       message("File '", basename(file), "' with header time: ", time)
     }

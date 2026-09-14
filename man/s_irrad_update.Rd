@@ -7,7 +7,7 @@
 s_irrad_update(
   x,
   y = NULL,
-  spct.names = c(light = "light", filter = "filter", dark = "dark")[names(x)],
+  spct.names = list(light = "light", filter = "filter", dark = "dark"),
   correction.method = NULL,
   hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
   return.cps = NULL,
@@ -24,8 +24,12 @@ s_irrad_update(
 \item{y}{source_spct Object containing spectral irradiance earlier
 computed from the same \code{raw_mspct} object as passed to \code{x}.}
 
-\item{spct.names}{named character vector of length three, to map names in
-\code{x} to those expected.}
+\item{spct.names}{named list of character vectors, with one, two or three
+members, named \code{"light"}, \code{"dark"} and \code{"filter"}, used to
+map names in \code{x} to the measuring protocol; for time series,
+\code{"light"} is a vector of length > 1, while \code{"dark"} and
+\code{"filter"} have always length = 1. The default is suitable for single
+spectra and must be overridden for time series.}
 
 \item{correction.method}{A named list of constants and functions defining the
 method to be used for stray light and dark signal corrections.}

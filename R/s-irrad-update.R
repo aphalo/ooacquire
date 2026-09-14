@@ -75,9 +75,9 @@
 s_irrad_update <-
   function(x,
            y = NULL,
-           spct.names = c(light = "light",
-                          filter = "filter",
-                          dark = "dark")[names(x)],
+           spct.names = list(light = "light",
+                             filter = "filter",
+                             dark = "dark"),
            correction.method = NULL,
            hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
            return.cps = NULL,
@@ -159,8 +159,7 @@ s_irrad_update <-
     if (!is.null(y)) {
       y.descriptor <- photobiology::instr_descriptor(y)
       matched <-
-        y.descriptor[["spectrometer.sn"]] == x.descriptor[["spectrometer.sn"]] &&
-        photobiology::when_measured(y) == photobiology::when_measured(z)
+        y.descriptor[["spectrometer.sn"]] == x.descriptor[["spectrometer.sn"]]
 
       which.not <- union(which.not,
                          c("instr.desc",

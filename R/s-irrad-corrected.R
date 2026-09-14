@@ -2,18 +2,22 @@
 #'
 #' @param x A named list of one to three vectors of file names, with names
 #'   "light", "filter", and "dark". Or a raw_mspt object, or a raw_spct object.
-#' @param spct.names named character vector of length three, to map names in
-#'   \code{x} to those expected.
+#' @param spct.names named list of character vectors, with one, two or three
+#'   members, named \code{"light"}, \code{"dark"} and \code{"filter"}, used to
+#'   map names in \code{x} to the measuring protocol; for time series,
+#'   \code{"light"} is a vector of length > 1, while \code{"dark"} and
+#'   \code{"filter"} have always length = 1. The default is suitable for single
+#'   spectra and must be overridden for time series.
 #' @param correction.method A named list of constants and functions defining the
 #'   method to be used for stray light and dark signal corrections.
-#' @param hdr.tolerance numeric Tolerance for mean deviation among cps columns as
-#'   a fraction of one. Used in check of HDR consistency. A negative value
+#' @param hdr.tolerance numeric Tolerance for mean deviation among cps columns
+#'   as a fraction of one. Used in check of HDR consistency. A negative value
 #'   disables merging using only the data for the shortest integration time.
-#' @param return.cps logical Useful when there is no need to apply a calibration,
-#'   such as when computing new calibration multipliers.
+#' @param return.cps logical Useful when there is no need to apply a
+#'   calibration, such as when computing new calibration multipliers.
 #' @param trim.descriptor logical If \code{TRUE} the spectrometer calibration
-#'   constants, pixel wavelengths, slit-function "tail-correction"
-#'   function code and other calibration-related information is deleted.
+#'   constants, pixel wavelengths, slit-function "tail-correction" function code
+#'   and other calibration-related information is deleted.
 #' @param descriptor A named list with a descriptor of the characteristics of
 #'   the spectrometer (if serial number does not agree an error is triggered).
 #' @param locale The locale controls defaults that vary from place to place. The
@@ -134,9 +138,9 @@ s_irrad_corrected.list <-
 #' @export
 s_irrad_corrected.raw_mspct <-
   function(x,
-           spct.names = c(light = "light",
-                          filter = "filter",
-                          dark = "dark"),
+           spct.names = list(light = "light",
+                             filter = "filter",
+                             dark = "dark"),
            correction.method = NULL,
            hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
            return.cps = FALSE,

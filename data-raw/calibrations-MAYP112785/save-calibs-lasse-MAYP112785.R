@@ -10,7 +10,9 @@ descriptor$num.dark.pixs <- 20
 
 descriptor$w <- NULL
 descriptor$sr.index <- 0L
-descriptor$bad.pixs <- numeric()
+descriptor$bad.pixs <- c(88, 371, 452, 757, 992, 1939, 1995)
+
+# black.pixels <- c(1, 2, 3, 4, 2065, 2066, 2067, 2068) # all covered?
 
 # create an object with the parameters for Lasse Ylianttila's method for Maya
 MAYP112785_ylianttila.mthd <- list(

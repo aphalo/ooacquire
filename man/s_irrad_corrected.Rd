@@ -27,7 +27,7 @@ s_irrad_corrected(x, ...)
 
 \method{s_irrad_corrected}{raw_mspct}(
   x,
-  spct.names = c(light = "light", filter = "filter", dark = "dark"),
+  spct.names = list(light = "light", filter = "filter", dark = "dark"),
   correction.method = NULL,
   hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
   return.cps = FALSE,
@@ -82,8 +82,12 @@ names.}
 
 \item{verbose}{Logical indicating the level of warnings and messages wanted.}
 
-\item{spct.names}{named character vector of length three, to map names in
-\code{x} to those expected.}
+\item{spct.names}{named list of character vectors, with one, two or three
+members, named \code{"light"}, \code{"dark"} and \code{"filter"}, used to
+map names in \code{x} to the measuring protocol; for time series,
+\code{"light"} is a vector of length > 1, while \code{"dark"} and
+\code{"filter"} have always length = 1. The default is suitable for single
+spectra and must be overridden for time series.}
 }
 \value{
 A \code{source_spct} or a \code{cps_spct} object.

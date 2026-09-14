@@ -4,8 +4,13 @@ editor_options:
     wrap: 72
 ---
 
-# ooacquire 0.5.6 (2026-09-xx)
+# ooacquire 0.5.6 (2026-09-14)
 
+- KNOWN BUG: Function `read_oo_ssdata()` is failing to obey the time zone in
+the `locale` passed as argument when decoding the time stamp in file headers
+with _R running under Linux_. Locales are tricky and Ocean Optics has chosen to
+use month names in a rather unusual format. Thus, decoding can fail depending
+on the OS and OS settings. **Do check the imported spectra!** 
 - Add functions `s_irrad_update()` and `instr_defaults()`, factoring out
 code shared with `acq_irrad_interactive()`.
 - Add function `files_rm_jwrapper()` for removing the Java wrapper from
@@ -23,6 +28,9 @@ correction method used in attribute `correction.method`.
 - Update `acq_irrad_interactive()` to more consistently use times and dates in
 defaults for folder name and session. Change default collection file name to
 use the starting time instead of time when the file is saved.
+- Update calibration for MAYP112785: add information for hot pixels
+(none -> 6) and adjust calibration multiplier for pixel at 409.02 nm in 
+calibration done in 2023.
 
 # ooacquire 0.5.5 (2026-02-21)
 
