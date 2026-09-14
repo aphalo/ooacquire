@@ -13,7 +13,7 @@ use month names in a rather unusual format. Thus, decoding can fail depending
 on the OS and OS settings. **Do check the imported spectra!** 
 - Add functions `s_irrad_update()` and `instr_defaults()`, factoring out
 code shared with `acq_irrad_interactive()`.
-- Update functions `s_irrad_corected()` and `s_irrad_update()` to call new
+- Update functions `s_irrad_corrected()` and `s_irrad_update()` to call new
 function `find_spct_names()` to set default for `spct.name` argument, making
 support of time series data automatic.
 - Add function `files_rm_jwrapper()` for removing the Java wrapper from
