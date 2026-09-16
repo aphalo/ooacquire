@@ -63,7 +63,8 @@ if there is more than one for the same instrument.}
 created on-the-fly.}
 
 \item{seq.settings}{named list with numeric members \code{start.boundary},
-\code{initial.delay}, \code{"step.delay"} and \code{"num.steps"}.}
+\code{initial.delay}, \code{step.delay}, \code{step.multiplier} and
+\code{num.steps}.}
 
 \item{area}{numeric Passed to \code{o_calib2irrad_mult()}.}
 
@@ -204,9 +205,10 @@ Function \code{acq_irrad_interactive()} supports measurement of
   and saved as a single \code{cps_spct} or \code{source_spct} in long form.
 
   Time series of light measurements using single "dark" and "filter"
-  measurements are scheduled by setting four members of the named list
+  measurements are scheduled by setting five members of the named list
   passed as argument to \code{seq.settings}, or interactively through the
-  user interface.
+  user interface. If the fields are missing in the list, defaults are used
+  for these fields.
 
   The \code{initial.delay} is numeric and gives a minimum delay in
   seconds before the start of measurements with a default of 0s.

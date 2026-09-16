@@ -394,10 +394,9 @@ choose_ch_interactive <- function(instruments,
 #' Enter settings defining a sequence of spectra to be measured as a time
 #' series.
 #'
-#' @param seq.settings numeric Definition of time steps for a sequence of
-#'   repeated measurements. Named vector with member named
-#'   \code{start.boundary}, \code{"initial.delay"}, \code{"step.delay"}, and
-#'   \code{"num.steps"}.
+#' @param seq.settings named list with numeric members \code{start.boundary},
+#'   \code{initial.delay}, \code{step.delay}, \code{step.multiplier} and
+#'   \code{num.steps}.
 #' @param measurement.duration numeric Duration of one measurement event (s).
 #' @param minimum.step.delay numeric Minimum duration of \code{"step.delay"} (s).
 #' @param time.division numeric The step is forced to be a multiple of this
@@ -426,6 +425,7 @@ choose_ch_interactive <- function(instruments,
 set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
                                                     initial.delay = 0,
                                                     step.delay = 0,
+                                                    step.multiplier = 1,
                                                     num.steps = 1),
                                 measurement.duration = 0,
                                 minimum.step.delay = measurement.duration,
@@ -445,13 +445,20 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
   }
 
   # validate input
-  if (!setequal(names(seq.settings),
-      c("start.boundary", "initial.delay", "step.delay", "num.steps"))) {
+  if (!all(names(seq.settings) %in%
+      c("start.boundary", "initial.delay", "step.delay",
+        "step.multiplier", "num.steps"))) {
     warning("Resetting invalid 'seq.settings' to defaults.")
     seq.settings <- list(start.boundary = "second",
                          initial.delay = 0,
                          step.delay = 0,
+                         step.multiplier = 1,
                          num.steps = 1)
+  }
+  if (seq.settings[["step.multiplier"]] < 1) {
+    warning("'step.multiplier' >= 1 expected, but is: ",
+            seq.settings[["step.multiplier"]], ". Using 1!")
+    seq.settings[["step.multiplier"]] <- 1
   }
 
   seq.settings$step.delay <-
@@ -464,9 +471,10 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
   all.help <- c(w = "w = wait. Waiting time before start of acquisition of time series.",
                 b = "b = boundary. The time boundary at which to start acquisition of time series.",
                 s = "s = step duration. The time step between the start of succesive acquisitions in a time series.",
-                r = "r = step repetitions. The number of spectra to measure for the current time series.",
+                m = "m = step multiplier. The time step between the start of succesive acquisitions in a time series.",
+                r = "r = step repetitions. The multiplier applied to the previous delay in succesive steps for exponential increase in delay.",
                 H = "? = help. Show this help text.",
-                m = "m = MEASURE. Measure without setting/tuning integration time.",
+                g = "g = GO. Accept current series-related settings and continue.",
                 default = "- = default. Action selected by pressing \"Enter\" key.")
   help.text <- paste(all.help, collapse = "\n")
 
@@ -475,20 +483,34 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
     if (seq.settings$step.delay < measurement.duration &&
         seq.settings$step.delay != 0) {
       seq.settings$step.delay <- signif(minimum.step.delay * 1.01, 3)
-      cat("'step.delay' too short! Reset to ", seq.settings$step.delay, " s.\n", sep = "")
+      cat("'step.delay' too short! Reset to ", seq.settings$step.delay,
+          " s.\n", sep = "")
     }
     # display current settings before prompt for user input
     seq.settings.string <-
-           sprintf("Seq: wait = %.3gS, boundary = %s, step-len = %.3gS, step-reps = %i \n",
+           sprintf("Seq: wait = %.3gS, boundary = %s, step-len = %.3gS, mult. = %.3gS, step-reps = %i \n",
                    seq.settings[["initial.delay"]],
                    seq.settings[["start.boundary"]],
                    seq.settings[["step.delay"]],
+                   seq.settings[["step.multiplier"]],
                    seq.settings[["num.steps"]])
     cat(seq.settings.string)
+    if (seq.settings[["step.delay"]] > 0 &&
+        (seq.settings[["step.multiplier"]] > 1 || seq.settings[["num.steps"]])) {
+      series.duration.string <-
+        sprintf("First step = %.3gS, last step (%i) = %.3gS, series duration =  = %.3gS\n",
+                seq.settings[["step.delay"]],
+                seq.settings[["num.steps"]],
+                seq.settings[["step.delay"]] *
+                  seq.settings[["step.multiplier"]]^(seq.settings[["num.steps"]] - 1),
+                sum(seq.settings[["step.delay"]] *
+                      seq.settings[["step.multiplier"]]^(0:(seq.settings[["num.steps"]] - 1))))
+      cat(series.duration.string)
+    }
 
-    answ <- readline(prompt = "wait/boundary/step-len/step-reps/undo/help/GO (w/b/s/r/u/?/g-): ")
+    answ <- readline(prompt = "wait/boundary/step-len/step-mult/step-reps/undo/help/GO (w/b/s/m/r/u/?/g-): ")
 
-    if (answ %in% c("", "m", "g")) {
+    if (answ %in% c("", "g")) {
       break()
     }
     if (answ == "?") {
@@ -528,6 +550,13 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
         }
       } else {
         cat("Time step value not changed!\n")
+      }
+    } else if (substr(answ, 1, 1) == "m") {
+      step.mult <- read_numbers("Time-step multiplier (>= 1): ", n.max = 1)
+      if (length(step.mult) && !is.na(step.mult) && step.mult >= 1) {
+        seq.settings$step.multiplier <- step.mult
+      } else {
+        cat("Time step multiplier not changed!\n")
       }
     } else if (substr(answ, 1, 1) == "r") {
       num.steps <- readline("Number of steps (1..100000): ")

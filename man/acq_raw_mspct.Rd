@@ -11,7 +11,7 @@ acq_raw_mspct(
   f.trigger.off = NA,
   triggers.enabled = character(),
   seq.settings = list(initial.delay = 0, start.boundary = "none", step.delay = 0,
-    num.steps = 1L),
+    step.multiplier = 1, num.steps = 1L),
   protocol = c("light", "filter", "dark"),
   user.label = "",
   where.measured = data.frame(lon = NA_real_, lat = NA_real_),
@@ -33,8 +33,9 @@ immediately before and immediately after a measurement. See
 \item{triggers.enabled}{character vector Names of protocol steps during which
 trigger functions should be called.}
 
-\item{seq.settings}{list with members "initial.delay", "step,delay" numeric
-values in seconds, "num.steps" integer.}
+\item{seq.settings}{named list with numeric members \code{start.boundary},
+\code{initial.delay}, \code{step.delay}, \code{step.multiplier} and
+\code{num.steps}.}
 
 \item{protocol}{vector of character strings.}
 

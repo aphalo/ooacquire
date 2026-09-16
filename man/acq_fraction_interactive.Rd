@@ -61,7 +61,8 @@ calibration data.}
 created on-the-fly.}
 
 \item{seq.settings}{named list with numeric members \code{start.boundary},
-\code{initial.delay}, \code{"step.delay"} and \code{"num.steps"}.}
+\code{initial.delay}, \code{step.delay}, \code{step.multiplier} and
+\code{num.steps}.}
 
 \item{light.source}{character One of "continuous", "pulsed".}
 

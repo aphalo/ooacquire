@@ -276,8 +276,9 @@ acq_raw_spct <- function(descriptor,
 #'   \code{\link{acq_raw_spct}} for details.
 #' @param triggers.enabled character vector Names of protocol steps during which
 #'   trigger functions should be called.
-#' @param seq.settings list with members "initial.delay", "step,delay" numeric
-#'   values in seconds, "num.steps" integer.
+#' @param seq.settings named list with numeric members \code{start.boundary},
+#'   \code{initial.delay}, \code{step.delay}, \code{step.multiplier} and
+#'   \code{num.steps}.
 #' @param protocol vector of character strings.
 #' @param user.label character string to set as label.
 #' @param where.measured data.frame with at least columns "lon" and "lat"
@@ -304,6 +305,7 @@ acq_raw_mspct <- function(descriptor,
                           seq.settings = list(initial.delay = 0,
                                               start.boundary = "none",
                                               step.delay = 0,
+                                              step.multiplier = 1,
                                               num.steps = 1L),
                           protocol = c("light", "filter", "dark"),
                           user.label = "",
@@ -338,11 +340,15 @@ acq_raw_mspct <- function(descriptor,
              !is.unsorted(seq.settings[["step.delay"]], strictly = TRUE)) {
     # use vector of time offsets as is
     steps <- seq.settings[["step.delay"]]
-  } else {
-    # build vector of offsets with regular pattern of steps
+  } else if (seq.settings[["step.multiplier"]] <= 1) {
+    # build vector of offsets with constant steps
     steps <- c(0,
                cumsum(rep_len(seq.settings[["step.delay"]],
                               length.out = seq.settings[["num.steps"]] - 1L)))
+  } else {
+    # build vector of offsets with exponential steps
+    steps <- seq.settings[["step.delay"]] *
+      seq.settings[["step.multiplier"]]^(0:(seq.settings[["num.steps"]] - 1L))
   }
   # add initial delay
   steps <- steps + seq.settings[["initial.delay"]][1]

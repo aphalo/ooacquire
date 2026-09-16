@@ -80,7 +80,8 @@
 #' @param stray.light.method character Used only when the correction method is
 #'   created on-the-fly.
 #' @param seq.settings named list with numeric members \code{start.boundary},
-#'   \code{initial.delay}, \code{"step.delay"} and \code{"num.steps"}.
+#'   \code{initial.delay}, \code{step.delay}, \code{step.multiplier} and
+#'   \code{num.steps}.
 #' @param light.source character One of "continuous", "pulsed".
 #' @param ref.value numeric or filter_spct/reflector_spct object.
 #' @param qty.out character One of "Tfr" (spectral transmittance as a fraction
@@ -462,19 +463,23 @@ acq_fraction_interactive <-
                              num.exposures = num.exposures)
 
     # set default sequential settings for time series
-    if (is.null(seq.settings)) {
-      seq.settings <- list(start.boundary = "none",
-                           initial.delay = 0,
-                           step.delay = 0,
-                           num.steps = 1L)
-    } else if (!setequal(names(seq.settings),
-                         c("start.boundary", "initial.delay",
-                           "step.delay", "num.steps"))) {
-      warning("Missing or wrong member names in 'seq.settings': ignoring!")
-      seq.settings <- list(start.boundary = "second",
-                           initial.delay = 0.1,
-                           step.delay = 0,
-                           num.steps = 1L)
+    default.seq.settings <- list(start.boundary = "none",
+                                 initial.delay = 0,
+                                 step.delay = 0,
+                                 step.multiplier = 1,
+                                 num.steps = 1L)
+
+    if (!all(names(seq.settings) %in%
+             c("start.boundary", "initial.delay",
+               "step.delay", "step.multiplier", "num.steps"))) {
+      warning("Bad names in 'seq.settings'. Fields ignored!")
+    }
+    if (!setequal(names(seq.settings),
+                  c("start.boundary", "initial.delay",
+                    "step.delay", "step.multiplier", "num.steps"))) {
+      warning("Missing members in 'seq.settings'. Using defaults for them!")
+      seq.settings <-
+        utils::modifyList(default.seq.settings, seq.settings)
     }
 
     # initialize counters used for sequential naming and repeats

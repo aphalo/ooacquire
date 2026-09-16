@@ -22,7 +22,8 @@
 #' @param stray.light.method character Used only when the correction method is
 #'   created on-the-fly.
 #' @param seq.settings named list with numeric members \code{start.boundary},
-#'   \code{initial.delay}, \code{"step.delay"} and \code{"num.steps"}.
+#'   \code{initial.delay}, \code{step.delay}, \code{step.multiplier} and
+#'   \code{num.steps}.
 #' @param area numeric Passed to \code{o_calib2irrad_mult()}.
 #' @param diff.type character Passed to \code{o_calib2irrad_mult()}.
 #' @param qty.out character One of "irrad" (spectral irradiance), "fluence"
@@ -123,9 +124,10 @@
 #'   and saved as a single \code{cps_spct} or \code{source_spct} in long form.
 #'
 #'   Time series of light measurements using single "dark" and "filter"
-#'   measurements are scheduled by setting four members of the named list
+#'   measurements are scheduled by setting five members of the named list
 #'   passed as argument to \code{seq.settings}, or interactively through the
-#'   user interface.
+#'   user interface. If the fields are missing in the list, defaults are used
+#'   for these fields.
 #'
 #'   The \code{initial.delay} is numeric and gives a minimum delay in
 #'   seconds before the start of measurements with a default of 0s.
@@ -625,19 +627,22 @@ acq_irrad_interactive <-
                              num.exposures = num.exposures)
 
     # set default sequential settings for time series
-    if (is.null(seq.settings)) {
-      seq.settings <- list(start.boundary = "none",
-                           initial.delay = 0,
-                           step.delay = 0,
-                           num.steps = 1L)
-    } else if (!setequal(names(seq.settings),
+    default.seq.settings <- list(start.boundary = "none",
+                                 initial.delay = 0,
+                                 step.delay = 0,
+                                 step.multiplier = 1,
+                                 num.steps = 1L)
+
+    if (!all(names(seq.settings) %in%
+             c("start.boundary", "initial.delay",
+               "step.delay", "step.multiplier", "num.steps"))) {
+      warning("Bad names in 'seq.settings'. Fields ignored!")
+    }
+    if (!setequal(names(seq.settings),
                          c("start.boundary", "initial.delay",
-                           "step.delay", "num.steps"))) {
-      warning("Missing or wrong member names in 'seq.settings': ignoring!")
-      seq.settings <- list(start.boundary = "second",
-                           initial.delay = 0.1,
-                           step.delay = 0,
-                           num.steps = 1L)
+                           "step.delay", "step.multiplier", "num.steps"))) {
+      warning("Missing members in 'seq.settings'. Using defaults for them!")
+      seq.settings <- modifyList(default.seq.settings, seq.settings)
     }
 
     # initialize counters used for sequential naming and repeats
