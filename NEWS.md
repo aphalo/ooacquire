@@ -4,6 +4,11 @@ editor_options:
     wrap: 72
 ---
 
+# ooacquire 0.5.7 (2026-10-xx)
+
+- Add methods `MAYP11278_none.mthd` and `MAYP112785_none.mthd` with no stray
+light correction.
+
 # ooacquire 0.5.6 (2026-09-14)
 
 - KNOWN BUG: Function `read_oo_ssdata()` is failing to obey the time zone in

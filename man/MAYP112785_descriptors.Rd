@@ -7,11 +7,14 @@
 \alias{MAYP112785_ylianttila.mthd}
 \alias{MAYP112785_sun.mthd}
 \alias{MAYP112785_simple.mthd}
+\alias{MAYP112785_none.mthd}
 \title{Maya2000 Pro  spectrometer s/n MAYP112785}
 \format{
 Lists and data frames.
 
 An object of class \code{spec_tbl_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 4 rows and 8 columns.
+
+An object of class \code{list} of length 11.
 
 An object of class \code{list} of length 11.
 
@@ -29,6 +32,8 @@ MAYP112785_ylianttila.mthd
 MAYP112785_sun.mthd
 
 MAYP112785_simple.mthd
+
+MAYP112785_none.mthd
 }
 \description{
 List of instrument descriptors, each one containing the calibration

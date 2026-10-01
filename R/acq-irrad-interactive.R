@@ -642,7 +642,7 @@ acq_irrad_interactive <-
                          c("start.boundary", "initial.delay",
                            "step.delay", "step.multiplier", "num.steps"))) {
       warning("Missing members in 'seq.settings'. Using defaults for them!")
-      seq.settings <- modifyList(default.seq.settings, seq.settings)
+      seq.settings <- utils::modifyList(default.seq.settings, seq.settings)
     }
 
     # initialize counters used for sequential naming and repeats

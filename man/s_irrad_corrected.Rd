@@ -16,6 +16,7 @@ s_irrad_corrected(x, ...)
   x,
   time = NULL,
   correction.method = NULL,
+  filter.nir.adjust = FALSE,
   hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
   return.cps = FALSE,
   trim.descriptor = !return.cps,
@@ -29,6 +30,7 @@ s_irrad_corrected(x, ...)
   x,
   spct.names = find_spct_names(x),
   correction.method = NULL,
+  filter.nir.adjust = FALSE,
   hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
   return.cps = FALSE,
   trim.descriptor = !return.cps,
@@ -40,6 +42,7 @@ s_irrad_corrected(x, ...)
   x,
   time = NULL,
   correction.method,
+  filter.nir.adjust = FALSE,
   hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
   return.cps = FALSE,
   trim.descriptor = !return.cps,
@@ -61,6 +64,10 @@ file is used, and if \code{NA}, date is set to NA.}
 
 \item{correction.method}{A named list of constants and functions defining the
 method to be used for stray light and dark signal corrections.}
+
+\item{filter.nir.adjust}{logical Flag indicating if the cps in the
+"filter" reference spectrum need to be adjust based on NIR region cps
+in the "light" spectrum. EXPERIMENTAL!!}
 
 \item{hdr.tolerance}{numeric Tolerance for mean deviation among cps columns
 as a fraction of one. Used in check of HDR consistency. A negative value

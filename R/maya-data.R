@@ -34,6 +34,10 @@
 #'
 "MAYP11278_simple.mthd"
 
+#' @rdname MAYP11278_descriptors
+#'
+"MAYP11278_none.mthd"
+
 ################
 
 #' Maya2000 Pro  spectrometer s/n MAYP112785
@@ -67,6 +71,10 @@
 #' @rdname MAYP112785_descriptors
 #'
 "MAYP112785_simple.mthd"
+
+#' @rdname MAYP112785_descriptors
+#'
+"MAYP112785_none.mthd"
 
 #######################
 
