@@ -9,7 +9,7 @@ files_s_irrad_update(
   pattern = "\\\\.spct\\\\.[Rr]da",
   recursive = TRUE,
   date.limit = NULL,
-  spct.names = c(light = "light", filter = "filter", dark = "dark"),
+  spct.names = NULL,
   correction.method = NULL,
   hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
   return.cps = NULL,
@@ -94,9 +94,11 @@ object with a matching name, the file is skipped.
 
 The defaults match the defaults of \code{s_irrad_corrected()} and
 \code{acq_irrad_interactive()} in the current version of 'ooacquire'.
+If \code[spct.names = NULL], the default, is passed, \code{find_spct_names()}
+is called on each \code{raw_mspct} object found.
 Field \code{w} containing the \code{jwrapper} is deleted from all
 spectral objects, and for objects containing spectral data expressed
-in physical units, also fields related to instrument calibration are also
+in physical units, fields related to instrument calibration are also
 deleted by default. If \code{trim.descriptor = FALSE} is passed in the call,
 deleting the \code{w} is the action applied to all objects.
 }

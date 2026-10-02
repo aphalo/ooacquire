@@ -2,6 +2,29 @@ library(ooacquire)
 
 photon_as_default()
 
+# RESET all files!
+
+reset_files <- function() {
+  file.remove(list.files("inst-not/problem-maya-files/",
+                         "spct.rda$|spct.bak.rda", full.names = TRUE))
+
+  file.copy(from = list.files("inst-not/problem-maya-files/original-files",
+                              "spct.rda$", full.names = TRUE),
+            to = "inst-not/problem-maya-files/")
+}
+
+# update files
+
+reset_files()
+
+files_s_irrad_update("inst-not/problem-maya-files/")
+
+files_s_irrad_update("inst-not/problem-maya-files/", save.files = TRUE)
+
+# same as above
+
+reset_files()
+
 files_s_irrad_update("inst-not/problem-maya-files/",
                      spct.names = list(dark = "dark", filter = "filter",
                                     light = paste("light", 1L:5L, sep = ".")))
@@ -10,17 +33,23 @@ files_s_irrad_update("inst-not/problem-maya-files/",
                      spct.names = list(dark = "dark", filter = "filter",
                                        light = paste("light", 1L:5L, sep = ".")),
                      save.files = TRUE)
+#
+
+reset_files()
 
 files_s_irrad_update("inst-not/problem-maya-files/",
-                     spct.names = list(dark = "dark", filter = "filter",
-                                       light = paste("light", 1L:5L, sep = ".")),
                      correction.method = MAYP11278_simple.mthd)
 
-load("inst-not/problem-maya-files/hemis_field_A021.spct.bak.rda")
+reset_files()
+
+files_s_irrad_update("inst-not/problem-maya-files/",
+                     correction.method = MAYP11278_none.mthd)
+
+#
+
+load("inst-not/problem-maya-files/original-files/hemis_field_A021.spct.rda")
 
 s_irrad_corrected(hemis_field_A021.raw_mspct,
-                  spct.names = list(dark = "dark", filter = "filter",
-                                    light = paste("light", 1L:5L, sep = ".")),
                   correction.method = MAYP11278_none.mthd) |> autoplot()
 
 s_irrad_corrected(hemis_field_A021.raw_mspct,

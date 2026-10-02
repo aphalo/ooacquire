@@ -8,6 +8,9 @@ editor_options:
 
 - Add methods `MAYP11278_none.mthd` and `MAYP112785_none.mthd` with no stray
 light correction.
+- Fix bug: in `files_s_irrad_update()` by default call `find_spct_names()` on
+each `raw_mspct` object used to update the `source_spct` object. Update of
+time series failed with default, requiring explicit argument for `spct.names`.
 
 # ooacquire 0.5.6 (2026-09-14)
 
