@@ -30,7 +30,7 @@
 #'
 #' The defaults match the defaults of \code{s_irrad_corrected()} and
 #' \code{acq_irrad_interactive()} in the current version of 'ooacquire'.
-#' If \code[spct.names = NULL], the default, is passed, \code{find_spct_names()}
+#' If \code{spct.names = NULL}, the default, is passed, \code{find_spct_names()}
 #' is called on each \code{raw_mspct} object found.
 #' Field \code{w} containing the \code{jwrapper} is deleted from all
 #' spectral objects, and for objects containing spectral data expressed

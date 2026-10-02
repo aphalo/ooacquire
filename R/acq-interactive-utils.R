@@ -401,7 +401,7 @@ choose_ch_interactive <- function(instruments,
 #' @param minimum.step.delay numeric Minimum duration of \code{"step.delay"} (s).
 #' @param time.division numeric The step is forced to be a multiple of this
 #'   time duration, because spectrometers normally are constantly acquiring
-#'   spectra and thbey return the most recently acquired one. Should be set to
+#'   spectra and they return the most recently acquired one. Should be set to
 #'   the integration time plus a very small overhead (s).
 #'
 #' @details Function \code{seq.settings()} allows users to enter values needed
@@ -471,8 +471,8 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
   all.help <- c(w = "w = wait. Waiting time before start of acquisition of time series.",
                 b = "b = boundary. The time boundary at which to start acquisition of time series.",
                 s = "s = step duration. The time step between the start of succesive acquisitions in a time series.",
-                m = "m = step multiplier. The time step between the start of succesive acquisitions in a time series.",
-                r = "r = step repetitions. The multiplier applied to the previous delay in succesive steps for exponential increase in delay.",
+                m = "m = step multiplier. The multiplier applied to succesive time steps.",
+                r = "r = step repetitions. The number of steps in the time series.",
                 H = "? = help. Show this help text.",
                 g = "g = GO. Accept current series-related settings and continue.",
                 default = "- = default. Action selected by pressing \"Enter\" key.")
@@ -488,23 +488,30 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
     }
     # display current settings before prompt for user input
     seq.settings.string <-
-           sprintf("Seq: wait = %.3gS, boundary = %s, step-len = %.3gS, mult. = %.3gS, step-reps = %i \n",
+           sprintf("Seq: wait = %.3gS, boundary = %s, step-len = %.3gS, mult. = %.3g, step-reps = %i \n",
                    seq.settings[["initial.delay"]],
                    seq.settings[["start.boundary"]],
                    seq.settings[["step.delay"]],
                    seq.settings[["step.multiplier"]],
                    seq.settings[["num.steps"]])
     cat(seq.settings.string)
-    if (seq.settings[["step.delay"]] > 0 &&
-        (seq.settings[["step.multiplier"]] > 1 || seq.settings[["num.steps"]])) {
+    if (seq.settings[["step.delay"]] > 0 && seq.settings[["num.steps"]] > 1) {
+      last.step.seconds <-
+        signif(
+          seq.settings[["step.delay"]] *
+            seq.settings[["step.multiplier"]]^(seq.settings[["num.steps"]] - 1),
+          digits = 3)
+      series.duration.min <-
+        signif(
+          sum(seq.settings[["step.delay"]] *
+                seq.settings[["step.multiplier"]]^(0:(seq.settings[["num.steps"]] - 1))),
+          digits = 3)
       series.duration.string <-
-        sprintf("First step = %.3gS, last step (%i) = %.3gS, series duration =  = %.3gS\n",
+        sprintf("Durations: step[1] = %.3gS, step[%i] = %s, series = %s\n",
                 seq.settings[["step.delay"]],
                 seq.settings[["num.steps"]],
-                seq.settings[["step.delay"]] *
-                  seq.settings[["step.multiplier"]]^(seq.settings[["num.steps"]] - 1),
-                sum(seq.settings[["step.delay"]] *
-                      seq.settings[["step.multiplier"]]^(0:(seq.settings[["num.steps"]] - 1))))
+                format(lubridate::as.duration(last.step.seconds)),
+                format(lubridate::as.duration(series.duration.min)))
       cat(series.duration.string)
     }
 
@@ -552,8 +559,9 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
         cat("Time step value not changed!\n")
       }
     } else if (substr(answ, 1, 1) == "m") {
-      step.mult <- read_numbers("Time-step multiplier (>= 1): ", n.max = 1)
-      if (length(step.mult) && !is.na(step.mult) && step.mult >= 1) {
+      step.mult <- read_numbers("Time-step multiplier (1..2): ", n.max = 1)
+      if (length(step.mult) && !is.na(step.mult) &&
+          step.mult >= 1 && step.mult <= 2) {
         seq.settings$step.multiplier <- step.mult
       } else {
         cat("Time step multiplier not changed!\n")
