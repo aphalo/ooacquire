@@ -1,5 +1,7 @@
 library(ooacquire)
 
+photon_as_default()
+
 files_s_irrad_update("inst-not/problem-maya-files/",
                      spct.names = list(dark = "dark", filter = "filter",
                                     light = paste("light", 1L:5L, sep = ".")))
@@ -17,13 +19,39 @@ files_s_irrad_update("inst-not/problem-maya-files/",
 load("inst-not/problem-maya-files/hemis_field_A021.spct.bak.rda")
 
 s_irrad_corrected(hemis_field_A021.raw_mspct,
+                  spct.names = list(dark = "dark", filter = "filter",
+                                    light = paste("light", 1L:5L, sep = ".")),
+                  correction.method = MAYP11278_none.mthd) |> autoplot()
+
+s_irrad_corrected(hemis_field_A021.raw_mspct,
+                  spct.names = list(dark = "dark", filter = "filter",
+                                    light = "light.1"),
+                  correction.method = MAYP11278_none.mthd) |> autoplot()
+
+s_irrad_corrected(hemis_field_A021.raw_mspct,
+                  spct.names = list(dark = "dark",
+                                    light = "light.1"),
+                  correction.method = MAYP11278_none.mthd) |>
+  smooth_spct() |> autoplot(facets = 2)
+
+s_irrad_corrected(hemis_field_A021.raw_mspct,
                      spct.names = list(dark = "dark", filter = "filter",
                                        light = paste("light", 1L:5L, sep = ".")),
                      correction.method = MAYP11278_simple.mthd) |> autoplot()
 
 s_irrad_corrected(hemis_field_A021.raw_mspct,
                   spct.names = list(dark = "dark", filter = "filter",
+                                    light = "light.1"),
+                  correction.method = MAYP11278_simple.mthd) |> autoplot()
+
+s_irrad_corrected(hemis_field_A021.raw_mspct,
+                  spct.names = list(dark = "dark", filter = "filter",
                                     light = paste("light", 1L:5L, sep = ".")),
+                  correction.method = MAYP11278_sun.mthd) |> autoplot()
+
+s_irrad_corrected(hemis_field_A021.raw_mspct,
+                  spct.names = list(dark = "dark", filter = "filter",
+                                    light = "light.1"),
                   correction.method = MAYP11278_sun.mthd) |> autoplot()
 
 s_irrad_corrected(hemis_field_A021.raw_mspct,
@@ -34,14 +62,21 @@ s_irrad_corrected(hemis_field_A021.raw_mspct,
 
 s_irrad_corrected(hemis_field_A021.raw_mspct,
                   spct.names = list(dark = "dark", filter = "filter",
-                                    light = paste("light", 1L:5L, sep = ".")),
+                                    light = "light.1"),
                   correction.method = MAYP11278_sun.mthd,
-                  return.cps = TRUE) |> autoplot()
+                  filter.nir.adjust = TRUE) |> autoplot()
 
 s_irrad_corrected(hemis_field_A021.raw_mspct,
                   spct.names = list(dark = "dark", filter = "filter",
                                     light = paste("light", 1L:5L, sep = ".")),
                   correction.method = MAYP11278_short_flt_ref.mthd) |> autoplot()
+
+s_irrad_corrected(hemis_field_A021.raw_mspct,
+                  spct.names = list(dark = "dark", filter = "filter",
+                                    light = "light.1"),
+                  correction.method = MAYP11278_short_flt_ref.mthd) |> autoplot()
+
+## no filter
 
 s_irrad_corrected(hemis_field_A021.raw_mspct,
                   spct.names = list(dark = "dark",
@@ -50,15 +85,16 @@ s_irrad_corrected(hemis_field_A021.raw_mspct,
 
 s_irrad_corrected(hemis_field_A021.raw_mspct,
                   spct.names = list(dark = "dark",
-                                    light = paste("light", 1L:5L, sep = ".")),
-                  correction.method = MAYP11278_simple.mthd) |>
-  smooth_spct() |> autoplot(facets = 2)
+                                    light = "light.1"),
+                  correction.method = MAYP11278_sun.mthd) |> autoplot()
 
-s_irrad_update(hemis_field_A021.raw_mspct,
-                  spct.names = list(dark = "dark",
+## CPS
+
+s_irrad_corrected(hemis_field_A021.raw_mspct,
+                  spct.names = list(dark = "dark", filter = "filter",
                                     light = paste("light", 1L:5L, sep = ".")),
-                  correction.method = MAYP11278_simple.mthd) |>
-  smooth_spct() |> autoplot(facets = 2)
+                  correction.method = MAYP11278_sun.mthd,
+                  return.cps = TRUE) |> autoplot()
 
 s_irrad_corrected(hemis_field_A021.raw_mspct,
                   spct.names = list(dark = "dark", filter = "filter",

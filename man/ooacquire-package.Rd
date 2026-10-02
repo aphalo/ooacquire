@@ -4,7 +4,7 @@
 \name{ooacquire-package}
 \alias{ooacquire}
 \alias{ooacquire-package}
-\title{ooacquire: Acquire Data from OO Spectrometers}
+\title{ooacquire: Acquire Data from Ocean Optics Spectrometers}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
