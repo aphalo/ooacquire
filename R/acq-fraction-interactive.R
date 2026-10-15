@@ -469,17 +469,22 @@ acq_fraction_interactive <-
                                  step.multiplier = 1,
                                  num.steps = 1L)
 
-    if (!all(names(seq.settings) %in%
-             c("start.boundary", "initial.delay",
-               "step.delay", "step.multiplier", "num.steps"))) {
-      warning("Bad names in 'seq.settings'. Fields ignored!")
+    if (is.null(seq.settings)) { # default
+      seq.settings <- default.seq.settings
+    } else if (!is.list(seq.settings)) {
+      stop("Argument for 'seq.settings' should be a named list or NULL, not: '", seq.settings, "'")
+    } else if (!all(names(seq.settings) %in% names(default.seq.settings))) {
+      warning("Bad member name(s) in argument to 'seq.settings': '",
+              paste(setdiff(names(seq.settings), names(default.seq.settings)),
+                    collapse = "', '"),
+              "'. Ignored!")
     }
-    if (!setequal(names(seq.settings),
-                  c("start.boundary", "initial.delay",
-                    "step.delay", "step.multiplier", "num.steps"))) {
-      warning("Missing members in 'seq.settings'. Using defaults for them!")
-      seq.settings <-
-        utils::modifyList(default.seq.settings, seq.settings)
+    if (length(setdiff(names(default.seq.settings), names(seq.settings)))) {
+      message("Missing members in 'seq.settings'. Using defaults for '",
+              paste(setdiff(names(default.seq.settings), names(seq.settings)),
+                    collapse = "', '"),
+              "' !")
+      seq.settings <- utils::modifyList(default.seq.settings, seq.settings)
     }
 
     # initialize counters used for sequential naming and repeats
