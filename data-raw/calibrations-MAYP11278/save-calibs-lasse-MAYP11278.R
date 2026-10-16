@@ -154,6 +154,7 @@ save(MAYP11278_ylianttila.mthd,
      MAYP11278_short_flt_ref.mthd,
      MAYP11278_sun.mthd,
      MAYP11278_simple.mthd,
+     MAYP11278_none.mthd,
      MAYP11278_descriptors,
      MAYP11278_calib_dates.df,
      file = "data/calibs-MAYP11278.rda")

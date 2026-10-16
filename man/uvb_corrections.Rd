@@ -16,6 +16,7 @@ uvb_corrections(
   inst.dark.pixs = 1:4,
   worker.fun = NULL,
   trim = 0.05,
+  filter.nir.adjust = FALSE,
   hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
   verbose = getOption("photobiology.verbose", default = FALSE),
   ...
@@ -54,6 +55,10 @@ are in full darkness by instrument design.}
 counts per second vectors, or the name of the function as a character string.}
 
 \item{trim}{a numeric value to be used as argument for mean}
+
+\item{filter.nir.adjust}{logical Flag indicating if the cps in the
+"filter" reference spectrum need to be adjust based on NIR region cps
+in the "light" spectrum. EXPERIMENTAL!!}
 
 \item{hdr.tolerance}{numeric Tolerance for mean deviation among cps columns as
 a fraction of one. Used in check of HDR consistency.}

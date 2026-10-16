@@ -6,17 +6,16 @@
 \usage{
 set_seq_interactive(
   seq.settings = list(start.boundary = "second", initial.delay = 0, step.delay = 0,
-    num.steps = 1),
+    step.multiplier = 1, num.steps = 1),
   measurement.duration = 0,
   minimum.step.delay = measurement.duration,
   time.division = 0
 )
 }
 \arguments{
-\item{seq.settings}{numeric Definition of time steps for a sequence of
-repeated measurements. Named vector with member named
-\code{start.boundary}, \code{"initial.delay"}, \code{"step.delay"}, and
-\code{"num.steps"}.}
+\item{seq.settings}{named list with numeric members \code{start.boundary},
+\code{initial.delay}, \code{step.delay}, \code{step.multiplier} and
+\code{num.steps}.}
 
 \item{measurement.duration}{numeric Duration of one measurement event (s).}
 
@@ -24,7 +23,7 @@ repeated measurements. Named vector with member named
 
 \item{time.division}{numeric The step is forced to be a multiple of this
 time duration, because spectrometers normally are constantly acquiring
-spectra and thbey return the most recently acquired one. Should be set to
+spectra and they return the most recently acquired one. Should be set to
 the integration time plus a very small overhead (s).}
 }
 \value{

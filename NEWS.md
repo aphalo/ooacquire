@@ -4,6 +4,14 @@ editor_options:
     wrap: 72
 ---
 
+# ooacquire 0.5.7 (2026-10-xx)
+
+- Add methods `MAYP11278_none.mthd` and `MAYP112785_none.mthd` with no stray
+light correction.
+- Fix bug: in `files_s_irrad_update()` by default call `find_spct_names()` on
+each `raw_mspct` object used to update the `source_spct` object. Update of
+time series failed with default, requiring explicit argument for `spct.names`.
+
 # ooacquire 0.5.6 (2026-09-14)
 
 - KNOWN BUG: Function `read_oo_ssdata()` is failing to obey the time zone in

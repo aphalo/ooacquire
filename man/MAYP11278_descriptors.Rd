@@ -8,11 +8,14 @@
 \alias{MAYP11278_short_flt_ref.mthd}
 \alias{MAYP11278_sun.mthd}
 \alias{MAYP11278_simple.mthd}
+\alias{MAYP11278_none.mthd}
 \title{Maya2000 Pro  spectrometer s/n MAYP11278}
 \format{
 Lists and data frames.
 
 An object of class \code{spec_tbl_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 9 rows and 8 columns.
+
+An object of class \code{list} of length 11.
 
 An object of class \code{list} of length 11.
 
@@ -34,6 +37,8 @@ MAYP11278_short_flt_ref.mthd
 MAYP11278_sun.mthd
 
 MAYP11278_simple.mthd
+
+MAYP11278_none.mthd
 }
 \description{
 List of instrument descriptors, each one containing the calibration

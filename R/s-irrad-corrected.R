@@ -11,6 +11,9 @@
 #'   \code{"filter"} have always length = 1 if present.
 #' @param correction.method A named list of constants and functions defining the
 #'   method to be used for stray light and dark signal corrections.
+#' @param filter.nir.adjust logical Flag indicating if the cps in the
+#'   "filter" reference spectrum need to be adjust based on NIR region cps
+#'   in the "light" spectrum. EXPERIMENTAL!!
 #' @param hdr.tolerance numeric Tolerance for mean deviation among cps columns
 #'   as a fraction of one. Used in check of HDR consistency. A negative value
 #'   disables merging using only the data for the shortest integration time.
@@ -107,6 +110,7 @@ s_irrad_corrected.list <-
   function(x,
            time = NULL,
            correction.method = NULL,
+           filter.nir.adjust = FALSE,
            hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
            return.cps = FALSE,
            trim.descriptor = !return.cps,
@@ -129,6 +133,7 @@ s_irrad_corrected.list <-
       s_irrad_corrected(x = raw.mspct,
                         spct.names = find_spct_names(x),
                         correction.method = correction.method,
+                        filter.nir.adjust = filter.nir.adjust,
                         hdr.tolerance = hdr.tolerance,
                         return.cps = return.cps,
                         trim.descriptor = trim.descriptor,
@@ -151,6 +156,7 @@ s_irrad_corrected.raw_mspct <-
   function(x,
            spct.names = find_spct_names(x),
            correction.method = NULL,
+           filter.nir.adjust = FALSE,
            hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
            return.cps = FALSE,
            trim.descriptor = !return.cps,
@@ -238,6 +244,7 @@ s_irrad_corrected.raw_mspct <-
           s_irrad_corrected(x[unname(temp.spct.names)], # extraction needed because of tests
                             spct.names = temp.spct.names,
                             correction.method = correction.method,
+                            filter.nir.adjust = filter.nir.adjust,
                             hdr.tolerance = hdr.tolerance,
                             return.cps = return.cps,
                             trim.descriptor = trim.descriptor,
@@ -258,8 +265,9 @@ s_irrad_corrected.raw_mspct <-
 
       check_sn_match(x, correction.method, missmatch.action = stop)
 
-      if (length(setdiff(names(x), spct.names)) > 0L) {
-        stop("Bad member names in 'spct.names': ", names(spct.names))
+      if (!all(spct.names %in% names(x))) {
+        stop("Bad member names in 'spct.names'! Missing: ",
+             setdiff(spct.names, names(x)))
       }
 
       if (length(x[[ spct.names[["light"]] ]]) == 0) {
@@ -298,6 +306,7 @@ s_irrad_corrected.raw_mspct <-
                         inst.dark.pixs = correction.method[["inst.dark.pixs"]],
                         worker.fun = worker.fun,
                         trim = correction.method[["trim"]],
+                        filter.nir.adjust = filter.nir.adjust,
                         hdr.tolerance = hdr.tolerance,
                         verbose = verbose)
 
@@ -332,6 +341,7 @@ s_irrad_corrected.raw_mspct <-
 s_irrad_corrected.raw_spct <- function(x,
                                        time = NULL,
                                        correction.method,
+                                       filter.nir.adjust = FALSE,
                                        hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
                                        return.cps = FALSE,
                                        trim.descriptor = !return.cps,
@@ -341,6 +351,7 @@ s_irrad_corrected.raw_spct <- function(x,
   s_irrad_corrected(x = raw.mspct,
                     time = time,
                     correction.method = correction.method,
+                    filter.nir.adjust = filter.nir.adjust,
                     hdr.tolerance = hdr.tolerance,
                     return.cps = return.cps,
                     trim.descriptor = trim.descriptor,

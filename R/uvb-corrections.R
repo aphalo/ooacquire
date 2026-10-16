@@ -22,6 +22,9 @@
 #' @param worker.fun function actually doing the correction on the w.lengths and
 #'   counts per second vectors, or the name of the function as a character string.
 #' @param trim a numeric value to be used as argument for mean
+#' @param filter.nir.adjust logical Flag indicating if the cps in the
+#'   "filter" reference spectrum need to be adjust based on NIR region cps
+#'   in the "light" spectrum. EXPERIMENTAL!!
 #' @param hdr.tolerance numeric Tolerance for mean deviation among cps columns as
 #'   a fraction of one. Used in check of HDR consistency.
 #' @param verbose Logical indicating the level of warnings wanted.
@@ -56,6 +59,7 @@ uvb_corrections <-
            inst.dark.pixs = 1:4,
            worker.fun = NULL,
            trim = 0.05,
+           filter.nir.adjust = FALSE,
            hdr.tolerance = getOption("ooacquire.hdr.tolerance", default = 0.05),
            verbose = getOption("photobiology.verbose", default = FALSE),
            ...) {
@@ -63,7 +67,7 @@ uvb_corrections <-
     stopifnot(length(x) > 0L)
     stopifnot(length(spct.names) > 0L)
     stopifnot(names(spct.names) %in% c("light", "filter", "dark"))
-    stopifnot(all(names(x) %in% spct.names))
+    stopifnot(all(spct.names %in% names(x)))
 
     if (!all(spct.names == names(spct.names))) {
       # rename columns
@@ -138,6 +142,7 @@ uvb_corrections <-
                              flt.ref.wl = flt.ref.wl,
                              flt.Tfr = flt.Tfr,
                              trim = trim,
+                             filter.nir.adjust = filter.nir.adjust,
                              hdr.tolerance = hdr.tolerance,
                              verbose = verbose)
     } else if (stray.light.method != "none") {
@@ -275,11 +280,12 @@ filter_correction <-
       max_x_nir_cps <- mean(clip_wl(x, range = c(950, 1020))[["cps"]], na.rm = TRUE)
       max_flt_nir_cps <- mean(clip_wl(flt, range = c(950, 1020))[["cps"]], na.rm = TRUE)
 
-      x2flt.k <- max_x_nir_cps * 0.85 / max_flt_nir_cps # assumed filter transmittance
+      x2flt.k <-
+        max_x_nir_cps * as.numeric(filter.nir.adjust) / max_flt_nir_cps # assumed filter transmittance
 
       # this is an attempt to deal with changing light conditions
       if (x2flt.k < 0.8 || x2flt.k > 1.2) {
-        #     message("Rescaling \"filter\" spectrum by ", signif(x2flt.k, 3))
+        message("Rescaling \"filter\" spectrum by ", signif(x2flt.k, 3))
         flt <- flt * x2flt.k
       }
 

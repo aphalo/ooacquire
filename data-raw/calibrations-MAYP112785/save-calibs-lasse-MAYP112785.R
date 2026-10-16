@@ -71,10 +71,26 @@ MAYP112785_simple.mthd <- list(
   flt.dark.wl = c(204.6, 219.1),
   flt.ref.wl = c(368.3, 388.3),
   flt.Tfr = 1,
-  inst.dark.pixs = NA_integer_,
+  inst.dark.pixs = 2:4,
   tail.coeffs = c(NA_real_, NA_real_),
   worker.fun = NULL,
   trim = 0.05
+)
+
+# create an object with the parameters for skipping correction method for Maya
+# suitable for any light source, but not as good for sunlight
+MAYP112785_none.mthd <- list(
+  name = "MAYP112785_none.mthd",
+  spectrometer.sn = descriptor$spectrometer.sn,
+  stray.light.method = "none",
+  stray.light.wl = c(218.5, 228.5),
+  flt.dark.wl = c(204.6, 219.1),
+  flt.ref.wl = c(368.3, 388.3),
+  flt.Tfr = 1,
+  inst.dark.pixs = NA_integer_,
+  tail.coeffs =  c(NA_real_, NA_real_),
+  worker.fun = NULL,
+  trim = 0
 )
 
 # find calibration files
@@ -132,6 +148,7 @@ MAYP112785_descriptors <- descriptors
 save(MAYP112785_ylianttila.mthd,
      MAYP112785_sun.mthd,
      MAYP112785_simple.mthd,
+     MAYP112785_none.mthd,
      MAYP112785_descriptors,
      MAYP112785_calib_dates.df,
      file = "data/calibs-MAYP112785.rda")
