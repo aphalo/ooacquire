@@ -461,8 +461,8 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
     seq.settings[["step.multiplier"]] <- 1
   }
 
-  seq.settings$step.delay <-
-    check.step.delay(seq.settings$step.delay, time.division)
+  seq.settings[["step.delay"]] <-
+    check.step.delay(seq.settings[["step.delay"]], time.division)
 
   # support undo
   old.seq.settings <- seq.settings
@@ -480,10 +480,10 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
 
   repeat{
     # ensure step delay is achievable
-    if (seq.settings$step.delay < measurement.duration &&
-        seq.settings$step.delay != 0) {
-      seq.settings$step.delay <- signif(minimum.step.delay * 1.01, 3)
-      cat("'step.delay' too short! Reset to ", seq.settings$step.delay,
+    if (seq.settings[["step.delay"]] < measurement.duration &&
+        seq.settings[["step.delay"]] != 0) {
+      seq.settings[["step.delay"]] <- signif(minimum.step.delay * 1.01, 3)
+      cat("'step.delay' too short! Reset to ", seq.settings[["step.delay"]],
           " s.\n", sep = "")
     }
     # display current settings before prompt for user input
@@ -549,10 +549,10 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
       step <- read_period("Time-step length (period): ", n.max = 1)
       if (length(step) && !is.na(step)) {
         step <- as.numeric(step) # period to seconds
-        seq.settings$step.delay <-
+        seq.settings[["step.delay"]] <-
           check.step.delay(step, time.division)
-        if (seq.settings$step.delay != step) {
-          cat("Time step = ", signif(seq.settings$step.delay, 3),
+        if (seq.settings[["step.delay"]] != step) {
+          cat("Time step = ", signif(seq.settings[["step.delay"]], 3),
               "s, adjusted from ", step, "\n", sep = "")
         }
       } else {
@@ -562,7 +562,7 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
       step.mult <- read_numbers("Time-step multiplier (1..2): ", n.max = 1)
       if (length(step.mult) && !is.na(step.mult) &&
           step.mult >= 1 && step.mult <= 2) {
-        seq.settings$step.multiplier <- step.mult
+        seq.settings[["step.multiplier"]] <- step.mult
       } else {
         cat("Time step multiplier not changed!\n")
       }
@@ -598,13 +598,16 @@ set_seq_interactive <- function(seq.settings = list(start.boundary = "second",
 set_attributes_interactive <- function(user.attrs = list(what.measured = "",
                                                          comment.text = "")) {
   repeat{
-    cat("Current 'what.measured': '", user.attrs$what.measured, "'.\n", sep = "")
-    cat("Current 'comment': '", user.attrs$comment.text, "'.\n", sep = "")
-    user.input <- readline(prompt = "Replace 'what.measured' or 'comment', or go (w/c/g-): ")
+    cat("Current 'what.measured': '", user.attrs[["what.measured"]], "'.\n", sep = "")
+    cat("Current 'comment': '", user.attrs[["comment.text"]], "'.\n", sep = "")
+    user.input <-
+      readline(prompt = "Replace 'what.measured' or 'comment', or go (w/c/g-): ")
     if (substr(user.input, 1, 1) == "w") {
-      user.attrs$what.measured <- readline("New 'what.measured' or clear (<text>/-): ")
+      user.attrs[["what.measured"]] <-
+        readline("New 'what.measured' or clear (<text>/-): ")
     } else if (substr(user.input, 1, 1) == "c") {
-      user.attrs$comment.text <- readline("New 'comment' or clear (<text>/-): ")
+      user.attrs[["comment.text"]] <-
+        readline("New 'comment' or clear (<text>/-): ")
     } else {
       break()
     }
