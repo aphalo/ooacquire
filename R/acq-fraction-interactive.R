@@ -462,30 +462,8 @@ acq_fraction_interactive <-
                              HDR.mult = HDR.mult,
                              num.exposures = num.exposures)
 
-    # set default sequential settings for time series
-    default.seq.settings <- list(start.boundary = "none",
-                                 initial.delay = 0,
-                                 step.delay = 0,
-                                 step.multiplier = 1,
-                                 num.steps = 1L)
-
-    if (is.null(seq.settings)) { # default
-      seq.settings <- default.seq.settings
-    } else if (!is.list(seq.settings)) {
-      stop("Argument for 'seq.settings' should be a named list or NULL, not: '", seq.settings, "'")
-    } else if (!all(names(seq.settings) %in% names(default.seq.settings))) {
-      warning("Bad member name(s) in argument to 'seq.settings': '",
-              paste(setdiff(names(seq.settings), names(default.seq.settings)),
-                    collapse = "', '"),
-              "'. Ignored!")
-    }
-    if (length(setdiff(names(default.seq.settings), names(seq.settings)))) {
-      message("Missing members in 'seq.settings'. Using defaults for '",
-              paste(setdiff(names(default.seq.settings), names(seq.settings)),
-                    collapse = "', '"),
-              "' !")
-      seq.settings <- utils::modifyList(default.seq.settings, seq.settings)
-    }
+    # set default sequential settings for time series or check argument
+    seq.settings <- check_seq_settings(seq.settings)
 
     # initialize counters used for sequential naming and repeats
     total.repeats <- 1L

@@ -2,15 +2,17 @@
 % Please edit documentation in R/acq-interactive-utils.R
 \name{set_seq_interactive}
 \alias{set_seq_interactive}
+\alias{check_seq_settings}
 \title{Interactively set sequential measurements}
 \usage{
 set_seq_interactive(
-  seq.settings = list(start.boundary = "second", initial.delay = 0, step.delay = 0,
-    step.multiplier = 1, num.steps = 1),
+  seq.settings = NULL,
   measurement.duration = 0,
   minimum.step.delay = measurement.duration,
   time.division = 0
 )
+
+check_seq_settings(seq.settings = NULL)
 }
 \arguments{
 \item{seq.settings}{named list with numeric members \code{start.boundary},
@@ -34,17 +36,24 @@ Enter settings defining a sequence of spectra to be measured as a time
 series.
 }
 \details{
-Function \code{seq.settings()} allows users to enter values needed
-to define a sequence of spectral acquisitions. These are the time unit
-boundary to synchronize to, the delay or duration of the time
-step between successive acquisitions and the number of acquisitions in the
-series. The \code{measurement.time} determines the minimum length for
-\code{"step"}.
+In a sequence, measurements share a single reference, filter and/or
+dark scan, and are acquired as a sequence. For "sequences" of any length,
+including single spectra, the initial delay or time unit boundary can be used
+to schedule the start of a sequence of measurements or a single measurement.
+Using a step multiplier, it is possible to automatically generate time steps
+that increase in length exponentialy.
 
-A sequence of measurements are expected to share a single reference or
-dark scan, and be done as a sequence. With a single time point, the initial
-delay or time unit boundary can be used to schedule a single timed
-measurement.
+Function \code{set_seq_interactive()} allows users to change values
+in the list \code{seq.settings()}, which to define a sequence of spectral
+acquisitions. These are the time unit boundary to synchronize to, the delay
+or duration of the time step between successive acquisitions and the number
+of acquisitions in the series. The \code{measurement.time} determines the
+minimum length for \code{"step"}.
+
+Function \code{check_seq_interactive()} checks the validity, fills incomplete
+list with defaults and expands the time steps into a sequence based on
+fields \code{step.multiplier} and \code{num.steps}, resetting
+\code{step.multiplier = 1}.
 }
 \seealso{
 Other interactive acquisition utility functions:
