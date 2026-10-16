@@ -90,8 +90,8 @@ acq_settings <- function(descriptor,
   max.integ.time <- max.integ.time * 1e6
   tot.time.range <- tot.time.range * 1e6
   # We check bounds and set the "fixed settings" (non-tunable)
-  min.integ.time <- max(min.integ.time, descriptor$min.integ.time)
-  max.integ.time <- min(max.integ.time, descriptor$max.integ.time)
+  min.integ.time <- max(min.integ.time, descriptor[["min.integ.time"]])
+  max.integ.time <- min(max.integ.time, descriptor[["max.integ.time"]])
   # Check bounds for integ.time value supplied by user
   integ.time <- ifelse(integ.time > max.integ.time, max.integ.time, integ.time)
   integ.time <- ifelse(integ.time < min.integ.time, min.integ.time, integ.time)
@@ -104,7 +104,7 @@ acq_settings <- function(descriptor,
     warning("Using a smallest 'HDR.mult' value that is > 1 will cause clipping")
   }
   if (is.logical(pix.selector) && length(pix.selector) != 1) {
-    stopifnot(length(pix.selector) == length(descriptor$wavelengths))
+    stopifnot(length(pix.selector) == length(descriptor[["wavelengths"]]))
   }
   # return a list
   list(
@@ -148,7 +148,7 @@ acq_settings <- function(descriptor,
 #' @keywords internal
 #'
 set_linearized <- function(acq.settings) {
-  acq.settings$linearized <- TRUE
+  acq.settings[["linearized"]] <- TRUE
   acq.settings
 }
 
@@ -170,40 +170,45 @@ set_integ_time <- function(acq.settings,
                            single.scan = FALSE,
                            verbose = TRUE) {
   if (length(integ.time) == 1) {
-    integ.time <- integ.time * acq.settings$HDR.mult
-  } else if (length(integ.time) != length(acq.settings$HDR.mult)) {
+    integ.time <- integ.time * acq.settings[["HDR.mult"]]
+  } else if (length(integ.time) != length(acq.settings[["HDR.mult"]])) {
     warning("Length missmatch in integration time, using only first value")
-    integ.time  <- integ.time[1] * acq.settings$HDR.mult
+    integ.time  <- integ.time[1] * acq.settings[["HDR.mult"]]
   }
-  integ.time <- ifelse(integ.time > acq.settings$max.integ.time, acq.settings$max.integ.time, integ.time)
-  integ.time <- ifelse(integ.time < acq.settings$min.integ.time, acq.settings$min.integ.time, integ.time)
+  integ.time <- ifelse(integ.time > acq.settings[["max.integ.time"]],
+                       acq.settings[["max.integ.time"]], integ.time)
+  integ.time <- ifelse(integ.time < acq.settings[["min.integ.time"]],
+                       acq.settings[["min.integ.time"]], integ.time)
   if (single.scan) {
     num.scans <- rep(1, times = length(integ.time))
   } else {
-    num.scans <- ifelse(integ.time < acq.settings$tot.time.range[1],
-                        trunc(acq.settings$tot.time.range[1] / integ.time) + 1,
+    num.scans <- ifelse(integ.time < acq.settings[["tot.time.range"]][1],
+                        trunc(acq.settings[["tot.time.range"]][1] / integ.time) + 1,
                         1)
-    if (acq.settings$tot.time.range[2] - acq.settings$tot.time.range[1] < acq.settings$min.integ.time) {
-      integ.time <- acq.settings$tot.time.range[1] / num.scans
-    } else if (integ.time[1] > acq.settings$tot.time.range[2]) {
-      integ.time <- acq.settings$tot.time.range[2]
+    if (acq.settings[["tot.time.range"]][2] -
+        acq.settings[["tot.time.range"]][1] <
+        acq.settings[["min.integ.time"]]) {
+      integ.time <- acq.settings[["tot.time.range"]][1] / num.scans
+    } else if (integ.time[1] > acq.settings[["tot.time.range"]][2]) {
+      integ.time <- acq.settings[["tot.time.range"]][2]
     }
   }
-  acq.settings$integ.time <- integ.time
-  acq.settings$num.scans <- num.scans
+  acq.settings[["integ.time"]] <- integ.time
+  acq.settings[["num.scans"]] <- num.scans
   #diagnosis
-  acq.settings$tot.time <- integ.time * num.scans
-  acq.settings$rel.signal = NA_real_
+  acq.settings[["tot.time"]] <- integ.time * num.scans
+  acq.settings[["rel.signal"]] = NA_real_
 
   if (verbose) {
     cat("Relative saturation: ",
-        format(acq.settings$rel.signal, width = 10, digits = 3), "\n")
+        format(acq.settings[["rel.signal"]], width = 10, digits = 3), "\n")
     cat("Integration times (s): ",
-        format(acq.settings$integ.time * 1e-6, nsmall = 0, width = 10, digits = 3), "\n")
+        format(acq.settings[["integ.time"]] * 1e-6,
+               nsmall = 0, width = 10, digits = 3), "\n")
     cat("Numbers of scans:       ",
-        format(acq.settings$num.scans, width = 10, digits = 3), "\n")
+        format(acq.settings[["num.scans"]], width = 10, digits = 3), "\n")
     cat("Total time (s):         ",
-        format(acq.settings$tot.time * 1e-6,
+        format(acq.settings[["tot.time"]] * 1e-6,
                digits = 3, width = 10), "\n")
   }
   acq.settings
@@ -253,10 +258,10 @@ set_num_exposures <- function(acq.settings,
 
   if (single.scan || any(num.exposures > 0L)) {
     num.scans <- rep(1, times = length(num.exposures))
-    acq.settings$num.scans <- num.scans
+    acq.settings[["num.scans"]] <- num.scans
   }
-  acq.settings$num.exposures <- num.exposures
-  acq.settings$HDR.mult <- HDR.mult
+  acq.settings[["num.exposures"]] <- num.exposures
+  acq.settings[["HDR.mult"]] <- HDR.mult
 
   acq.settings
 }
@@ -295,43 +300,47 @@ tune_acq_settings <- function(descriptor,
   }
   # old objects are missing this field, so we set it to retain old behaviour
   if (!exists("num.exposures", acq.settings)) {
-    acq.settings$num.exposures <- -1L
+    acq.settings[["num.exposures"]] <- -1L
   }
 
   x <- acq.settings
 
-  if (!all(x$num.exposures < 0L)) {
+  if (!all(x[["num.exposures"]] < 0L)) {
     warning("Multiple exposures set.\nIntegration time not adjusted!")
     return(x)
   }
 
   # correction for electrical dark (in instrument using ocluded pixels in array)
-  rOmniDriver::set_correct_for_electrical_dark(descriptor$w, x$corr.elect.dark,
-                                               descriptor$sr.index,
-                                               descriptor$ch.index)
+  rOmniDriver::set_correct_for_electrical_dark(descriptor[["w"]],
+                                               x[["corr.elect.dark"]],
+                                               descriptor[["sr.index"]],
+                                               descriptor[["ch.index"]])
   # correction for sensor non-linearity (in instrument)
-  rOmniDriver::set_correct_for_detector_nonlinearity(descriptor$w,
-                                                     x$corr.sensor.nl,
-                                                     descriptor$sr.index,
-                                                     descriptor$ch.index)
+  rOmniDriver::set_correct_for_detector_nonlinearity(descriptor[["w"]],
+                                                     x[["corr.sensor.nl"]],
+                                                     descriptor[["sr.index"]],
+                                                     descriptor[["ch.index"]])
   # moving window smoothing
-  rOmniDriver::set_boxcar_width(descriptor$w,
-                                x$boxcar.width,
-                                descriptor$sr.index,
-                                descriptor$ch.index)
+  rOmniDriver::set_boxcar_width(descriptor[["w"]],
+                                x[["boxcar.width"]],
+                                descriptor[["sr.index"]],
+                                descriptor[["ch.index"]])
   # to speed up tunning we set number of scans to one
-  rOmniDriver::set_scans_to_avg(descriptor$w,
+  rOmniDriver::set_scans_to_avg(descriptor[["w"]],
                                 1L,
-                                descriptor$sr.index,
-                                descriptor$ch.index)
+                                descriptor[["sr.index"]],
+                                descriptor[["ch.index"]])
   # to more easily reach the target we linearize the counts before interpolation
-  nl.fun <- descriptor$inst.calib$nl.fun
+  nl.fun <- descriptor[["inst.calib"]][["nl.fun"]]
   # optimize parameters
-  integ.time <- x$integ.time[1]
-  target.margin <- x$target.margin
-  target.min.counts <- nl.fun((1 - target.margin) * descriptor$max.counts)
-  target.max.counts <- nl.fun((1 - target.margin / 2) * descriptor$max.counts)
-  target.counts <- nl.fun((1 - target.margin / 3 * 2) * descriptor$max.counts)
+  integ.time <- x[["integ.time"]][1]
+  target.margin <- x[["target.margin"]]
+  target.min.counts <-
+    nl.fun((1 - target.margin) * descriptor[["max.counts"]])
+  target.max.counts <-
+    nl.fun((1 - target.margin / 2) * descriptor[["max.counts"]])
+  target.counts <-
+    nl.fun((1 - target.margin / 3 * 2) * descriptor[["max.counts"]])
 
   i <- 0L
   repeat {
@@ -339,41 +348,41 @@ tune_acq_settings <- function(descriptor,
       cat("Trying integration time (s): ", format(integ.time  * 1e-6), "\n")
     }
     repeat {
-      rOmniDriver::set_integration_time(descriptor$w,
+      rOmniDriver::set_integration_time(descriptor[["w"]],
                                         integ.time,
-                                        descriptor$sr.index,
-                                        descriptor$ch.index)
-      raw.counts <- rOmniDriver::get_spectrum(descriptor$w,
-                                              descriptor$sr.index,
-                                              descriptor$ch.index)
+                                        descriptor[["sr.index"]],
+                                        descriptor[["ch.index"]])
+      raw.counts <- rOmniDriver::get_spectrum(descriptor[["w"]],
+                                              descriptor[["sr.index"]],
+                                              descriptor[["ch.index"]])
       if (!all(raw.counts == 0)) break()
       message("Failure: retrying!")
       Sys.sleep(0.1) # seconds
     }
-    dark.counts <- nl.fun(min(raw.counts[x$pix.selector]))
-    max.counts <- nl.fun(max(raw.counts[x$pix.selector]))
+    dark.counts <- nl.fun(min(raw.counts[x[["pix.selector"]]]))
+    max.counts <- nl.fun(max(raw.counts[x[["pix.selector"]]]))
     while (max.counts > target.max.counts)
     {
       # increased divisor to 5 to make the "blind" decrease in integration time faster
       integ.time <- integ.time / 5
-      if (integ.time < x$min.integ.time) {
+      if (integ.time < x[["min.integ.time"]]) {
         break()
       }
       if (verbose) cat("Clipping! Trying (ms): ", format(integ.time  * 1e-3), "\n")
-      rOmniDriver::set_integration_time(descriptor$w,
+      rOmniDriver::set_integration_time(descriptor[["w"]],
                                         integ.time,
-                                        descriptor$sr.index,
-                                        descriptor$ch.index)
-      raw.counts <- rOmniDriver::get_spectrum(descriptor$w,
-                                              descriptor$sr.index,
-                                              descriptor$ch.index)
+                                        descriptor[["sr.index"]],
+                                        descriptor[["ch.index"]])
+      raw.counts <- rOmniDriver::get_spectrum(descriptor[["w"]],
+                                              descriptor[["sr.index"]],
+                                              descriptor[["ch.index"]])
       # subtracting the minimum counts as proxi for dark signal improves
       # the guess without much danger of overshooting
-      dark.counts <- nl.fun(min(raw.counts[x$pix.selector]))
-      max.counts <- nl.fun(max(raw.counts[x$pix.selector]))
+      dark.counts <- nl.fun(min(raw.counts[x[["pix.selector"]]]))
+      max.counts <- nl.fun(max(raw.counts[x[["pix.selector"]]]))
     }
     if (verbose) cat("Max counts [", i, "]: ", format(max.counts), sep = "")
-    if (max.counts < target.min.counts && integ.time < x$max.integ.time) {
+    if (max.counts < target.min.counts && integ.time < x[["max.integ.time"]]) {
       if (verbose){
         cat(" < ", trunc(target.min.counts), " target", sep = "")
       }
@@ -389,8 +398,8 @@ tune_acq_settings <- function(descriptor,
       cat("\n")
     }
 
-    if (integ.time >= x$max.integ.time) {
-      integ.time <- x$max.integ.time
+    if (integ.time >= x[["max.integ.time"]]) {
+      integ.time <- x[["max.integ.time"]]
       if (verbose) {
         warning("Light too low for optimal performance! Using (s): ",
                 format(integ.time * 1e-6), call. = FALSE)
@@ -398,10 +407,10 @@ tune_acq_settings <- function(descriptor,
       break()
     }
 
-    if (integ.time < x$min.integ.time) {
-      integ.time = x$min.integ.time
+    if (integ.time < x[["min.integ.time"]]) {
+      integ.time = x[["min.integ.time"]]
       if (verbose) {
-        if (max(raw.counts[x$pix.selector]) >= descriptor$max.counts ) {
+        if (max(raw.counts[x[["pix.selector"]]]) >= descriptor[["max.counts"]]) {
           warning("Clipping cannot be avoided! Using (s): ",
                   format(integ.time * 1e-6), call. = FALSE)
         } else {
@@ -419,32 +428,38 @@ tune_acq_settings <- function(descriptor,
     }
   }
 
-  integ.time <- x$HDR.mult * integ.time # vectorized!
-  integ.time <- ifelse(integ.time > x$max.integ.time, x$max.integ.time, integ.time)
-  integ.time <- ifelse(integ.time < x$min.integ.time, x$min.integ.time, integ.time)
-  num.scans <- ifelse(integ.time < x$tot.time.range[1],
-                      trunc(x$tot.time.range[1] / integ.time) + 1,
+  integ.time <- x[["HDR.mult"]] * integ.time # vectorized!
+  integ.time <-
+    ifelse(integ.time > x[["max.integ.time"]], x[["max.integ.time"]], integ.time)
+  integ.time <-
+    ifelse(integ.time < x[["min.integ.time"]], x[["min.integ.time"]], integ.time)
+  num.scans <- ifelse(integ.time < x[["tot.time.range"]][1],
+                      trunc(x[["tot.time.range"]][1] / integ.time) + 1,
                       1)
-  if (x$tot.time.range[2] - x$tot.time.range[1] < x$min.integ.time) {
-    integ.time <- x$tot.time.range[1] / num.scans
-  } else if (integ.time[1] > x$tot.time.range[2]) {
-    integ.time <- x$tot.time.range[2]
+  if (x[["tot.time.range"]][2] - x[["tot.time.range"]][1] <
+      x[["min.integ.time"]]) {
+    integ.time <- x[["tot.time.range"]][1] / num.scans
+  } else if (integ.time[1] > x[["tot.time.range"]][2]) {
+    integ.time <- x[["tot.time.range"]][2]
   }
-  acq.settings$integ.time <- integ.time
-  acq.settings$num.scans <- num.scans
+  acq.settings[["integ.time"]] <- integ.time
+  acq.settings[["num.scans"]] <- num.scans
   #diagnosis
-  acq.settings$tot.time <- integ.time * num.scans
-  acq.settings$rel.signal = max.counts / nl.fun(descriptor$max.counts)
+  acq.settings[["tot.time"]] <- integ.time * num.scans
+  acq.settings[["rel.signal"]] <- max.counts / nl.fun(descriptor[["max.counts"]])
 
   if (verbose) {
     cat("\nTUNED SETTINGS:\nRelative saturation:   ",
-        format(acq.settings$rel.signal, nsmall = 0, width = 10, digits = 3), "\n")
+        format(acq.settings[["rel.signal"]],
+               nsmall = 0, width = 10, digits = 3), "\n")
     cat("Integration times (s): ",
-        format(acq.settings$integ.time * 1e-6, nsmall = 0, width = 10, digits = 3), "\n")
+        format(acq.settings[["integ.time"]] * 1e-6,
+               nsmall = 0, width = 10, digits = 3), "\n")
     cat("Numbers of scans:       ",
-        format(acq.settings$num.scans, nsmall = 0, width = 10, digits = 3), "\n")
+        format(acq.settings[["num.scans"]],
+               nsmall = 0, width = 10, digits = 3), "\n")
     cat("Total time (s):         ",
-        format(acq.settings$tot.time * 1e-6,
+        format(acq.settings[["tot.time"]] * 1e-6,
                digits = 3, nsmall = 0, width = 10), "\n")
   }
   acq.settings

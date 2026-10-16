@@ -804,18 +804,18 @@ acq_irrad_interactive <-
       if (get.seq.settings) {
 
         # Estimate time needed for measuring one spectrum
-        if (length(settings$HDR.mult) > 1) { # settings per integ time value
+        if (length(settings[["HDR.mult"]]) > 1) { # settings per integ time value
           estimated.measurement.duration <-
-            sum(settings$integ.time * settings$num.scans * 1e-6) +
-            acq.overhead * length(settings$HDR.mult) + # number of HDR acq.
-            sum(2 * settings$integ.time * 1e-6) # worse case overhead on restart
-        } else if (length(settings$HDR.mult) == 1) { # no change in settings
-          if (settings$num.scans > 1) {
+            sum(settings[["integ.time"]] * settings[["num.scans"]] * 1e-6) +
+            acq.overhead * length(settings[["HDR.mult"]]) + # number of HDR acq.
+            sum(2 * settings[["integ.time"]] * 1e-6) # worse case overhead on restart
+        } else if (length(settings[["HDR.mult"]]) == 1) { # no change in settings
+          if (settings[["num.scans"]] > 1) {
             estimated.measurement.duration <-
-              settings$integ.time * settings$num.scans * 1e-6 + acq.overhead
-          } else if (settings$num.scans == 1) { # buffered high speed acq.
+              settings[["integ.time"]] * settings[["num.scans"]] * 1e-6 + acq.overhead
+          } else if (settings[["num.scans"]] == 1) { # buffered high speed acq.
             estimated.measurement.duration <-
-              settings$integ.time * 1e-6 # no overhead
+              settings[["integ.time"]] * 1e-6 # no overhead
           } else {
             estimated.measurement.duration <- NA_real_
           }
@@ -833,11 +833,11 @@ acq_irrad_interactive <-
           set_seq_interactive(
             seq.settings = seq.settings,
             measurement.duration = estimated.measurement.duration,
-            minimum.step.delay = ifelse(length(settings$HDR.mult) == 1L,
+            minimum.step.delay = ifelse(length(settings[["HDR.mult"]]) == 1L,
                                         0,
                                         estimated.measurement.duration),
-            time.division = ifelse(length(settings$HDR.mult) == 1L,
-                                   settings$integ.time * 1e-6, # -> seconds
+            time.division = ifelse(length(settings[["HDR.mult"]]) == 1L,
+                                   settings[["integ.time"]] * 1e-6, # -> seconds
                                    0))
         get.seq.settings <- FALSE
 
@@ -944,18 +944,18 @@ acq_irrad_interactive <-
             return.cps = qty.out == "cps")
 
         cat('Adding metadata ... ')
-        photobiology::setHowMeasured(irrad.spct, user.attrs$how.measured)
+        photobiology::setHowMeasured(irrad.spct, user.attrs[["how.measured"]])
 
-        if (user.attrs$what.measured == "") {
+        if (user.attrs[["what.measured"]] == "") {
           photobiology::setWhatMeasured(irrad.spct, obj.name)
         } else {
-          photobiology::setWhatMeasured(irrad.spct, user.attrs$what.measured)
+          photobiology::setWhatMeasured(irrad.spct, user.attrs[["what.measured"]])
         }
 
         comment.text.root <- comment(irrad.spct)
-        if (user.attrs$comment.text != "") {
+        if (user.attrs[["comment.text"]] != "") {
           comment(irrad.spct) <-
-            paste(comment.text.root, user.attrs$comment.text, sep = "\n")
+            paste(comment.text.root, user.attrs[["comment.text"]], sep = "\n")
         }
 
         if (length(raw.mspct) > 10L) {
@@ -1084,16 +1084,16 @@ acq_irrad_interactive <-
                      user.attrs <- set_attributes_interactive(user.attrs)
                      # object to be saved to file
                      photobiology::what_measured(irrad.spct) <-
-                       user.attrs$what.measured
+                       user.attrs[["what.measured"]]
                      comment(irrad.spct) <-
-                       paste(comment.text.root, user.attrs$comment.text,
+                       paste(comment.text.root, user.attrs[["comment.text"]],
                              sep = "\n")
                      # plot data, possibly a subset of measured spectra
                      # metadata update needed if annotations not default
                      photobiology::what_measured(plot.spct) <-
-                       user.attrs$what.measured
+                       user.attrs[["what.measured"]]
                      comment(plot.spct) <-
-                       paste(comment.text.root, user.attrs$comment.text,
+                       paste(comment.text.root, user.attrs[["comment.text"]],
                              sep = "\n")
                      # Update plot title text
                      if (plot.lines.max < getMultipleWl(irrad.spct)) {
@@ -1366,7 +1366,7 @@ acq_irrad_interactive <-
                   readr::write_delim(
                     summary.tb,
                     file =  paste(collection.name, "csv", sep = "."),
-                    delim = readr::locale()$grouping_mark)
+                    delim = readr::locale()[["grouping_mark"]])
                   summary.collection.name <-
                     paste(collection.name, "summary.tb", sep = ".")
                   # "rename" data frame with summaries
