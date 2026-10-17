@@ -6,12 +6,15 @@ editor_options:
 
 # ooacquire 0.5.7 (2026-10-xx)
 
-- Add methods `MAYP11278_none.mthd` and `MAYP112785_none.mthd` with no stray
-light correction.
+- Allow interactive acquisition of single scans, with and without integration
+time bracketing. 
 - Implement support for exponentially increasing and exponentially decreasing 
 time steps for acquisition of time series of spectra.
 - Enhance messages to clearly show the expected time required to acquire time
 series.
+- Enhance interactive user interface for entry of time series settings.
+- Add methods `MAYP11278_none.mthd` and `MAYP112785_none.mthd` with no stray
+light correction.
 - Fix bug: in `set_acq_settings_interactive()` the current values could be
 selected for use, even when tainted by changes to settings.
 - Fix bug: in `files_s_irrad_update()` by default call `find_spct_names()` on
