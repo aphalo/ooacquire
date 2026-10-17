@@ -7,7 +7,7 @@
 read_seconds(
   prompt,
   n.max = 1L,
-  pattern = "[,;S]",
+  pattern = "[,;Ss]",
   pass.through = "",
   minimum = 0
 )

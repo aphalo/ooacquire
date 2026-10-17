@@ -363,7 +363,7 @@ tune_acq_settings <- function(descriptor,
     max.counts <- nl.fun(max(raw.counts[x[["pix.selector"]]]))
     while (max.counts > target.max.counts)
     {
-      # increased divisor to 5 to make the "blind" decrease in integration time faster
+      # divide by 5 as decrease is "blind" while increase is by extrapolation
       integ.time <- integ.time / 5
       if (integ.time < x[["min.integ.time"]]) {
         break()
@@ -433,14 +433,18 @@ tune_acq_settings <- function(descriptor,
     ifelse(integ.time > x[["max.integ.time"]], x[["max.integ.time"]], integ.time)
   integ.time <-
     ifelse(integ.time < x[["min.integ.time"]], x[["min.integ.time"]], integ.time)
-  num.scans <- ifelse(integ.time < x[["tot.time.range"]][1],
-                      trunc(x[["tot.time.range"]][1] / integ.time) + 1,
-                      1)
-  if (x[["tot.time.range"]][2] - x[["tot.time.range"]][1] <
-      x[["min.integ.time"]]) {
-    integ.time <- x[["tot.time.range"]][1] / num.scans
-  } else if (integ.time[1] > x[["tot.time.range"]][2]) {
-    integ.time <- x[["tot.time.range"]][2]
+  if (x[["tot.time.range"]][2] <= 0) {
+    num.scans <- rep(1, length(integ.time))
+  } else {
+    num.scans <- ifelse(integ.time < x[["tot.time.range"]][1],
+                        trunc(x[["tot.time.range"]][1] / integ.time) + 1,
+                        1)
+    if (x[["tot.time.range"]][2] - x[["tot.time.range"]][1] <
+        x[["min.integ.time"]]) {
+      integ.time <- x[["tot.time.range"]][1] / num.scans
+    } else if (integ.time[1] > x[["tot.time.range"]][2]) {
+      integ.time <- x[["tot.time.range"]][2]
+    }
   }
   acq.settings[["integ.time"]] <- integ.time
   acq.settings[["num.scans"]] <- num.scans

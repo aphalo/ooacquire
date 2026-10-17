@@ -174,12 +174,13 @@ tune_interactive <- function(descriptor,
       }
     } else if (answ == "r") {
       tot.time.range <-
-        read_seconds("Total time range (seconds), 1 or 2 numbers: ", n.max = 2)
+        read_seconds("Total time range (seconds), 1 or 2 numbers: ",
+                     n.max = 2)
       tot.time.range <- round(tot.time.range * 1e6) # integer microseconds
       if (length(tot.time.range) >= 1) {
         tot.time.range <- range(tot.time.range)
-        # ensure that the the range includes a finite positive value
-        if (tot.time.range[1] >= 0 && tot.time.range[2] > 0) {
+        # allow zero to indicate single scan
+        if (tot.time.range[1] >= 0 && tot.time.range[2] >= 0) {
           acq.settings[["tot.time.range"]] <- tot.time.range
           modified <- TRUE
           tuned <- FALSE
@@ -453,18 +454,28 @@ set_seq_interactive <- function(seq.settings = NULL,
                                 time.division = 0) {
 
   # ensure that step.delay is a multiple of time.division (integration time)
-  check.step.delay <- function(step, time.div) {
-    if (time.division > 0) {
-      num.time.divs <- (min(step) + 1e-7) %/% time.division # protect from loss of precision
+  check.step.delay <- function(step, time.division) {
+    step.num <- as.numeric(step)
+    if (step.num == 0 || time.division <= 0) {
+      # nothing to do
+      step
+    } else {
+      num.time.divs <- (min(step.num) + 1e-7) %/% time.division # protect from loss of precision
       if (num.time.divs < 1) {
-        step <- 0
+        cat("Set 'step-len = 0s' (no delay) as '",
+            lubridate::as.duration(step.num), "s' was too short\n", sep = "")
+        step.num <- 0
       } else {
-        step <- time.division * num.time.divs
+        new.step.num <- time.division * num.time.divs
+        if (abs(new.step.num - step.num) / step.num > 0.02) {
+          cat("Set 'step-len = ", signif(new.step.num, 4),
+              "s, adjusted from ", signif(step.num, 4), "s \n", sep = "")
+        }
+        step.num <- time.division * num.time.divs
       }
+      lubridate::as.period(step.num)
     }
-    step
   }
-
   # validate input and fill in missing with defaults
   seq.settings <- check_seq_settings(seq.settings)
   seq.settings[["step.delay"]] <-
@@ -499,10 +510,10 @@ set_seq_interactive <- function(seq.settings = NULL,
     seq.settings <- check_seq_settings(seq.settings)
     # display current settings before prompt for user input
     seq.settings.string <-
-           sprintf("Seq: wait = %.3gS, boundary = %s, step-len = %.3gS, mult. = %.3g, step-reps = %i \n",
-                   seq.settings[["initial.delay"]],
-                   seq.settings[["start.boundary"]],
-                   seq.settings[["step.delay"]],
+           sprintf("Seq: wait = %s, boundary = %s, step-len = %s, mult. = %.4g, spct-reps = %i \n",
+                   format(lubridate::as.duration(seq.settings[["initial.delay"]])),
+                   format(lubridate::as.duration(seq.settings[["start.boundary"]])),
+                   format(lubridate::as.duration(seq.settings[["step.delay"]])),
                    seq.settings[["step.multiplier"]],
                    seq.settings[["num.steps"]])
     cat(seq.settings.string)
@@ -515,11 +526,12 @@ set_seq_interactive <- function(seq.settings = NULL,
       series.duration <-
         signif(sum(seq.settings[["steps"]]), digits = 3)
       series.duration.string <-
-        sprintf("Durations: step[1] = %s, step[%i] = %s, series = %s\n",
-                format(lubridate::as.period(first.step.seconds)),
+        sprintf("Series of %i: delays[2..%i] = [%s..%s], total span = %s\n",
                 seq.settings[["num.steps"]],
-                format(lubridate::as.period(last.step.seconds)),
-                format(lubridate::as.period(series.duration)))
+                length(seq.settings[["steps"]]),
+                format(lubridate::as.duration(first.step.seconds)),
+                format(lubridate::as.duration(last.step.seconds)),
+                format(lubridate::as.duration(series.duration)))
       cat(series.duration.string)
     }
 
@@ -532,11 +544,7 @@ set_seq_interactive <- function(seq.settings = NULL,
       cat(help.text)
     } else if (substr(answ, 1, 1) == "w") {
       step <- read_period("Wait before series start (period): ", n.max = 1)
-      # step <- readline(sprintf("Wait = %.3gS, new: ",
-      #                          seq.settings[["initial.delay"]]))
-      # step <- period(step)
       if (!is.na(step) && length(step)) {
-        step <- as.numeric(step) # period to seconds
         seq.settings[["initial.delay"]] <- step
       } else {
         cat("Wait value not changed!\n")
@@ -546,9 +554,6 @@ set_seq_interactive <- function(seq.settings = NULL,
                                    n.max = 1,
                                    pass.through = "none")
       if (length(time.boundary) && !is.na(lubridate::period(time.boundary))) {
-        if (lubridate::is.period(time.boundary) && as.numeric(time.boundary) == 0) {
-          time.boundary <- "none"
-        }
         seq.settings[["start.boundary"]] <- time.boundary
       } else {
         cat("Start-boundary Value not changed!\n")
@@ -556,13 +561,8 @@ set_seq_interactive <- function(seq.settings = NULL,
     } else if (substr(answ, 1, 1) == "s") {
       step <- read_period("Time-step length (period): ", n.max = 1)
       if (length(step) && !is.na(step)) {
-        step <- as.numeric(step) # period to seconds
         seq.settings[["step.delay"]] <-
           check.step.delay(step, time.division)
-        if (seq.settings[["step.delay"]] != step) {
-          cat("Time step = ", signif(seq.settings[["step.delay"]], 3),
-              "s, adjusted from ", step, "\n", sep = "")
-        }
       } else {
         cat("Time step value not changed!\n")
       }
@@ -575,16 +575,15 @@ set_seq_interactive <- function(seq.settings = NULL,
         cat("Time step multiplier not changed!\n")
       }
     } else if (substr(answ, 1, 1) == "r") {
-      num.steps <- readline("Number of steps (1..100000): ")
+      num.steps <- readline("Number of steps (1..10000): ")
       num.steps <- try(as.integer(num.steps))
       if (is.na(num.steps)) {
         cat("Expected a positive integer. Value not changed!\n")
-      } else if (num.steps < 1L || num.steps > 100000L) {
-        warning("Expected number within range 1..100000. Value not changed!")
+      } else if (num.steps < 1L || num.steps > 10000L) {
+        warning("Expected an integer in [1..10000]. Value not changed!")
       } else {
         seq.settings[["num.steps"]] <- num.steps
-        # next line should be redundant!
-        seq.settings[["step.delay"]] <- min(seq.settings[["step.delay"]])
+        seq.settings[["steps"]] <-  NA_integer_ # guard
       }
     } else if (substr(answ, 1, 1) == "u") {
       cat("Restoring previous settings!\n")
@@ -604,7 +603,7 @@ check_seq_settings <- function(seq.settings = NULL) {
                                step.delay = 0,
                                step.multiplier = 1,
                                num.steps = 1L,
-                               steps = NA)
+                               steps = NA_integer_)
   if (is.null(seq.settings)) { # default
     seq.settings <- default.seq.settings
   } else if (!is.list(seq.settings)) {
@@ -638,7 +637,8 @@ check_seq_settings <- function(seq.settings = NULL) {
     seq.settings[["step.multiplier"]] <- 1
   }
   # compute step durations in seconds
-  if (abs(seq.settings[["step.multiplier"]]) != 1) {
+  if (abs(seq.settings[["step.multiplier"]]) != 1 &&
+      seq.settings[["num.steps"]] >= 2) {
     seq.settings[["steps"]] <-
       seq.settings[["step.delay"]] *
       abs(seq.settings[["step.multiplier"]])^(0:(seq.settings[["num.steps"]] - 2))
@@ -869,12 +869,14 @@ read_numbers <- function(prompt,
     gsub(pattern, " ", x = _) |>
     trimws() |>
     strsplit( "\\s+") |>
-    unlist() |> print() |>
+    unlist() |>
     as.numeric() -> z
 
   if (length(z) <= n.max) {
     z
   } else {
+    message("Maximum of ", n.max, " value(s) accepted; ",
+            length(z) - n.max, " value(s) discarded!")
     z[1:n.max]
   }
 }
@@ -899,7 +901,7 @@ read_numbers <- function(prompt,
 #'
 read_seconds <- function(prompt,
                          n.max = 1L,
-                         pattern = "[,;S]",
+                         pattern = "[,;Ss]",
                          pass.through = "",
                          minimum = 0) {
   repeat {
@@ -927,8 +929,8 @@ read_seconds <- function(prompt,
       }
       break()
     }
-    message("Please, try again. Numbers or numbers followed by S; >= ",
-            minimum[1], "seconds")
+    message("Please, try with a number >= ",
+            minimum[1], "s")
   }
   z
 }
@@ -969,16 +971,24 @@ read_period <- function(prompt,
       gsub(pattern, " ", x = _) |>
       trimws() |>
       strsplit( "\\s+") |>
-      unlist() |>
-      lubridate::period() -> z
+      unlist() -> yy
 
-    if (length(z) & !anyNA(z)) {
-      if (length(z) > n.max) {
-        z <- z[1:n.max]
+    if (!any(grepl("y$|Y$|m$|d$|D$|w$|W$", yy))) {
+      # ignore years, months, days, and weeks
+      ifelse(grepl("[SsMHh]$|min$", x = yy), yes = yy, paste0(yy, "S")) |>
+        lubridate::as.period() -> z
+
+      if (length(z) & !anyNA(z)) {
+        if (length(z) > n.max) {
+          message("Maximum of ", n.max, " value(s) accepted; ",
+                  length(z) - n.max, " value(s) discarded!")
+          z <- z[1:n.max]
+        }
+        break()
       }
-      break()
     }
-    message("Please, try again. Numbers followed by S, M, or H.\n",
+    message("Please, enter bare numbers (seconds) or numbers\n",
+            "followed by S or s, M or min, or H or h.\n",
             "6S = 6 seconds, 10M12S = 10 minutes 12 seconds.")
   }
   z
