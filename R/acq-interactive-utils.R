@@ -516,10 +516,10 @@ set_seq_interactive <- function(seq.settings = NULL,
         signif(sum(seq.settings[["steps"]]), digits = 3)
       series.duration.string <-
         sprintf("Durations: step[1] = %s, step[%i] = %s, series = %s\n",
-                format(lubridate::as.duration(first.step.seconds)),
+                format(lubridate::as.period(first.step.seconds)),
                 seq.settings[["num.steps"]],
-                format(lubridate::as.duration(last.step.seconds)),
-                format(lubridate::as.duration(series.duration)))
+                format(lubridate::as.period(last.step.seconds)),
+                format(lubridate::as.period(series.duration)))
       cat(series.duration.string)
     }
 
@@ -622,11 +622,13 @@ check_seq_settings <- function(seq.settings = NULL) {
             "' !")
     seq.settings <- utils::modifyList(default.seq.settings, seq.settings)
   }
-  if (seq.settings[["start.boundary"]] == "none") {
-    seq.settings[["start.boundary"]] <- lubridate::as.duration(0)
-  } else if (!is.duration(seq.settings[["start.boundary"]])) {
+  if (is.character(seq.settings[["start.boundary"]]) &&
+      seq.settings[["start.boundary"]] == "none") {
+    # "none" is not accepted by as.period() as input
+    seq.settings[["start.boundary"]] <- lubridate::as.period(0)
+  } else if (!lubridate::is.period(seq.settings[["start.boundary"]])) {
     seq.settings[["start.boundary"]] <-
-      lubridate::as.duration(seq.settings[["start.boundary"]])
+      lubridate::as.period(seq.settings[["start.boundary"]])
   }
   if (abs(seq.settings[["step.multiplier"]]) < 1 ||
       abs(seq.settings[["step.multiplier"]]) > 2) {

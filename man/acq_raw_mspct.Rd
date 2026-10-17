@@ -87,7 +87,7 @@ Function \code{acq_raw_mspct} acquires directly from a spectrometer
   \code{rep_len()}, and the values interpreted as the time increment
   in seconds between the start of successive measurements. Member
   \code{start.boundary} can take any input accepted by
-  \code{\link[lubridate]{as.duration}()} such as "none", "second", "minute",
+  \code{\link[lubridate]{as.period}()} such as "none", "second", "minute",
    "hour", "5s", "2min", or a numeric value interpreted as seconds,
   indicating the time boundary at which to start the measurement of the series
   e.g. exactly at the next minute and 0s. Member \code{num.steps} must

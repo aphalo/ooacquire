@@ -248,7 +248,7 @@ acq_raw_spct <- function(descriptor,
 #'   \code{rep_len()}, and the values interpreted as the time increment
 #'   in seconds between the start of successive measurements. Member
 #'   \code{start.boundary} can take any input accepted by
-#'   \code{\link[lubridate]{as.duration}()} such as "none", "second", "minute",
+#'   \code{\link[lubridate]{as.period}()} such as "none", "second", "minute",
 #'    "hour", "5s", "2min", or a numeric value interpreted as seconds,
 #'   indicating the time boundary at which to start the measurement of the series
 #'   e.g. exactly at the next minute and 0s. Member \code{num.steps} must
@@ -372,8 +372,7 @@ acq_raw_mspct <- function(descriptor,
       f.off.current <- NA
     }
     if (p == "light") {
-      if (is.character(seq.settings[["start.boundary"]]) &&
-          seq.settings[["start.boundary"]] == "none") {
+      if (seq.settings[["start.boundary"]] == lubridate::as.period(0)) {
         times <- lubridate::now(tzone = "UTC") +
           lubridate::milliseconds(10) +
           lubridate::seconds(steps)
@@ -400,7 +399,7 @@ acq_raw_mspct <- function(descriptor,
         cat("Buffered series of ", seq.settings[["num.steps"]], ", starting at ",
             strftime(times[1], format = "%H:%M:%OS", usetz = TRUE),
             ", lasting ",
-            format(lubridate::as.duration(signif(series.duration, 4))),
+            format(lubridate::as.period(signif(series.duration, 4))),
             " (\"quietly\")\n", sep = "")
       } else if (seq.settings[["step.delay"]] == 0 && length(times) > 1L) {
         cat("Fast series of ", seq.settings[["num.steps"]], ", starting at ",
@@ -412,7 +411,7 @@ acq_raw_mspct <- function(descriptor,
             strftime(times[length(times)], format = "%H:%M:%OS", usetz = TRUE),
             "\n", sep = "")
       } else if (seq.settings[["initial.delay"]] > 1 ||
-                 seq.settings[["start.boundary"]] > lubridate::as.duration(5)) { # delay > 1 s
+                 seq.settings[["start.boundary"]] > lubridate::as.period(5)) { # delay > 1 s
         cat("Timed acquisition at ", strftime(times[1], format = "%H:%M:%OS", usetz = TRUE),
             "\n", sep = "")
       }
