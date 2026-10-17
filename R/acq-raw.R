@@ -246,13 +246,13 @@ acq_raw_spct <- function(descriptor,
 #'   most cases a vector of length one is used as time delta in seconds. Any
 #'   vector shorter than the number of steps will be extended with
 #'   \code{rep_len()}, and the values interpreted as the time increment
-#'   in seconds between the start of successive measurements. If the length is
-#'   the same as "num.steps", and the values are monotonically increasing, they
-#'   are interpreted as time offsets from the start of the sequence. Member
-#'   \code{start.boundary} can take one of "none", "second", "minute" or "hour"
-#'   indicating the unit to which the start of the series should be scheduled,
-#'   e.g. the next minute and 0s, for "minute". Member \code{num.steps} must
-#'   be an integer between 1 and small thousands indicating the number of time
+#'   in seconds between the start of successive measurements. Member
+#'   \code{start.boundary} can take any input accepted by
+#'   \code{\link[lubridate]{as.duration}()} such as "none", "second", "minute",
+#'    "hour", "5s", "2min", or a numeric value interpreted as seconds,
+#'   indicating the time boundary at which to start the measurement of the series
+#'   e.g. exactly at the next minute and 0s. Member \code{num.steps} must
+#'   be an integer between 1 and small 100000 indicating the number of time
 #'   steps in the series.
 #'
 #' @note Obviously the duration of the time steps must be longer than the time
@@ -260,7 +260,7 @@ acq_raw_spct <- function(descriptor,
 #'   of integration times, as there is considerable overhead in both the
 #'   OmniDriver Java code, in USB communication, in the spectrometer
 #'   itself and in R. The overhead depends strongly on the model of
-#'   spectrometer.
+#'   spectrometer and the acquisition protocol.
 #'
 #'   No multitasking is used or supported, so R waits for the spectrometer to
 #'   answer. The operating system and other programs are not blocked, but the
@@ -339,7 +339,7 @@ acq_raw_mspct <- function(descriptor,
 
   # set flag if buffered acquisition of time series is possible
   high.speed <-
-    all(seq.settings[["step.delay"]] == 0) &&
+    seq.settings[["step.delay"]] == 0 &&
     seq.settings[["num.steps"]] > 1L &&
     length(acq.settings[["HDR.mult"]]) == 1L &&
     length(acq.settings[["integ.time"]]) == 1L
@@ -395,19 +395,24 @@ acq_raw_mspct <- function(descriptor,
 
     if (verbose && p == "light") {
       if (high.speed) {
-        cat("Buffered series of ", seq.settings[["num.steps"]], " starting at ",
+        series.duration <- 40e-3 + seq.settings[["num.steps"]] *
+          (acq.settings[["integ.time"]] * 1e-6 * acq.settings[["num.scans"]] + 7e-3)
+        cat("Buffered series of ", seq.settings[["num.steps"]], ", starting at ",
             strftime(times[1], format = "%H:%M:%OS", usetz = TRUE),
-            " (\"quiet\")\n", sep = "")
-      } else if (all(seq.settings[["step.delay"]] == 0) && length(times) > 1L) {
-        cat("Fast series  of ", seq.settings[["num.steps"]], " starting at ",
+            ", lasting ",
+            format(lubridate::as.duration(signif(series.duration, 4))),
+            " (\"quietly\")\n", sep = "")
+      } else if (seq.settings[["step.delay"]] == 0 && length(times) > 1L) {
+        cat("Fast series of ", seq.settings[["num.steps"]], ", starting at ",
             strftime(times[1], format = "%H:%M:%OS", usetz = TRUE),
-            " (\"quiet\")\n", sep = "")
+            " (\"quietly\")\n", sep = "")
       } else if (length(times) > 1L) {
         cat("Timed series of ", length(times), " from ",
             strftime(times[1], format = "%H:%M:%OS", usetz = TRUE), " to ",
             strftime(times[length(times)], format = "%H:%M:%OS", usetz = TRUE),
             "\n", sep = "")
-      } else if (steps[1] > 1) {
+      } else if (seq.settings[["initial.delay"]] > 1 ||
+                 seq.settings[["start.boundary"]] > lubridate::as.duration(5)) { # delay > 1 s
         cat("Timed acquisition at ", strftime(times[1], format = "%H:%M:%OS", usetz = TRUE),
             "\n", sep = "")
       }
@@ -427,10 +432,11 @@ acq_raw_mspct <- function(descriptor,
       z <- c(z, zz)
       idx <- idx + length(zz)
     } else {
+      # enable messages only if will not interfere with sequential acquisition
       messages.enabled <-
         verbose && (p %in% c("dark", "filter") ||
                       length(times) == 1L ||
-                      length(times) > 1L && all(seq.settings[["step.delay"]] > 0.5)
+                      length(times) > 1L && all(seq.settings[["steps"]] > 0.5)
                     )
 
       # acquire multiple spectra one by one at target times

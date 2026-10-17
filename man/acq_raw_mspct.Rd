@@ -85,13 +85,13 @@ Function \code{acq_raw_mspct} acquires directly from a spectrometer
   most cases a vector of length one is used as time delta in seconds. Any
   vector shorter than the number of steps will be extended with
   \code{rep_len()}, and the values interpreted as the time increment
-  in seconds between the start of successive measurements. If the length is
-  the same as "num.steps", and the values are monotonically increasing, they
-  are interpreted as time offsets from the start of the sequence. Member
-  \code{start.boundary} can take one of "none", "second", "minute" or "hour"
-  indicating the unit to which the start of the series should be scheduled,
-  e.g. the next minute and 0s, for "minute". Member \code{num.steps} must
-  be an integer between 1 and small thousands indicating the number of time
+  in seconds between the start of successive measurements. Member
+  \code{start.boundary} can take any input accepted by
+  \code{\link[lubridate]{as.duration}()} such as "none", "second", "minute",
+   "hour", "5s", "2min", or a numeric value interpreted as seconds,
+  indicating the time boundary at which to start the measurement of the series
+  e.g. exactly at the next minute and 0s. Member \code{num.steps} must
+  be an integer between 1 and small 100000 indicating the number of time
   steps in the series.
 }
 \note{
@@ -100,7 +100,7 @@ Obviously the duration of the time steps must be longer than the time
   of integration times, as there is considerable overhead in both the
   OmniDriver Java code, in USB communication, in the spectrometer
   itself and in R. The overhead depends strongly on the model of
-  spectrometer.
+  spectrometer and the acquisition protocol.
 
   No multitasking is used or supported, so R waits for the spectrometer to
   answer. The operating system and other programs are not blocked, but the

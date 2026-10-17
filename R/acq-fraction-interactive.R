@@ -169,7 +169,8 @@ acq_fraction_interactive <-
            ref.value = 1,
            qty.out = "Tfr",
            type = "total",
-           plot.lines.max = 11,
+           plot.lines.max =
+             ifelse(interface.mode %in% c("series", "series-attr"), 11, 50),
            summary.type = "VIS",
            save.pdfs = TRUE,
            save.summaries = !interface.mode %in% c("series", "series-attr"),
@@ -184,16 +185,25 @@ acq_fraction_interactive <-
            f.trigger.on = f.trigger.message,
            f.trigger.off = NA,
            triggers.enabled = c("sample", "reference"),
-           folder.name = paste("acq", qty.out,
-                               lubridate::today(tzone = "UTC"),
-                               sep = "-"),
+           folder.name = NULL,
            user.name = Sys.info()[["user"]],
-           session.name = paste(user.name,
-                                strftime(lubridate::now(tzone = ""),
-                                         "%Y_%m_%d.%H%M"),
-                                sep = "_"),
+           session.name = NULL,
            verbose = getOption("photobiology.verbose", default = FALSE),
            QC.enabled = TRUE) {
+
+    session.start.time <- lubridate::now(tzone = "UTC")
+    collection.start.time <- session.start.time
+    if (is.null(folder.name)) {
+      folder.name <- paste("acq",
+                           qty.out,
+                           strftime(session.start.time, "%Y-%m-%d"),
+                           sep = "-")
+    }
+    if (is.null(session.name)) {
+      session.name = paste(user.name,
+                           strftime(session.start.time, "%Y_%m_%d.%H%M"),
+                           sep = "_")
+    }
 
     ## ggplot default themes
     # A dark theme option used only for the screen would be useful
@@ -1088,7 +1098,7 @@ acq_fraction_interactive <-
               cat("No name supplied, creating one...\n")
               collection.name <-
                 paste("collection",
-                      format(lubridate::now(tzone = ""),
+                      format(collection.start.time,
                              format = "%Y_%m_%d.%H%M",
                              tz = "UTC"), sep = ".")
             } else {
@@ -1244,6 +1254,7 @@ acq_fraction_interactive <-
                   # reset the lists of names for next collection
                   filter.names <- character()
                   raw.names <- character()
+                  collection.start.time <- lubridate::now(tzone = "UTC")
                   cat("Lists of collected objects' reset.\n")
                   break()
                 } else {

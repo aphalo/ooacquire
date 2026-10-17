@@ -82,7 +82,8 @@ tune_interactive <- function(descriptor,
   help.text <- paste(all.help[setdiff(valid.input, "")], collapse = "\n")
   # common code to all modes
   old.settings <- acq.settings # allow starting over
-  tuned <- FALSE
+  tuned <- FALSE # if settings not modified -> tuning by default, but not required
+  modified <- FALSE # if settings modified -> tuning required
   repeat{
     acq.settings.string <-
       sprintf("Acq: %s = %.3gS, saturation = %.2f, tot. range = %.3g-%.3gS, HDR mult. = %s\n",
@@ -116,22 +117,34 @@ tune_interactive <- function(descriptor,
     if (answ == "?") {
       cat(help.text)
     } else if (answ %in% c("t", "T")) {
-      answ.t <- readline("Auto-adjust integration time? ADJUST/current/abort (a-/c/z): ")
-      if (answ.t %in% c("z", "c")) {
-        if (answ.t == "c") {
-          tuned <- TRUE
-        }
-        next()
-      } else if (answ.t %in% c("a", "")) {
-      if (answ == "T") {
-        acq.settings[["integ.time"]] <- start.int.time * 1e6
+      if (!modified) {
+        answ.t <-
+          readline("Auto-adjust integration time? ADJUST/current/abort (a-/c/z): ")
+      } else {
+        answ.t <-
+          readline("Auto-adjust integration time? ADJUST/abort (a-/z): ")
       }
-      acq.settings <- tune_acq_settings(descriptor = descriptor,
-                                        acq.settings = acq.settings)
-      tuned <- TRUE
+      if (answ.t == "c") {
+        if (!modified) {
+          tuned <- TRUE
+        } else {
+          message("Modified current settings: auto-adjust is required!")
+        }
+      } else if (answ.t %in% c("a", "")) {
+        if (answ == "T") {
+          # tune from default instead of last used value
+          acq.settings[["integ.time"]] <- start.int.time * 1e6
+        }
+        acq.settings <- tune_acq_settings(descriptor = descriptor,
+                                          acq.settings = acq.settings)
+        modified <- FALSE
+        tuned <- TRUE
+      } else if (answ.t != "z") {
+        message("Bad input '", answ.t, "' ignored")
       }
     } else if (answ == "f") {
-      user.integ.time <- read_seconds("Integration time(s) (seconds): ", n.max = 4)
+      user.integ.time <-
+        read_seconds("Integration time(s) (seconds): ", n.max = 4)
       user.integ.time <- user.integ.time * 1e6 # seconds -> microseconds
       if (length(user.integ.time) >= 1) {
         num.integ.times <- length(unique(user.integ.time))
@@ -154,6 +167,7 @@ tune_interactive <- function(descriptor,
       margin <- try(as.numeric(margin))[1]
       if (!is.na(margin) && margin >= 0 && margin < 1) {
         acq.settings[["target.margin"]] <- margin
+        modified <- TRUE
         tuned <- FALSE
       } else {
         cat("Request ignored: value not in 0..1 range\n")
@@ -167,6 +181,7 @@ tune_interactive <- function(descriptor,
         # ensure that the the range includes a finite positive value
         if (tot.time.range[1] >= 0 && tot.time.range[2] > 0) {
           acq.settings[["tot.time.range"]] <- tot.time.range
+          modified <- TRUE
           tuned <- FALSE
         } else {
           cat("Request ignored: entered value < 0!\n")
@@ -179,11 +194,12 @@ tune_interactive <- function(descriptor,
       HDR.mult <- read_numbers("HDR multipliers, 1 to 4 numbers: ", n.max = 4)
       HDR.mult <- sort(HDR.mult)
       if (length(HDR.mult) >= 1 &&
-          HDR.mult[1] >= 0  && HDR.mult[length(HDR.mult)] < 1000) {
+          HDR.mult[1] >= 0 && HDR.mult[length(HDR.mult)] < 1000) {
         acq.settings[["HDR.mult"]] <- HDR.mult
+        modified <- TRUE
         tuned <- FALSE
         if (length(HDR.mult) != old.hdr.mult.len) {
-          # ensure 'num.exposures' matches 'HDR.mult' in length
+          # ensure 'num.exposures' must match 'HDR.mult' in length
           num.exposures <- acq.settings[["num.exposures"]]
           if (length(num.exposures) < length(HDR.mult)) {
             acq.settings[["num.exposures"]] <- rep(acq.settings[["num.exposures"]][1], length(HDR.mult))
@@ -197,8 +213,12 @@ tune_interactive <- function(descriptor,
       } else {
         cat("Bad multipliers ignored. Value not changed! Please, try again...\n")
       }
+      # check assertion
+      stopifnot(length(acq.settings[["num.exposures"]]) ==
+                  length(acq.settings[["HDR.mult"]]))
     } else if (answ == "u") {
       cat("Restoring previous settings!\n")
+      modified <- FALSE
       tuned <- FALSE
       acq.settings <- old.settings
     }
@@ -445,10 +465,10 @@ set_seq_interactive <- function(seq.settings = NULL,
     step
   }
 
-  # validate input
+  # validate input and fill in missing with defaults
   seq.settings <- check_seq_settings(seq.settings)
-  seq.settings$step.delay <-
-    check.step.delay(seq.settings$step.delay, time.division)
+  seq.settings[["step.delay"]] <-
+    check.step.delay(seq.settings[["step.delay"]], time.division)
 
   # support undo
   old.seq.settings <- seq.settings
@@ -456,48 +476,50 @@ set_seq_interactive <- function(seq.settings = NULL,
   # set help
   all.help <- c(w = "w = wait. Waiting time before start of acquisition of time series.",
                 b = "b = boundary. The time boundary at which to start acquisition of time series.",
-                s = "s = step duration. The time step between the start of succesive acquisitions in a time series.",
+                s = "s = step duration. A constant step or the shortest step between the start of succesive time points in a series.",
                 m = "m = step multiplier. The multiplier applied to succesive time steps. Negative value for reverse series.",
-                r = "r = step repetitions. The number of steps in the time series.",
-                H = "? = help. Show this help text.",
+                r = "r = step repetitions. The number of points in the time series.",
+                H = "? = help, about settings for sequential acquisition of a time series of spectra.",
                 g = "g = GO. Accept current series-related settings and continue.",
                 default = "- = default. Action selected by pressing \"Enter\" key.")
   help.text <- paste(all.help, collapse = "\n")
 
   repeat{
     # ensure step delay is achievable
-    if (min(seq.settings$step.delay) < measurement.duration &&
-        !all(seq.settings$step.delay == 0)) {
-      seq.settings$step.delay <-
-        ifelse(seq.settings$step.delay < measurement.duration,
+    if (min(seq.settings[["step.delay"]]) < measurement.duration &&
+        !all(seq.settings[["step.delay"]] == 0)) {
+      seq.settings[["step.delay"]] <-
+        ifelse(seq.settings[["step.delay"]] < measurement.duration,
                signif(minimum.step.delay * 1.01, 3),
-               seq.settings$step.delay)
-      cat("'step.delay' too short! Reset to ", seq.settings$step.delay,
+               seq.settings[["step.delay"]])
+      cat("'step.delay' too short! Reset to ", seq.settings[["step.delay"]],
           " s.\n", sep = "")
     }
+    # check and update settings
+    seq.settings <- check_seq_settings(seq.settings)
     # display current settings before prompt for user input
     seq.settings.string <-
            sprintf("Seq: wait = %.3gS, boundary = %s, step-len = %.3gS, mult. = %.3g, step-reps = %i \n",
                    seq.settings[["initial.delay"]],
                    seq.settings[["start.boundary"]],
-                   min(seq.settings[["step.delay"]]),
+                   seq.settings[["step.delay"]],
                    seq.settings[["step.multiplier"]],
                    seq.settings[["num.steps"]])
     cat(seq.settings.string)
-    if (seq.settings[["num.steps"]] > 1 &&
-        length(seq.settings[["step.delay"]]) == seq.settings[["num.steps"]]) {
-      last.step.seconds <-
-        with(seq.settings, signif(step.delay[num.steps], digits = 3))
+    if (seq.settings[["step.delay"]] > 0 && seq.settings[["num.steps"]] > 1) {
       first.step.seconds <-
-        with(seq.settings, signif(step.delay[1], digits = 3))
-      series.duration.min <-
-        signif(sum(seq.settings[["step.delay"]]), digits = 3)
+        signif(seq.settings[["steps"]][2], digits = 3)
+      last.step.seconds <-
+        signif(seq.settings[["steps"]][length(seq.settings[["steps"]])],
+               digits = 3)
+      series.duration <-
+        signif(sum(seq.settings[["steps"]]), digits = 3)
       series.duration.string <-
         sprintf("Durations: step[1] = %s, step[%i] = %s, series = %s\n",
                 format(lubridate::as.duration(first.step.seconds)),
                 seq.settings[["num.steps"]],
                 format(lubridate::as.duration(last.step.seconds)),
-                format(lubridate::as.duration(series.duration.min)))
+                format(lubridate::as.duration(series.duration)))
       cat(series.duration.string)
     }
 
@@ -541,16 +563,14 @@ set_seq_interactive <- function(seq.settings = NULL,
           cat("Time step = ", signif(seq.settings[["step.delay"]], 3),
               "s, adjusted from ", step, "\n", sep = "")
         }
-        seq.settings <- check_seq_settings(seq.settings)
       } else {
         cat("Time step value not changed!\n")
       }
     } else if (substr(answ, 1, 1) == "m") {
       step.mult <- read_numbers("Time-step multiplier (1..2): ", n.max = 1)
       if (length(step.mult) && !is.na(step.mult) &&
-          step.mult >= 1 && step.mult <= 2) {
+          abs(step.mult) >= 1 && abs(step.mult) <= 2) {
         seq.settings[["step.multiplier"]] <- step.mult
-        seq.settings <- check_seq_settings(seq.settings)
       } else {
         cat("Time step multiplier not changed!\n")
       }
@@ -563,8 +583,8 @@ set_seq_interactive <- function(seq.settings = NULL,
         warning("Expected number within range 1..100000. Value not changed!")
       } else {
         seq.settings[["num.steps"]] <- num.steps
+        # next line should be redundant!
         seq.settings[["step.delay"]] <- min(seq.settings[["step.delay"]])
-        seq.settings <- check_seq_settings(seq.settings)
       }
     } else if (substr(answ, 1, 1) == "u") {
       cat("Restoring previous settings!\n")
@@ -583,7 +603,8 @@ check_seq_settings <- function(seq.settings = NULL) {
                                initial.delay = 0,
                                step.delay = 0,
                                step.multiplier = 1,
-                               num.steps = 1L)
+                               num.steps = 1L,
+                               steps = NA)
   if (is.null(seq.settings)) { # default
     seq.settings <- default.seq.settings
   } else if (!is.list(seq.settings)) {
@@ -601,6 +622,12 @@ check_seq_settings <- function(seq.settings = NULL) {
             "' !")
     seq.settings <- utils::modifyList(default.seq.settings, seq.settings)
   }
+  if (seq.settings[["start.boundary"]] == "none") {
+    seq.settings[["start.boundary"]] <- lubridate::as.duration(0)
+  } else if (!is.duration(seq.settings[["start.boundary"]])) {
+    seq.settings[["start.boundary"]] <-
+      lubridate::as.duration(seq.settings[["start.boundary"]])
+  }
   if (abs(seq.settings[["step.multiplier"]]) < 1 ||
       abs(seq.settings[["step.multiplier"]]) > 2) {
     warning("Ignoring 'step.multiplier = ",
@@ -611,7 +638,8 @@ check_seq_settings <- function(seq.settings = NULL) {
   # compute step durations in seconds
   if (abs(seq.settings[["step.multiplier"]]) != 1) {
     seq.settings[["steps"]] <-
-      with(seq.settings, min(step.delay) * abs(step.multiplier)^0:(num.steps - 2))
+      seq.settings[["step.delay"]] *
+      abs(seq.settings[["step.multiplier"]])^(0:(seq.settings[["num.steps"]] - 2))
     if (seq.settings[["step.multiplier"]] < 0) {
       seq.settings[["steps"]] <- rev(seq.settings[["steps"]])
     }

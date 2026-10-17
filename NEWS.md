@@ -8,6 +8,12 @@ editor_options:
 
 - Add methods `MAYP11278_none.mthd` and `MAYP112785_none.mthd` with no stray
 light correction.
+- Implement support for exponentially increasing and exponentially decreasing 
+time steps for acquisition of time series of spectra.
+- Enhance messages to clearly show the expected time required to acquire time
+series.
+- Fix bug: in `set_acq_settings_interactive()` the current values could be
+selected for use, even when tainted by changes to settings.
 - Fix bug: in `files_s_irrad_update()` by default call `find_spct_names()` on
 each `raw_mspct` object used to update the `source_spct` object. Update of
 time series failed with default, requiring explicit argument for `spct.names`.

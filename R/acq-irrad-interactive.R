@@ -314,7 +314,7 @@ acq_irrad_interactive <-
     if (is.null(folder.name)) {
       folder.name <- paste("acq",
                            qty.out,
-                           strftime(session.start.time, "%Y_%m_%d"),
+                           strftime(session.start.time, "%Y-%m-%d"),
                            sep = "-")
     }
     if (is.null(session.name)) {

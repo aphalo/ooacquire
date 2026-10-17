@@ -17,7 +17,7 @@ acq_fraction_interactive(
   ref.value = 1,
   qty.out = "Tfr",
   type = "total",
-  plot.lines.max = 11,
+  plot.lines.max = ifelse(interface.mode \%in\% c("series", "series-attr"), 11, 50),
   summary.type = "VIS",
   save.pdfs = TRUE,
   save.summaries = !interface.mode \%in\% c("series", "series-attr"),
@@ -31,10 +31,9 @@ acq_fraction_interactive(
   f.trigger.on = f.trigger.message,
   f.trigger.off = NA,
   triggers.enabled = c("sample", "reference"),
-  folder.name = paste("acq", qty.out, lubridate::today(tzone = "UTC"), sep = "-"),
+  folder.name = NULL,
   user.name = Sys.info()[["user"]],
-  session.name = paste(user.name, strftime(lubridate::now(tzone = ""),
-    "\%Y_\%m_\%d.\%H\%M"), sep = "_"),
+  session.name = NULL,
   verbose = getOption("photobiology.verbose", default = FALSE),
   QC.enabled = TRUE
 )
