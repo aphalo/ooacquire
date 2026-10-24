@@ -969,7 +969,7 @@ acq_irrad_interactive <-
                               "/", getMultipleWl(irrad.spct),
                               ")",
                               sep = "")
-          if (utils::packageVersion("photobiology") < "0.14.2.9001") {
+          if (utils::packageVersion("photobiology") < "0.14.3.9101") {
             plot.spct <- pull_sample(irrad.spct,
                                      size = plot.lines.max)
           } else {
@@ -986,19 +986,19 @@ acq_irrad_interactive <-
 
         # display plot, allowing user to tweak it
         repeat {
-          if (length(raw.mspct) > 10L) {
+          if (length(plot.spct) > 11L) {
             cat("Building plot ... ")
           }
           fig <-
             ggplot2::autoplot(plot.spct,
                               annotations = c("-", "colour.guide"),
-                              geom = ifelse(getMultipleWl(irrad.spct) == 1,
+                              geom = ifelse(getMultipleWl(plot.spct) == 1,
                                             "spct", "line")) +
             ggplot2::labs(title = title.text,
                           subtitle = format(when_measured(irrad.spct)[[1L]],
                                             tz = ""),
                           caption = how_measured(irrad.spct)[[1L]])
-          if (length(raw.mspct) > 10L) {
+          if (length(plot.spct) > 11L) {
             cat("ready.\n")
           }
 
@@ -1307,7 +1307,7 @@ acq_irrad_interactive <-
             # if too many spectra, draw a random sample of the maximum size
             collection.fig <-
               ggplot2::autoplot(
-                pull_sample(collection.mspct, plot.lines.max),
+                pull_sample(collection.mspct, size = plot.lines.max),
                 annotations =
                   c("-", "peaks", "colour.guide", "summaries")) +
               ggplot2::labs(

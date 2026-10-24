@@ -823,7 +823,7 @@ acq_fraction_interactive <-
                               "/", getMultipleWl(filter.spct),
                               ")",
                               sep = "")
-          if (utils::packageVersion("photobiology") <= "0.14.2.9001") {
+          if (utils::packageVersion("photobiology") <= "0.14.3.9101") {
             plot.spct <- pull_sample(filter.spct,
                                      size = plot.lines.max)
           } else {
@@ -840,7 +840,7 @@ acq_fraction_interactive <-
 
         # display plot, allowing user to tweak it
         repeat {
-          if (length(raw.mspct) > 10L) {
+          if (length(plot.spct) > 11L) {
             cat("Building plot ... ")
           }
           fig <- ggplot2::autoplot(plot.spct,
@@ -851,7 +851,7 @@ acq_fraction_interactive <-
                           subtitle = format(when_measured(plot.spct)[[1L]],
                                             tz = ""),
                           caption = how_measured(plot.spct)[[1L]])
-          if (length(raw.mspct) > 10L) {
+          if (length(plot.spct) > 11L) {
             cat("ready.\n")
           }
 
