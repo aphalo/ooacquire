@@ -343,11 +343,14 @@ tune_acq_settings <- function(descriptor,
     nl.fun((1 - target.margin / 3 * 2) * descriptor[["max.counts"]])
 
   i <- 0L
+  retry.count <- 0L
+  retry.count.max <- 3 # can need tweaking
   repeat {
     if (verbose) {
       cat("Trying integration time (s): ", format(integ.time  * 1e-6), "\n")
     }
     repeat {
+      # set to target and retry if spectrometer fails to return spectral data
       rOmniDriver::set_integration_time(descriptor[["w"]],
                                         integ.time,
                                         descriptor[["sr.index"]],
@@ -361,8 +364,9 @@ tune_acq_settings <- function(descriptor,
     }
     dark.counts <- nl.fun(min(raw.counts[x[["pix.selector"]]]))
     max.counts <- nl.fun(max(raw.counts[x[["pix.selector"]]]))
-    while (max.counts > target.max.counts)
-    {
+
+    while (max.counts > target.max.counts) {
+      # decrease integration time
       # divide by 5 as decrease is "blind" while increase is by extrapolation
       integ.time <- integ.time / 5
       if (integ.time < x[["min.integ.time"]]) {
@@ -382,7 +386,9 @@ tune_acq_settings <- function(descriptor,
       max.counts <- nl.fun(max(raw.counts[x[["pix.selector"]]]))
     }
     if (verbose) cat("Max counts [", i, "]: ", format(max.counts), sep = "")
+
     if (max.counts < target.min.counts && integ.time < x[["max.integ.time"]]) {
+      # increase integration time
       if (verbose){
         cat(" < ", trunc(target.min.counts), " target", sep = "")
       }
@@ -399,31 +405,42 @@ tune_acq_settings <- function(descriptor,
     }
 
     if (integ.time >= x[["max.integ.time"]]) {
+      # too low irradiance found
       integ.time <- x[["max.integ.time"]]
       if (verbose) {
         warning("Light too low for optimal performance! Using (s): ",
                 format(integ.time * 1e-6), call. = FALSE)
       }
       break()
-    }
-
-    if (integ.time < x[["min.integ.time"]]) {
-      integ.time = x[["min.integ.time"]]
-      if (verbose) {
-        if (max(raw.counts[x[["pix.selector"]]]) >= descriptor[["max.counts"]]) {
-          warning("Clipping cannot be avoided! Using (s): ",
-                  format(integ.time * 1e-6), call. = FALSE)
-        } else {
-          warning("Low headroom, clipping likely! Using (s): ",
-                  format(integ.time * 1e-6), call. = FALSE)
+    } else if (integ.time < x[["min.integ.time"]]) {
+      # possibly too high irradiance found
+      if (retry.count > retry.count.max) {
+        integ.time <- x[["min.integ.time"]]
+        if (verbose) {
+          if (max(raw.counts[x[["pix.selector"]]]) >= descriptor[["max.counts"]]) {
+            warning("Clipping cannot be avoided! Using (s): ",
+                    format(integ.time * 1e-6), call. = FALSE)
+          } else {
+            warning("Low headroom, clipping likely! Using (s): ",
+                    format(integ.time * 1e-6), call. = FALSE)
+          }
         }
+        break()
+      } else {
+        # as extrapolation can overshoot
+        # we try integration times close to maximum
+        # before giving up
+        integ.time <- x[["min.integ.time"]] *
+          (1 + (retry.count.max - retry.count) / retry.count.max * 10)
+        retry.count <- retry.count + 1L
       }
-      break()
     }
 
     if (max.counts >= target.min.counts) {
+      # sucess
       break()
     } else {
+      # iterate
       i <- i + 1
     }
   }
