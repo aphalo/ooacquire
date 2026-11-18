@@ -88,7 +88,7 @@ metadata attribute `instr.desc` in existing `raw_spct` and `raw_mspct` objects.
 # ooacquire 0.5.2 (2024-12-30)
 
 _Two bugs, one of them major, are fixed._ Although neither of them affected the
-quality of the spectral data one of them prevented the acquisition of spectra.
+quality of the spectral data, one of them prevented the acquisition of spectra.
 The bugs were most likely introduced in version 0.5.1. Automated unit tests
 check the data conversion and file reading functions and did not detect these
 bugs. I do the testing of the interactive data-acquisition functions manually
