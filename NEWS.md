@@ -15,6 +15,11 @@ series.
 - Enhance interactive user interface for entry of time series settings.
 - Add methods `MAYP11278_none.mthd` and `MAYP112785_none.mthd` with no stray
 light correction.
+- Fix bug: is `tune_acq_settings()` fails to converge towards integration
+times near the shortest allowed by the instrument, and enhance massages and
+warning texts.
+- Fix bug: `acq_irrad_interactive()` accepts out-of-range integration times
+entered by the user.
 - Fix bug: in `set_acq_settings_interactive()` the current values could be
 selected for use, even when tainted by changes to settings.
 - Fix bug: in `files_s_irrad_update()` by default call `find_spct_names()` on

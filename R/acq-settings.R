@@ -341,10 +341,10 @@ tune_acq_settings <- function(descriptor,
     nl.fun((1 - target.margin / 2) * descriptor[["max.counts"]])
   target.counts <-
     nl.fun((1 - target.margin / 3 * 2) * descriptor[["max.counts"]])
+  inst.max.counts <- nl.fun(descriptor[["max.counts"]])
 
   i <- 0L
-  retry.count <- 0L
-  retry.count.max <- 3 # can need tweaking
+  retry.count <- retry.count.max <- 3 # can need tweaking
   repeat {
     if (verbose) {
       cat("Trying integration time (s): ", format(integ.time  * 1e-6), "\n")
@@ -372,7 +372,7 @@ tune_acq_settings <- function(descriptor,
       if (integ.time < x[["min.integ.time"]]) {
         break()
       }
-      if (verbose) cat("Clipping! Trying (ms): ", format(integ.time  * 1e-3), "\n")
+ #     if (verbose) cat("Clipping! Trying (ms): ", format(integ.time  * 1e-3), "\n")
       rOmniDriver::set_integration_time(descriptor[["w"]],
                                         integ.time,
                                         descriptor[["sr.index"]],
@@ -385,23 +385,28 @@ tune_acq_settings <- function(descriptor,
       dark.counts <- nl.fun(min(raw.counts[x[["pix.selector"]]]))
       max.counts <- nl.fun(max(raw.counts[x[["pix.selector"]]]))
     }
-    if (verbose) cat("Max counts [", i, "]: ", format(max.counts), sep = "")
+    if (verbose) {
+      cat("  highest count [", i, "]: ", format(round(max.counts)),
+          " (", format(round(max.counts / target.min.counts * 100)),
+          "% of target; ",
+          format(round((1 - max(raw.counts[x[["pix.selector"]]]) /
+                         descriptor[["max.counts"]]) * 100)),
+          "% headroom)\n", sep = "")
+    }
 
     if (max.counts < target.min.counts && integ.time < x[["max.integ.time"]]) {
       # increase integration time
-      if (verbose){
-        cat(" < ", trunc(target.min.counts), " target", sep = "")
-      }
-      cat("\n")
       # replaced round with trunc as the algorithm was sometimes overshooting
       integ.time <- trunc(integ.time *
                             (target.counts - dark.counts) /
                             (max.counts - dark.counts))
-    } else {
-      if (verbose){
-        cat(" >= ", trunc(target.min.counts), " target", sep = "")
-      }
-      cat("\n")
+      rOmniDriver::set_integration_time(descriptor[["w"]],
+                                        integ.time,
+                                        descriptor[["sr.index"]],
+                                        descriptor[["ch.index"]])
+      raw.counts <- rOmniDriver::get_spectrum(descriptor[["w"]],
+                                              descriptor[["sr.index"]],
+                                              descriptor[["ch.index"]])
     }
 
     if (integ.time >= x[["max.integ.time"]]) {
@@ -414,25 +419,23 @@ tune_acq_settings <- function(descriptor,
       break()
     } else if (integ.time < x[["min.integ.time"]]) {
       # possibly too high irradiance found
-      if (retry.count > retry.count.max) {
+      if (retry.count == 0) {
         integ.time <- x[["min.integ.time"]]
-        if (verbose) {
-          if (max(raw.counts[x[["pix.selector"]]]) >= descriptor[["max.counts"]]) {
-            warning("Clipping cannot be avoided! Using (s): ",
-                    format(integ.time * 1e-6), call. = FALSE)
-          } else {
-            warning("Low headroom, clipping likely! Using (s): ",
-                    format(integ.time * 1e-6), call. = FALSE)
-          }
-        }
         break()
       } else {
         # as extrapolation can overshoot
         # we try integration times close to maximum
         # before giving up
-        integ.time <- x[["min.integ.time"]] *
-          (1 + (retry.count.max - retry.count) / retry.count.max * 10)
-        retry.count <- retry.count + 1L
+        k <- 1 + (retry.count.max - retry.count) / retry.count.max
+        integ.time <- x[["min.integ.time"]] * k
+        retry.count <- retry.count - 1L
+        rOmniDriver::set_integration_time(descriptor[["w"]],
+                                          integ.time,
+                                          descriptor[["sr.index"]],
+                                          descriptor[["ch.index"]])
+        raw.counts <- rOmniDriver::get_spectrum(descriptor[["w"]],
+                                                descriptor[["sr.index"]],
+                                                descriptor[["ch.index"]])
       }
     }
 
@@ -470,19 +473,26 @@ tune_acq_settings <- function(descriptor,
   acq.settings[["rel.signal"]] <- max.counts / nl.fun(descriptor[["max.counts"]])
 
   if (verbose) {
-    cat("\nTUNED SETTINGS:\nRelative saturation:   ",
-        format(acq.settings[["rel.signal"]],
-               nsmall = 0, width = 10, digits = 3), "\n")
+    cat("TUNED SETTINGS:\nRelative saturation (%):",
+        ifelse(acq.settings[["rel.signal"]] == 1,
+               format("clipping!", width = 9),
+               format(acq.settings[["rel.signal"]] * 100,
+                      nsmall = 0, width = 9, digits = 3)), "\n")
     cat("Integration times (s): ",
         format(acq.settings[["integ.time"]] * 1e-6,
                nsmall = 0, width = 10, digits = 3), "\n")
-    cat("Numbers of scans:       ",
+    cat("Numbers of scans:      ",
         format(acq.settings[["num.scans"]],
                nsmall = 0, width = 10, digits = 3), "\n")
-    cat("Total time (s):         ",
+    cat("Total time (s):        ",
         format(acq.settings[["tot.time"]] * 1e-6,
-               digits = 3, nsmall = 0, width = 10), "\n")
+               digits = 3, nsmall = 0, width = 10), "\n\n")
   }
+  if (max(raw.counts[x[["pix.selector"]]]) >= descriptor[["max.counts"]]) {
+    warning("Clipping cannot be avoided! Using (s): ",
+            paste(signif(integ.time * 1e-6, 3), collapse = ", "),
+            call. = FALSE)
+  }
+
   acq.settings
 }
-

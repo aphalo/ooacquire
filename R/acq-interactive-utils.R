@@ -143,9 +143,17 @@ tune_interactive <- function(descriptor,
         message("Bad input '", answ.t, "' ignored")
       }
     } else if (answ == "f") {
-      user.integ.time <-
-        read_seconds("Integration time(s) (seconds): ", n.max = 4)
-      user.integ.time <- user.integ.time * 1e6 # seconds -> microseconds
+      repeat {
+        user.integ.time <-
+          read_seconds("Integration time(s) (seconds): ", n.max = 4)
+        user.integ.time <- user.integ.time * 1e6 # seconds -> microseconds
+        if (any(user.integ.time < descriptor[["min.integ"]]) ||
+            any(user.integ.time > descriptor[["max.integ"]])) {
+              warning("Out of range integration time: ", user.integ.time, " s. ",
+                      "Expected: [", descriptor[["min.integ"]], "..",
+                      descriptor[["max.integ"]], "] s.")
+            }
+      }
       if (length(user.integ.time) >= 1) {
         num.integ.times <- length(unique(user.integ.time))
         if (num.integ.times > 1) {
