@@ -6,6 +6,9 @@ editor_options:
 
 # ooacquire 0.5.7 (2026-10-xx)
 
+- Revise `irrad_summary_table()` by removing `summary.type` `"PAR"`, adding
+`"plant-pbio"` and enhancing `"VIS"` and `"total"`. `irrad_summary_table()` is
+called from `acq_irrad_interactive()` to generate the table of summaries.
 - Allow interactive acquisition of single scans, with and without integration
 time bracketing. 
 - Implement support for exponentially increasing and exponentially decreasing 

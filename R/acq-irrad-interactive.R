@@ -1341,7 +1341,7 @@ acq_irrad_interactive <-
               if (qty.out %in% c("irrad", "fluence")) {
                 last.summary.type <- summary.type
                 repeat{
-                  valid.answers <- c("plant", "PAR", "VIS")
+                  valid.answers <- c("plant", "plant-pbio", "VIS", "total")
                   summary.type <-
                     readline(paste("Change summary type from \"",
                                    last.summary.type, "\"? (",
@@ -1351,7 +1351,7 @@ acq_irrad_interactive <-
                   if (summary.type == "") {
                     summary.type <- last.summary.type
                   }
-                  if (summary.type %in% c("plant", "PAR", "VIS")) {
+                  if (summary.type %in% c("plant", "plant-pbio", "VIS", "total")) {
                     break()
                   } else {
                     print("Answer not recognized. Please try again...")
@@ -1359,7 +1359,10 @@ acq_irrad_interactive <-
                 }
                 summary.tb <-
                   irrad_summary_table(mspct = collection.mspct,
-                                      summary.type = summary.type)
+                                      summary.type = summary.type,
+                                      attr2tb = ifelse(grepl("-attr", interface.mode),
+                                                       c("when.measured", "what.measured", "comment"),
+                                                       "when.measured"))
 
                 # save summary table to file on disk
                 if (!is.null(summary.tb) && is.data.frame(summary.tb)) {
@@ -1569,125 +1572,3 @@ acq_irrad_interactive <-
     # disconnection even when end of session is forced by error or by user
 
   }
-
-#' Summarize spectral irradiance or fluence
-#'
-#' Compute irradiance or fluence by waveband and energy or photon ratios
-#' between wavebands of interest to plants' and human visual responses to light.
-#'
-#' @param mspct A source_mspct, or a source_spct object containing spectral
-#'    irradiance for one or more sources.
-#' @param unit.out character One of "photon" or "energy".
-#' @param scale.factor numeric A multiplicative factor used to rescale data.
-#' @param attr2tb character Vector with one or more of "when.measured",
-#'    "what.measured", "where.measured", "how.measured" and "comment".
-#' @param summary.type character One of "plant", "PAR" or "VIS".
-#' @param digits integer The number of significant digits in the output.
-#'
-#' @details This function packages different functions from pacakge
-#'   'photobiology' and returns a typical set of summaries for different
-#'   purposes.
-#'
-#' @return A tibble with one row per spectrum and one column per summary
-#'   quantity and attribute and a column with the names of the spectra.
-#'
-#' @export
-#'
-#' @seealso See the documentation for functions
-#'   \code{\link[photobiology]{irrad}},
-#'   \code{\link[photobiology]{q_ratio}}, \code{\link[photobiology]{e_ratio}},
-#'   \code{\link[photobiology]{add_attr2tb}},
-#'   \code{\link[photobiologyInOut]{spct_CRI}},
-#'   \code{\link[photobiologyInOut]{spct_CCT}}
-#'   and \code{\link[base]{signif}} which are called to build
-#'   the summary table.
-#'
-#' @examples
-#'
-#' irrad_summary_table(sun.spct)
-#' irrad_summary_table(sun.spct, attr2tb = c("what.measured", "where.measured"))
-#' irrad_summary_table(sun.spct, summary.type = "plant", unit.out = "photon")
-#' irrad_summary_table(sun.spct, summary.type = "PAR", unit.out = "photon")
-#' # temporary kludge until fixed in photobiologyInOut
-#' # irrad_summary_table(sun.spct, summary.type = "VIS", unit.out = "energy")
-#'
-irrad_summary_table <-
-  function(mspct,
-           unit.out = getOption("photobiology.radiation.unit",
-                                default = "energy"),
-           scale.factor = ifelse(unit.out == "photon",
-                                 1e6, 1),
-           attr2tb = "when.measured",
-           summary.type = "plant",
-           digits = 3L) {
-
-  # handle also single spectra
-  if (is.generic_spct(mspct)) {
-    mspct <- generic_mspct(list(mspct), class = class(mspct)[1])
-  }
-  if (any(unname(sapply(mspct, getMultipleWl)) > 1)) {
-    mspct <- subset2mspct(mspct)
-  }
-
-  ratio <- switch(unit.out,
-                  photon = photobiology::q_ratio,
-                  quantum = photobiology::q_ratio,
-                  energy = photobiology::e_ratio)
-
-  if (summary.type %in% c("plant", "PAR")) {
-    plant.wb <- switch(summary.type,
-                       PAR = c(photobiologyWavebands::UV_bands("CIE"),
-                               list(photobiologyWavebands::PAR())),
-                       plant = c(photobiologyWavebands::Plant_bands(),
-                                 list(photobiologyWavebands::PAR())))
-    irrad.tb <-
-      photobiology::irrad(mspct,
-                          unit.out = unit.out,
-                          scale.factor = scale.factor,
-                          w.band = plant.wb)
-    uv_ratios.tb <-
-      ratio(mspct,
-            w.band.num = photobiologyWavebands::UV_bands(),
-            w.band.denom = photobiologyWavebands::PAR())
-    vis_ratios.tb <-
-      ratio(mspct,
-            w.band.num =
-              list(blue = photobiologyWavebands::Blue("Sellaro"),
-                   red = photobiologyWavebands::Red("Smith20")),
-            w.band.denom =
-              list(green = photobiologyWavebands::Green("Sellaro"),
-                   "far-red" = photobiologyWavebands::Far_red("Smith20")),
-            attr2tb = attr2tb)
-    summary.tb <-
-      dplyr::full_join(irrad.tb, uv_ratios.tb, by = "spct.idx")
-    summary.tb <-
-      dplyr::full_join(summary.tb, vis_ratios.tb, by = "spct.idx")
-  } else if (summary.type == "VIS") {
-    summary.tb <-
-      photobiology::irrad(mspct,
-                          unit.out = unit.out,
-                          scale.factor = scale.factor,
-                          w.band = photobiologyWavebands::VIS_bands(),
-                          attr2tb = attr2tb)
-    summary.tb[["CRI"]] <- sapply(mspct,
-                                  photobiologyInOut::spct_CRI,
-                                  tol = 0.0054,
-                                  named = FALSE)
-    summary.tb[["CCT"]] <- sapply(mspct,
-                                  photobiologyInOut::spct_CCT,
-                                  strict = TRUE,
-                                  named = FALSE)
-  } else { # total
-    summary.tb <-
-      photobiology::irrad(mspct,
-                          unit.out = unit.out,
-                          scale.factor = scale.factor,
-                          w.band = NULL,
-                          attr2tb = attr2tb)
-  }
-
-  selector <- unname(sapply(summary.tb, is.numeric))
-  summary.tb[ , selector] <- signif(summary.tb[ , selector], digits = digits)
-
-  summary.tb
-}
